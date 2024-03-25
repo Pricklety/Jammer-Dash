@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Localization.Plugins.XLIFF.V20;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -18,8 +19,16 @@ public class RestartCustom : MonoBehaviour
 
     public void LoadScene()
     {
-        Time.timeScale = 1f;
+        AudioSource[] audios = FindObjectsOfType<AudioSource>();
+        foreach (AudioSource audio in audios)
+        {
+            audio.outputAudioMixerGroup.audioMixer.SetFloat("Lowpass", 22000);
+            audio.outputAudioMixerGroup.audioMixer.ClearFloat("Lowpass");
+        }
         LevelDataManager.Instance.LoadLevelData(LevelDataManager.Instance.levelName);
+
+        Time.timeScale = 1f;
+
     }
 
 }

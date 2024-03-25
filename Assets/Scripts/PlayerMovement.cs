@@ -127,8 +127,8 @@ public class PlayerMovement : MonoBehaviour
         {
             healthPercentage = 1;
         }
-
-        float vignetteIntensity = Mathf.Lerp(0, 1, healthPercentage);
+        vignette.center.Override(new Vector2(0.5f, 0.5f));
+        float vignetteIntensity = Mathf.Lerp(0, 0.25f, healthPercentage);
         vignette.intensity.Override(vignetteIntensity);
     }
 

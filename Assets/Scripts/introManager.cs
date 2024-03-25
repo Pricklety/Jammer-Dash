@@ -25,6 +25,7 @@ public class introManager : MonoBehaviour
             PlayerPrefs.DeleteAll();
             PlayerPrefs.SetInt("bootSafe", 1);
         }
+        QualitySettings.maxQueuedFrames = 3;
     }
 
     

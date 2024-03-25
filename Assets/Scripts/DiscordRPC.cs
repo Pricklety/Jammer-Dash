@@ -29,8 +29,8 @@ public class DiscordRPC : MonoBehaviour
     }
     private void FixedUpdate()
     {
-
-        PresenceManager.UpdatePresence(detail: detail, state: state, largeKey: largeimagekey, largeText: largetext, smallKey: smallimagekey, smallText: smalltext, start: start);
+        SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+       
 
         #region Large Text
         largeimagekey = "logo";

@@ -17,6 +17,8 @@ using Random = UnityEngine.Random;
 using System.Collections.Generic;
 using UnityEngine.Video;
 using UnityEditor;
+using System.Diagnostics;
+using Debug = UnityEngine.Debug;
 
 public class mainMenu : MonoBehaviour
 {
@@ -326,15 +328,21 @@ public class mainMenu : MonoBehaviour
         // Save JSON to a new file in the persistentDataPath + scenes & levels folder
         string path = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
         string filePath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, $"{sceneData.levelName}.json");
-
+        string musicPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, $"{sceneData.songName}.mp3");
+        string defSongPath = Path.Combine(Application.streamingAssetsPath, "music", "NikoN1nja - Slowly Going Insane.mp3");
+        defSongPath.Replace("\\", "/");
+        sceneData.clipPath = defSongPath;
         if (Directory.Exists(path))
         {
             File.WriteAllText(filePath, json);
+            File.Delete(musicPath);
+            File.Copy(defSongPath, musicPath);
         }
         else
         {
             Directory.CreateDirectory(path);
             File.WriteAllText(filePath, json);
+            File.Copy(defSongPath, musicPath);
         }
         
     }
@@ -521,7 +529,7 @@ public class mainMenu : MonoBehaviour
         lowpassTargetValue = 500;  // Adjust the cutoff frequency as needed
 
         // Start coroutine for fading
-        StartCoroutine(FadeLowpass(true));
+        StartCoroutine(FadeLowpass());
 
         Application.wantsToQuit += QuitHandler;
 
@@ -539,17 +547,17 @@ public class mainMenu : MonoBehaviour
         lowpassTargetValue = 22000;  // Adjust the cutoff frequency as needed
 
         // Start coroutine for fading
-        StartCoroutine(FadeLowpass(false));
+        StartCoroutine(FadeLowpass());
 
         Application.wantsToQuit -= QuitHandler;
     }
 
     // Coroutine for fading the Lowpass filter
-    private IEnumerator FadeLowpass(bool fadeIn)
+    private IEnumerator FadeLowpass()
     {
         SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
         float timer = 0f;
-        float startValue = fadeIn ? 22000 : data.lowpassValue;  // Initial value based on fade in or out
+        float startValue = lowpassTargetValue;  // Initial value based on fade in or out
 
         while (timer < fadeDuration)
         {
@@ -611,13 +619,12 @@ public class mainMenu : MonoBehaviour
     {
         if (quittingAllowed)
         {
-            // Any additional cleanup or save operations can be done here
-            Debug.Log("Quitting the application");
+          
             return true; // Return true to allow quitting
         }
         else
         {
-            Debug.Log("User canceled quitting");
+           
             return false; // Return false to prevent quitting
         }
     }
@@ -634,6 +641,8 @@ public class mainMenu : MonoBehaviour
         quittingAllowed = false;
         HideQuit();
         Debug.Log("User canceled quitting");
+        // Set the Lowpass filter parameter on the Master AudioMixer
+        audioMixer.SetFloat("Lowpass", 22000);
     }
 
 
@@ -755,12 +764,23 @@ public class mainMenu : MonoBehaviour
 
     public void CrashReports()
     {
-        crashReport.SetActive(!crashReport.activeSelf);
-        var reports = CrashReport.reports.First();
-        
-            text.text = "Crashed at: " + reports.time + "\n" + reports.text + "\n\n";
-        
+        // File path of the player log
+        string logFilePath = Application.persistentDataPath + "/Player.log";
+
+        // Open the player log file using the default application associated with its file type
+        Process.Start(logFilePath);
     }
+
+    public void SettingsFile()
+    {
+        // File path of the player log
+        string logFilePath = Application.persistentDataPath + "/settings.json";
+
+        // Open the player log file using the default application associated with its file type
+        Process.Start(logFilePath);
+    }
+
+
     public void FixedUpdate()
     {
         // Check for any input (keyboard or mouse)
@@ -784,7 +804,18 @@ public class mainMenu : MonoBehaviour
             animator.ResetTrigger("StartIdle");
             Cursor.visible = true;
         }
-
+        
+        
+        if (quitPanel.activeSelf)
+        {
+            // Set the Lowpass filter parameter on the Master AudioMixer
+            audioMixer.SetFloat("Lowpass", data.lowpassValue);
+        }
+        else
+        {
+            // Set the Lowpass filter parameter on the Master AudioMixer
+            audioMixer.SetFloat("Lowpass", 22000);
+        }
         
     }
 }

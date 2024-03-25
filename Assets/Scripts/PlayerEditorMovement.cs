@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements.Experimental;
+using UnityEngine.UI;
 
 public class PlayerEditorMovement : MonoBehaviour
 {
@@ -17,15 +17,17 @@ public class PlayerEditorMovement : MonoBehaviour
     public AudioSource sfxS;
     public AudioClip jump;
     public AudioClip impact;
-
+    public Text text;
 
     private void Update()
     {
+        
         // Move player right
         transform.Translate(Vector2.right * moveSpeed * Time.deltaTime);
+        text.text = "X: " + transform.position.x.ToString("F1") + ", Y: " + transform.position.y.ToString("F0");
         cam.transform.position = new Vector3(transform.position.x + 6, 0.7f, -10);
 
-        // Check for vertical movement
+      
         // Check for vertical movement
         if (Input.GetKeyDown(KeyCode.W) && transform.position.y < maxY || Input.GetKeyDown(KeyCode.UpArrow) && transform.position.y < maxY)
         {
@@ -34,8 +36,6 @@ public class PlayerEditorMovement : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Space) && transform.position.y < maxY - jumpHeight)
         {
             transform.position += new Vector3(0f, jumpHeight * 2f, 0f);
-            sfxS.clip = jump;
-            sfxS.Play();
         }
         else if (Input.GetKeyDown(KeyCode.S) && transform.position.y > minY || Input.GetKeyDown(KeyCode.DownArrow) && transform.position.y > minY)
         {
@@ -44,14 +44,7 @@ public class PlayerEditorMovement : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.A) && transform.position.y > -1 || Input.GetKeyDown(KeyCode.LeftArrow) && transform.position.y > -1)
         {
-            if (transform.position.y > 0)
-            {
-                sfxS.clip = impact;
-                sfxS.Play();
-            }
-
             transform.position = new Vector3(transform.position.x, -1, transform.position.z);
-
 
         }
 

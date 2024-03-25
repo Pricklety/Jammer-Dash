@@ -34,7 +34,7 @@ namespace DiscordPresence
         
 
 
-        DiscordRpc.EventHandlers handlers;
+        public DiscordRpc.EventHandlers handlers;
 
         public static PresenceManager instance;
 
@@ -124,8 +124,11 @@ namespace DiscordPresence
             instance.presence.matchSecret = match ?? instance.presence.matchSecret;
             instance.presence.joinSecret = join ?? instance.presence.joinSecret;
             instance.presence.spectateSecret = spectate ?? instance.presence.spectateSecret;
-            //instance.presence.presence.instance =
             DiscordRpc.UpdatePresence(instance.presence);
+                
+            
+                
+            
         }
 
         public static void ClearPresence()

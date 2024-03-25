@@ -161,7 +161,7 @@ public class PauseMenu : MonoBehaviour
         GameObject.Find("loadingText").GetComponent<Text>().text = "";
             // Check if the player exists and is not at the starting position
             GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null && player.transform.position != new Vector3(0, -1, 0))
+        if (player != null && (player.transform.position != new Vector3(0, -1, 0) || player.transform.position != FindObjectOfType<FinishLine>().transform.position))
         {
             if (music.pitch < 1)
             {

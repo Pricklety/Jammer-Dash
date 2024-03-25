@@ -136,9 +136,10 @@ public class LevelDataManager : MonoBehaviour
             yield return LoadAudioClip(audioFilePath, clip =>
             {
                 GameObject.Find("Music").GetComponent<AudioSource>().clip = sceneData.clip;
+                
             });
-
-            FindObjectOfType<CubeCounter>().maxScore = FindObjectOfType<CubeCounter>().cubes.Length * 50;
+       
+        FindObjectOfType<CubeCounter>().maxScore = FindObjectOfType<CubeCounter>().cubes.Length * 50;
             GameObject.Find("Cube").SetActive(sceneData.ground);
             GameObject.Find("elevator").SetActive(sceneData.ground); 
             GameObject.Find("elevator").SetActive(sceneData.ground);

@@ -17,7 +17,6 @@ public class FinishLine : MonoBehaviour
     public AudioSource finishSound;
     public GameObject finishMenu;
     private bool coroutineRunning;
-    public AudioSource mainSong;
 
     private void Start()
     {
@@ -60,7 +59,6 @@ public class FinishLine : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         player0 = player.GetComponent<PlayerMovement>();
         scores = player.GetComponent<CubeCounter>();
-        mainSong = GameObject.Find("Music").GetComponent<AudioSource>();
         if (player0 == null || player == null)
         {
 
@@ -70,9 +68,8 @@ public class FinishLine : MonoBehaviour
         }
         if (player.transform.position.x >= transform.position.x && player != null)
         {
-            player.transform.position = transform.position;
+            player.transform.position = new Vector2(transform.position.x, transform.position.y + 0.5f);
             player0.enabled = false;
-            StartCoroutine(FadeOutVolume());
         }
 
             float destruction = player0.counter.score;
@@ -132,20 +129,4 @@ public class FinishLine : MonoBehaviour
        
     }
 
-    private IEnumerator FadeOutVolume()
-    {
-        SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-        float duration = 2f;
-        float elapsedTime = 0.0f;
-        float startVolume = mainSong.volume;
-        while (elapsedTime < duration)
-        {
-            mainSong.outputAudioMixerGroup.audioMixer.SetFloat("Lowpass", Mathf.Lerp(22000f, data.lowpassValue, elapsedTime / duration));
-            
-            elapsedTime += Time.fixedDeltaTime;
-            yield return null;
-        }
-        mainSong.outputAudioMixerGroup.audioMixer.SetFloat("Lowpass", data.lowpassValue);
-        coroutineRunning = false;
-    }
 }

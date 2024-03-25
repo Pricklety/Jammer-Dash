@@ -46,9 +46,8 @@ public class Options : MonoBehaviour
     public Dropdown backgrounds;
     public Slider trailParticleCount;
     public Toggle showFPS;
-    public Toggle RPC;
 
-
+    public Image backgroundImage;
 
     public void Start()
     {
@@ -126,9 +125,67 @@ public class Options : MonoBehaviour
         antiAliasing.ClearOptions();
         List<string> aaOptions = new List<string> { "None", "2x", "4x", "8x" }; 
         antiAliasing.AddOptions(aaOptions);
+
+        backgrounds.ClearOptions();
+
+        List<Sprite> images = GetImagesFromFolder("backgrounds");
+
+        // Add the images to the dropdown options
+        foreach (Sprite sprite in images)
+        {
+            backgrounds.options.Add(new Dropdown.OptionData(sprite.name));
+        }
+        backgrounds.RefreshShownValue();
+    }
+    List<Sprite> GetImagesFromFolder(string folderPath)
+    {
+        List<Sprite> images = new List<Sprite>();
+        Sprite[] sprites = Resources.LoadAll<Sprite>(folderPath);
+        images.AddRange(sprites);
+
+        // Get subfolders
+        string[] subfolders = GetSubfolders(folderPath);
+        foreach (string subfolder in subfolders)
+        {
+            // Load images recursively from subfolders
+            images.AddRange(GetImagesFromFolder(folderPath + "/" + subfolder));     
+        }
+
+        return images;
     }
 
+    string[] GetSubfolders(string folderPath)
+    {
+        List<string> subfolders = new List<string>();
+        string path = folderPath;
+        GameObject[] folders = Resources.LoadAll<GameObject>(path);
+        foreach (GameObject folder in folders)
+        {
+            // Get the relative path of the subfolder
+            string subfolder = folder.name.Substring(folderPath.Length + 1);
+            subfolders.Add(subfolder);
+        }
+        return subfolders.ToArray();
+    }
+    public void SetBackgroundImage(string imageName)
+    {
+        // Get the currently selected dropdown option (image name)
+        imageName = backgrounds.captionText.text;
+        // Iterate through all loaded images
+        foreach (Sprite image in GetImagesFromFolder("backgrounds"))
+        {
+            // Check if the image name matches the requested image
+            if (image.name == imageName)
+            {
+                // Set the found image as the background image
+                backgroundImage.sprite = image;
+                return;
+            }
+        }
 
+        // If the image is not found in any subfolder, log a warning
+        Debug.LogWarning("Background image not found: " + imageName);
+    }
     public void LoadMasterVolume()
     {
         float savedMasterVolume = PlayerPrefs.GetFloat("MasterVolume", 1.0f);
@@ -185,6 +242,8 @@ public class Options : MonoBehaviour
         unfocusVol.value = settingsData.noFocusVolume;
         lowpass.value = settingsData.lowpassValue;
         scoreType.value = settingsData.scoreType;
+        trailParticleCount.value = settingsData.mouseParticles;
+        showFPS.isOn = settingsData.isShowingFPS;
     }
 
     public void ApplyOptions()

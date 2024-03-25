@@ -242,46 +242,33 @@ public class AudioManager : MonoBehaviour
         UpdateAllVolumes();
     }
 
+
     private void UpdateAllVolumes()
     {
-        StartCoroutine(Volume());
-    }
-
-    IEnumerator Volume()
-    {
         SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-        float targetVolume = SceneManager.GetActiveScene().buildIndex != 1 ? data.volume : (Application.isFocused ? data.volume : data.noFocusVolume);
-
-        float volumeTime = Time.time;
-        float duration = 5f; // Transition duration in seconds
-
-        // Apply volume changes to all audio sources
         AudioSource[] audios = FindObjectsOfType<AudioSource>();
         foreach (AudioSource audio in audios)
         {
             audio.outputAudioMixerGroup = master;
             if (data.focusVol)
             {
-                float startVolume;
-                audio.outputAudioMixerGroup.audioMixer.GetFloat("Master", out startVolume);
-
-                while (Time.time - volumeTime < duration)
+                if (Application.isFocused)
                 {
-                    float timeElapsed = Time.time - volumeTime; // Calculate time elapsed since the volume change started
-                    float interpolationFactor = Mathf.Clamp01(timeElapsed / duration); // Calculate interpolation factor
-
-                    float currentVolume;
-                    audio.outputAudioMixerGroup.audioMixer.GetFloat("Master", out currentVolume);
-                    float newVolume = Mathf.Lerp(startVolume, targetVolume, interpolationFactor); // Perform interpolation
-                    audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", newVolume);
-
-                    yield return null; // Yield each frame
+                    audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", masterVolume);
                 }
+                else
+                {
 
-                // Ensure the final volume is set exactly
-                audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", targetVolume);
+                    audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", data.noFocusVolume);
+                }
+            }
+            else
+            {
+                audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", masterVolume);
+                
             }
         }
+
     }
 
     public float GetLoadingProgress()

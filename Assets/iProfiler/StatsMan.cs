@@ -108,7 +108,8 @@ public class StatsMan : MonoBehaviour
     void DisplayOptionsInfo()
     {
         SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-
+        bool scoretype = Convert.ToBoolean(data.scoreType);
+        string a = scoretype ? "Old" : "New";
         gui.text += "Resolution value: " + data.resolutionValue + $" ({Screen.width}x{Screen.height})"+
                     "\nScreen Mode: " + data.windowMode + $" ({Screen.fullScreenMode})"+
                     "\nQuality Level: " + data.qualitySettingsLevel + $" ({GetQualityLevelName()})" +
@@ -120,7 +121,12 @@ public class StatsMan : MonoBehaviour
                     "\nPlayer Type: " + data.playerType + 
                     "\nAntialiasing: " + data.antialiasing + 
                     "\nCursor Trail: " + data.cursorTrail + 
-                    "\nVisualizers: {" + data.allVisualizers + "," + data.lineVisualizer + "," + data.logoVisualizer + "," + data.bgVisualizer + "}";
+                    "\nVisualizers: {" + data.allVisualizers + "," + data.lineVisualizer + "," + data.logoVisualizer + "," + data.bgVisualizer + "}" +
+                    "\nNo focus volume: " + data.noFocusVolume + 
+                    "\nLowpass value: " + data.lowpassValue + 
+                    "\nScore Display Type: " + a + 
+                    "\nMouse particle count: " + data.mouseParticles + 
+                    "\nShowing FPS: " + data.isShowingFPS;
 
     }
         

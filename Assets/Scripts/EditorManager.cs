@@ -13,6 +13,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.Networking;
+using Unity.Mathematics;
 
 public class EditorManager : MonoBehaviour
 {
@@ -50,9 +51,7 @@ public class EditorManager : MonoBehaviour
     public GameObject bgPic; // Reference to the bgPic game object
     public GameObject musicPanel;
     public string musicFolderPath;
-    public Dropdown musicDropdown;
     public Dropdown defMusic;
-    public Dropdown stockMusic;
     public LineController lineControllerPrefab;
     public Text artistText;
     public Text nameText;
@@ -62,7 +61,8 @@ public class EditorManager : MonoBehaviour
     public Text playbackText;
     public GameObject linePrefab;
     public Slider sliderOffset2;
-
+    public InputField bpmInput;
+    public Slider bpmMultiplier;
 
     [Header("Post Processing")]
     public PostProcessVolume vol;
@@ -111,6 +111,7 @@ public class EditorManager : MonoBehaviour
 
     [Header("Other")]
     private string selectedImagePath;
+    private string selectedSongPath;
     public float delay;
     public float delayLimit = 0.25f;
 
@@ -144,7 +145,57 @@ public class EditorManager : MonoBehaviour
         SetupMusicDropdown(defMusic, GetMusicFiles);
         // Or SetupMusicDropdown(stockMusic, GetStockMusicFiles); if needed
     }
+    public void OnMultiplierChange()
+    {
+        // Check if the audio clip is assigned
+        if (audio.clip == null)
+        {
+            Debug.LogError("Audio clip is not assigned.");
+            return;
+        }
 
+        // Parse BPM value from text
+        if (!int.TryParse(bpm.text, out int parsedBPM))
+        {
+            Debug.LogError("Failed to parse BPM value.");
+            return;
+        }
+        parsedBPM *= (int)bpmMultiplier.value;
+        bpmMultiplier.GetComponentInChildren<Text>().text = "Marker Multiplier (" + bpmMultiplier.value + ")";
+
+        // Calculate the length of each line
+        float lineLength = audio.clip.length * 7f;
+
+        // Calculate the spacing between each line based on BPM
+        float spacing = 7f / (parsedBPM / 60f);
+
+        // Determine the number of lines to spawn based on the entire length of the audio clip
+        int numLines = Mathf.FloorToInt(lineLength / spacing);
+
+        // Clear existing beat objects
+        foreach (GameObject gobject in GameObject.FindGameObjectsWithTag("Beat"))
+        {
+            Destroy(gobject);
+        }
+
+        originalPositions = new Vector3[numLines]; // Create originalPositions array
+
+        for (int i = 0; i < numLines; i++)
+        {
+            float x = i * spacing;
+            Vector3 position = new Vector3(x, 0f, 0f);
+            GameObject newLine = Instantiate(linePrefab, position, Quaternion.identity);
+
+            // Set original position if newLine has "Beat" tag
+            if (newLine.CompareTag("Beat"))
+            {
+                originalPositions[i] = position;
+            }
+        }
+
+        sliderOffset2.value = 0f;
+
+    }
     private void MeasureTimeToReachDistance()
     {
         GameObject[] objectsWithTag = FindObjectsWithTags(targetTags);
@@ -226,8 +277,6 @@ public class EditorManager : MonoBehaviour
 
         dropdown.AddOptions(options);
 
-        // Add a listener to the dropdown to handle value changes
-        dropdown.onValueChanged.AddListener(index => OnSongDropdownValueChanged(index, getMusicFiles));
     }
 
     private string[] GetMusicFiles()
@@ -253,7 +302,7 @@ public class EditorManager : MonoBehaviour
 
     public void ChangeSong()
     {
-        OnSongDropdownValueChanged(musicDropdown.value, GetMusicFiles);
+        OnSongDropdownValueChanged(defMusic.value, GetMusicFiles);
     }
 
 
@@ -270,7 +319,6 @@ public class EditorManager : MonoBehaviour
             if (customMusicFiles[index] is string selectedAudioClip)
             {
                 Debug.Log("Custom song selected: " + selectedAudioClip);
-                StartCoroutine(LoadClip(selectedAudioClip));
                 
             }
             else
@@ -285,38 +333,125 @@ public class EditorManager : MonoBehaviour
     }
 
 
-    private string[] GetCustomMusicFiles()
+    public void LoadCustomMusic()
     {
-        // Load all custom music files from the persistent data path
-        string customMusicPath = Path.Combine(Application.streamingAssetsPath, "music", "downloaded");
-        string[] customMusicFiles = Directory.GetFiles(customMusicPath, "*.mp3");
-
-        foreach (string filePath in customMusicFiles)
+        FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserCanvas")).GetComponent<FileBrowser>();
+        FileBrowser.SetFilters(true, new FileBrowser.Filter("Music", ".mp3"));
+        FileBrowser.SetDefaultFilter(".mp3");
+        FileBrowser.ShowLoadDialog(SongSelected, null, FileBrowser.PickMode.Files, false, null, null, "Load Local song...", "Choose");
+    }
+    void SongSelected(string[] paths)
+    {
+        if (paths.Length >= 0)
         {
-            Debug.Log("Custom Music File: " + filePath);
+            selectedSongPath = paths[0];
+            StartCoroutine(LoadCustomClip(selectedSongPath));
         }
-
-        return customMusicFiles;
     }
 
-    private string[] GetStockMusicFiles()
+    public void OpenDefaultMusic()
     {
-        // Load all custom music files from the persistent data path
-        string stockMusicPath = Path.Combine("https://jammerdash.com/database/audio/stock/stockID.mp3");
-        string[] stockMusicFiles = Directory.GetFiles(stockMusicPath, "*.mp3");
+        FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserLibraryCanvas")).GetComponent<FileBrowser>();
+        FileBrowser.SetFilters(true, new FileBrowser.Filter("Music", ".mp3"));
+        FileBrowser.SetDefaultFilter(".mp3");
+        FileBrowser.ShowLoadDialog(DefaultSongSelected, null, FileBrowser.PickMode.Files, false, Application.streamingAssetsPath + "/music", null, "Choose From Library...", "Choose");
+    }
 
-        foreach (string filePath in stockMusicFiles)
+    void DefaultSongSelected(string[] paths)
+    {
+        if (paths.Length >= 0)
         {
-            Debug.Log("Custom Music File: " + filePath);
+            selectedSongPath = paths[0];
+            StartCoroutine(LoadClip(Path.GetFileName(selectedSongPath)));
+        }
+    }
+
+    public IEnumerator LoadCustomClip(string filePath)
+    {
+        string path = Path.Combine(Application.persistentDataPath, "scenes", sceneNameInput.text, sceneNameInput.text + ".json");
+        string json = File.ReadAllText(path);
+        SceneData data = SceneData.FromJson(json);
+
+        using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(filePath, AudioType.MPEG);
+
+        // Start the request asynchronously
+        var operation = www.SendWebRequest();
+
+        // Update loading text to indicate completion
+        downloadSlider.gameObject.SetActive(true);
+        // Keep updating loading progress until the request is done
+        while (!operation.isDone)
+        {
+            // Calculate loading progress
+            float progress = operation.progress;
+            // Update loading text
+            downloadText.text = $"Downloading: {www.downloadedBytes / 1024768} MB";
+            downloadSlider.value = operation.progress;
+            Debug.Log(filePath);
+            yield return null;
         }
 
-        return stockMusicFiles;
+        // Check for errors
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            LevelDataManager.Instance.LoadLevelData(LevelDataManager.Instance.levelName);
+            Debug.LogError($"Failed to load audio clip: {www.error}");
+            downloadText.text = "Failed to download the song. Restarting...";
+            Debug.Log(filePath);
+
+            yield break;
+        }
+
+        // Get the loaded audio clip
+        AudioClip loadedAudioClip = DownloadHandlerAudioClip.GetContent(www);
+        // Update loading text to indicate completion
+        downloadSlider.gameObject.SetActive(false);
+
+        string directoryPath = Path.Combine(Application.persistentDataPath, "scenes", sceneNameInput.text);
+
+        // Check if the directory exists
+        if (Directory.Exists(directoryPath))
+        {
+            // Get all MP3 files in the directory
+            string[] mp3Files = Directory.GetFiles(directoryPath, "*.mp3");
+
+            // Iterate over each MP3 file
+            foreach (string mp3File in mp3Files)
+            {
+                // Get the file name without extension
+                string name = Path.GetFileNameWithoutExtension(mp3File);
+
+                // Check if the file name is not equal to data.songName
+                if (name != data.songName && data.songName != null)
+                {
+                    // Delete the MP3 file
+                    File.Delete(mp3File);
+                }
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"Directory '{directoryPath}' does not exist.");
+        }
+
+        // Set the audio source clip
+        loadedAudioClip.name = Path.GetFileNameWithoutExtension(filePath);
+        nameText.text = loadedAudioClip.name;
+        audio.clip = loadedAudioClip;
+        lineController.audioClip = loadedAudioClip;
+
+        musicFolderPath = filePath;
+        
+
+        // Yield return the loaded audio clip
+        yield return loadedAudioClip;
     }
+
+
 
     private IEnumerator LoadCustomAudioClip(string fileName)
     {
-        fileName = Path.GetFileNameWithoutExtension(fileName);
-        string filePath = Path.Combine(Application.persistentDataPath, "scenes", LevelDataManager.Instance.levelName, fileName + ".mp3");
+        string filePath = Path.Combine(Application.persistentDataPath, "scenes", sceneNameInput.text, fileName + ".mp3");
         string formattedPath = "file://" + filePath.Replace("\\", "/");
 
         using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(formattedPath, AudioType.MPEG);
@@ -331,14 +466,21 @@ public class EditorManager : MonoBehaviour
             // Update loading text
             downloadSlider.value = operation.progress;
             downloadText.text = $"{formattedPath}: {www.downloadedBytes / 1024768} MB";
-
+            Debug.Log(fileName);
             yield return null;
         }
 
         AudioClip loadedAudioClip = null;
 
 
-        if (www.isDone)
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError($"Failed to load custom audio clip: {www.error}");
+            Debug.Log(fileName);
+            downloadText.text = "Failed to download the song. Restarting...";
+        }
+
+        else if (www.result == UnityWebRequest.Result.Success)
         {
             downloadSlider.gameObject.SetActive(false);
             loadedAudioClip = DownloadHandlerAudioClip.GetContent(www);
@@ -347,21 +489,15 @@ public class EditorManager : MonoBehaviour
             nameText.text = loadedAudioClip.name;
             audio.clip = loadedAudioClip;
             defMusic.value = defMusic.options.FindIndex(option => option.text == nameText.text);
-        }
-        else
-        {
-            Debug.LogError("Failed to convert MP3 to AudioClip");
-        }
 
+        }
 
         yield return loadedAudioClip;
     }
-
     public IEnumerator LoadClip(string fileName)
     {
-        string filePath = Path.Combine(Application.streamingAssetsPath, "music", fileName + ".mp3");
+        string filePath = Path.Combine(Application.streamingAssetsPath, "music", fileName);
         string formattedPath = "file://" + filePath.Replace("\\", "/");
-
         using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(formattedPath, AudioType.MPEG);
 
         // Start the request asynchronously
@@ -378,6 +514,7 @@ public class EditorManager : MonoBehaviour
             downloadText.text = $"Downloading: {www.downloadedBytes / 1024768} MB";
             downloadSlider.value = operation.progress;
 
+            Debug.Log(formattedPath);
 
             yield return null;
         }
@@ -387,10 +524,6 @@ public class EditorManager : MonoBehaviour
         {
             Debug.LogError($"Failed to load audio clip: {www.error}");
             downloadText.text = "Failed to download the song. Restarting...";
-            LevelDataManager.Instance.LoadLevelData(LevelDataManager.Instance.levelName);
-
-
-            yield break;
         }
 
         // Get the loaded audio clip
@@ -403,12 +536,17 @@ public class EditorManager : MonoBehaviour
         nameText.text = loadedAudioClip.name;
         audio.clip = loadedAudioClip;
         lineController.audioClip = loadedAudioClip;
-
+        musicFolderPath = filePath;
         // Yield return the loaded audio clip
         yield return loadedAudioClip;
     }
 
-
+    public void LoadSongBPM()
+    {
+        int bpm = UniBpmAnalyzer.AnalyzeBpm(lineController.audioClip);
+        bpmInput.text = $"{bpm / 2}";
+            
+    }
     public void OpenMusic()
     {
         musicPanel.SetActive(true);
@@ -461,6 +599,7 @@ public class EditorManager : MonoBehaviour
             bpm.text = sceneData.bpm.ToString();
             color1.startingColor = sceneData.defBGColor;
             StartCoroutine(LoadCustomAudioClip(sceneData.songName));
+            
         }
         else
         {
@@ -666,8 +805,8 @@ public class EditorManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        sliderOffset2.GetComponentInChildren<Text>().text = "BPM Offset (" + (sliderOffset2.value / 7).ToString("F1") + "s)";
-        if (sliderOffset2.value < 0.25f && sliderOffset2.value > -0.25f)
+        sliderOffset2.GetComponentInChildren<Text>().text = "BPM Offset (" + (sliderOffset2.value / 7).ToString("F2") + "s)";
+        if (sliderOffset2.value < 0.15f && sliderOffset2.value > -0.15f)
         {
             sliderOffset2.value = 0f;
         }
@@ -1321,8 +1460,6 @@ public class EditorManager : MonoBehaviour
                 File.Delete(filePath);
             }
         }
-        musicFolderPath = newPath;
-        string songPath = Path.Combine(Application.streamingAssetsPath, "music", sceneData.songName + ".mp3");
         Debug.Log("a " + newPath);
 
         sceneData.clipPath = musicFolderPath;
@@ -1331,8 +1468,9 @@ public class EditorManager : MonoBehaviour
             SaveBackgroundImageTexture(Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, "bgImage.png"));
             sceneData.picLocation = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, "bgImage.png");
         }
-        CopyFileDirectly(songPath, newPath);
-
+        Debug.Log(musicFolderPath);
+        CopyFileDirectly(musicFolderPath, newPath);
+        musicFolderPath = newPath;
         if (cubes != null)
         {
             sceneData.cubePositions = new List<Vector3>();
@@ -1392,6 +1530,7 @@ public class EditorManager : MonoBehaviour
 
     public void OpenImageDialog()
     {
+        FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserCanvas")).GetComponent<FileBrowser>();
         FileBrowser.SetFilters(true, new FileBrowser.Filter("Images", ".png", ".jpg", ".jpeg"));
         FileBrowser.SetDefaultFilter(".png");
         FileBrowser.ShowLoadDialog(OnFileSelected, null, FileBrowser.PickMode.Files);

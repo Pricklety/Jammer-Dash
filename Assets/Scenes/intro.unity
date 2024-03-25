@@ -5469,7 +5469,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 160.00085, y: 29.999878}
+  m_AnchoredPosition: {x: 160.00098, y: 30}
   m_SizeDelta: {x: 320, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &787129918
@@ -5505,7 +5505,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "v0.301 - \xA9 Pricklety 2021-2024"
+  m_Text: "v0.31 - \xA9 Pricklety 2021-2024"
 --- !u!222 &787129919
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6790,7 +6790,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 100
+  m_SortingOrder: 32767
   m_TargetDisplay: 0
 --- !u!224 &1616578517
 RectTransform:
@@ -6825,9 +6825,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c50cc68c40e82744a95248ef3f061d77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  text: {fileID: 1755215915}
-  obj: {fileID: 128296607}
-  smoothing: 0.5
+  Text: {fileID: 1755215915}
+  panel: {fileID: 128296607}
 --- !u!1 &1657487955
 GameObject:
   m_ObjectHideFlags: 0
@@ -7540,3 +7539,24 @@ MonoBehaviour:
   trailColor: {r: 1, g: 0.996, b: 0.682, a: 1}
   distanceFromCamera: 5
   trailImage: {fileID: 0}
+--- !u!114 &2810003823231954469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 156647891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45b6af07983945442bb332c796be0f5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSource: {fileID: 1287563237}
+  bufferSize: 1024
+  gThresh: 0.1
+  onBeat:
+    m_PersistentCalls:
+      m_Calls: []
+  onSpectrum:
+    m_PersistentCalls:
+      m_Calls: []

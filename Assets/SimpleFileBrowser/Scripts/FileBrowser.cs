@@ -348,7 +348,7 @@ namespace SimpleFileBrowser
 			}
 		}
 
-		private static FileBrowser m_instance = null;
+		public static FileBrowser m_instance = null;
 		private static FileBrowser Instance
 		{
 			get
@@ -1010,7 +1010,6 @@ namespace SimpleFileBrowser
 
 			return item;
 		}
-
 		void IListViewAdapter.SetItemContent( ListItem item )
 		{
 			FileBrowserItem file = (FileBrowserItem) item;
@@ -2017,6 +2016,7 @@ namespace SimpleFileBrowser
 			filenameImage.color = m_skin.InputFieldNormalBackgroundColor;
 		}
 
+		
 		public void Hide()
 		{
 			IsOpen = false;
@@ -2881,7 +2881,11 @@ namespace SimpleFileBrowser
 			return ShowDialogInternal( onSuccess, onCancel, pickMode, allowMultiSelection, false, initialPath, initialFilename, title, loadButtonText );
 		}
 
-		private static bool ShowDialogInternal( OnSuccess onSuccess, OnCancel onCancel,
+
+
+
+
+        private static bool ShowDialogInternal( OnSuccess onSuccess, OnCancel onCancel,
 												PickMode pickMode, bool allowMultiSelection, bool acceptNonExistingFilename,
 												string initialPath, string initialFilename, string title, string submitButtonText )
 		{
