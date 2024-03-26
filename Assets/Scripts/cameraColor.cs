@@ -69,6 +69,7 @@ public class cameraColor : MonoBehaviour
         GetComponent<Animator>().enabled = false;
         song.volume = 1f;
         song.pitch = 1f;
+        song.Play();
     }
 
     private void Update()
@@ -96,11 +97,6 @@ public class cameraColor : MonoBehaviour
         if (SceneManager.GetActiveScene().name == "LevelDefault")
         {
 
-            string filePath = Path.Combine(Application.persistentDataPath, "scenes", FindObjectOfType<LevelDataManager>().levelName, FindObjectOfType<LevelDataManager>().levelName + ".json");
-           
-            string json = File.ReadAllText(filePath);
-            SceneData data = SceneData.FromJson(json);
-            startColor = data.defBGColor;
             startColorG = ground.GetComponent<SpriteRenderer>().color;
             targetColor = player.combo < 250 ? startColor : Random.ColorHSV();
             targetColorG = player.combo < 250 ? Color.white : Random.ColorHSV();

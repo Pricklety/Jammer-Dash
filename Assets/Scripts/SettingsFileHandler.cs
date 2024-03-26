@@ -56,6 +56,7 @@ public class SettingsData
     public int scoreType = 0;
     public float mouseParticles = 1000;
     public bool isShowingFPS = false;
+    public int hitType = 0;
     public string gameVersion = Application.version;
     public string saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
 

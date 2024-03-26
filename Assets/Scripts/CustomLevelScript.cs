@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -11,13 +11,13 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class LevelScript : MonoBehaviour
+public class CustomLevelScript : MonoBehaviour
 {
     public Text levelNameText;
     public Text songNameText;
     public Text difficultyText;
+    public Text creatorText;
     public UnityEvent onPlay;
-    public UnityEvent onEdit;
     public GameObject cubePrefab;
     public GameObject sawPrefab;
     public SceneData sceneData;
@@ -27,6 +27,7 @@ public class LevelScript : MonoBehaviour
     public void SetSceneData(SceneData data)
     {
         sceneData = data;
+        sceneData.clipPath = sceneData.clipPath.Replace("scenes", "levels\\extracted");
     }
 
     public void SetLevelName(string levelName)
@@ -55,46 +56,16 @@ public class LevelScript : MonoBehaviour
         }
     }
 
-   
-    public void DeleteLevel()
+    public void SetCreator(string creatorName)
     {
-        string levelPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
-
-        // Check if the level path exists
-        if (Directory.Exists(levelPath))
+        if (creatorText != null)
         {
-            // Delete the directory and its contents recursively
-            Directory.Delete(levelPath, true);
-
-            Debug.Log("Level deleted successfully: " + sceneData.levelName);
+            creatorText.text = creatorName;
         }
-        else
-        {
-            Debug.LogWarning("Level does not exist: " + sceneData.levelName);
-        }
-
-        // Clear existing level information panels
-        mainMenu menu = FindObjectOfType<mainMenu>();
-        foreach (Transform child in menu.levelInfoParent)
-        {
-            Destroy(child.gameObject);
-        }
-
-        // Reload the UI to remove the deleted level
-        menu.LoadLevelsFromFiles();
     }
+
+    
     public void SetDifficulty(string difficulty)
-    {
-        if (difficultyText != null)
-        {
-            difficultyText.text = difficulty;
-        }
-        else
-        {
-            Debug.LogError("difficultyText is not assigned in the inspector.");
-        }
-    }
-    public void SetCustomDifficulty(string difficulty)
     {
         if (difficultyText != null)
         {
@@ -138,41 +109,19 @@ public class LevelScript : MonoBehaviour
     {
         string json = File.ReadAllText(Application.persistentDataPath + $"/scenes/{levelNameText.text}/" + $"{levelNameText.text}.json");
         SceneData sceneData = SceneData.FromJson(json);
-        LevelDataManager data = LevelDataManager.Instance;
+        CustomLevelDataManager data = CustomLevelDataManager.Instance;
         data.levelName = levelNameText.text;
         LoadSceneAddressable("Assets/LevelDefault.unity", () =>
         {
 
             SceneManager.UnloadSceneAsync("MainMenu");
-            LevelDataManager data = LevelDataManager.Instance;
+            CustomLevelDataManager data = CustomLevelDataManager.Instance;
             data.levelName = levelNameText.text;
-            LevelDataManager.Instance.LoadLevelData(levelNameText.text);
+            CustomLevelDataManager.Instance.LoadLevelData(levelNameText.text);
         });
     }
 
-   
-    public void EditLevel()
-    {
-        string json = File.ReadAllText(Application.persistentDataPath + $"/scenes/{levelNameText.text}/" + $"{levelNameText.text}.json");
-        SceneData sceneData = SceneData.FromJson(json);
-        if (sceneData != null)
-        {
 
-            PlayerPrefs.SetString("CurrentLevelData", sceneData.ToJson());
-            SceneManager.LoadSceneAsync("SampleScene").completed += operation =>
-            {
-                LevelDataManager data = LevelDataManager.Instance;
-                data.levelName = levelNameText.text;
-                LevelDataManager.Instance.LoadLevelData(levelNameText.text);
-            };
-
-
-        }
-        else
-        {
-            Debug.LogError("SceneData is not set for this level.");
-        }
-    }
 
     private void LoadSceneAddressable(string sceneKey, System.Action onComplete)
     {
@@ -188,18 +137,5 @@ public class LevelScript : MonoBehaviour
                 Debug.LogError($"Failed to load scene '{sceneKey}': {operation.OperationException}");
             }
         };
-    }
-
-    public void OpenEditor()
-    {
-        if (sceneData != null)
-        {
-            PlayerPrefs.SetString("CurrentLevelData", sceneData.ToJson());
-            SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
-        }
-        else
-        {
-            Debug.LogError("SceneData is not set for this level.");
-        }
     }
 }

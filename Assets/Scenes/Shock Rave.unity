@@ -2601,7 +2601,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panel: {fileID: 1102487004}
   song: {fileID: 246358479}
+  info: {fileID: 0}
   attint: 0
+  music: {fileID: 0}
 --- !u!114 &107469421
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19251,6 +19253,8 @@ MonoBehaviour:
   duration: 2.59
   player: {fileID: 2073273725}
   song: {fileID: 1535058409}
+  player0: {fileID: 0}
+  player1: {fileID: 0}
   ground: {fileID: 898525997}
 --- !u!81 &723444388
 AudioListener:
@@ -49134,19 +49138,22 @@ MonoBehaviour:
   jump: {fileID: 8300000, guid: d0020306d40e74046a3bed46b31c7b3f, type: 3}
   hit: {fileID: 0}
   impact: {fileID: 0}
-  walk: {fileID: 0}
+  fail: {fileID: 0}
   health: 300
   maxHealth: 0
   hpText: {fileID: 0}
   hpSlider: {fileID: 0}
   counter: {fileID: 2073273726}
-  color: {fileID: 723444387}
   combotext: {fileID: 0}
   cubeanim: {fileID: 2854668884622228783, guid: 65027b124e056534dbf5cc3ff5bd9dea, type: 3}
   godmode: {fileID: 0}
   music: {fileID: 1535058409}
+  cubes: []
   scoreText: {fileID: 0}
   keyText: {fileID: 0}
+  acc: {fileID: 0}
+  vignetteStartHealthPercentage: 0.5
+  startColor: {r: 1, g: 0, b: 0, a: 1}
   clip01: {fileID: 0}
   clip02: {fileID: 0}
   clip03: {fileID: 0}
@@ -49156,6 +49163,7 @@ MonoBehaviour:
   deathPanel: {fileID: 1929878321}
   combo: 0
   highestCombo: 0
+  Total: 0
 --- !u!114 &2073273726
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49170,6 +49178,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destroyedCubes: 0
   maxScore: 0
+  score: 0
+  accCount: 0
+  destructionPercentage: 0
+  cubes: []
 --- !u!4 &2073273727
 Transform:
   m_ObjectHideFlags: 0

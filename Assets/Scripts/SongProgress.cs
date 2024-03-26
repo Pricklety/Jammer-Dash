@@ -15,17 +15,39 @@ public class SongProgress : MonoBehaviour
     public PlayerMovement player;
     private void Start()
     {
-       if (SceneManager.GetActiveScene().name == "LevelDefault")
+        if (SceneManager.GetActiveScene().name == "LevelDefault")
         {
+            string levelName = LevelDataManager.Instance.levelName;
+            if (string.IsNullOrEmpty(levelName))
+            {
+                levelName = CustomLevelDataManager.Instance.levelName;
+            }
 
-            string filePath = Path.Combine(Application.persistentDataPath, "scenes", LevelDataManager.Instance.levelName, $"{LevelDataManager.Instance.levelName}.json");
+            string levelsFolderPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", levelName);
+            string levelJsonFilePath = Path.Combine(levelsFolderPath, $"{levelName}.json");
+            string sceneJsonFilePath = Path.Combine(Application.persistentDataPath, "scenes", levelName, $"{levelName}.json");
 
-            string json = File.ReadAllText(filePath);
-            SceneData sceneData = SceneData.FromJson(json);
-            StartCoroutine(LoadCustomAudioClip(sceneData.songName));
+            if (File.Exists(levelJsonFilePath))
+            {
+                // Load level data from "levels" folder
+                string json = File.ReadAllText(levelJsonFilePath);
+                SceneData sceneData = SceneData.FromJson(json);
+                StartCoroutine(LoadAudioClip(sceneData.songName, levelsFolderPath));
+            }
+            else if (File.Exists(sceneJsonFilePath))
+            {
+                // Load level data from "scenes" folder if "levels" folder doesn't contain the file
+                string json = File.ReadAllText(sceneJsonFilePath);
+                SceneData sceneData = SceneData.FromJson(json);
+                StartCoroutine(LoadAudioClip(sceneData.songName, Path.Combine(Application.persistentDataPath, "scenes", levelName)));
+            }
+            else
+            {
+                Debug.LogError("Neither 'levels' nor 'scenes' folder contains the required level data.");
+            }
         }
 
-       if (progressSlider == null)
+        if (progressSlider == null)
         {
             progressSlider = GameObject.Find("11").GetComponent<Slider>();
             progressText = GameObject.Find("progressText").GetComponent<Text>();
@@ -49,16 +71,13 @@ public class SongProgress : MonoBehaviour
         // Update the slider value with the current progress
         progressSlider.value = currentProgress;
 
-        if (!audioSource.isPlaying)
-        {
-            audioSource.Play();
-        }
     }
-    private IEnumerator LoadCustomAudioClip(string fileName)
-    {
-        string filePath = Path.Combine(Application.persistentDataPath, "scenes", LevelDataManager.Instance.levelName, fileName + ".mp3");
-        string formattedPath = "file://" + filePath.Replace("\\", "/");
 
+    private IEnumerator LoadAudioClip(string fileName, string folderPath)
+    {
+        string filePath = Path.Combine(folderPath, fileName);
+        string formattedPath = "file://" + filePath.Replace("\\", "/");
+        Debug.Log(formattedPath);
         using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(formattedPath, AudioType.MPEG);
 
         // Start the request asynchronously
@@ -83,16 +102,16 @@ public class SongProgress : MonoBehaviour
             Debug.LogError($"Failed to load audio clip: {www.error}");
             GameObject.Find("Canvas/default/loadingText").GetComponent<Text>().text = "Failed to download the song. Restarting...";
             SceneManager.LoadScene("SampleScene");
-            LevelDataManager.Instance.LoadLevelData(LevelDataManager.Instance.levelName);
-        Time.timeScale = 1f;
-            
+            CustomLevelDataManager.Instance.LoadLevelData(CustomLevelDataManager.Instance.levelName);
+            Time.timeScale = 1f;
+
             yield break;
         }
 
         // Get the loaded audio clip
         AudioClip loadedAudioClip = DownloadHandlerAudioClip.GetContent(www);
         // Set the audio source clip
-        loadedAudioClip.name = Path.GetFileNameWithoutExtension(fileName);
+        loadedAudioClip.name = Path.GetFileName(fileName);
         audioSource.clip = loadedAudioClip;
         Time.timeScale = 1f;
 
@@ -104,6 +123,5 @@ public class SongProgress : MonoBehaviour
         // Yield return the loaded audio clip
         yield return loadedAudioClip;
     }
-
 
 }

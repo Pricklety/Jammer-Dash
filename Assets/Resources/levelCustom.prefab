@@ -1,5 +1,85 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3051555479679042458
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 399993279679159098}
+  - component: {fileID: 2559429799271209582}
+  - component: {fileID: 6918328536562915351}
+  m_Layer: 5
+  m_Name: Text (Legacy)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &399993279679159098
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3051555479679042458}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7639366849649331121}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 50, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &2559429799271209582
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3051555479679042458}
+  m_CullTransparentMesh: 1
+--- !u!114 &6918328536562915351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3051555479679042458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 8a2b9e2a607dd2143b58c44bc32410b4, type: 3}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 1
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 4
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 0
 --- !u!1 &7272120594848452226
 GameObject:
   m_ObjectHideFlags: 0
@@ -159,7 +239,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: S+
+  m_Text: 
 --- !u!1 &7639366849289852409
 GameObject:
   m_ObjectHideFlags: 0
@@ -269,7 +349,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 399993279679159098}
   m_Father: {fileID: 7639366849960705823}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -328,9 +409,9 @@ GameObject:
   - component: {fileID: 7639366849960705820}
   - component: {fileID: 7639366849960705821}
   - component: {fileID: 7639366849960705822}
-  - component: {fileID: 8239834601599152839}
+  - component: {fileID: 4529574611654421863}
   m_Layer: 5
-  m_Name: Level
+  m_Name: levelCustom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -443,10 +524,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: mainMenu, Assembly-CSharp
-        m_MethodName: OpenLevel
-        m_Mode: 3
+      - m_Target: {fileID: 4529574611654421863}
+        m_TargetAssemblyTypeName: CustomLevelScript, Assembly-CSharp
+        m_MethodName: PlayLevel
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -455,7 +536,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &8239834601599152839
+--- !u!114 &4529574611654421863
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -464,12 +545,51 @@ MonoBehaviour:
   m_GameObject: {fileID: 7639366849960705808}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b64afac3c6a3574498e4cf90dea623bf, type: 3}
+  m_Script: {fileID: 11500000, guid: ff75366af3d77d045a339aad58e692ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rankText: {fileID: 7639366849124775846}
-  sceneIndex: 0
-  keyName: 
+  levelNameText: {fileID: 7639366849289852359}
+  songNameText: {fileID: 7639366850392796565}
+  difficultyText: {fileID: 6918328536562915351}
+  creatorText: {fileID: 8180933709672880576}
+  onPlay:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4529574611654421863}
+        m_TargetAssemblyTypeName: CustomLevelScript, Assembly-CSharp
+        m_MethodName: PlayLevel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  cubePrefab: {fileID: 2952827130082377523, guid: 65027b124e056534dbf5cc3ff5bd9dea, type: 3}
+  sawPrefab: {fileID: 6790652013434663268, guid: e7cfd04f467fef246a13d24e93894e8a, type: 3}
+  sceneData:
+    sceneName: 
+    cubePositions: []
+    sawPositions: []
+    ID: 0
+    bpm: 0
+    levelName: 
+    levelLength: 0
+    songName: NikoN1nja - Slowly Going Insane
+    calculatedDifficulty: 0
+    gameVersion: 
+    saveTime: 1.7114893e+9
+    clip: {fileID: 0}
+    clipPath: 
+    creator: 
+    ground: 1
+    defBGColor: {r: 0, g: 0, b: 0, a: 0}
+    defGColor: {r: 0, g: 0, b: 0, a: 0}
+    isVerified: 0
+    isUploaded: 0
+    picLocation: 
 --- !u!1 &7639366850392796567
 GameObject:
   m_ObjectHideFlags: 0

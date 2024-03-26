@@ -19,6 +19,9 @@ using UnityEngine.Video;
 using UnityEditor;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
+using System.Security.Cryptography;
+using System.Text;
+using System.IO.Compression;
 
 public class mainMenu : MonoBehaviour
 {
@@ -53,6 +56,10 @@ public class mainMenu : MonoBehaviour
     public InputField newLevelNameInput;
     public GameObject cubePrefab;
     public GameObject sawPrefab;
+    public GameObject playPrefab;
+    public Transform playlevelInfoParent;
+    private string decryptionKey = "NzhXiVAcdTD4S+wsZWp3D4l1vk2gXSMrsRRBbw376/pzqiw6SHKxsVhFzLa6bp8c"; 
+    private string decryptionIV = "KJHDSBAK";
 
     [Header("Internet Check")]
     public Text internetStatusText;
@@ -84,10 +91,82 @@ public class mainMenu : MonoBehaviour
     {
         data = SettingsFileHandler.LoadSettingsFromFile();
         LoadRandomBackground();
-        LoadLevelsFromFiles();
         RefreshInternetConnection();
+        LoadLevelFromLevels();
+        LoadLevelsFromFiles();
 
     }
+    public void LoadLevelFromLevels()
+    {
+        foreach (Transform child in levelInfoParent)
+        {
+            if (child.GetComponent<CustomLevelScript>())
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
+        string levelsPath = Path.Combine(Application.persistentDataPath, "levels");
+
+        if (!Directory.Exists(levelsPath))
+        {
+            Debug.LogError("The 'levels' folder does not exist in persistentDataPath.");
+            Directory.CreateDirectory(levelsPath);
+            return;
+        }
+
+        string[] levelFiles = Directory.GetFiles(levelsPath, "*.jdl", SearchOption.AllDirectories);
+
+        foreach (string filePath in levelFiles)
+        {
+            if (Path.GetFileName(filePath).Equals("LevelDefault.jdl"))
+            {
+                continue; // Skip LevelDefault.jdl
+            }
+
+            // Extract JSON data from JDL file
+            string json = ExtractJSONFromJDL(filePath);
+
+            // Parse the JSON data into SceneData
+            SceneData sceneData = SceneData.FromJson(json);
+
+            // Instantiate the level information panel prefab
+            GameObject levelInfoPanel = Instantiate(playPrefab, playlevelInfoParent);
+
+            // Display level information on UI
+            DisplayCustomLevelInfo(sceneData, levelInfoPanel.GetComponent<CustomLevelScript>());
+            levelInfoPanel.GetComponent<CustomLevelScript>().SetSceneData(sceneData);
+        }
+    }
+
+    public static string ExtractJSONFromJDL(string jdlFilePath)
+    {
+        try
+        {
+            using (ZipArchive archive = ZipFile.OpenRead(jdlFilePath))
+            {
+                foreach (ZipArchiveEntry entry in archive.Entries)
+                {
+                    if (!entry.FullName.EndsWith(".json"))
+                    {
+                        continue; // Skip non-JSON files
+                    }
+
+                    using (StreamReader reader = new StreamReader(entry.Open()))
+                    {
+                        return reader.ReadToEnd();
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Error extracting JSON from JDL: " + e.Message);
+        }
+
+        return null;
+    }
+
     public void URL(string url)
     {
         Application.OpenURL(url);
@@ -409,23 +488,6 @@ public class mainMenu : MonoBehaviour
 
         // Other initialization logic for objects
     }
-    void LoadCurrentLevel()
-    {
-        string sceneName = SceneManager.GetActiveScene().name;
-        SceneData sceneData = LevelDataManager.Instance.LoadLevelData(sceneName);
-        LevelScript level = EventSystem.current.lastSelectedGameObject.GetComponentInParent<LevelScript>();
-
-        if (sceneData != null)
-        {
-            DisplayLevelInfo(sceneData, level); // Example method to display information
-            // Other logic to handle the loaded data
-        }
-        else
-        {
-            Debug.LogWarning("Scene data not found for scene: " + sceneName);
-        }
-    }
-
 
     // Display level information on UI
     void DisplayLevelInfo(SceneData sceneData, LevelScript level)
@@ -436,13 +498,36 @@ public class mainMenu : MonoBehaviour
         // Check if LevelScript component is not null
         if (level != null)
         {
+            Debug.Log(sceneData);
             // Assuming YourPanelScript has methods to set text or image properties
             level.SetLevelName($"{sceneData.levelName}");
             level.SetSongName($"♫ {sceneData.songName}");
             level.SetDifficulty($"{sceneData.calculatedDifficulty:0.00} sn");
 
+        }
+        else
+        {
             // Logging for debugging purposes
-            Debug.Log("DisplayLevelInfo - Level information displayed successfully");
+            Debug.LogError("DisplayLevelInfo - LevelScript component is null");
+        }
+
+        // Logging for debugging purposes
+        Debug.Log("DisplayLevelInfo - End");
+    }
+
+    void DisplayCustomLevelInfo(SceneData sceneData, CustomLevelScript level)
+    {
+        // Logging for debugging purposes
+        Debug.Log("DisplayLevelInfo - Start");
+
+        // Check if LevelScript component is not null
+        if (level != null)
+        {
+            // Assuming YourPanelScript has methods to set text or image properties
+            level.SetLevelName($"{sceneData.levelName}");
+            level.SetSongName($"♫ {sceneData.songName}");
+            level.SetDifficulty($"{Mathf.RoundToInt(sceneData.calculatedDifficulty):0}");
+            level.SetCreator($"mapped by {sceneData.creator}");
         }
         else
         {

@@ -59,6 +59,23 @@ public class FinishLine : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         player0 = player.GetComponent<PlayerMovement>();
         scores = player.GetComponent<CubeCounter>();
+        float num1 = float.NegativeInfinity;
+        itemUnused itemUnused1 = null;
+        foreach (itemUnused itemUnused2 in FindObjectsOfType<itemUnused>())
+        {
+            float num2 = itemUnused2.transform.position.x - transform.position.x;
+            if (num2 > num1)
+            {
+                num1 = num2;
+                itemUnused1 = itemUnused2;
+            }
+        }
+        if (itemUnused1 != null)
+        {
+            transform.position = new Vector3((itemUnused1.transform.position + new Vector3(5f, 0f, 0.0f)).x, 0.0f, 0.0f);
+
+        }
+
         if (player0 == null || player == null)
         {
 
@@ -119,14 +136,40 @@ public class FinishLine : MonoBehaviour
             SaveLevelData("Skystrike", "SkystrikeTier", "destskystrike", actualdest);
         PlayerPrefs.Save();
         yield return new WaitForSecondsRealtime(2f);
+        AudioSource[] audios = FindObjectsOfType<AudioSource>();
+        Debug.Log(audios);
+        float startVolume = 1f;
+        float targetVolume = 0f;
+        float currentTime = 0f; 
         finishMenu.SetActive(true);
-
         SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
         if (data.scoreType == 0)
             score.text = "Tier: " + scores.GetTier(actualdest) + "\nHighest Combo: " + player0.highestCombo.ToString() + string.Format("\nScore: {0} ({1})", destruction.ToString("N0"), scores.destroyedCubes) + string.Format("\nAccuracy: {0:00.00}%", (object)scores.destructionPercentage);
         else
             score.text = "Tier: " + scores.GetTier(actualdest) + "\nHighest Combo: " + player0.highestCombo.ToString() + string.Format("\nScore: {0}", scores.destroyedCubes) + string.Format("\nAccuracy: {0:00.00}%", (object)scores.destructionPercentage);
-       
+        while (currentTime < 3f)
+        {
+          
+            currentTime += Time.deltaTime;
+            foreach (AudioSource audio in audios)
+            {
+                audio.volume = Mathf.Lerp(startVolume, targetVolume, currentTime / 3f);
+            }
+            yield return null;
+            
+
+        }
+
+        // Stop playing the audio after 10 seconds
+        foreach (AudioSource audio in audios)
+        {
+            audio.Stop();
+        }
+        
+
+
+
+
     }
 
 }

@@ -86,8 +86,17 @@ public class PlayerMovement : MonoBehaviour
             combo = 0;
             highestCombo = 0;
             Scene scene = SceneManager.GetActiveScene();
-            goodTextPrefab = Resources.Load<GameObject>("good");
-            badTextPrefab = Resources.Load<GameObject>("bad");
+            SettingsData adata = SettingsFileHandler.LoadSettingsFromFile();
+            if (adata.hitType == 0)
+            {
+                goodTextPrefab = Resources.Load<GameObject>("good");
+                badTextPrefab = Resources.Load<GameObject>("bad");
+            }
+            else if (adata.hitType == 1)
+            {
+                goodTextPrefab = Resources.Load<GameObject>("RinHit");
+                badTextPrefab = Resources.Load<GameObject>("RinMiss");
+            }
             hpSlider = GameObject.Find("health").GetComponent<Slider>();
             if (hpSlider = null)
             {
@@ -99,7 +108,20 @@ public class PlayerMovement : MonoBehaviour
             combotext = GameObject.Find("combo").GetComponent<Text>();
         }
         maxHealth = 300;
-        
+
+        SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+        if (data.hitType == 0)
+        {
+            goodTextPrefab = Resources.Load<GameObject>("good");
+            badTextPrefab = Resources.Load<GameObject>("bad");
+            Debug.Log("asd");
+        }
+        else if (data.hitType == 1)
+        {
+            goodTextPrefab = Resources.Load<GameObject>("RinHit");
+            badTextPrefab = Resources.Load<GameObject>("RinMiss");
+            Debug.Log("asd");
+        }
         GameObject[] deathObjects = FindObjectsOfType<GameObject>();
         FindObjectOfType<cameraColor>().enabled = true;
 
@@ -145,8 +167,17 @@ public class PlayerMovement : MonoBehaviour
             combo = 0;
             highestCombo = 0;
             Scene scene = SceneManager.GetActiveScene();
-            goodTextPrefab = Resources.Load<GameObject>("good");
-            badTextPrefab = Resources.Load<GameObject>("bad");
+            SettingsData adata = SettingsFileHandler.LoadSettingsFromFile();
+            if (adata.hitType == 0)
+            {
+                goodTextPrefab = Resources.Load<GameObject>("good");
+                badTextPrefab = Resources.Load<GameObject>("bad");
+            }
+            else if (adata.hitType == 1)
+            {
+                goodTextPrefab = Resources.Load<GameObject>("RinHit");
+                badTextPrefab = Resources.Load<GameObject>("RinMiss");
+            }
             hpSlider = GameObject.Find("health").GetComponent<Slider>();
             if (hpSlider = null)
             {
@@ -158,12 +189,46 @@ public class PlayerMovement : MonoBehaviour
             combotext = GameObject.Find("combo").GetComponent<Text>();
 
         }
+
+        SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+        if (data.hitType == 0)
+        {
+            goodTextPrefab = Resources.Load<GameObject>("good");
+            badTextPrefab = Resources.Load<GameObject>("bad");
+        }
+        else if (data.hitType == 1)
+        {
+            goodTextPrefab = Resources.Load<GameObject>("RinHit");
+            badTextPrefab = Resources.Load<GameObject>("RinMiss");
+        }
         hpint = ((int)health);
         UpdateVignette(hpint);
         hpText.text = hpint.ToString() + "/" + maxHealth.ToString("0");
         // Move player right
         transform.Translate(Vector2.right * moveSpeed * Time.deltaTime);
-        cam.transform.position = new Vector3(transform.position.x + 6, 0.7f, -10);
+        if(cam.transform.position.x < FindObjectOfType<FinishLine>().transform.position.x)
+        {
+            float distanceToFinishLine = Mathf.Abs(cam.transform.position.x - FindObjectOfType<FinishLine>().transform.position.x);
+
+            if (distanceToFinishLine < 3)
+            {
+                // Calculate the target position to move the camera
+                Vector3 targetPos = new Vector3(FindObjectOfType<FinishLine>().transform.position.x, 0.7f, -10);
+
+                // Smoothly move the camera towards the target position
+                Vector3 smoothPosition = Vector3.Lerp(cam.transform.position, targetPos, 10f * Time.deltaTime);
+
+                // Update the camera's position
+                cam.transform.position = smoothPosition;
+            }
+            else
+            {
+                Vector3 targetPosition = new Vector3(transform.position.x + 6, 0.7f, -10);
+                Vector3 smoothedPosition = Vector3.Lerp(cam.transform.position, targetPosition, 10f * Time.deltaTime);
+                cam.transform.position = smoothedPosition;
+
+            }
+        }
         if (health > maxHealth)
         {
             health = maxHealth;
@@ -390,7 +455,7 @@ public class PlayerMovement : MonoBehaviour
     IEnumerator ChangeScore()
     {
         counter.destroyedCubes += 50;
-        int newDestroyedCubes = counter.score + Mathf.RoundToInt((float)counter.destructionPercentage) * combo * counter.accCount / 500 + Mathf.RoundToInt(health);
+        int newDestroyedCubes = counter.score + Mathf.RoundToInt((float)counter.destructionPercentage) * combo * (counter.accCount / Total * 100 / 2) + hpint;
         float elapsedTime = 0f;
         float duration = 0.1f; 
         counter.accCount++;

@@ -14,6 +14,9 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.Networking;
 using Unity.Mathematics;
+using System.Text;
+using System.Security.Cryptography;
+using System.IO.Compression;
 
 public class EditorManager : MonoBehaviour
 {
@@ -183,7 +186,7 @@ public class EditorManager : MonoBehaviour
         for (int i = 0; i < numLines; i++)
         {
             float x = i * spacing;
-            Vector3 position = new Vector3(x, 0f, 0f);
+            Vector3 position = new(x, 0f, 0f);
             GameObject newLine = Instantiate(linePrefab, position, Quaternion.identity);
 
             // Set original position if newLine has "Beat" tag
@@ -292,7 +295,7 @@ public class EditorManager : MonoBehaviour
 
         foreach (string songPath in filePaths)
         {
-            string fileName = Path.GetFileNameWithoutExtension(songPath);
+            string fileName = Path.GetFileName(songPath);
             musicFiles.Add(fileName);
             
         }
@@ -346,6 +349,7 @@ public class EditorManager : MonoBehaviour
         {
             selectedSongPath = paths[0];
             StartCoroutine(LoadCustomClip(selectedSongPath));
+            musicFolderPath = selectedSongPath;
         }
     }
 
@@ -419,7 +423,7 @@ public class EditorManager : MonoBehaviour
             foreach (string mp3File in mp3Files)
             {
                 // Get the file name without extension
-                string name = Path.GetFileNameWithoutExtension(mp3File);
+                string name = Path.GetFileName(mp3File);
 
                 // Check if the file name is not equal to data.songName
                 if (name != data.songName && data.songName != null)
@@ -435,7 +439,7 @@ public class EditorManager : MonoBehaviour
         }
 
         // Set the audio source clip
-        loadedAudioClip.name = Path.GetFileNameWithoutExtension(filePath);
+        loadedAudioClip.name = Path.GetFileName(filePath);
         nameText.text = loadedAudioClip.name;
         audio.clip = loadedAudioClip;
         lineController.audioClip = loadedAudioClip;
@@ -477,7 +481,7 @@ public class EditorManager : MonoBehaviour
         {
             Debug.LogError($"Failed to load custom audio clip: {www.error}");
             Debug.Log(fileName);
-            downloadText.text = "Failed to download the song. Restarting...";
+            downloadText.text = "Failed to download the song.";
         }
 
         else if (www.result == UnityWebRequest.Result.Success)
@@ -485,10 +489,9 @@ public class EditorManager : MonoBehaviour
             downloadSlider.gameObject.SetActive(false);
             loadedAudioClip = DownloadHandlerAudioClip.GetContent(www);
             lineController.audioClip = loadedAudioClip;
-            loadedAudioClip.name = Path.GetFileNameWithoutExtension(fileName);
+            loadedAudioClip.name = Path.GetFileName(fileName);
             nameText.text = loadedAudioClip.name;
             audio.clip = loadedAudioClip;
-            defMusic.value = defMusic.options.FindIndex(option => option.text == nameText.text);
 
         }
 
@@ -532,7 +535,7 @@ public class EditorManager : MonoBehaviour
         downloadSlider.gameObject.SetActive(false);
 
         // Set the audio source clip
-        loadedAudioClip.name = Path.GetFileNameWithoutExtension(fileName);
+        loadedAudioClip.name = Path.GetFileName(fileName);
         nameText.text = loadedAudioClip.name;
         audio.clip = loadedAudioClip;
         lineController.audioClip = loadedAudioClip;
@@ -598,7 +601,7 @@ public class EditorManager : MonoBehaviour
             Debug.Log("Objects and UI loaded successfully");
             bpm.text = sceneData.bpm.ToString();
             color1.startingColor = sceneData.defBGColor;
-            StartCoroutine(LoadCustomAudioClip(sceneData.songName));
+            StartCoroutine(LoadCustomClip(sceneData.clipPath));
             
         }
         else
@@ -633,6 +636,127 @@ public class EditorManager : MonoBehaviour
         }
     }
 
+    public void SaveLevelData()
+    {
+        try
+        {
+            // Create a new SceneData instance and populate it with current objects' positions
+            SceneData sceneData = CreateLevelSceneData();
+
+            Text text = GameObject.Find("errorText").GetComponent<Text>();
+
+            // Get the directory path based on the scene name
+            string directoryPath = GetLevelDataPath(sceneData.levelName);
+
+            // Check if the directory exists before proceeding
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath); // Create the directory if it doesn't exist
+            }
+
+            // Serialize the SceneData instance to formatted JSON
+            string json = JsonUtility.ToJson(sceneData, true);
+            
+
+            // Write the encrypted JSON data to a file inside the directory
+            string encryptedJsonFilePath = Path.Combine(directoryPath, $"{sceneData.levelName}.json");
+            encryptedJsonFilePath = encryptedJsonFilePath.Replace("/", "\\");
+            if (File.Exists(encryptedJsonFilePath))
+            {
+                File.Delete(encryptedJsonFilePath);
+                File.WriteAllText(encryptedJsonFilePath, json);
+            }
+            else
+                File.WriteAllText(encryptedJsonFilePath, json);
+
+            // Zip the directory and keep only the .jdl file
+            string zipFilePath = Path.Combine(Application.persistentDataPath, "levels", $"{sceneData.levelName}.zip");
+            ZipFile.CreateFromDirectory(directoryPath, zipFilePath, System.IO.Compression.CompressionLevel.Optimal, false);
+            
+            // Delete the directory
+            Directory.Delete(directoryPath, true);
+            Debug.Log(directoryPath);
+            text.text = $"{sceneData.levelName} exported successfully.";
+            File.Delete(zipFilePath);
+            Debug.Log($"Level data for {sceneData.levelName} saved in folder: {directoryPath}");
+        }
+        catch (Exception e)
+        {
+            Text text = GameObject.Find("errorText").GetComponent<Text>();
+            Debug.LogError("Error saving scene: " + e);
+            text.text = $"Couldn't save scene: {e.Message}.\nTry again later.\nError happened on {DateTime.Now}\n\nFull error: {e}";
+        }
+    }
+
+    // Function to encrypt a string using AES encryption
+    private string Encrypt(string plainText, string key)
+    {
+        byte[] keyBytes = Encoding.UTF8.GetBytes(key);
+        byte[] iv = new byte[16];
+        using (Aes aesAlg = Aes.Create())
+        {
+            aesAlg.Key = keyBytes;
+            aesAlg.IV = iv;
+
+            ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+            using MemoryStream msEncrypt = new();
+            using (CryptoStream csEncrypt = new(msEncrypt, encryptor, CryptoStreamMode.Write))
+            {
+                using (StreamWriter swEncrypt = new(csEncrypt))
+                {
+                    swEncrypt.Write(plainText);
+                }
+            }
+            return Convert.ToBase64String(msEncrypt.ToArray());
+        }
+    }
+    private string GetLevelDataPath(string sceneName)
+    {
+        // Combine the application's persistent data path with "levels" folder and the scene name
+        string directoryPath = Path.Combine(Application.persistentDataPath, "levels", sceneName);
+
+        // Create the directory if it doesn't exist
+        Directory.CreateDirectory(directoryPath);
+
+        // Combine the directory path with the scene name and ".jdl" extension for the file
+        string jdlFilePath = Path.Combine(directoryPath, $"{sceneName}.jdl");
+
+        // Convert the folder to a .jdl file if it's not already converted
+        if (!File.Exists(jdlFilePath))
+        {
+            ConvertFolderToJDL(directoryPath);
+        }
+
+        return directoryPath;
+    }
+
+    private void ConvertFolderToJDL(string folderPath)
+    {
+        try
+        {
+            // Check if the .jdl file already exists
+            string jdlFilePath = $"{folderPath}.jdl";
+            if (File.Exists(jdlFilePath))
+            {
+                Debug.LogWarning($"Folder '{folderPath}' is already converted to .jdl file: '{jdlFilePath}'");
+                return;
+            }
+
+            // Create a zip archive of the folder
+            string zipFilePath = $"{folderPath}.zip";
+            ZipFile.CreateFromDirectory(folderPath, zipFilePath);
+
+            // Rename the zip file to have a .jdl extension
+            File.Move(zipFilePath, jdlFilePath);
+
+            Debug.Log($"Folder '{folderPath}' converted to .jdl file: '{jdlFilePath}'");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error converting folder to .jdl: {e.Message}");
+        }
+    }
 
     public void SaveSceneData()
     {
@@ -769,7 +893,7 @@ public class EditorManager : MonoBehaviour
         for (int i = 0; i < numLines; i++)
         {
             float x = i * spacing;
-            Vector3 position = new Vector3(x, 0f, 0f);
+            Vector3 position = new(x, 0f, 0f);
             GameObject newLine = Instantiate(linePrefab, position, Quaternion.identity);
 
             // Set original position if newLine has "Beat" tag
@@ -899,7 +1023,7 @@ public class EditorManager : MonoBehaviour
                 GameObject nextBeatObject = null;
                 float shortestPreviousDistance = Mathf.Infinity;
                 float shortestNextDistance = Mathf.Infinity;
-                Vector3 clickPosition = new Vector3(Mathf.RoundToInt(worldPos.x * 2) / 2, Mathf.Round(worldPos.y), 0);
+                Vector3 clickPosition = new(Mathf.RoundToInt(worldPos.x * 2) / 2, Mathf.Round(worldPos.y), 0);
 
                 foreach (GameObject beatObject in beatObjects)
                 {
@@ -918,17 +1042,20 @@ public class EditorManager : MonoBehaviour
                     }
                 }
 
-                // Choose the closer beat object for instantiation
-                GameObject nearestBeatObject;
+                float sqrDistanceToPrevious = (previousBeatObject != null) ? (Input.mousePosition - Camera.main.WorldToScreenPoint(previousBeatObject.transform.position)).sqrMagnitude : float.MaxValue;
+                float sqrDistanceToNext = (nextBeatObject != null) ? (Input.mousePosition - Camera.main.WorldToScreenPoint(nextBeatObject.transform.position)).sqrMagnitude : float.MaxValue;
 
-                if (previousBeatObject != null && nextBeatObject != null)
+                // Determine the nearest beat object
+                GameObject nearestBeatObject = null;
+                if (sqrDistanceToPrevious < sqrDistanceToNext)
                 {
-                    nearestBeatObject = (shortestNextDistance < shortestPreviousDistance) ? nextBeatObject : previousBeatObject;
+                    nearestBeatObject = previousBeatObject;
                 }
                 else
                 {
-                    nearestBeatObject = (previousBeatObject != null) ? previousBeatObject : nextBeatObject;
+                    nearestBeatObject = nextBeatObject;
                 }
+
 
                 if (nearestBeatObject != null)
                 {
@@ -1416,16 +1543,31 @@ public class EditorManager : MonoBehaviour
 
     private SceneData CreateSceneData()
     {
+        // Find the farthest object in X direction
         Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));
+
+        // Calculate the distance based on the position of the farthest object and additional distance
         float distance = targetObject.position.x + additionalDistance;
- 
+        List<Vector2> cubePositions = new List<Vector2>(); // Declare cubePositions as a List<Vector2>
+
+        foreach (GameObject cube in cubes)
+        {
+            Vector2 cubePos = cube.transform.position;
+            cubePositions.Add(cubePos); // Add cube position to the list
+        }
+        // Calculate the number of cubes per Y level
+        int[] cubesPerY = CalculateCubesPerY(cubePositions.ToArray());
+
+        // Calculate the difficulty based on cubes per Y level and other parameters
+        float calculatedDifficulty = CalculateDifficulty(cubesPerY, cubePositions.ToArray(), distance / 7);
+
+        // Create a SceneData object and populate its properties
         SceneData sceneData = new SceneData()
         {
             levelName = sceneNameInput.text.Trim(),
             sceneName = sceneNameInput.text.Trim(),
             songName = (audio.clip != null) ? audio.clip.name : "NikoN1nja - Slowly Going Insane",
-            calculatedDifficulty = CalculateDifficulty(distance, cubes.Count, saws.Count, 5, CalculateAverageCubeDistance(cubes)),
-            bpm = int.Parse(bpm.text),
+            calculatedDifficulty = calculatedDifficulty,
             gameVersion = Application.version,
             saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             clip = audio.clip,
@@ -1433,6 +1575,7 @@ public class EditorManager : MonoBehaviour
             ID = UnityEngine.Random.Range(int.MinValue, int.MaxValue),
             levelLength = (int)(distance / 7)
         };
+
         Camera mainCamera = Camera.main;
         if (mainCamera != null)
         {
@@ -1445,13 +1588,13 @@ public class EditorManager : MonoBehaviour
         }
 
         string directoryPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
-        string newPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, sceneData.songName + ".mp3");
+        string newPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, sceneData.songName);
         string[] existingFiles = Directory.GetFiles(directoryPath, "*.mp3");
         // Iterate through each file
         foreach (string filePath in existingFiles)
         {
             // Get the file name without extension
-            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            string fileName = Path.GetFileName(filePath);
 
             // Check if the file name is not equal to the current song name
             if (fileName != sceneData.songName)
@@ -1461,7 +1604,6 @@ public class EditorManager : MonoBehaviour
             }
         }
         Debug.Log("a " + newPath);
-
         sceneData.clipPath = musicFolderPath;
         if (bgPreview.texture != null && bgImage.isOn)
         {
@@ -1470,6 +1612,7 @@ public class EditorManager : MonoBehaviour
         }
         Debug.Log(musicFolderPath);
         CopyFileDirectly(musicFolderPath, newPath);
+
         musicFolderPath = newPath;
         if (cubes != null)
         {
@@ -1498,24 +1641,154 @@ public class EditorManager : MonoBehaviour
         return sceneData;
     }
 
-    public float CalculateDifficulty(float timeToReachDistance, int numCubes, int numSaws, int numVerticalLevels, float averageCubeDistance)
+    private SceneData CreateLevelSceneData()
     {
+        Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));
 
-        float obstacleDensity = numSaws + numCubes; 
+        // Calculate the distance based on the position of the farthest object and additional distance
+        float distance = targetObject.position.x + additionalDistance;
+        List<Vector2> cubePositions = new List<Vector2>(); // Declare cubePositions as a List<Vector2>
 
-        float verticalFactor = 5; 
+        foreach (GameObject cube in cubes)
+        {
+            Vector2 cubePos = cube.transform.position;
+            cubePositions.Add(cubePos); // Add cube position to the list
+        }
+        // Calculate the number of cubes per Y level
+        int[] cubesPerY = CalculateCubesPerY(cubePositions.ToArray());
 
-        float distanceFactor = 1 / (numVerticalLevels + averageCubeDistance / 10); 
+        // Calculate the difficulty based on cubes per Y level and other parameters
+        float calculatedDifficulty = CalculateDifficulty(cubesPerY, cubePositions.ToArray(), distance / 7);
 
-        float difficulty = (obstacleDensity / 1000) + verticalFactor + distanceFactor + (timeToReachDistance / averageCubeDistance);
+        // Create a SceneData object and populate its properties
+        SceneData sceneData = new SceneData()
+        {
+            levelName = sceneNameInput.text.Trim(),
+            sceneName = sceneNameInput.text.Trim(),
+            songName = (audio.clip != null) ? audio.clip.name : "NikoN1nja - Slowly Going Insane",
+            calculatedDifficulty = calculatedDifficulty,
+            gameVersion = Application.version,
+            saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+            clip = audio.clip,
+            ground = groundToggle.isOn,
+            ID = UnityEngine.Random.Range(int.MinValue, int.MaxValue),
+            levelLength = (int)(distance / 7)
+        };
 
-        difficulty = Mathf.Max(difficulty, -1f);
+        // Get the source and destination paths
+        string sourceFolderPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
+        string destinationFolderPath = Path.Combine(Application.persistentDataPath, "levels", sceneData.levelName);
+        // Create the destination directory if it doesn't exist
+        Directory.CreateDirectory(destinationFolderPath);
+
+        // Get the files in the source directory and copy them to the destination directory
+        foreach (string filePath in Directory.GetFiles(sourceFolderPath))
+        {
+            string fileName = Path.GetFileName(filePath);
+            string destFilePath = Path.Combine(destinationFolderPath, fileName);
+            File.Copy(filePath, destFilePath, true);
+        }
+
+        // Recursively copy subdirectories
+        foreach (string subDirPath in Directory.GetDirectories(sourceFolderPath))
+        {
+            string subDirName = Path.GetFileName(subDirPath);
+            string destSubDirPath = Path.Combine(destinationFolderPath, subDirName);
+            File.Copy(subDirPath, destSubDirPath); // Recursive call
+        }
+
+        // Create a ZIP file with the .jdl extension
+        string zipFilePath = Path.Combine(Application.persistentDataPath, "levels", $"{sceneData.levelName}.jdl");
+        if (File.Exists(zipFilePath))
+            File.Delete(zipFilePath);
+
+        ZipFile.CreateFromDirectory(destinationFolderPath, zipFilePath, System.IO.Compression.CompressionLevel.NoCompression, false);
+
+        // Delete the original copied folder
+        Directory.Delete(destinationFolderPath, true);
+
+
+        return sceneData;
+    }
+
+    public float CalculateDifficulty(int[] cubeCountsPerY, Vector2[] cubePositions, float clickTimingWindow)
+    {
+        float difficulty = 0f;
+        Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));
+
+        // Calculate the distance based on the position of the farthest object and additional distance
+        float distance = targetObject.position.x + additionalDistance;
+
+        // Iterate over each Y level
+        for (int y = -1; y <= 4; y++)
+        {
+            // Get the number of cubes on this Y level
+            int cubeCount = cubeCountsPerY[y + 1];
+
+            // If there are no cubes on this level, continue
+            if (cubeCount == 0)
+                continue;
+
+            // Iterate over each pair of consecutive cubes on this Y level
+            for (int i = 0; i < cubeCount - 1; i++)
+            {
+                // Calculate timing window based on Y level difference and player movement speed
+                float timingWindow = CalculateTimingWindow(cubePositions[i], cubePositions[i + 1], y);
+
+                // Consider X position variation for precision calculation
+                float xPositionVariation = Mathf.Abs(cubePositions[i].x - cubePositions[i + 1].x);
+
+                // Factor in precision required for clicking correctly
+                float precisionFactor = CalculatePrecisionFactor(xPositionVariation);
+
+                // Avoid division by zero by ensuring clickTimingWindow + distance is not zero
+                float divisor = clickTimingWindow + distance != 0 ? clickTimingWindow + distance : float.Epsilon;
+
+                // Diagnostic output
+                Debug.Log($"timingWindow: {timingWindow}, cubeCount: {cubeCount}, precisionFactor: {precisionFactor}, distance: {distance}, divisor: {divisor}, cubes.Count: {cubes.Count}, saws.Count: {saws.Count}");
+
+                // Add difficulty contribution for this pair of cubes
+                difficulty += timingWindow * 2 + (cubeCount / 30f) * (cubes.Count / 100) * (saws.Count / 100) * (precisionFactor / divisor * 100);
+            }
+        }
 
         return difficulty;
     }
+    private float CalculateTimingWindow(Vector2 position1, Vector2 position2, int yLevelDifference)
+    {
+        // Calculate the Y-axis distance between the cubes
+        float yDistance = Mathf.Abs(position2.y - position1.y);
+
+        // Calculate timing window based on Y-axis distance and player movement speed
+        float timeWindow = yDistance * 0.1f;
+
+        return timeWindow;
+    }
 
 
+    private float CalculatePrecisionFactor(float xPositionVariation)
+    {
+        float precisionFactor = 1 - xPositionVariation / 10f; 
 
+        return Mathf.Clamp01(precisionFactor); 
+    }
+    public int[] CalculateCubesPerY(Vector2[] cubePositions)
+    {
+        // Initialize an array to store the number of cubes per Y level
+        int[] cubesPerY = new int[6]; // Y levels range from -1 to 4, so 6 elements are needed
+
+        // Iterate over each cube position and count the number of cubes per Y level
+        foreach (Vector2 position in cubePositions)
+        {
+            int yLevel = Mathf.RoundToInt(position.y); // Round Y position to the nearest integer
+            yLevel = Mathf.Clamp(yLevel, -1, 4); // Ensure Y level is within valid range
+
+            // Increment the count for the corresponding Y level
+            cubesPerY[yLevel + 1]++;
+        }
+
+        return cubesPerY;
+    }
 
 
     public void OpenBGSel()
@@ -1577,18 +1850,4 @@ public class EditorManager : MonoBehaviour
         }
     }
 
-}
-
-
-public static class ColorPickerUtils
-{
-    public static int ColorToHash(Color color)
-    {
-        return color.GetHashCode();
-    }
-
-    public static Color ColorFromHash(int colorHash)
-    {
-        return new Color(colorHash % 255, (colorHash / 255) % 255, (colorHash / (255 * 255)) % 255);
-    }
 }

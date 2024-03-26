@@ -30,12 +30,16 @@ public class PauseMenu : MonoBehaviour
         if (SceneManager.GetActiveScene().buildIndex < 25 && SceneManager.GetActiveScene().name != "LevelDefault")
         {
 
-            song.text = GameObject.Find("Music").GetComponent<AudioSource>().clip.name;
+            song.text = SceneManager.GetActiveScene().name;
         }
         else if (SceneManager.GetActiveScene().name == "LevelDefault")
         {
+            string levelName = "";
 
-            LoadSceneData(LevelDataManager.Instance.levelName);
+                levelName = CustomLevelDataManager.Instance.levelName;
+                CheckSceneDataExists(levelName, "levels\\extracted");
+            
+            song.text = levelName;
         }
         if (PlayerPrefs.HasKey("attempts"))
         {
@@ -44,6 +48,24 @@ public class PauseMenu : MonoBehaviour
             {
                 attint = 1;
             }
+        }
+    }
+    private void CheckSceneDataExists(string levelName, string folder)
+    {
+        string filePath = Path.Combine(Application.persistentDataPath, folder, levelName, $"{levelName}.json");
+
+        if (File.Exists(filePath))
+        {
+            Debug.Log($"Scene data file found: {filePath}");
+            // LoadSceneData(levelName, folder); // You can load scene data here if needed
+        }
+        else
+        {
+            Debug.LogWarning($"Scene data file not found: {filePath}");
+
+            levelName = LevelDataManager.Instance.levelName;
+            CheckSceneDataExists(levelName, "scenes");
+
         }
     }
 
@@ -94,11 +116,19 @@ public class PauseMenu : MonoBehaviour
             
             PlayerPrefs.SetInt("attempts", attint);
             PlayerPrefs.Save();
-            panel.SetActive(!panel.activeSelf);
+            if (Time.timeScale == 1f)
+            {
+                panel.SetActive(true);
+            }
+            else if (Time.timeScale == 0f)
+            {
+                music.time = GameObject.FindGameObjectWithTag("Player").transform.position.x / 7;
+                panel.SetActive(false);
+            }
 
             if (panel.active && Time.timeScale == 1f)
             {
-                music.time = GameObject.FindGameObjectWithTag("Player").transform.position.x / 7;
+               
                 music.pitch = 0;
                 Time.timeScale = 0;
                 GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().enabled = false;
@@ -146,7 +176,7 @@ public class PauseMenu : MonoBehaviour
         AudioSource music = obj01.GetComponent<AudioSource>();
 
         panel.SetActive(false);
-        GameObject.Find("loadingText").GetComponent<Text>().text = "Click the left mouse to continue";
+        GameObject.Find("loadingText").GetComponent<Text>().text = "Click anything to continue";
 
         StartCoroutine(ResumeAfterDelay(music));
     }
@@ -157,7 +187,7 @@ public class PauseMenu : MonoBehaviour
         float duration = 1f; // Duration for the time scale transition
         float startPitch = music.pitch;
         float startScale = Time.timeScale;
-        yield return new WaitUntil(() => Input.GetMouseButtonDown(0));
+        yield return new WaitUntil(() => Input.anyKeyDown && !Input.GetKeyDown(KeyCode.Escape)); 
         GameObject.Find("loadingText").GetComponent<Text>().text = "";
             // Check if the player exists and is not at the starting position
             GameObject player = GameObject.FindGameObjectWithTag("Player");

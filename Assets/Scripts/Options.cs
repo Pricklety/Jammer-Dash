@@ -46,6 +46,8 @@ public class Options : MonoBehaviour
     public Dropdown backgrounds;
     public Slider trailParticleCount;
     public Toggle showFPS;
+    public Dropdown hitType;
+    
 
     public Image backgroundImage;
 
@@ -244,6 +246,8 @@ public class Options : MonoBehaviour
         scoreType.value = settingsData.scoreType;
         trailParticleCount.value = settingsData.mouseParticles;
         showFPS.isOn = settingsData.isShowingFPS;
+        hitType.value = settingsData.hitType;
+
     }
 
     public void ApplyOptions()
@@ -277,6 +281,8 @@ public class Options : MonoBehaviour
         settingsData.antialiasing = antiAliasing.value;
         settingsData.noFocusVolume = unfocusVol.value;
         settingsData.lowpassValue = lowpass.value;
+        settingsData.hitType = hitType.value;
+        settingsData.isShowingFPS = showFPS.isOn;
         // Apply settings to the game
         ApplyWindowMode(settingsData.windowMode);
         ApplyQualitySettings(settingsData.qualitySettingsLevel);
@@ -445,7 +451,7 @@ public class Options : MonoBehaviour
             cursorTrail = cursorTrail.isOn,
             allVisualizers = allVis.isOn,
             lineVisualizer = lineVis.isOn,
-            logoVisualizer = logoVis.isOn,
+            logoVisualizer = logoVis.isOn, 
             bgVisualizer = bgVis.isOn,
             antialiasing = antiAliasing.value,
             noFocusVolume = unfocusVol.value,
@@ -453,6 +459,7 @@ public class Options : MonoBehaviour
             scoreType = scoreType.value,
             mouseParticles = trailParticleCount.value,
             isShowingFPS = showFPS.isOn,
+            hitType = hitType.value,
             saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
             gameVersion = Application.version
     };

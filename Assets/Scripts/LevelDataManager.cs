@@ -23,7 +23,7 @@ public class LevelDataManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); 
+            DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
@@ -47,6 +47,7 @@ public class LevelDataManager : MonoBehaviour
 
             if (SceneManager.GetActiveScene().name == "SampleScene")
             {
+                OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
                 EditorManager manager = FindObjectOfType<EditorManager>();
                  using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(sceneData.picLocation))
                 {
@@ -99,8 +100,6 @@ public class LevelDataManager : MonoBehaviour
         string json = File.ReadAllText(filePath);   
         SceneData sceneData = SceneData.FromJson(json);
         Debug.Log(sceneData.levelName);
-        PauseMenu pause = FindObjectOfType<PauseMenu>();
-        string audioFilePath = Path.Combine(Application.persistentDataPath, "scenes", levelName, $"{sceneData.songName}.mp3");
         
         foreach (Vector3 cubePos in sceneData.cubePositions)
             {
@@ -126,18 +125,10 @@ public class LevelDataManager : MonoBehaviour
             }
 
 
-            GameObject.Find("Cube").SetActive(sceneData.ground);
-            GameObject.Find("elevator").SetActive(sceneData.ground);
-            GameObject.Find("Music").GetComponent<AudioSource>().clip = sceneData.clip;
+           
             levelName = sceneData.levelName;
             creator = sceneData.creator;
             diff = (int)sceneData.calculatedDifficulty;
-
-            yield return LoadAudioClip(audioFilePath, clip =>
-            {
-                GameObject.Find("Music").GetComponent<AudioSource>().clip = sceneData.clip;
-                
-            });
        
         FindObjectOfType<CubeCounter>().maxScore = FindObjectOfType<CubeCounter>().cubes.Length * 50;
             GameObject.Find("Cube").SetActive(sceneData.ground);
@@ -191,6 +182,7 @@ public class LevelDataManager : MonoBehaviour
     {
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + filePath, AudioType.MPEG))
         {
+            Debug.Log(filePath);
             yield return www.SendWebRequest();
 
             if (www.isDone)
