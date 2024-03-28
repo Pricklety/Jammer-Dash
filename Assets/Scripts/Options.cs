@@ -47,7 +47,8 @@ public class Options : MonoBehaviour
     public Slider trailParticleCount;
     public Toggle showFPS;
     public Dropdown hitType;
-    
+    public Slider trailFade;
+    public Text trailFadeText;
 
     public Image backgroundImage;
 
@@ -247,7 +248,7 @@ public class Options : MonoBehaviour
         trailParticleCount.value = settingsData.mouseParticles;
         showFPS.isOn = settingsData.isShowingFPS;
         hitType.value = settingsData.hitType;
-
+        trailFade.value = settingsData.cursorFade;
     }
 
     public void ApplyOptions()
@@ -283,6 +284,7 @@ public class Options : MonoBehaviour
         settingsData.lowpassValue = lowpass.value;
         settingsData.hitType = hitType.value;
         settingsData.isShowingFPS = showFPS.isOn;
+        settingsData.cursorFade = trailFade.value;
         // Apply settings to the game
         ApplyWindowMode(settingsData.windowMode);
         ApplyQualitySettings(settingsData.qualitySettingsLevel);
@@ -460,6 +462,7 @@ public class Options : MonoBehaviour
             mouseParticles = trailParticleCount.value,
             isShowingFPS = showFPS.isOn,
             hitType = hitType.value,
+            cursorFade = trailFade.value,
             saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
             gameVersion = Application.version
     };
@@ -747,5 +750,10 @@ public class Options : MonoBehaviour
         seconds = Mathf.Clamp(seconds, 0, 59);
 
         return string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
+    public void FixedUpdate()
+    {
+        trailFadeText.text = $"Trail fade ({trailFade.value:0.00}s)";
     }
 }

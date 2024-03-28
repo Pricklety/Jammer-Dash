@@ -87,14 +87,19 @@ public class mainMenu : MonoBehaviour
     private float currentLerpTime = 0f;
     public bool focus = true;
 
+    [Header("Profile")]
+    public Slider levelSlider;
+    public Text levelText;
+
     void Start()
     {
         data = SettingsFileHandler.LoadSettingsFromFile();
         LoadRandomBackground();
         RefreshInternetConnection();
-        LoadLevelFromLevels();
         LoadLevelsFromFiles();
-
+        LoadLevelFromLevels();
+        levelSlider.maxValue = LevelSystem.Instance.xpRequiredPerLevel[LevelSystem.Instance.level];
+        levelSlider.value = LevelSystem.Instance.currentXP;
     }
     public void LoadLevelFromLevels()
     {
@@ -124,25 +129,72 @@ public class mainMenu : MonoBehaviour
                 continue; // Skip LevelDefault.jdl
             }
 
-            // Extract JSON data from JDL file
-            string json = ExtractJSONFromJDL(filePath);
+            // Create a temporary folder
+            string tempFolder = Path.Combine(Application.temporaryCachePath, "tempExtractedJson");
+            Directory.CreateDirectory(tempFolder);
 
-            // Parse the JSON data into SceneData
-            SceneData sceneData = SceneData.FromJson(json);
+            try
+            {
+                // Extract JSON data from JDL file to the temporary folder
+                string jsonFilePath = ExtractJSONFromJDL(filePath);
 
-            // Instantiate the level information panel prefab
-            GameObject levelInfoPanel = Instantiate(playPrefab, playlevelInfoParent);
+                if (jsonFilePath == null)
+                {
+                    Debug.LogError("Failed to extract JSON from JDL: " + filePath);
+                    continue;
+                }
 
-            // Display level information on UI
-            DisplayCustomLevelInfo(sceneData, levelInfoPanel.GetComponent<CustomLevelScript>());
-            levelInfoPanel.GetComponent<CustomLevelScript>().SetSceneData(sceneData);
+                // Read JSON content from the extracted JSON file
+                string json = File.ReadAllText(jsonFilePath);
+                Debug.Log(json);
+
+                // Deserialize JSON data into SceneData object
+                SceneData sceneData = SceneData.FromJson(json);
+
+                if (sceneData == null)
+                {
+                    Debug.LogError("Failed to deserialize JSON from file: " + jsonFilePath);
+                    continue;
+                }
+
+                // Log the level name to verify if sceneData is successfully deserialized
+                Debug.LogWarning(sceneData.levelName);
+
+                // Create a directory with the level name
+                string extractedPath = Path.Combine(levelsPath, "extracted", sceneData.sceneName);
+                Directory.CreateDirectory(extractedPath);
+
+                // Move the JSON file to the new directory
+                string jsonDestinationPath = Path.Combine(extractedPath, sceneData.sceneName + ".json");
+                if (File.Exists(jsonDestinationPath))
+                {
+                    File.Delete(jsonDestinationPath);
+                }
+                File.Move(jsonFilePath, jsonDestinationPath);
+                ExtractMP3FromJDL(filePath, extractedPath);
+                GameObject levelInfoPanel = Instantiate(playPrefab, playlevelInfoParent);
+
+                // Display level information on UI
+                DisplayCustomLevelInfo(sceneData, levelInfoPanel.GetComponent<CustomLevelScript>());
+                levelInfoPanel.GetComponent<CustomLevelScript>().SetSceneData(sceneData);
+            }
+            finally
+            {
+                // Clean up the temporary folder
+                Directory.Delete(tempFolder, true);
+            }
         }
     }
+
 
     public static string ExtractJSONFromJDL(string jdlFilePath)
     {
         try
         {
+            // Create a temporary folder
+            string tempFolder = Path.Combine(Application.temporaryCachePath, "tempExtractedJson");
+            Directory.CreateDirectory(tempFolder);
+
             using (ZipArchive archive = ZipFile.OpenRead(jdlFilePath))
             {
                 foreach (ZipArchiveEntry entry in archive.Entries)
@@ -152,10 +204,14 @@ public class mainMenu : MonoBehaviour
                         continue; // Skip non-JSON files
                     }
 
-                    using (StreamReader reader = new StreamReader(entry.Open()))
-                    {
-                        return reader.ReadToEnd();
-                    }
+                    // Generate a unique filename for the extracted JSON file
+                    string extractedFilePath = Path.Combine(tempFolder, Path.GetFileName(entry.FullName));
+
+                    // Extract the JSON file to the temporary folder
+                    entry.ExtractToFile(extractedFilePath, true); // Overwrite if file exists
+
+                    // Return the path of the extracted JSON file
+                    return extractedFilePath;
                 }
             }
         }
@@ -166,6 +222,36 @@ public class mainMenu : MonoBehaviour
 
         return null;
     }
+
+    public static void ExtractMP3FromJDL(string jdlFilePath, string destinationFilePath)
+    {
+        try
+        {
+            using (ZipArchive archive = ZipFile.OpenRead(jdlFilePath))
+            {
+                foreach (ZipArchiveEntry entry in archive.Entries)
+                {
+                    string entryFileName = entry.FullName;
+
+                    if (entryFileName.EndsWith(".mp3"))
+                    {
+                        // Combine the destination directory path with the MP3 filename
+                        string destinationFullPath = Path.Combine(destinationFilePath, Path.GetFileName(entryFileName));
+
+                        // Extract the MP3 file to the specified destination file path
+                        entry.ExtractToFile(destinationFullPath, overwrite: true);
+                        return; // Exit the method after extracting the MP3 file
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Error extracting MP3 from JDL: " + e.Message);
+        }
+    }
+
+
 
     public void URL(string url)
     {
@@ -408,7 +494,7 @@ public class mainMenu : MonoBehaviour
         string path = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
         string filePath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, $"{sceneData.levelName}.json");
         string musicPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, $"{sceneData.songName}.mp3");
-        string defSongPath = Path.Combine(Application.streamingAssetsPath, "music", "NikoN1nja - Slowly Going Insane.mp3");
+        string defSongPath = Path.Combine(Application.streamingAssetsPath, "music", "Pricklety - Fall'd.mp3");
         defSongPath.Replace("\\", "/");
         sceneData.clipPath = defSongPath;
         if (Directory.Exists(path))
@@ -868,7 +954,10 @@ public class mainMenu : MonoBehaviour
 
     public void FixedUpdate()
     {
-        // Check for any input (keyboard or mouse)
+        LevelSystem.Instance.CheckForLevelUp();
+        levelSlider.maxValue = LevelSystem.Instance.initialXPRequirement;
+        levelSlider.value = LevelSystem.Instance.currentXP;
+        levelText.text = "Level: " + LevelSystem.Instance.level.ToString() + $" (XP: {LevelSystem.Instance.currentXP:N0}; Total: {LevelSystem.Instance.currentXP + LevelSystem.Instance.initialXPRequirement:N0})";
         bool hasInput = Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0 || Input.GetMouseButtonDown(0);
         idleTimer += Time.fixedDeltaTime;
         if (!hasInput)

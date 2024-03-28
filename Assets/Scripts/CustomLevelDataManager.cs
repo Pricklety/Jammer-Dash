@@ -24,7 +24,7 @@ public class CustomLevelDataManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            SceneManager.sceneLoaded += OnSceneLoaded;
+
         }
         else
         {
@@ -49,6 +49,7 @@ public class CustomLevelDataManager : MonoBehaviour
             diff = (int)sceneData.calculatedDifficulty;
             loaded = false;
             Addressables.LoadScene("Assets/" + SceneManager.GetActiveScene().name + ".unity", LoadSceneMode.Single);
+            SceneManager.sceneLoaded += OnSceneLoaded;
 
         }
         else
@@ -116,6 +117,8 @@ public class CustomLevelDataManager : MonoBehaviour
         if (scene.name == "LevelDefault")
         {
             StartCoroutine(ProcessAfterSceneLoaded());
+
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
     }
 
@@ -169,7 +172,7 @@ public class CustomLevelDataManager : MonoBehaviour
         levelName = sceneData.levelName;
         creator = sceneData.creator;
         diff = (int)sceneData.calculatedDifficulty;
-       
+
         yield return null;
     }
 }

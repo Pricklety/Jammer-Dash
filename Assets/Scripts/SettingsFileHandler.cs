@@ -57,6 +57,7 @@ public class SettingsData
     public float mouseParticles = 1000;
     public bool isShowingFPS = false;
     public int hitType = 0;
+    public float cursorFade = 0.24f;
     public string gameVersion = Application.version;
     public string saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
 

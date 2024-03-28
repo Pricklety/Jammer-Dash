@@ -34,11 +34,15 @@ public class PauseMenu : MonoBehaviour
         }
         else if (SceneManager.GetActiveScene().name == "LevelDefault")
         {
-            string levelName = "";
-
-                levelName = CustomLevelDataManager.Instance.levelName;
+                string levelName = CustomLevelDataManager.Instance.levelName;
                 CheckSceneDataExists(levelName, "levels\\extracted");
-            
+            if (levelName == null)
+            {
+
+                levelName = LevelDataManager.Instance.levelName;
+                CheckSceneDataExists(levelName, "scenes");
+            }
+
             song.text = levelName;
         }
         if (PlayerPrefs.HasKey("attempts"))
@@ -52,21 +56,7 @@ public class PauseMenu : MonoBehaviour
     }
     private void CheckSceneDataExists(string levelName, string folder)
     {
-        string filePath = Path.Combine(Application.persistentDataPath, folder, levelName, $"{levelName}.json");
-
-        if (File.Exists(filePath))
-        {
-            Debug.Log($"Scene data file found: {filePath}");
-            // LoadSceneData(levelName, folder); // You can load scene data here if needed
-        }
-        else
-        {
-            Debug.LogWarning($"Scene data file not found: {filePath}");
-
-            levelName = LevelDataManager.Instance.levelName;
-            CheckSceneDataExists(levelName, "scenes");
-
-        }
+       
     }
 
     // Function to load SceneData for a specific level
@@ -226,6 +216,8 @@ public class PauseMenu : MonoBehaviour
     {
         Time.timeScale = 1;
         SceneManager.LoadSceneAsync(1);
+        LevelDataManager.Instance.enabled = false;
+        CustomLevelDataManager.Instance.enabled = false;
     }
 
     public void Restart()

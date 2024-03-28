@@ -4,6 +4,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static Cinemachine.DocumentationSortingAttribute;
 
 public class FinishLine : MonoBehaviour
 {
@@ -70,7 +71,7 @@ public class FinishLine : MonoBehaviour
                 itemUnused1 = itemUnused2;
             }
         }
-        if (itemUnused1 != null)
+        if (itemUnused1 != null && transform.position.x < itemUnused1.transform.position.x)
         {
             transform.position = new Vector3((itemUnused1.transform.position + new Vector3(5f, 0f, 0.0f)).x, 0.0f, 0.0f);
 
@@ -96,24 +97,25 @@ public class FinishLine : MonoBehaviour
         
     }
 
-    private void SaveLevelData(string levelKey, string tierKey, string destructionKey, float destruction)
+    private void SaveLevelData(string levelKey, string tierKey, string destructionKey, float destruction, string actualDestructionKey, float actualDestruction)
     {
-        if (PlayerPrefs.HasKey(destructionKey))
-        {
-            float num = PlayerPrefs.GetFloat(destructionKey);
-            if ((double)destruction <= (double)num)
-                return;
-            PlayerPrefs.SetString(levelKey, Guid.NewGuid().ToString("N"));
-            PlayerPrefs.SetString(tierKey, scores.GetTier(destruction));
-            PlayerPrefs.SetFloat(destructionKey, destruction);
-        }
-        else
-        {
-            PlayerPrefs.SetString(levelKey, Guid.NewGuid().ToString("N"));
-            PlayerPrefs.SetString(tierKey, scores.GetTier(destruction));
-            PlayerPrefs.SetFloat(destructionKey, destruction);
-        }
+        // Save destruction and actual destruction values
+        PlayerPrefs.SetFloat(destructionKey, destruction);
+        PlayerPrefs.SetFloat(actualDestructionKey, actualDestruction);
+
+        // Save other level data if needed
+        PlayerPrefs.SetString(levelKey, Guid.NewGuid().ToString("N"));
+        PlayerPrefs.SetString(tierKey, scores.GetTier(destruction));
     }
+
+    private float LoadLevelData(string destructionKey, float actualDestructionKey)
+    {
+        float destruction = PlayerPrefs.GetFloat(destructionKey, 0f);
+
+        // Return destruction or actual destruction based on your requirements
+        return destruction;
+    }
+
 
     private IEnumerator End()
     {
@@ -124,51 +126,83 @@ public class FinishLine : MonoBehaviour
         Scene activeScene = SceneManager.GetActiveScene();
         player.transform.localScale = Vector3.zero;
         objectOfType.enabled = false;
+        float lastScore = 0f;
         if (activeScene.buildIndex == 25)
-            SaveLevelData("Explorers", "ExplorersTier", "destexplorer", actualdest);
+        {
+
+            lastScore = LoadLevelData("destexplorer1", destruction);
+            SaveLevelData("Explorers", "ExplorersTier", "destexplorer", actualdest, "destexplorer1", destruction);
+        }
+
         if (activeScene.buildIndex == 26)
-            SaveLevelData("GeometricalDominator", "GeometricalDominatorTier", "destgd", actualdest);
+        {
+            lastScore = LoadLevelData("destgd1", destruction);
+            SaveLevelData("GeometricalDominator", "GeometricalDominatorTier", "destgd", actualdest, "destgd1", destruction);
+
+        }
+
         if (activeScene.buildIndex == 27)
-            SaveLevelData("SkySoul", "SkySoulTier", "destsky", actualdest);
+        {
+            lastScore = LoadLevelData("destsky1", destruction);
+            SaveLevelData("SkySoul", "SkySoulTier", "destsky", actualdest, "destsky1", destruction);
+        }
+
         if (activeScene.buildIndex == 28)
-            SaveLevelData("RedHorizon", "RedHorizonTier", "destredhorizon", actualdest);
+        {
+            lastScore = LoadLevelData("destredhorizon1", destruction);
+            SaveLevelData("RedHorizon", "RedHorizonTier", "destredhorizon", actualdest, "destredhorizon1", destruction);
+        }
+
         if (activeScene.buildIndex == 29)
-            SaveLevelData("Skystrike", "SkystrikeTier", "destskystrike", actualdest);
+        {
+            lastScore = LoadLevelData("destskystrike1", destruction);
+            SaveLevelData("Skystrike", "SkystrikeTier", "destskystrike", actualdest, "destskystrike1", destruction);
+        }
+
         PlayerPrefs.Save();
         yield return new WaitForSecondsRealtime(2f);
         AudioSource[] audios = FindObjectsOfType<AudioSource>();
         Debug.Log(audios);
         float startVolume = 1f;
         float targetVolume = 0f;
-        float currentTime = 0f; 
+        float currentTime = 0f;
         finishMenu.SetActive(true);
         SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
         if (data.scoreType == 0)
             score.text = "Tier: " + scores.GetTier(actualdest) + "\nHighest Combo: " + player0.highestCombo.ToString() + string.Format("\nScore: {0} ({1})", destruction.ToString("N0"), scores.destroyedCubes) + string.Format("\nAccuracy: {0:00.00}%", (object)scores.destructionPercentage);
         else
             score.text = "Tier: " + scores.GetTier(actualdest) + "\nHighest Combo: " + player0.highestCombo.ToString() + string.Format("\nScore: {0}", scores.destroyedCubes) + string.Format("\nAccuracy: {0:00.00}%", (object)scores.destructionPercentage);
+        
+        float currentScore = player0.counter.score;
+        float scoreDifference = currentScore - lastScore;
+        // Add the score difference as XP
+        if (scoreDifference > 0)
+        {
+            float xpToAdd = scoreDifference;
+            LevelSystem.Instance.GainXP(xpToAdd);
+        }
+        else if (lastScore == 0 && scoreDifference <= 0)
+        {
+            LevelSystem.Instance.GainXP(scoreDifference);
+        }
+
         while (currentTime < 3f)
         {
-          
+
             currentTime += Time.deltaTime;
             foreach (AudioSource audio in audios)
             {
                 audio.volume = Mathf.Lerp(startVolume, targetVolume, currentTime / 3f);
             }
             yield return null;
-            
+
 
         }
-
         // Stop playing the audio after 10 seconds
         foreach (AudioSource audio in audios)
         {
             audio.Stop();
         }
-        
-
-
-
 
     }
 

@@ -17,7 +17,7 @@ public class SceneData
     public int bpm;
     public string levelName;
     public int levelLength;
-    public string songName = "NikoN1nja - Slowly Going Insane";
+    public string songName = "Pricklety - Fall'd.mp3";
     public float calculatedDifficulty = 0f;
     public string gameVersion;
     public float saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -29,6 +29,8 @@ public class SceneData
     public Color defGColor;
     public bool isVerified;
     public bool isUploaded;
+    public int playerScore;
+    public string rank;
     public string picLocation;
 
     public string ToJson()

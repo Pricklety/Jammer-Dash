@@ -455,7 +455,7 @@ public class PlayerMovement : MonoBehaviour
     IEnumerator ChangeScore()
     {
         counter.destroyedCubes += 50;
-        int newDestroyedCubes = counter.score + Mathf.RoundToInt((float)counter.destructionPercentage) * combo * (counter.accCount / Total * 100 / 2) + hpint;
+        int newDestroyedCubes = counter.score + Mathf.RoundToInt((float)counter.destructionPercentage) * (counter.accCount / Total * 100 / 2) + hpint + combo * 10;
         float elapsedTime = 0f;
         float duration = 0.1f; 
         counter.accCount++;
@@ -543,7 +543,7 @@ public class PlayerMovement : MonoBehaviour
             GameObject tutg = GameObject.Find("TutorialText");
         }
 
-        if (collision.tag == "Cubes" && activeCubes.Contains(collision.gameObject))
+        if (collision.tag == "Cubes" && activeCubes.Contains(collision.gameObject) && health > 0)
         {
             activeCubes.Remove(collision.gameObject);
 

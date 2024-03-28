@@ -117,6 +117,8 @@ public class EditorManager : MonoBehaviour
     private string selectedSongPath;
     public float delay;
     public float delayLimit = 0.25f;
+    public float timer = 0f;
+    
 
     // Start is called before the first frame update
     void Start()
@@ -455,7 +457,7 @@ public class EditorManager : MonoBehaviour
 
     private IEnumerator LoadCustomAudioClip(string fileName)
     {
-        string filePath = Path.Combine(Application.persistentDataPath, "scenes", sceneNameInput.text, fileName + ".mp3");
+        string filePath = Path.Combine(Application.persistentDataPath, "scenes", sceneNameInput.text, fileName);
         string formattedPath = "file://" + filePath.Replace("\\", "/");
 
         using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(formattedPath, AudioType.MPEG);
@@ -601,7 +603,7 @@ public class EditorManager : MonoBehaviour
             Debug.Log("Objects and UI loaded successfully");
             bpm.text = sceneData.bpm.ToString();
             color1.startingColor = sceneData.defBGColor;
-            StartCoroutine(LoadCustomClip(sceneData.clipPath));
+            StartCoroutine(LoadCustomAudioClip(sceneData.songName));
             
         }
         else
@@ -1011,9 +1013,15 @@ public class EditorManager : MonoBehaviour
         int accurateCount = cubes.Count + saws.Count;
         
             objectCount.text = "Objects: " + accurateCount.ToString() + "/6000";
-        if (Input.GetMouseButton(0) && delay >= delayLimit && itemButtons[currentButtonPressed].clicked && !pointerOverUI && !player.enabled)
-        {
 
+        if (Input.GetMouseButton(0))
+        {
+            timer += Time.unscaledDeltaTime;
+        }
+        
+        if (Input.GetMouseButtonUp(0) && timer < 0.2f && delay >= delayLimit && itemButtons[currentButtonPressed].clicked && !pointerOverUI && !player.enabled)
+        {
+            timer = 0f;
             delay = 0;
 
             if (worldPos.y < 4.5f && worldPos.x > 1 && worldPos.y > -1.5f && worldPos.x < 20000 && accurateCount < 6000)
@@ -1097,7 +1105,10 @@ public class EditorManager : MonoBehaviour
                 
             }
         }
-
+        if (Input.GetMouseButtonUp(0))
+        {
+            timer = 0f;
+        }
         if (Input.GetMouseButtonDown(1))
         {
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -1566,7 +1577,7 @@ public class EditorManager : MonoBehaviour
         {
             levelName = sceneNameInput.text.Trim(),
             sceneName = sceneNameInput.text.Trim(),
-            songName = (audio.clip != null) ? audio.clip.name : "NikoN1nja - Slowly Going Insane",
+            songName = (audio.clip != null) ? audio.clip.name : "Pricklety - Fall'd.mp3",
             calculatedDifficulty = calculatedDifficulty,
             gameVersion = Application.version,
             saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
@@ -1665,7 +1676,7 @@ public class EditorManager : MonoBehaviour
         {
             levelName = sceneNameInput.text.Trim(),
             sceneName = sceneNameInput.text.Trim(),
-            songName = (audio.clip != null) ? audio.clip.name : "NikoN1nja - Slowly Going Insane",
+            songName = (audio.clip != null) ? audio.clip.name : "Pricklety - Fall'd.mp3",
             calculatedDifficulty = calculatedDifficulty,
             gameVersion = Application.version,
             saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),

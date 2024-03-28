@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.EventSystems;
+using UnityEngine.Localization.SmartFormat.Utilities;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -30,6 +32,7 @@ public class AudioManager : MonoBehaviour
     public Slider masterS;
     public bool sfx;
     public bool hits;
+    float timer = 0f;
         
     private void Awake()
     {
@@ -40,7 +43,6 @@ public class AudioManager : MonoBehaviour
             if (!isMusicLoaded)
             {
                 StartCoroutine(LoadAudioClipsAsync());
-                StartCoroutine(ChangeVol());
             }
             // Find the menuMusicControl script
             menuMusicControl musicControl = FindObjectOfType<menuMusicControl>();
@@ -71,7 +73,6 @@ public class AudioManager : MonoBehaviour
 
     public void Start()
     {
-        StartCoroutine(ChangeVol());
         masterS.onValueChanged.AddListener(OnMasterVolumeChanged);
     }
     public void OnMasterVolumeChanged(float volume)
@@ -116,7 +117,7 @@ public class AudioManager : MonoBehaviour
 
     public void Update()
     {
-       
+
         if (SceneManager.GetActiveScene().buildIndex == 1)
         {
             options = FindObjectOfType<Options>();
@@ -165,75 +166,111 @@ public class AudioManager : MonoBehaviour
         {
             songPlayed = false;
         }
-    }
 
-    IEnumerator ChangeVol()
-    {
         AudioSource[] audios = FindObjectsOfType<AudioSource>();
         float value1 = Input.GetAxis("Mouse ScrollWheel");
-        float volumeChangeSpeed = 1f;
+        float volumeChangeSpeed = 2f;
 
         float volumeAdjustmentDelay = 1f;
+
         foreach (AudioSource audio in audios)
         {
             audio.outputAudioMixerGroup = master;
-            audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", masterVolume);
+            audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", Mathf.Clamp(masterS.value, -80f, 0f));
         }
 
-        if (value1 != 0)
-        {
-            bool isAdjustingVolume;
-            float volumeAdjustmentTimer;
-            masterS.gameObject.SetActive(true);
+        // Calculate the new volume within the range of -80 to 0
+        float newVolume = Mathf.Clamp(masterS.value + value1 * volumeChangeSpeed, -80f, 0f);
+        float intVol = Mathf.RoundToInt(Mathf.InverseLerp(-80f, 0f, newVolume) * 100f);
 
+        // Update UI slider text outside the loop
+        masterS.GetComponentInChildren<Text>().text = "Master: " + intVol;
+
+        if (value1 != 0 && !IsScrollingUI())
+        {
+            timer = 0f; // Increment timer each frame
+            // Activate masterS GameObject if it's not active
+            if (!masterS.gameObject.activeSelf)
+            {
+                masterS.gameObject.SetActive(true);
+            }
+
+            // Loop through each audio source
             foreach (AudioSource audio in audios)
             {
-                // Calculate the new volume within the range of 0 to 100
-                float newVolume = Mathf.Clamp(audio.volume + value1 * volumeChangeSpeed / 200, 0f, 1f);
-
-                // Update UI sliders
-                masterS.value = newVolume;
-
-                if (SceneManager.GetActiveScene().buildIndex == 1)
-                {
-                    // Assuming options.masterVolumeSlider range is also 0 to 100
-                    options.masterVolumeSlider.value = masterS.value;
-                    options.ApplySettings();
-                }
-
-                isAdjustingVolume = true;
-                volumeAdjustmentTimer = volumeAdjustmentDelay;
 
                 // Apply the new volume to the audio source
-                audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", newVolume); 
+                audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", newVolume);
+                if (SceneManager.GetActiveScene().buildIndex == 1)
+                {
+                    options.masterVolumeSlider.value = newVolume;
+                }
             }
+            masterS.value = newVolume;
 
-            // Start a coroutine for the delay
-            yield return StartCoroutine(DelayCoroutine());
 
-            masterS.gameObject.SetActive(false);
-        }
-    }
-
-    IEnumerator DelayCoroutine()
-    {
-        float timer = 0f;
-
-        while (timer < 2f)
-        {
-            // Check for user input (scroll or mouse interaction) only when masterS is held
-            if (Input.GetMouseButton(0) && EventSystem.current.currentSelectedGameObject == masterS.gameObject)
+            // Update UI slider text
+            masterS.GetComponentInChildren<Text>().text = "Master: " + intVol;
+             // Check if masterS is held and there's no input from Mouse ScrollWheel
+            if (EventSystem.current.currentSelectedGameObject == masterS || Input.GetAxis("Mouse ScrollWheel") != 0)
             {
-                // If there's input and masterS is held, reset the timer
-                timer = 0f;
+                if (SceneManager.GetActiveScene().buildIndex == 1)
+                {
+                    options.masterVolumeSlider.value = masterS.value;
+                }
+                timer = 0f; // Reset the timer when masterS is held
+            } 
+        }
+        else
+        {
+            if (Input.GetMouseButton(0) && timer < 2)
+            {
+                if (SceneManager.GetActiveScene().buildIndex == 1)
+                {
+                    options.masterVolumeSlider.value = masterS.value;
+                }
+                timer = 1.95f;
             }
 
-            // Wait for a short time before checking again
-            yield return null;
-
-            // Update the timer
-            timer += Time.deltaTime;
+            timer += Time.fixedDeltaTime;
         }
+        if (Mathf.Approximately(timer, 2f))
+        {
+            options.masterVolumeSlider.value = masterS.value;
+            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+            data.volume = masterS.value;
+            SettingsFileHandler.SaveSettingsToFile(data);
+            Debug.Log("asdass");
+        }
+
+        // Check if the timer has exceeded 2 seconds and masterS is not held
+        if (timer > 2f)
+        {
+            masterS.gameObject.SetActive(false);
+            masterS.value = options.masterVolumeSlider.value; 
+        }
+        
+    }
+    bool IsScrollingUI()
+    {
+        EventSystem eventSystem = EventSystem.current;
+        if (eventSystem != null && eventSystem.currentSelectedGameObject != null)
+        {
+            Scrollbar scrollbar = eventSystem.currentSelectedGameObject.GetComponent<Scrollbar>();
+            ScrollRect scrollRect = eventSystem.currentSelectedGameObject.GetComponentInParent<ScrollRect>();
+            if (scrollbar != null || scrollRect != null)
+                return true;
+        }
+
+        // Check if mouse is over a ScrollRect
+        if (eventSystem != null && eventSystem.IsPointerOverGameObject())
+        {
+            ScrollRect scrollRect = FindObjectOfType<ScrollRect>();
+            if (scrollRect != null && RectTransformUtility.RectangleContainsScreenPoint(scrollRect.viewport, Input.mousePosition))
+                return true;
+        }
+
+        return false;
     }
 
     public void SetMasterVolume(float volume)

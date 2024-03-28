@@ -23,9 +23,6 @@ public class StatsMan : MonoBehaviour
     float lastInterval; // Last interval end time
     float frames = 0; // Frames over the current interval
 
-    float framesavtick = 0;
-    float framesav = 0.0f;
-    float ping;
 
     [SerializeField]
     private AudioMixer audioMixer; // Reference to your AudioMixer
@@ -36,7 +33,6 @@ public class StatsMan : MonoBehaviour
     {
         lastInterval = Time.realtimeSinceStartup;
         frames = 0;
-        framesav = 0;
 
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
@@ -167,13 +163,7 @@ public class StatsMan : MonoBehaviour
             info += "Multicast: " + iface.SupportsMulticast + "\n\n";
 
         }
-        
-        StartCoroutine(GetPingToGoogle((pingTime) =>
-        {
-            ping = pingTime;
-        }));
-        info += "Ping: " + ping + "ms\n\n";
-        gui.text += info;
+       
     }
 
     void DisplayApplicationInfo()
@@ -201,33 +191,5 @@ public class StatsMan : MonoBehaviour
         }
     }
 
-    IEnumerator GetPingToGoogle(Action<float> callback)
-    {
-        const float trackingDuration = 1; // Duration to track ping times (in seconds)
-        List<float> pingTimes = new List<float>();
-
-        // Track ping times for the specified duration
-        float startTime = Time.time;
-        while (Time.time - startTime < trackingDuration)
-        {
-            Ping ping = new Ping("jammerdash.com");
-            while (!ping.isDone)
-            {
-                yield return null;
-            }
-            pingTimes.Add(ping.time);
-            yield return new WaitForSeconds(1f); // Wait for 1 second before checking again
-        }
-
-        // Calculate average ping time
-        float totalPingTime = 0f;
-        foreach (float time in pingTimes)
-        {
-            totalPingTime += time;
-        }
-        float averagePingTime = pingTimes.Count > 0 ? totalPingTime / pingTimes.Count : -1f;
-
-        callback(averagePingTime);
-    }
 
 }

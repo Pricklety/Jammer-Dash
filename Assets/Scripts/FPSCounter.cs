@@ -36,7 +36,7 @@ public class FPSCounter : MonoBehaviour
     {
         // Sample FPS
         {
-            var currentFrame = (int)Math.Round(1f / Time.smoothDeltaTime);
+            var currentFrame = (int)Math.Round(1f / Time.unscaledDeltaTime);
             _frameRateSamples[_averageCounter] = currentFrame;
         }
 

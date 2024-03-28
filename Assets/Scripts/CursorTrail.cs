@@ -1,3 +1,4 @@
+using UnityEditor.Localization.Plugins.XLIFF.V20;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -37,6 +38,7 @@ public class CursorTrail : MonoBehaviour
 
     void Update()
     {
+       
         mainCamera = Camera.main;
         // Move the trail object to the cursor position 
        
@@ -79,7 +81,7 @@ public class CursorTrail : MonoBehaviour
                 trailImage.rectTransform.localEulerAngles = Vector3.zero;
             }
         }
-
+        SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
         if (Input.touchCount == 0)
         {
             
@@ -89,7 +91,7 @@ public class CursorTrail : MonoBehaviour
             }
             else
             {
-                SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+                
                 trailImage.GetComponentInChildren<ParticleSystem>().emissionRate = data.mouseParticles; hasClicked = false;
             }
         }
@@ -97,7 +99,7 @@ public class CursorTrail : MonoBehaviour
         {
             trailImage.GetComponentInChildren<ParticleSystem>().emissionRate = 10000;
         }
+        trailImage.GetComponentInChildren<ParticleSystem>().startLifetime = data.cursorFade;
 
-       
     }
 }

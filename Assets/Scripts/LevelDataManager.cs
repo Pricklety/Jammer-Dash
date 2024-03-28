@@ -24,6 +24,7 @@ public class LevelDataManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
@@ -43,7 +44,7 @@ public class LevelDataManager : MonoBehaviour
             SceneData sceneData = SceneData.FromJson(json);
 
             // Load the audio clip
-            string audioFilePath = Path.Combine(Application.persistentDataPath, "scenes", sceneName, $"{sceneData.songName}.mp3");
+            string audioFilePath = Path.Combine(Application.persistentDataPath, "scenes", sceneName, $"{sceneData.songName}");
 
             if (SceneManager.GetActiveScene().name == "SampleScene")
             {
@@ -58,9 +59,6 @@ public class LevelDataManager : MonoBehaviour
                         manager.bgPreview.texture = DownloadHandlerTexture.GetContent(www);
                     }
                 }
-                StartCoroutine(LoadAudioClip(audioFilePath, clip => {
-                    manager.lineController.audioClip = clip;
-                }));
                 manager.sceneNameInput.text = sceneData.levelName;
                 manager.ground.SetActive(sceneData.ground);
                 manager.groundToggle.isOn = sceneData.ground;
@@ -69,6 +67,7 @@ public class LevelDataManager : MonoBehaviour
                 levelName = sceneData.levelName;
                 creator = sceneData.creator;
                 diff = (int)sceneData.calculatedDifficulty;
+                SceneManager.sceneLoaded += OnSceneLoaded;
                 return sceneData;
             }
 
@@ -76,6 +75,8 @@ public class LevelDataManager : MonoBehaviour
             {
                 loaded = false;
                 Addressables.LoadScene("Assets/" + SceneManager.GetActiveScene().name + ".unity", LoadSceneMode.Single);
+                SceneManager.sceneLoaded += OnSceneLoaded;
+
             }
         }
         else
@@ -90,6 +91,8 @@ public class LevelDataManager : MonoBehaviour
         if (scene.name == "LevelDefault")
         {
             StartCoroutine(ProcessAfterSceneLoaded());
+
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
     }
     private IEnumerator ProcessAfterSceneLoaded()
@@ -125,8 +128,8 @@ public class LevelDataManager : MonoBehaviour
             }
 
 
-           
-            levelName = sceneData.levelName;
+
+        levelName = sceneData.levelName;
             creator = sceneData.creator;
             diff = (int)sceneData.calculatedDifficulty;
        
@@ -178,31 +181,7 @@ public class LevelDataManager : MonoBehaviour
         }
     }
 
-    public IEnumerator LoadAudioClip(string filePath, Action<AudioClip> callback)
-    {
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + filePath, AudioType.MPEG))
-        {
-            Debug.Log(filePath);
-            yield return www.SendWebRequest();
-
-            if (www.isDone)
-            {
-                AudioClip audioClip = DownloadHandlerAudioClip.GetContent(www);
-
-                if (audioClip != null)
-                {
-                    callback(audioClip);
-                }
-                else
-                {
-                    Debug.LogError("Failed to convert audio clip: " + filePath);
-                    callback(null);
-                    SceneManager.LoadScene("SampleScene");
-                    LoadLevelData(levelName);
-                }
-            }
-        }
-    }
+   
     // Function to find an inactive object of a specific type
     // Function to find an inactive object of a specific type
     private T FindInactiveObjectOfType<T>() where T : Component

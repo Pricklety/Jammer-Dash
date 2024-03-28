@@ -16,14 +16,14 @@ public class introManager : MonoBehaviour
     void Start()
     {
         StartCoroutine(LoadMusicAndMenu()); 
-        if (!Directory.Exists(Path.Combine(Application.persistentDataPath + "backgrounds")))
+        if (!Directory.Exists(Path.Combine(Application.persistentDataPath,"backgrounds")))
         {
-            Directory.CreateDirectory(Path.Combine(Application.persistentDataPath + "backgrounds"));
+            Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "backgrounds"));
         }
-        if (!PlayerPrefs.HasKey("bootSafe"))
+        if (!PlayerPrefs.HasKey("bootSafe031"))
         {
             PlayerPrefs.DeleteAll();
-            PlayerPrefs.SetInt("bootSafe", 1);
+            PlayerPrefs.SetInt("bootSafe031", 1);
         }
         QualitySettings.maxQueuedFrames = 3;
     }
@@ -35,7 +35,7 @@ public class introManager : MonoBehaviour
 
         while (!AudioManager.Instance.isMusicLoaded)
         {
-            if (Directory.Exists(Path.Combine(Application.persistentDataPath + "music")))
+            if (Directory.Exists(Path.Combine(Application.persistentDataPath, "music")))
             {
                 float progress = AudioManager.Instance.GetLoadingProgress();
                 Text percentage = load.GetComponentInChildren<Text>();
@@ -45,7 +45,7 @@ public class introManager : MonoBehaviour
             }
             else
             {
-                Directory.CreateDirectory(Path.Combine(Application.persistentDataPath + "music"));
+                Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "music"));
                 StartCoroutine(LoadMusicAndMenu());
             }
             
