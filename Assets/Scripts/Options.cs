@@ -6,7 +6,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.Windows;
 using Debug = UnityEngine.Debug;
+using Input = UnityEngine.Input;
 
 public class Options : MonoBehaviour
 {
@@ -55,12 +57,10 @@ public class Options : MonoBehaviour
     public void Start()
     {
         audio = FindObjectOfType<AudioManager>();
-
         if (audio == null)
         {
             musicText.text = "<color=red><b>Music folder empty, or not found</b></color>";
         }
-
         // Load or initialize settingsData
         settingsData = SettingsFileHandler.LoadSettingsFromFile();
         PopulateDropdowns();
@@ -601,11 +601,25 @@ public class Options : MonoBehaviour
             InitializeMusic();
         }
     }
+    public void Play()
+    {
+        audio.PlaySource();
+    }
+
+    public void Pause()
+    {
+        audio.Pause();
+    }
+
+    public void Stop()
+    {
+        audio.Stop();
+    }
 
     public void UpdateDropdownSelection()
     {
         // Update the dropdown selection based on the currently playing audio clip
-        if (audio != null && audio.isMusicLoaded    )
+        if (audio != null)
         {
             // Get the name of the currently playing audio clip
             string currentClipName = audio.GetComponent<AudioSource>().clip.name;
@@ -630,11 +644,6 @@ public class Options : MonoBehaviour
                 playlist.value = currentIndex;
             }
         }
-        // Handle the case when audio clips are not loaded yet or not playing
-        else
-        {
-            Debug.LogWarning("Audio clips are not loaded or not playing. Make sure AudioManager is initialized.");
-        }
     }
    
     public void Update()
@@ -658,19 +667,20 @@ public class Options : MonoBehaviour
             
         }
 
-        if (!logoVis.isOn || !lineVis.isOn || !bgVis.isOn)
-        {
-            allVis.isOn = false;
-        }
-        else if (logoVis.isOn && lineVis.isOn && bgVis.isOn)
-        {
-            allVis.isOn = true;
-        }
+
         if (allVis.isOn)
         {
             logoVis.isOn = true;
             bgVis.isOn = true;
             lineVis.isOn = true;
+        }
+        else if (!logoVis.isOn || !bgVis.isOn || !lineVis.isOn)
+            allVis.isOn = false;
+        else if (!allVis.isOn)
+        {
+            logoVis.isOn = false;
+            bgVis.isOn = false;
+            lineVis.isOn = false;
         }
 
         if (artBG.isOn)

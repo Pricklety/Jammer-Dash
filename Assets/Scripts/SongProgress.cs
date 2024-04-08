@@ -102,7 +102,7 @@ public class SongProgress : MonoBehaviour
             Debug.LogError($"Failed to load audio clip: {www.error}");
             GameObject.Find("Canvas/default/loadingText").GetComponent<Text>().text = "Failed to download the song. Restarting...";
             SceneManager.LoadScene("SampleScene");
-            CustomLevelDataManager.Instance.LoadLevelData(CustomLevelDataManager.Instance.levelName);
+            CustomLevelDataManager.Instance.LoadLevelData(CustomLevelDataManager.Instance.levelName, CustomLevelDataManager.Instance.ID);
             Time.timeScale = 1f;
 
             yield break;

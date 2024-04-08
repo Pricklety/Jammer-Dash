@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Cubes
+  - Saw
+  - EditorManager
+  - LongCube
+  - SloMoTutorial
+  - Trigger
+  - Beat
+  - BadNote
+  - GoodNote
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - Cubes
+  - Water
+  - UI
+  - Saw
+  - LongCube
+  - GrToggle
+  - Ground
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: trail
+    uniqueID: 2931457087
+    locked: 0

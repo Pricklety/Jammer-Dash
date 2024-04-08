@@ -13,10 +13,12 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.Networking;
-using Unity.Mathematics;
 using System.Text;
 using System.Security.Cryptography;
 using System.IO.Compression;
+using System.Net.NetworkInformation;
+using Random = UnityEngine.Random;
+using System.Data.Common;
 
 public class EditorManager : MonoBehaviour
 {
@@ -29,7 +31,7 @@ public class EditorManager : MonoBehaviour
     public RaycastHit hit;
     public int finishCount = 1;
 
-    [Header("UI - Panels")]
+    [Header("UI and Stuff")]
     public GameObject[] editorPages;
     public GameObject optionsMenu;
     public GameObject mainMenu;
@@ -66,6 +68,10 @@ public class EditorManager : MonoBehaviour
     public Slider sliderOffset2;
     public InputField bpmInput;
     public Slider bpmMultiplier;
+    public InputField creator;
+    public InputField customSongName;
+    public Text levelID;
+    public Text difficulty;
 
     [Header("Post Processing")]
     public PostProcessVolume vol;
@@ -103,7 +109,6 @@ public class EditorManager : MonoBehaviour
     public string sceneNameInBundle;
     public List<GameObject> cubes; // List of cube game objects
     public List<GameObject> saws; // List of saw game objects
-    public InputField creator;
     public InputField bpm;
 
     [Header("Length Calculator")]
@@ -123,7 +128,6 @@ public class EditorManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        SetupCall();
         cubes = new List<GameObject>();
         saws = new List<GameObject>();
         if (vol != null && vol.profile != null)
@@ -145,11 +149,6 @@ public class EditorManager : MonoBehaviour
         saws.AddRange(GameObject.FindGameObjectsWithTag("Saw"));
     }
 
-    public void SetupCall()
-    {
-        SetupMusicDropdown(defMusic, GetMusicFiles);
-        // Or SetupMusicDropdown(stockMusic, GetStockMusicFiles); if needed
-    }
     public void OnMultiplierChange()
     {
         // Check if the audio clip is assigned
@@ -284,32 +283,7 @@ public class EditorManager : MonoBehaviour
 
     }
 
-    private string[] GetMusicFiles()
-    {
-
-        // Use Application.dataPath to get the correct absolute path
-        string absoluteFolderPath = Path.Combine(Application.streamingAssetsPath, "music");
-
-        // Get all files with a specific extension, such as ".mp3" or ".wav"
-        string[] filePaths = Directory.GetFiles(absoluteFolderPath, "*.mp3"); // Adjust the file extension as needed
-
-        List<string> musicFiles = new();
-
-        foreach (string songPath in filePaths)
-        {
-            string fileName = Path.GetFileName(songPath);
-            musicFiles.Add(fileName);
-            
-        }
-
-        return musicFiles.ToArray();
-    }
-
-    public void ChangeSong()
-    {
-        OnSongDropdownValueChanged(defMusic.value, GetMusicFiles);
-    }
-
+   
 
     public void OnSongDropdownValueChanged(int index, Func<object[]> getMusicFiles)
     {
@@ -442,10 +416,11 @@ public class EditorManager : MonoBehaviour
 
         // Set the audio source clip
         loadedAudioClip.name = Path.GetFileName(filePath);
+        Debug.Log(filePath);
         nameText.text = loadedAudioClip.name;
         audio.clip = loadedAudioClip;
         lineController.audioClip = loadedAudioClip;
-
+        customSongName.text = loadedAudioClip.name;
         musicFolderPath = filePath;
         
 
@@ -535,13 +510,14 @@ public class EditorManager : MonoBehaviour
         AudioClip loadedAudioClip = DownloadHandlerAudioClip.GetContent(www);
         // Update loading text to indicate completion
         downloadSlider.gameObject.SetActive(false);
-
         // Set the audio source clip
         loadedAudioClip.name = Path.GetFileName(fileName);
         nameText.text = loadedAudioClip.name;
         audio.clip = loadedAudioClip;
         lineController.audioClip = loadedAudioClip;
         musicFolderPath = filePath;
+
+        customSongName.text = loadedAudioClip.name;
         // Yield return the loaded audio clip
         yield return loadedAudioClip;
     }
@@ -604,7 +580,8 @@ public class EditorManager : MonoBehaviour
             bpm.text = sceneData.bpm.ToString();
             color1.startingColor = sceneData.defBGColor;
             StartCoroutine(LoadCustomAudioClip(sceneData.songName));
-            
+            creator.text = sceneData.creator;
+            customSongName.text = sceneData.songName;
         }
         else
         {
@@ -786,7 +763,7 @@ public class EditorManager : MonoBehaviour
             $"\nLevel file loc: {filePath}" +
             $"\nBPM: {sceneData.bpm}" +
             $"\nSaved version: {Application.version}" +
-            $"\nLocal Level ID: {sceneData.ID:0,000,000,000}" +
+            $"\nLocal Level ID: {sceneData.ID:0000000000}" +
             $"\nUploaded: {sceneData.isUploaded}";
         }
         catch (Exception e)
@@ -937,44 +914,41 @@ public class EditorManager : MonoBehaviour
             sliderOffset2.value = 0f;
         }
 
-        if (playback.value < 0.275)
+        if (!Input.GetKey(KeyCode.R))
         {
-            playback.value = 0.25f;
-            Time.timeScale = playback.value;
-            playbackText.text = $"Playback ({Time.timeScale:0.00}x)";
-        }
-        else if (playback.value >= 0.275f && playback.value < 0.4f)
-        {
-            playback.value = 0.3f;
-            Time.timeScale = playback.value;
-            playbackText.text = $"Playback ({Time.timeScale:0.00}x)";
-        }
-        else if (playback.value >= 0.4f && playback.value < 0.55f)
-        {
-            playback.value = 0.5f;
-            Time.timeScale = playback.value;
-            playbackText.text = $"Playback ({Time.timeScale:0.00}x)";
-        }
-        else if (playback.value >= 0.55f && playback.value < 0.675f)
-        {
-            playback.value = 0.6f;
-            Time.timeScale = playback.value;
-            playbackText.text = $"Playback ({Time.timeScale:0.00}x)";
-        }
-        else if (playback.value >= 0.675f && playback.value < 0.875f)
-        {
-            playback.value = 0.75f;
-            Time.timeScale = playback.value;
-            playbackText.text = $"Playback ({Time.timeScale:0.00}x)";
-        }
-        else if (playback.value >= 0.875f)
-        {
-            playback.value = 1;
-            Time.timeScale = playback.value;
-            playbackText.text = $"Playback ({Time.timeScale:0.00}x)";
-        }
 
-
+            if (playback.value < 0.275)
+            {
+                playback.value = 0.25f;
+                Time.timeScale = playback.value;
+            }
+            else if (playback.value >= 0.275f && playback.value < 0.4f)
+            {
+                playback.value = 0.3f;
+                Time.timeScale = playback.value;
+            }
+            else if (playback.value >= 0.4f && playback.value < 0.55f)
+            {
+                playback.value = 0.5f;
+                Time.timeScale = playback.value;
+            }
+            else if (playback.value >= 0.55f && playback.value < 0.675f)
+            {
+                playback.value = 0.6f;
+                Time.timeScale = playback.value;
+            }
+            else if (playback.value >= 0.675f && playback.value < 0.875f)
+            {
+                playback.value = 0.75f;
+                Time.timeScale = playback.value;
+            }
+            else if (playback.value >= 0.875f)
+            {
+                playback.value = 1;
+                Time.timeScale = playback.value;
+            }
+        }
+        playbackText.text = $"Playback ({Time.timeScale:0.00}x)";
         audio = GameObject.Find("Music").GetComponent<AudioSource>();
         audio.pitch = Time.timeScale;
         PlayerEditorMovement player = GameObject.FindObjectOfType<PlayerEditorMovement>();
@@ -1013,13 +987,36 @@ public class EditorManager : MonoBehaviour
         int accurateCount = cubes.Count + saws.Count;
         
             objectCount.text = "Objects: " + accurateCount.ToString() + "/6000";
+        string file = Path.Combine(Application.persistentDataPath, "scenes", sceneNameInput.text, sceneNameInput.text + ".json");
+        string json = File.ReadAllText(file);
+        SceneData data = SceneData.FromJson(json);
+        levelID.text = "Level ID: " + data.ID;
+        // Find the farthest object in X direction
+        if (cubes.Count > 0)
+        {
+
+            Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));// Calculate the distance based on the position of the farthest object and additional distance
+        float cdistance = targetObject.position.x + additionalDistance;
+        List<Vector2> cubePositions = new List<Vector2>(); // Declare cubePositions as a List<Vector2>
+
+        foreach (GameObject cube in cubes)
+        {
+            Vector2 cubePos = cube.transform.position;
+            cubePositions.Add(cubePos); // Add cube position to the list
+        }
+        // Calculate the number of cubes per Y level
+        int[] cubesPerY = CalculateCubesPerY(cubePositions.ToArray());
+        difficulty.text = "Live Level Difficulty: " + CalculateDifficulty(cubesPerY, cubePositions.ToArray(), cdistance / 7);
+        }
+
+        
 
         if (Input.GetMouseButton(0))
         {
             timer += Time.unscaledDeltaTime;
         }
         
-        if (Input.GetMouseButtonUp(0) && timer < 0.2f && delay >= delayLimit && itemButtons[currentButtonPressed].clicked && !pointerOverUI && !player.enabled)
+        if (Input.GetMouseButtonUp(0) && timer < 0.125f && delay >= delayLimit && itemButtons[currentButtonPressed].clicked && !pointerOverUI && !player.enabled)
         {
             timer = 0f;
             delay = 0;
@@ -1410,6 +1407,7 @@ public class EditorManager : MonoBehaviour
 
     public void MainMenu()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadSceneAsync(1);
     }
 
@@ -1466,6 +1464,7 @@ public class EditorManager : MonoBehaviour
         try
         {
             File.Copy(sourcePath, destinationPath, true);
+            Debug.Log("Copied file to " + destinationPath);
         }
         catch (Exception e)
         {
@@ -1554,6 +1553,10 @@ public class EditorManager : MonoBehaviour
 
     private SceneData CreateSceneData()
     {
+        if (!customSongName.text.Contains(".mp3"))
+        {
+            customSongName.text += ".mp3";
+        }
         // Find the farthest object in X direction
         Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));
 
@@ -1571,21 +1574,31 @@ public class EditorManager : MonoBehaviour
 
         // Calculate the difficulty based on cubes per Y level and other parameters
         float calculatedDifficulty = CalculateDifficulty(cubesPerY, cubePositions.ToArray(), distance / 7);
-
+        string json = File.ReadAllText(Path.Combine(Application.persistentDataPath, "scenes", sceneNameInput.text, sceneNameInput.text + ".json"));
+        SceneData data = SceneData.FromJson(json);
         // Create a SceneData object and populate its properties
         SceneData sceneData = new SceneData()
         {
             levelName = sceneNameInput.text.Trim(),
             sceneName = sceneNameInput.text.Trim(),
-            songName = (audio.clip != null) ? audio.clip.name : "Pricklety - Fall'd.mp3",
+            songName = (audio.clip != null) ? customSongName.text : "Pricklety - Fall'd.mp3",
+            bpm = int.Parse(bpmInput.text),
             calculatedDifficulty = calculatedDifficulty,
             gameVersion = Application.version,
             saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             clip = audio.clip,
             ground = groundToggle.isOn,
-            ID = UnityEngine.Random.Range(int.MinValue, int.MaxValue),
-            levelLength = (int)(distance / 7)
+            levelLength = (int)(distance / 7),
+            creator = creator.text
         };
+        if (data.ID == 0)
+        {
+            sceneData.ID = Random.Range(int.MinValue, int.MaxValue);
+        }
+        else
+        {
+            sceneData.ID = data.ID;
+        }
 
         Camera mainCamera = Camera.main;
         if (mainCamera != null)
@@ -1597,9 +1610,15 @@ public class EditorManager : MonoBehaviour
             Debug.LogWarning("No main camera found. Setting default background color to black.");
             sceneData.defBGColor = Color.black; // Or any other default color you want to use
         }
-
+        
         string directoryPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
+
+        if (sceneData.songName.Length >= 36)
+            sceneData.songName += ".mp3";
         string newPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, sceneData.songName);
+        newPath = newPath.Replace("/", "\\");
+        CopyFileDirectly(musicFolderPath, newPath);
+        Debug.LogError(newPath);
         string[] existingFiles = Directory.GetFiles(directoryPath, "*.mp3");
         // Iterate through each file
         foreach (string filePath in existingFiles)
@@ -1614,17 +1633,15 @@ public class EditorManager : MonoBehaviour
                 File.Delete(filePath);
             }
         }
-        Debug.Log("a " + newPath);
-        sceneData.clipPath = musicFolderPath;
+        
+        sceneData.clipPath = newPath;
         if (bgPreview.texture != null && bgImage.isOn)
         {
             SaveBackgroundImageTexture(Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, "bgImage.png"));
             sceneData.picLocation = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, "bgImage.png");
         }
         Debug.Log(musicFolderPath);
-        CopyFileDirectly(musicFolderPath, newPath);
 
-        musicFolderPath = newPath;
         if (cubes != null)
         {
             sceneData.cubePositions = new List<Vector3>();
@@ -1676,16 +1693,17 @@ public class EditorManager : MonoBehaviour
         {
             levelName = sceneNameInput.text.Trim(),
             sceneName = sceneNameInput.text.Trim(),
-            songName = (audio.clip != null) ? audio.clip.name : "Pricklety - Fall'd.mp3",
+            songName = (audio.clip != null) ? customSongName.text : "Pricklety - Fall'd.mp3",
             calculatedDifficulty = calculatedDifficulty,
             gameVersion = Application.version,
             saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             clip = audio.clip,
             ground = groundToggle.isOn,
-            ID = UnityEngine.Random.Range(int.MinValue, int.MaxValue),
-            levelLength = (int)(distance / 7)
+            levelLength = (int)(distance / 7),
+            creator = creator.text
         };
-
+        if (sceneData.ID == 0)
+            sceneData.ID = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
         // Get the source and destination paths
         string sourceFolderPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
         string destinationFolderPath = Path.Combine(Application.persistentDataPath, "levels", sceneData.levelName);
@@ -1706,6 +1724,19 @@ public class EditorManager : MonoBehaviour
             string subDirName = Path.GetFileName(subDirPath);
             string destSubDirPath = Path.Combine(destinationFolderPath, subDirName);
             File.Copy(subDirPath, destSubDirPath); // Recursive call
+        }
+        string[] existingFiles = Directory.GetFiles(destinationFolderPath, "*.mp3");
+        foreach (string filePath in existingFiles)
+        {
+            // Get the file name without extension
+            string fileName = Path.GetFileName(filePath);
+
+            // Check if the file name is not equal to the current song name
+            if (fileName != sceneData.songName)
+            {
+                // Delete the file
+                File.Delete(filePath);
+            }
         }
 
         // Create a ZIP file with the .jdl extension
@@ -1755,9 +1786,7 @@ public class EditorManager : MonoBehaviour
                 // Avoid division by zero by ensuring clickTimingWindow + distance is not zero
                 float divisor = clickTimingWindow + distance != 0 ? clickTimingWindow + distance : float.Epsilon;
 
-                // Diagnostic output
-                Debug.Log($"timingWindow: {timingWindow}, cubeCount: {cubeCount}, precisionFactor: {precisionFactor}, distance: {distance}, divisor: {divisor}, cubes.Count: {cubes.Count}, saws.Count: {saws.Count}");
-
+                
                 // Add difficulty contribution for this pair of cubes
                 difficulty += timingWindow * 2 + (cubeCount / 30f) * (cubes.Count / 100) * (saws.Count / 100) * (precisionFactor / divisor * 100);
             }

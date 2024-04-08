@@ -120,7 +120,7 @@ public class MusicVisualizer : MonoBehaviour
                 {
                     float customTargetSize = Mathf.Lerp(1.25f, 0.9f, rms);
                     float customCurrentSize = customImage.rectTransform.localScale.x;
-                    float customNewSize = Mathf.Lerp(customCurrentSize, customTargetSize, Time.deltaTime * 2f);
+                    float customNewSize = Mathf.Lerp(customCurrentSize, customTargetSize, Time.unscaledDeltaTime * 10f);
                     customImage.rectTransform.localScale = new Vector3(customNewSize, customNewSize, 1f);
                 }
                 else if (customImage != null && !data.logoVisualizer)
@@ -135,19 +135,23 @@ public class MusicVisualizer : MonoBehaviour
 
     float GetRMS(AudioSource audioSource)
     {
-        float[] samples = new float[4096];
-        audioSource.GetSpectrumData(samples, 0, FFTWindow.Rectangular);
+        int sampleSize = audioSource.clip.frequency / 10;
+        float[] samples = new float[sampleSize];
+        audioSource.GetOutputData(samples, 1); // Get raw audio data
+
         float sum = 0f;
-        foreach (float sample in samples)
+        for (int i = 0; i < sampleSize; i++)
         {
-            sum += sample * sample;
+            sum += samples[i] * samples[i];
         }
-        return Mathf.Sqrt(sum / samples.Length * 1000);
+
+        float rms = Mathf.Sqrt(sum / sampleSize);
+        return rms;
     }
     Color CalculateTargetColor(float intensity, float rms)
     {
         float adjustedIntensity = intensity * rms * 2;
-        float hue = Mathf.Lerp(0, Random.Range(0, 360), adjustedIntensity);
+        float hue = Mathf.Lerp(360, Random.Range(0, 360), adjustedIntensity);
         return Color.HSVToRGB(hue / 360f, 1.0f, 1.0f);
     }
 

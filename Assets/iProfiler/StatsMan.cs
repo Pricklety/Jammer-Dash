@@ -16,64 +16,32 @@ using System.Collections.Generic;
 
 public class StatsMan : MonoBehaviour
 {
-    public Color tx_Color = Color.white;
     public Text gui;
-    Queue<float> fpsValues = new Queue<float>();
-    float updateInterval = 0.1f;
-    float lastInterval; // Last interval end time
-    float frames = 0; // Frames over the current interval
 
 
     [SerializeField]
     private AudioMixer audioMixer; // Reference to your AudioMixer
     private AudioSource musicSource;
-
-    // Use this for initialization
-    void Start()
-    {
-        lastInterval = Time.realtimeSinceStartup;
-        frames = 0;
-
-        Screen.sleepTimeout = SleepTimeout.NeverSleep;
-
-        musicSource = FindObjectOfType<AudioSource>();
-
-    }
-
+        
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        ++frames;
-        var timeNow = Time.realtimeSinceStartup;
+            gui.text = $"Debug v10 - Jammer Dash {Application.version} ({Application.unityVersion})\n\n";
 
-        if (timeNow > lastInterval + updateInterval)
-        {
-            float fps = frames / (timeNow - lastInterval);
-            float ms = 1000.0f / Mathf.Max(fps, 0f);
-
-
-            gui.text = $"Debug 9 - FPS: {fps:f0} ({ms:f1}ms)\n";
-
-            DisplayApplicationInfo();
             DisplayAudioInfo();
             DisplayInputInfo();
-            DisplayNetworkInfo();
             DisplayOptionsInfo();
             DisplaySystemInfo();
             DisplayGraphicsInfo();
             DisplayVideoInfo();
 
-            frames = 0;
-            lastInterval = timeNow;
-        }
     } 
     
     void DisplaySystemInfo()
     {
-        gui.text += "\n\n" + "System Memory: " + (SystemInfo.systemMemorySize / 1000).ToString("f2") + "GB" +
+        gui.text += "System Memory: " + (SystemInfo.systemMemorySize / 1000).ToString("f2") + "GB" +
                     "\nProcessor Type: " + SystemInfo.processorType +
                     "\nProcessor Count: " + SystemInfo.processorCount +
-                    "\nDevice Model: " + SystemInfo.deviceModel +
                     "\nDevice Type: " + SystemInfo.deviceType +
                     "\nOperating System: " + SystemInfo.operatingSystem +
                     "\nCPU Speed: " + SystemInfo.processorFrequency + "MHz" +
@@ -85,19 +53,21 @@ public class StatsMan : MonoBehaviour
         gui.text += "\n\n" + "GPU: " + SystemInfo.graphicsDeviceName +
                     "\nGPU Type: " + SystemInfo.graphicsDeviceType +
                     "\nGPU Version: " + SystemInfo.graphicsDeviceVersion +
-                    "\nGPU Memory: " + SystemInfo.graphicsMemorySize + "MB" +
-                    "\nShader Level: " + SystemInfo.graphicsShaderLevel +
-                    "\nRender Texture Formats: " + string.Join(", ", SystemInfo.supportedRenderTargetCount);
+                    "\nGPU Memory: " + SystemInfo.graphicsMemorySize + "MB\n\n";
     }
 
     void DisplayAudioInfo()
     {
-        gui.text += "\n\n" + "Audio Mixer: " + (audioMixer != null ? audioMixer.name : "N/A");
+        gui.text += "Audio Mixer: " + (audioMixer != null ? audioMixer.name : "N/A");
 
         if (musicSource != null && musicSource.name == "mainmenu")
         {
             gui.text += "\nMusic Clip: " + (musicSource.clip != null ? musicSource.clip.name : "N/A") + 
-                        "\nCurrent song index: " + musicSource.GetComponent<AudioManager>().currentClipIndex;
+                        "\nCurrent song index: " + musicSource.GetComponent<AudioManager>().currentClipIndex  +"\n\n";
+        }
+        else
+        {
+            musicSource = GameObject.Find("mainmenu").GetComponent<AudioSource>();
         }
     }
 
@@ -122,57 +92,23 @@ public class StatsMan : MonoBehaviour
                     "\nLowpass value: " + data.lowpassValue + 
                     "\nScore Display Type: " + a + 
                     "\nMouse particle count: " + data.mouseParticles + 
-                    "\nShowing FPS: " + data.isShowingFPS;
+                    "\nShowing FPS: " + data.isShowingFPS + "\n\n";
 
     }
         
     void DisplayVideoInfo()
     {
-        gui.text += "\n\n" + "Current Resolution: " + Screen.currentResolution.width + "x" + Screen.currentResolution.height +
-                    "\nScreen DPI: " + Screen.dpi +
-                    "\nScreen Orientation: " + Screen.orientation +
-                    "\nScreen Full Screen: " + Screen.fullScreen +
-                    "\nScreen Sleep Timeout: " + Screen.sleepTimeout +
-                    "\nConnected Displays: " + Display.displays.Length;
+        gui.text += "Screen Full Screen: " + Screen.fullScreen +
+                    "\nConnected Displays: " + Display.displays.Length + "\n\n";
     }
 
 
     void DisplayInputInfo()
     {
-        gui.text += "\n\n" + "Touch Support: " + Input.touchSupported +
-                    "\nInput count: " + Input.touchCount +
-                    "\nInput Acceleration: " + $"{Input.GetAxisRaw("Mouse X")},  {Input.GetAxisRaw("Mouse Y")}";
+        gui.text += "Touch Support: " + Input.touchSupported +
+                    "\nInput count: " + Input.touchCount + "\n\n";
     }
-
-    void DisplayNetworkInfo()
-    {
         
-
-        string info = "\n\n";
-
-        // Internet reachability
-        info += "Internet Reachability: " + Application.internetReachability + "\n\n";
-
-        // Network interface information
-        NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces();
-        foreach (NetworkInterface iface in interfaces)
-        {
-            info += "Network: " + iface.Name + "\n";
-            info += "Status: " + iface.OperationalStatus + "\n";
-            info += "Speed: " + (iface.Speed / 1000000) + " Mbps\n";
-            info += "Multicast: " + iface.SupportsMulticast + "\n\n";
-
-        }
-       
-    }
-
-    void DisplayApplicationInfo()
-    {
-        gui.text += "\n\n" + "Made in Unity " + Application.unityVersion +
-                    "\nTarget Frame Rate: " + Application.targetFrameRate +
-                    "\nGame version: " + Application.version +
-                    "\nVSync: " + QualitySettings.vSyncCount;
-    }
 
     private string[] qualityLevelNames = new string[]
     {

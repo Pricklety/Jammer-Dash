@@ -47,6 +47,10 @@ public class CustomLevelScript : MonoBehaviour
     {
         if (songNameText != null)
         {
+            if (songName.Contains(".mp3"))
+            {
+                songName = songName.Replace(".mp3", "");    
+            }
             songNameText.text = songName;
         }
         else
@@ -108,6 +112,9 @@ public class CustomLevelScript : MonoBehaviour
     public void PlayLevel()
     {
         LevelDataManager.Instance.levelName = null;
+        LevelDataManager.Instance.creator = null;
+        LevelDataManager.Instance.diff = 0;
+        LevelDataManager.Instance.ID = 0;
         string json = File.ReadAllText(Application.persistentDataPath + $"/scenes/{levelNameText.text}/" + $"{levelNameText.text}.json");
         SceneData sceneData = SceneData.FromJson(json);
         CustomLevelDataManager data = CustomLevelDataManager.Instance;
@@ -118,7 +125,7 @@ public class CustomLevelScript : MonoBehaviour
             SceneManager.UnloadSceneAsync("MainMenu");
             CustomLevelDataManager data = CustomLevelDataManager.Instance;
             data.levelName = levelNameText.text;
-            CustomLevelDataManager.Instance.LoadLevelData(levelNameText.text);
+            CustomLevelDataManager.Instance.LoadLevelData(levelNameText.text, data.ID);
         });
     }
 

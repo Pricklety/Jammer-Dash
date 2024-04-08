@@ -15,6 +15,7 @@ public class LevelDataManager : MonoBehaviour
     public string levelName;
     public string creator;
     public int diff;
+    public int ID;
     bool loaded;
 
     private void Awake()
@@ -67,6 +68,7 @@ public class LevelDataManager : MonoBehaviour
                 levelName = sceneData.levelName;
                 creator = sceneData.creator;
                 diff = (int)sceneData.calculatedDifficulty;
+                ID = sceneData.ID;
                 SceneManager.sceneLoaded += OnSceneLoaded;
                 return sceneData;
             }
@@ -74,8 +76,8 @@ public class LevelDataManager : MonoBehaviour
             if (SceneManager.GetActiveScene().name == "LevelDefault")
             {
                 loaded = false;
-                Addressables.LoadScene("Assets/" + SceneManager.GetActiveScene().name + ".unity", LoadSceneMode.Single);
                 SceneManager.sceneLoaded += OnSceneLoaded;
+                Addressables.LoadScene("Assets/" + SceneManager.GetActiveScene().name + ".unity", LoadSceneMode.Single);
 
             }
         }
@@ -103,18 +105,25 @@ public class LevelDataManager : MonoBehaviour
         string json = File.ReadAllText(filePath);   
         SceneData sceneData = SceneData.FromJson(json);
         Debug.Log(sceneData.levelName);
-        
+
+        itemUnused[] obj = FindObjectsOfType<itemUnused>();
+        foreach (itemUnused gobject in obj)
+        {
+            Destroy(gobject.gameObject);
+
+        }
         foreach (Vector3 cubePos in sceneData.cubePositions)
-            {
-                GameObject cube = Instantiate(Resources.Load<GameObject>("hitter01"), cubePos, Quaternion.identity);
-            }
+        {
+            GameObject cubeObject = Instantiate(Resources.Load<GameObject>("hitter01"), cubePos, Quaternion.identity);
+            Debug.Log("Cube instantiated: " + cubeObject);
 
-            foreach (Vector3 sawPos in sceneData.sawPositions)
-            {
-                GameObject saw = Instantiate(Resources.Load<GameObject>("Saws and Spikes/rotateSaw01"), sawPos, Quaternion.identity);
-            }
+        }
 
-            if (sceneData.picLocation != null)
+        foreach (Vector3 sawPos in sceneData.sawPositions)
+        {
+            Instantiate(Resources.Load<GameObject>("Saws and Spikes/rotateSaw01"), sawPos, Quaternion.identity);
+        }
+        if (sceneData.picLocation != null)
             {
 
                 StartCoroutine(LoadImageCoroutine(sceneData.picLocation));
@@ -132,16 +141,12 @@ public class LevelDataManager : MonoBehaviour
         levelName = sceneData.levelName;
             creator = sceneData.creator;
             diff = (int)sceneData.calculatedDifficulty;
-       
-        FindObjectOfType<CubeCounter>().maxScore = FindObjectOfType<CubeCounter>().cubes.Length * 50;
-            GameObject.Find("Cube").SetActive(sceneData.ground);
-            GameObject.Find("elevator").SetActive(sceneData.ground); 
-            GameObject.Find("elevator").SetActive(sceneData.ground);
+        ID = sceneData.ID;
         
         FindObjectOfType<Camera>().backgroundColor = sceneData.defBGColor;
-        levelName = sceneData.levelName;
-            creator = sceneData.creator;
-            diff = (int)sceneData.calculatedDifficulty;
+
+
+        GameObject.Find("Cube").SetActive(sceneData.ground);
 
         yield return null;
     }

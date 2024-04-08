@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,7 +22,6 @@ public class PlayerEditorMovement : MonoBehaviour
 
     private void Update()
     {
-        
         // Move player right
         transform.Translate(Vector2.right * moveSpeed * Time.deltaTime);
         text.text = "X: " + transform.position.x.ToString("F1") + ", Y: " + transform.position.y.ToString("F0");
@@ -47,7 +47,34 @@ public class PlayerEditorMovement : MonoBehaviour
             transform.position = new Vector3(transform.position.x, -1, transform.position.z);
 
         }
+       
+        if (Input.GetKey(KeyCode.R))
+        {
+            Time.timeScale = 2f;
+            AudioSource[] sources = FindObjectsOfType<AudioSource>();
 
+            foreach (AudioSource source in sources)
+            {
+                source.pitch = 2f;
+            }
+        }
     }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Cubes")
+        {
+            new WaitForSeconds(0.14f);
+            Debug.Log("hit");
+            AudioClip hitSound = Resources.Load<AudioClip>("Audio/SFX/hit");
+            GameObject.Find("sfx").GetComponent<AudioSource>().PlayOneShot(hitSound, 1);
 
+        }
+        if (collision.tag == "Beat")
+        {
+            Debug.Log("hit");
+            AudioClip hitSound = Resources.Load<AudioClip>("Audio/SFX/hit");
+            GameObject.Find("sfx").GetComponent<AudioSource>().PlayOneShot(hitSound, 1);
+
+        }
+    }
 }

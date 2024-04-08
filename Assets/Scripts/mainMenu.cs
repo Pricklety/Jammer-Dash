@@ -3,15 +3,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
 using UnityEngine.UI;
-using System.Linq;
-using System.Net.NetworkInformation;
 using System.IO;
-using UnityEngine.EventSystems;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.Rendering.PostProcessing;
-using UnityEngine.Networking;
 using UnityEngine.Audio;
 using Random = UnityEngine.Random;
 using System.Collections.Generic;
@@ -19,9 +12,9 @@ using UnityEngine.Video;
 using UnityEditor;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
-using System.Security.Cryptography;
-using System.Text;
 using System.IO.Compression;
+using Lachee.Discord;
+using Button = UnityEngine.UI.Button;
 
 public class mainMenu : MonoBehaviour
 {
@@ -30,6 +23,8 @@ public class mainMenu : MonoBehaviour
     public Sprite[] sprite;
     private bool quittingAllowed = false;
     public SettingsData data;
+
+    PlayerData playerData;
 
     [Header("Panels")]
     public GameObject mainPanel;
@@ -43,11 +38,8 @@ public class mainMenu : MonoBehaviour
     public GameObject quitPanel;
     public GameObject leaderboard;
     public GameObject community;
-    public GameObject legacy;
-    public GameObject crashReport;
 
-    [Header("Crash Reports")]
-    public Text text;
+    
 
     [Header("LevelInfo")]
     public GameObject levelInfoPanelPrefab;
@@ -58,8 +50,6 @@ public class mainMenu : MonoBehaviour
     public GameObject sawPrefab;
     public GameObject playPrefab;
     public Transform playlevelInfoParent;
-    private string decryptionKey = "NzhXiVAcdTD4S+wsZWp3D4l1vk2gXSMrsRRBbw376/pzqiw6SHKxsVhFzLa6bp8c"; 
-    private string decryptionIV = "KJHDSBAK";
 
     [Header("Internet Check")]
     public Text internetStatusText;
@@ -90,9 +80,12 @@ public class mainMenu : MonoBehaviour
     [Header("Profile")]
     public Slider levelSlider;
     public Text levelText;
+    public RawImage discordpfp;
+    public Text discordName;
 
     void Start()
     {
+        playerData = LevelSystem.Instance.LoadTotalXP();
         data = SettingsFileHandler.LoadSettingsFromFile();
         LoadRandomBackground();
         RefreshInternetConnection();
@@ -100,6 +93,10 @@ public class mainMenu : MonoBehaviour
         LoadLevelFromLevels();
         levelSlider.maxValue = LevelSystem.Instance.xpRequiredPerLevel[LevelSystem.Instance.level];
         levelSlider.value = LevelSystem.Instance.currentXP;
+
+        discordpfp.texture = DiscordManager.current.CurrentUser.avatar;
+        discordName.text = DiscordManager.current.CurrentUser.username + "\n\nID: " +
+        DiscordManager.current.CurrentUser.ID;
     }
     public void LoadLevelFromLevels()
     {
@@ -146,7 +143,6 @@ public class mainMenu : MonoBehaviour
 
                 // Read JSON content from the extracted JSON file
                 string json = File.ReadAllText(jsonFilePath);
-                Debug.Log(json);
 
                 // Deserialize JSON data into SceneData object
                 SceneData sceneData = SceneData.FromJson(json);
@@ -578,9 +574,7 @@ public class mainMenu : MonoBehaviour
     // Display level information on UI
     void DisplayLevelInfo(SceneData sceneData, LevelScript level)
     {
-        // Logging for debugging purposes
-        Debug.Log("DisplayLevelInfo - Start");
-
+        
         // Check if LevelScript component is not null
         if (level != null)
         {
@@ -594,17 +588,13 @@ public class mainMenu : MonoBehaviour
         else
         {
             // Logging for debugging purposes
-            Debug.LogError("DisplayLevelInfo - LevelScript component is null");
+            Debug.LogError("Failed to load level " + sceneData.ID);
         }
 
-        // Logging for debugging purposes
-        Debug.Log("DisplayLevelInfo - End");
     }
 
     void DisplayCustomLevelInfo(SceneData sceneData, CustomLevelScript level)
     {
-        // Logging for debugging purposes
-        Debug.Log("DisplayLevelInfo - Start");
 
         // Check if LevelScript component is not null
         if (level != null)
@@ -618,11 +608,9 @@ public class mainMenu : MonoBehaviour
         else
         {
             // Logging for debugging purposes
-            Debug.LogError("DisplayLevelInfo - LevelScript component is null");
+            Debug.LogError("Failed to load level " + sceneData.ID);
         }
 
-        // Logging for debugging purposes
-        Debug.Log("DisplayLevelInfo - End");
     }
 
 
@@ -655,17 +643,7 @@ public class mainMenu : MonoBehaviour
         additionalPanel.SetActive(false);
     }
 
-    public void LegacyOpen()
-    {
-        legacy.SetActive(true);
-        playPanel.SetActive(false);
-    }
-
-    public void LegacyClose()
-    {
-        playPanel.SetActive(true);
-        legacy.SetActive(false);
-    }
+   
 
     public void LBOpen()
     {
@@ -704,9 +682,6 @@ public class mainMenu : MonoBehaviour
 
         Application.wantsToQuit += QuitHandler;
 
-#if UNITY_EDITOR
-        EditorApplication.ExitPlaymode();
-#endif
     }
 
     // Call this method when hiding the quit panel
@@ -721,6 +696,26 @@ public class mainMenu : MonoBehaviour
         StartCoroutine(FadeLowpass());
 
         Application.wantsToQuit -= QuitHandler;
+        PostProcessVolume volume = FindObjectOfType<PostProcessVolume>();
+        if (volume != null)
+        {
+            PostProcessProfile profile = volume.profile;
+            Vignette vignette;
+            if (profile.TryGetSettings(out vignette))
+            {
+                vignette.intensity.value = 0;
+            }
+            else
+            {
+                // Settings couldn't be retrieved
+                Debug.LogWarning("Vignette settings not found in the Post Process Profile.");
+            }
+        }
+        else
+        {
+            // PostProcessVolume not found in the scene
+            Debug.LogWarning("Post Process Volume not found in the scene.");
+        }
     }
 
     // Coroutine for fading the Lowpass filter
@@ -751,34 +746,28 @@ public class mainMenu : MonoBehaviour
 
     public void OnApplicationFocus(bool focus)
     {
-        Debug.Log("Finding AudioSource...");
+        
         source = GameObject.Find("mainmenu").GetComponent<AudioSource>();
         if (source == null)
         {
-            Debug.LogError("AudioSource not found or not attached to 'mainmenu' GameObject.");
             return;
         }
 
-        Debug.Log("Getting Options component...");
         Options options = GetComponent<Options>();
         if (options == null)
         {
-            Debug.LogError("Options component not found or not attached to this GameObject.");
             return;
         }
         focus = options.focusVol.isOn;
-        Debug.Log("Setting volume based on focus state...");
         float ogvol = options.masterVolumeSlider.value;
         float focVol = options.unfocusVol.value;
 
         if (!focus && this.focus)
         {
-            Debug.Log("Application lost focus. Setting volume to unfocused volume: " + focVol);
             source.outputAudioMixerGroup.audioMixer.SetFloat("Master", focVol);
         }
         else if (focus && this.focus)
         {
-            Debug.Log("Application regained focus. Setting volume to original volume: " + ogvol);
             source.outputAudioMixerGroup.audioMixer.SetFloat("Master", ogvol);
         }
 
@@ -954,10 +943,14 @@ public class mainMenu : MonoBehaviour
 
     public void FixedUpdate()
     {
-        LevelSystem.Instance.CheckForLevelUp();
+        LevelSystem.Instance.initialXPRequirement = LevelSystem.Instance.xpRequiredPerLevel[LevelSystem.Instance.level];
         levelSlider.maxValue = LevelSystem.Instance.initialXPRequirement;
         levelSlider.value = LevelSystem.Instance.currentXP;
-        levelText.text = "Level: " + LevelSystem.Instance.level.ToString() + $" (XP: {LevelSystem.Instance.currentXP:N0}; Total: {LevelSystem.Instance.currentXP + LevelSystem.Instance.initialXPRequirement:N0})";
+        if (LevelSystem.Instance.currentXP > 0)
+        {
+            levelText.text = "Level: " + LevelSystem.Instance.level.ToString() + $" (XP: {LevelSystem.Instance.currentXP:N0}; Total: {playerData.totalXP:N0})";
+
+        }
         bool hasInput = Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0 || Input.GetMouseButtonDown(0);
         idleTimer += Time.fixedDeltaTime;
         if (!hasInput)
@@ -991,5 +984,7 @@ public class mainMenu : MonoBehaviour
             audioMixer.SetFloat("Lowpass", 22000);
         }
         
+
     }
+
 }

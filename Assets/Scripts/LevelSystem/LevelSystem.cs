@@ -10,15 +10,17 @@ public class PlayerData
     public int level;
     public float currentXP;
     public Dictionary<int, float> xpRequiredPerLevel;
+    public float totalXP;
 }
 
 public class LevelSystem : MonoBehaviour
 {
     public int level = 0;
     public float currentXP = 0;
-    public float initialXPRequirement = 200000;
+    public float initialXPRequirement = 250000;
     public float xpGrowthRate = 1.2f;
     public Dictionary<int, float> xpRequiredPerLevel = new Dictionary<int, float>();
+    public float totalXP = 0;
 
     public static LevelSystem Instance { get; private set; }
 
@@ -34,6 +36,7 @@ public class LevelSystem : MonoBehaviour
 
     void Start()
     {
+        totalXP = currentXP;
         LoadPlayerData();
     }
 
@@ -50,19 +53,29 @@ public class LevelSystem : MonoBehaviour
     public void GainXP(float amount)
     {
         currentXP += amount;
+        totalXP += amount;
         CheckForLevelUp();
         SavePlayerData();
     }
 
     public void CheckForLevelUp()
     {
-        while (xpRequiredPerLevel.ContainsKey(level) && currentXP >= initialXPRequirement)
+        while (xpRequiredPerLevel.ContainsKey(level) && currentXP >= xpRequiredPerLevel[level])
         {
             level++;
-            currentXP -= initialXPRequirement;
-            initialXPRequirement *= xpGrowthRate;
+            if (xpRequiredPerLevel.ContainsKey(level))
+            {
+                initialXPRequirement = xpRequiredPerLevel[level];
+            }
+            else
+            {
+                initialXPRequirement *= xpGrowthRate;
+                xpRequiredPerLevel[level] = initialXPRequirement;
+            }
+            currentXP -= xpRequiredPerLevel[level - 1];
         }
     }
+
 
     void SavePlayerData()
     {
@@ -70,7 +83,8 @@ public class LevelSystem : MonoBehaviour
         {
             level = level,
             currentXP = currentXP,
-            xpRequiredPerLevel = xpRequiredPerLevel
+            xpRequiredPerLevel = xpRequiredPerLevel,
+            totalXP = totalXP
         };
 
         BinaryFormatter formatter = new BinaryFormatter();
@@ -81,7 +95,7 @@ public class LevelSystem : MonoBehaviour
         stream.Close();
     }
 
-    void LoadPlayerData()
+    public void LoadPlayerData()
     {
         string path = Application.persistentDataPath + "/playerData.dat";
         if (File.Exists(path))
@@ -95,10 +109,37 @@ public class LevelSystem : MonoBehaviour
             level = data.level;
             currentXP = data.currentXP;
             xpRequiredPerLevel = data.xpRequiredPerLevel;
+            totalXP = data.totalXP;
+
+            CheckForLevelUp();
         }
         else
         {
             CalculateXPRequirements();
+        }
+    }
+
+    public PlayerData LoadTotalXP()
+    {
+        string path = Application.persistentDataPath + "/playerData.dat";
+
+        if (File.Exists(path))
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            FileStream stream = new FileStream(path, FileMode.Open);
+
+            PlayerData data = formatter.Deserialize(stream) as PlayerData;
+            stream.Close();
+
+            level = data.level;
+            currentXP = data.currentXP;
+            xpRequiredPerLevel = data.xpRequiredPerLevel;
+            return data;
+        }
+        else
+        {
+            CalculateXPRequirements();
+            return null;
         }
     }
 }

@@ -25,16 +25,11 @@ public class introManager : MonoBehaviour
             PlayerPrefs.DeleteAll();
             PlayerPrefs.SetInt("bootSafe031", 1);
         }
-        QualitySettings.maxQueuedFrames = 3;
     }
 
     
     IEnumerator LoadMusicAndMenu()
     {
-        
-
-        while (!AudioManager.Instance.isMusicLoaded)
-        {
             if (Directory.Exists(Path.Combine(Application.persistentDataPath, "music")))
             {
                 float progress = AudioManager.Instance.GetLoadingProgress();
@@ -51,10 +46,8 @@ public class introManager : MonoBehaviour
             
 
             yield return null;
-        }
+        
 
-        if (AudioManager.Instance.isMusicLoaded)
-        {
             load.value = 0;
             load.maxValue = 100;
             AsyncOperation operation = SceneManager.LoadSceneAsync(1);
@@ -76,7 +69,6 @@ public class introManager : MonoBehaviour
                     {
                         sceneActivationAllowed = true;
                         operation.allowSceneActivation = true;
-                        source.Play();
                         break;
                     }
                 }
@@ -85,7 +77,7 @@ public class introManager : MonoBehaviour
             }
 
             
-        }
+        
     }
 }
 

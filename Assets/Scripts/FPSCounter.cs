@@ -61,7 +61,7 @@ public class FPSCounter : MonoBehaviour
         float drawingTimeMs = 1000f / Mathf.Max(_currentAveraged, 0.00001f); // Avoid division by zero
 
         // Assign to UI
-        {
+        {                                                                                                                                                                                           
             SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
             if (data.isShowingFPS)
             {
@@ -71,8 +71,17 @@ public class FPSCounter : MonoBehaviour
             {
                 panel.SetActive(false);
             }
-            Text.text = $"FPS: {_currentAveraged} \n{drawingTimeMs:F2} ms";
-            Text.color = _currentColor;
+            if (QualitySettings.vSyncCount == 1)
+            {
+                Text.text = $"FPS: {_currentAveraged} / {Screen.currentResolution.refreshRate} \n{drawingTimeMs:F2} ms";
+                Text.color = _currentColor;
+            }
+            else
+            {
+                Text.text = $"FPS: {_currentAveraged} / {Application.targetFrameRate} \n{drawingTimeMs:F2} ms";
+                Text.color = _currentColor;
+            }
+            
         }
     }
 
@@ -81,7 +90,7 @@ public class FPSCounter : MonoBehaviour
     {
         if (fps < 30)
             return Color.red;
-        else if (fps < 50)
+        else if (fps < 90)
             return Color.yellow;
         else
             return Color.green;

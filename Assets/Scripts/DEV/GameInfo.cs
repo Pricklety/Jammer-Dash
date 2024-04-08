@@ -33,38 +33,11 @@ public class GameInfo : MonoBehaviour
         gameInfoText.text = "";
 
         DisplayTimeInfo();
-        DisplayGameData();
-        DisplayProfileInfo();
         DisplayMusicList();
         DisplayAudioInfo();
     }
 
    
-
-    void DisplayGameData()
-    {
-        // Add app version and Unity developer information
-        string gameData = "Game Version: " + Application.version + "\n";
-        gameData += "Unity Version: " + Application.unityVersion + "\n";
-        gameData += "Genuine build?: " + Application.genuine + "\n";
-        gameData += "Installed by " + Application.installMode + "\n";
-        gameData += "Installer: " + Application.installerName + "\n";
-        gameData += "Developed by " + Application.companyName + "\n\n";
-
-        gameInfoText.text += gameData + "----------------\n\n";
-    }
-
-    void DisplayProfileInfo()
-    {
-        string profileInfo = "Rank: #N/A\n";
-        profileInfo += "Shines: 0\n";
-        profileInfo += "Jams: 0\n";
-        profileInfo += "Friends: N/A\n";
-        profileInfo += "Total play count: N/A\n\n";
-
-        gameInfoText.text += profileInfo + "----------------\n\n";
-    }
-
 
     void DisplayMusicList()
     {
@@ -72,26 +45,11 @@ public class GameInfo : MonoBehaviour
         string musicFolderPathFull = Path.Combine(Application.persistentDataPath, musicFolderPath);
         string[] musicFiles = Directory.GetFiles(musicFolderPathFull, "*.mp3");
 
-        // Display the list of music files in the UI Text
-        string musicList = "Alphabetic Music List (First 40):\n";
-        int maxLines = Mathf.Min(musicFiles.Length, 40); // Limit display to the first 30 lines
-
-        for (int i = 0; i < maxLines; i++)
-        {
-            string fileName = Path.GetFileNameWithoutExtension(musicFiles[i]);
-            musicList += $"{i + 1}. {fileName}\n";
-        }
-
-        // Check if there are more items to display
-        if (musicFiles.Length > maxLines)
-        {
-            musicList += $"and {musicFiles.Length - maxLines} more...\n\n";
-        }
 
         // Display total music count
-        string totalMusicCount = "\nTotal Music Count: " + musicFiles.Length + "\n\n";
+        string totalMusicCount = "Total Music Count: " + musicFiles.Length + "\n\n";
 
-        gameInfoText.text += totalMusicCount + musicList + "----------------\n\n";
+        gameInfoText.text += totalMusicCount + "----------------\n\n";
     }
 
     void DisplayAudioInfo()
@@ -106,7 +64,7 @@ public class GameInfo : MonoBehaviour
             audioInfo += "Is Playing: " + musicAudioSource.isPlaying + "\n";
             if (result)
             {
-                float mappedVolume = Mathf.InverseLerp(-80f, 1f, volume);
+                float mappedVolume = Mathf.InverseLerp(-80f, 0f, volume);
                 audioInfo += "Volume: " + mappedVolume + "\n";
             }
             else
@@ -116,19 +74,7 @@ public class GameInfo : MonoBehaviour
            
             audioInfo += "Time: " + FormatTime(musicAudioSource.time) + "\n";
             audioInfo += "Length: " + FormatTime(musicAudioSource.clip.length) + "\n";
-            float[] samples = new float[4096];
-            musicAudioSource.GetSpectrumData(samples, 0, FFTWindow.Rectangular);
-            float sum = 0f;
-            foreach (float sample in samples)
-            {
-                sum += sample * sample;
-            }
-            float averageAmplitude = Mathf.Sqrt(sum / samples.Length);
-
-            // Update the highest recorded amplitude
-            highestRecordedAmplitude = Mathf.Max(highestRecordedAmplitude, sum * 1000);
-
-            audioInfo += "Amplitude: " + (sum * 1000).ToString("F2") + " / " + highestRecordedAmplitude.ToString("F2") + "\n\n";
+            
 
             gameInfoText.text += audioInfo + "----------------\n\n";
         }

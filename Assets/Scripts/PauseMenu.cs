@@ -7,13 +7,13 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 public class PauseMenu : MonoBehaviour
 {
     public GameObject panel;
 
     public Text song;
+    public Text creator;
     public Text info;
     public int attint;
     private float startTime;
@@ -23,27 +23,93 @@ public class PauseMenu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+       
         GameObject animA = GameObject.Find("Main Camera");
         anim = animA.GetComponent<Animator>();
         startTime = Time.time;
-        if (SceneManager.GetActiveScene().buildIndex < 25 && SceneManager.GetActiveScene().name != "LevelDefault")
+        if (SceneManager.GetActiveScene().name != "LevelDefault")
         {
-
             song.text = SceneManager.GetActiveScene().name;
+            Transform canvasTransform = GameObject.Find("Canvas").transform;
+            if (canvasTransform != null)
+            {
+                Transform pauseTransform = canvasTransform.Find("Pause").transform;
+                if (pauseTransform != null)
+                {
+                    Transform textTransform = pauseTransform.Find("Text (Legacy) (1)").transform;
+                    if (textTransform != null)
+                    {
+                        Text creatorText = textTransform.GetComponent<Text>();
+                        if (creatorText != null)
+                        {
+                            creator = creatorText;
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Text (Legacy) (1) not found under Pause");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("Pause not found under Canvas");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Canvas not found in the scene");
+            }
+
+            creator.text = "by Pricklety";
         }
         else if (SceneManager.GetActiveScene().name == "LevelDefault")
         {
-                string levelName = CustomLevelDataManager.Instance.levelName;
+            string levelName = CustomLevelDataManager.Instance.levelName;
                 CheckSceneDataExists(levelName, "levels\\extracted");
+            string creator = $"by {CustomLevelDataManager.Instance.creator}";
             if (levelName == null)
             {
-
+                creator = $"by {LevelDataManager.Instance.creator}";
                 levelName = LevelDataManager.Instance.levelName;
                 CheckSceneDataExists(levelName, "scenes");
             }
-
+           this.creator.text = creator;
             song.text = levelName;
+        }
+        else
+        {
+            Transform canvasTransform = GameObject.Find("Canvas").transform;
+            if (canvasTransform != null)
+            {
+                Transform pauseTransform = canvasTransform.Find("Pause");
+                if (pauseTransform != null)
+                {
+                    Transform textTransform = pauseTransform.Find("Text (Legacy) (1)");
+                    if (textTransform != null)
+                    {
+                        Text creatorText = textTransform.GetComponent<Text>();
+                        if (creatorText != null)
+                        {
+                            creator = creatorText;
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Text (Legacy) (1) not found under Pause");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("Pause not found under Canvas");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Canvas not found in the scene");
+            }
+
+            song.text = SceneManager.GetActiveScene().name;
+            creator.text = "by Pricklety";
         }
         if (PlayerPrefs.HasKey("attempts"))
         {
@@ -101,7 +167,7 @@ public class PauseMenu : MonoBehaviour
             music = GameObject.Find("Music").GetComponent<AudioSource>();
 
 
-        if (Input.GetKeyDown(KeyCode.Escape) && GameObject.Find("loadingText").GetComponent<Text>().text == "" && GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindObjectOfType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
+        if (Input.GetKeyDown(KeyCode.Escape)&& GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindObjectOfType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
         {
             
             PlayerPrefs.SetInt("attempts", attint);
@@ -146,7 +212,7 @@ public class PauseMenu : MonoBehaviour
     {
         if (!focus) // Only execute when focus is lost
         {
-            if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindObjectOfType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
+            if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindObjectOfType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0) && GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().IsPlayerCloseToNextCube() && !GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().IsPlayerInLongSeries()))
             {
                
                 panel.SetActive(true);
@@ -222,7 +288,10 @@ public class PauseMenu : MonoBehaviour
 
     public void Restart()
     {
-        SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex);
-        Time.timeScale = 1;
+        if (SceneManager.GetActiveScene().name != "LevelDefault")
+        {
+            SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex);
+            Time.timeScale = 1;
+        }
     }
 }

@@ -137,6 +137,9 @@ public class LevelScript : MonoBehaviour
     public void PlayLevel()
     {
         CustomLevelDataManager.Instance.levelName = null;
+        CustomLevelDataManager.Instance.creator = null;
+        CustomLevelDataManager.Instance.diff = 0;
+        CustomLevelDataManager.Instance.ID = 0;
         string json = File.ReadAllText(Application.persistentDataPath + $"/scenes/{levelNameText.text}/" + $"{levelNameText.text}.json");
         SceneData sceneData = SceneData.FromJson(json);
         LevelDataManager data = LevelDataManager.Instance;

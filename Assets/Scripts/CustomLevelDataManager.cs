@@ -15,6 +15,7 @@ public class CustomLevelDataManager : MonoBehaviour
     public string levelName;
     public string creator;
     public int diff;
+    public int ID;
     bool loaded;
 
     private void Awake()
@@ -33,9 +34,10 @@ public class CustomLevelDataManager : MonoBehaviour
     }
 
     // Function to load SceneData based on the scene name
-    public SceneData LoadLevelData(string sceneName)
+    public SceneData LoadLevelData(string sceneName, int id)
     {
         levelName = sceneName;
+        ID = id;
         string filePath = Path.Combine(Application.persistentDataPath, "levels", sceneName + ".jdl");
 
         if (File.Exists(filePath))
@@ -47,9 +49,10 @@ public class CustomLevelDataManager : MonoBehaviour
             levelName = sceneData.levelName;
             creator = sceneData.creator;
             diff = (int)sceneData.calculatedDifficulty;
+            ID = sceneData.ID;
             loaded = false;
-            Addressables.LoadScene("Assets/" + SceneManager.GetActiveScene().name + ".unity", LoadSceneMode.Single);
             SceneManager.sceneLoaded += OnSceneLoaded;
+            Addressables.LoadScene("Assets/" + SceneManager.GetActiveScene().name + ".unity", LoadSceneMode.Single, true, 1000);
 
         }
         else
@@ -134,6 +137,12 @@ public class CustomLevelDataManager : MonoBehaviour
 
         Debug.Log(sceneData.cubePositions.Count);
 
+        itemUnused[] obj = FindObjectsOfType<itemUnused>();
+        foreach (itemUnused gobject in obj)
+        {
+            Destroy(gobject.gameObject);
+
+        }
         foreach (Vector3 cubePos in sceneData.cubePositions)
         {
             GameObject cubeObject = Instantiate(Resources.Load<GameObject>("hitter01"), cubePos, Quaternion.identity);
@@ -162,16 +171,10 @@ public class CustomLevelDataManager : MonoBehaviour
         levelName = sceneData.levelName;
         creator = sceneData.creator;
         diff = (int)sceneData.calculatedDifficulty;
-
-        FindObjectOfType<CubeCounter>().maxScore = FindObjectOfType<CubeCounter>().cubes.Length * 50;
+        ID = sceneData.ID;
         GameObject.Find("Cube").SetActive(sceneData.ground);
-        GameObject.Find("elevator").SetActive(sceneData.ground);
-        GameObject.Find("elevator").SetActive(sceneData.ground);
 
         FindObjectOfType<Camera>().backgroundColor = sceneData.defBGColor;
-        levelName = sceneData.levelName;
-        creator = sceneData.creator;
-        diff = (int)sceneData.calculatedDifficulty;
 
         yield return null;
     }

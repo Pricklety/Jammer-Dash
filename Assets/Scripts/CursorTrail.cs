@@ -1,4 +1,3 @@
-using UnityEditor.Localization.Plugins.XLIFF.V20;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -38,7 +37,23 @@ public class CursorTrail : MonoBehaviour
 
     void Update()
     {
-       
+        SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+        if (Input.GetKey(KeyCode.B) && !Input.GetKeyUp(KeyCode.B)) 
+        {
+            trailImage.GetComponentInChildren<ParticleSystem>().startLifetime = 5f;
+            trailImage.GetComponentInChildren<ParticleSystem>().maxParticles = int.MaxValue;
+
+            trailImage.GetComponentInChildren<ParticleSystem>().emissionRate = 3000;
+        }
+        else
+        {
+            
+            trailImage.GetComponentInChildren<ParticleSystem>().startLifetime = data.cursorFade;
+
+            trailImage.GetComponentInChildren<ParticleSystem>().maxParticles = 2000; 
+
+            trailImage.GetComponentInChildren<ParticleSystem>().emissionRate = data.mouseParticles;
+        }
         mainCamera = Camera.main;
         // Move the trail object to the cursor position 
        
@@ -81,7 +96,6 @@ public class CursorTrail : MonoBehaviour
                 trailImage.rectTransform.localEulerAngles = Vector3.zero;
             }
         }
-        SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
         if (Input.touchCount == 0)
         {
             
@@ -89,17 +103,13 @@ public class CursorTrail : MonoBehaviour
             {
                 trailImage.GetComponentInChildren<ParticleSystem>().emissionRate = 0;
             }
-            else
-            {
-                
-                trailImage.GetComponentInChildren<ParticleSystem>().emissionRate = data.mouseParticles; hasClicked = false;
-            }
+            
         }
         else
         {
             trailImage.GetComponentInChildren<ParticleSystem>().emissionRate = 10000;
         }
-        trailImage.GetComponentInChildren<ParticleSystem>().startLifetime = data.cursorFade;
+        
 
     }
 }

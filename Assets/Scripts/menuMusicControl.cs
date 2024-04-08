@@ -1,10 +1,8 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Networking;
-using System;
-using UnityEngine.Audio;
 
 public class menuMusicControl : MonoBehaviour
 {
@@ -13,51 +11,51 @@ public class menuMusicControl : MonoBehaviour
     private bool fadingOut = false;
     public AudioClip christmasClip;
     public AudioClip normalClip;
-    public int normalClipIndex = 0; // Index of the normal music clip
-    public int christmasClipIndex = 1; // Index of the Christmas music clip
+    public int normalClipIndex = 1; // Index of the normal music clip
+    public int christmasClipIndex = 2; // Index of the Christmas music clip
+
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
         DontDestroyOnLoad(gameObject);
-        if (DateTime.Now.Month == 12)
-        {
-            GetComponent<AudioSource>().clip = christmasClip;
-        }
-        else
-        {
-            GetComponent<AudioSource>().clip = normalClip;  
-        }
-    }
-    private void Start()
-    {
-        AudioManager audioManager = AudioManager.Instance;
-        if (audioManager != null)
-        {
-            int desiredIndex = GetDesiredSongIndex(audioManager);
-            audioManager.Play(desiredIndex);
-        }
-        else
-        {
-            Debug.LogError("AudioManager instance not found!");
-        }
     }
 
-    private void OnEnable()
+    private void Start()
     {
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        SetDesiredMusic();
     }
+
+    private void SetDesiredMusic()
+    {
+        // Check if it's December
+        if (DateTime.Now.Month == 12)
+        {
+            audioSource.clip = christmasClip;
+        }
+        else
+        {
+            audioSource.clip = normalClip;
+        }
+
+    }
+
     public int GetDesiredSongIndex(AudioManager audioManager)
     {
         // Check if it's December
         if (System.DateTime.Now.Month == 12)
         {
-            return GetActualIndex(audioManager, christmasClipIndex); // Play Christmas music
+            int index = GetActualIndex(audioManager, christmasClipIndex); // Get index based on Christmas clip
+            audioManager.currentClipIndex = index; // Set AudioManager's currentClipIndex
+            return index;
         }
         else
         {
-            return GetActualIndex(audioManager, normalClipIndex); // Play normal music
+            int index = GetActualIndex(audioManager, normalClipIndex); // Get index based on normal clip
+            audioManager.currentClipIndex = index; // Set AudioManager's currentClipIndex
+            return index;
         }
     }
+
 
     private int GetActualIndex(AudioManager audioManager, int desiredIndex)
     {
@@ -66,56 +64,38 @@ public class menuMusicControl : MonoBehaviour
             // Ensure desiredIndex is within the valid range
             desiredIndex = Mathf.Clamp(desiredIndex, 0, audioManager.songPathsList.Count - 1);
 
-            // Find the actual index of the desired song in the shuffled playlist
+            // Find the actual index of the desired song in the playlist
+            string clipName = System.DateTime.Now.Month == 12 ? christmasClip.name : normalClip.name; // Get the name of the appropriate clip
             for (int i = 0; i < audioManager.songPathsList.Count; i++)
             {
-                if (audioManager.songPathsList[i] == audioManager.songPathsList[desiredIndex])
+                string songPath = audioManager.songPathsList[i];
+                string fileName = Path.GetFileNameWithoutExtension(songPath);
+                if (fileName.Contains(clipName))
                 {
-                    return i;
+                    return i; // Return the index if the file name contains the clip name
                 }
             }
         }
 
         Debug.LogWarning("Desired song not found in the playlist. Playing the first song.");
-        return 0; // Return the first song if the desired one is not found or if AudioManager is not properly initialized
+        return desiredIndex;
     }
 
 
-    private void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        fadingOut = false;
-    }
 
     private void Update()
     {
-
-        if (SceneManager.GetActiveScene().buildIndex > 1)
-        {
-            fadingOut = true;
-        }
-        else if (SceneManager.GetActiveScene().name == "LevelDefault")
+        if (SceneManager.GetActiveScene().buildIndex > 1 || SceneManager.GetActiveScene().name == "LevelDefault")
         {
             fadingOut = true;
         }
         else
         {
             fadingOut = false;
-            if (audioSource.volume < 1 && audioSource.pitch < 1)
-            {
-                audioSource.volume++;
-
-                audioSource.outputAudioMixerGroup.audioMixer.SetFloat("Lowpass", 22000);
-            }
             audioSource.volume = 1;
             audioSource.pitch = 1;
-
-
         }
+
         if (fadingOut)
         {
             // Continue the fade-out process
@@ -127,7 +107,6 @@ public class menuMusicControl : MonoBehaviour
     {
         float startVolume = audioSource.volume;
         float elapsedTime = 0.0f;
-
 
         while (elapsedTime < fadeDuration)
         {
@@ -142,10 +121,6 @@ public class menuMusicControl : MonoBehaviour
         // Lower the pitch after the fade out
         audioSource.pitch = 0f;
 
-
         fadingOut = false;
     }
-
-
-
 }

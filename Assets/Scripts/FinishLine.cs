@@ -91,73 +91,156 @@ public class FinishLine : MonoBehaviour
         }
 
             float destruction = player0.counter.score;
-        float actualdest = (float)player0.counter.destructionPercentage;
+            float actualdest = (float)player0.counter.destructionPercentage;
             deadScore.text = "Your stats for this attempt: \nTier: " + scores.GetTier(actualdest) + "\nHighest Combo: " + player0.highestCombo.ToString() + string.Format("\nScore: {0} ({1})", destruction.ToString("N0"), scores.destroyedCubes);
 
         
     }
 
-    private void SaveLevelData(string levelKey, string tierKey, string destructionKey, float destruction, string actualDestructionKey, float actualDestruction)
+    void SaveLevelData(float actualdest, float destruction)
     {
-        // Save destruction and actual destruction values
-        PlayerPrefs.SetFloat(destructionKey, destruction);
-        PlayerPrefs.SetFloat(actualDestructionKey, actualDestruction);
-
-        // Save other level data if needed
-        PlayerPrefs.SetString(levelKey, Guid.NewGuid().ToString("N"));
-        PlayerPrefs.SetString(tierKey, scores.GetTier(destruction));
+        string sceneName = SceneManager.GetActiveScene().name;
+        if (sceneName == "LevelDefault")
+        {
+            SaveLevelDataForLevelDefault(actualdest, destruction);
+        }
+        else
+        {
+            SaveLevelDataDef(SceneManager.GetActiveScene().buildIndex, scores.GetTier(actualdest), "dest" + sceneName, actualdest, "scores", destruction);
+        }
     }
-
-    private float LoadLevelData(string destructionKey, float actualDestructionKey)
+    void SaveLevelDataForLevelDefault(float actualdest, float destruction)
     {
-        float destruction = PlayerPrefs.GetFloat(destructionKey, 0f);
+        // Construct the path based on conditions
+        string levelsPath = Path.Combine(Application.persistentDataPath,
+            string.IsNullOrEmpty(CustomLevelDataManager.Instance.levelName)
+                ? Path.Combine("scenes", LevelDataManager.Instance.levelName)
+                : Path.Combine("levels", "extracted", CustomLevelDataManager.Instance.levelName));
 
-        // Return destruction or actual destruction based on your requirements
-        return destruction;
+        string[] levelFiles = Directory.GetFiles(levelsPath, "*.json", SearchOption.AllDirectories);
+        string levelName = "";
+
+        foreach (string file in levelFiles)
+        {
+            if (Path.GetFileName(file).Equals("LevelDefault.jdl"))
+            {
+                continue; // Skip LevelDefault.jdl
+            }
+            levelName = Path.GetFileNameWithoutExtension(file);
+            break; // Stop after finding the first valid level file
+        }
+
+        if (!string.IsNullOrEmpty(levelName))
+        {
+            string json = File.ReadAllText(Path.Combine(levelsPath, levelName + ".json"));
+            SceneData sceneData = SceneData.FromJson(json);
+            Debug.Log(sceneData.levelName);
+            SaveLevelDataDef(sceneData.ID, scores.GetTier(actualdest), "dest" + sceneData.levelName, actualdest, "scores", destruction);
+        }
+        else
+        {
+            Debug.LogWarning("No valid level found in the directory: " + levelsPath);
+        }
     }
+    void SaveLevelDataDef(int levelID, string tierName, string destName, float actualdest, string fileName, float destruction)
+    {
+        string filePath = Path.Combine(Application.persistentDataPath, fileName + ".dat");
+        using (StreamWriter writer = File.AppendText(filePath))
+        {
+            writer.WriteLine($"{levelID},{tierName},{destName},{actualdest},{destruction}");
+        }
+    }
+    float LoadLevelData(int levelID, string fileName, float destruction)
+    {
+        string filePath = Path.Combine(Application.persistentDataPath, fileName + ".dat");
 
-
+        if (File.Exists(filePath))
+        {
+            // Read the file and parse data as needed
+            string[] lines = File.ReadAllLines(filePath);
+            foreach (string line in lines)
+            {
+                if (line == SceneManager.GetActiveScene().name)
+                {
+                    string[] data = line.Split(',');
+                    // Assuming the file format is consistent with the data you're saving
+                    float actualdest = int.Parse(data[3]);
+                    destruction = int.Parse(data[4]);
+                    // Process the loaded data as needed
+                    return destruction;
+                }
+                else
+                {
+                    string[] data = line.Split(',');
+                    if (int.Parse(data[0]) == levelID)
+                    {
+                        float actualdest = float.Parse(data[3]);
+                        destruction = int.Parse(data[4]);
+                        // Process the loaded data as needed
+                        Debug.LogError(destruction);    
+                        return destruction;
+                    }
+                }
+            }
+        }
+        else
+        {
+            Debug.LogWarning("File does not exist: " + filePath);
+        }
+        
+        return 0;
+    }
     private IEnumerator End()
     {
         coroutineRunning = true;
         PlayerMovement objectOfType = FindObjectOfType<PlayerMovement>();
         float destruction = objectOfType.counter.score;
         float actualdest = (float)player0.counter.destructionPercentage;
-        Scene activeScene = SceneManager.GetActiveScene();
+        if (SceneManager.GetActiveScene().name != "LevelDefault")
+        {
+            Scene activeScene = SceneManager.GetActiveScene(); 
+            float lastScore = LoadLevelData(activeScene.buildIndex, "scores", destruction);
+            float currentScore = player0.counter.score;
+            float scoreDifference = currentScore - lastScore;
+            // Add the score difference as XP
+            if (scoreDifference > 0)
+            {
+                float xpToAdd = scoreDifference;
+                LevelSystem.Instance.GainXP(xpToAdd);
+            }
+            else if (lastScore == 0 && scoreDifference <= 0)
+            {
+                LevelSystem.Instance.GainXP(scoreDifference);
+            }
+        } 
+        else
+        {
+
+            int id = CustomLevelDataManager.Instance.ID;
+            if (CustomLevelDataManager.Instance.levelName == null)
+            {
+                id = LevelDataManager.Instance.ID;
+            }
+            float lastScore = LoadLevelData(id, "scores", destruction); 
+            float currentScore = player0.counter.score;
+            float scoreDifference = currentScore - lastScore;
+            // Add the score difference as XP
+            if (scoreDifference > 0)
+            {
+                float xpToAdd = scoreDifference;
+                LevelSystem.Instance.GainXP(xpToAdd);
+            }
+            else if (lastScore == 0)
+            {
+                LevelSystem.Instance.GainXP(scoreDifference);
+            }
+        }
         player.transform.localScale = Vector3.zero;
         objectOfType.enabled = false;
-        float lastScore = 0f;
-        if (activeScene.buildIndex == 25)
-        {
 
-            lastScore = LoadLevelData("destexplorer1", destruction);
-            SaveLevelData("Explorers", "ExplorersTier", "destexplorer", actualdest, "destexplorer1", destruction);
-        }
-
-        if (activeScene.buildIndex == 26)
-        {
-            lastScore = LoadLevelData("destgd1", destruction);
-            SaveLevelData("GeometricalDominator", "GeometricalDominatorTier", "destgd", actualdest, "destgd1", destruction);
-
-        }
-
-        if (activeScene.buildIndex == 27)
-        {
-            lastScore = LoadLevelData("destsky1", destruction);
-            SaveLevelData("SkySoul", "SkySoulTier", "destsky", actualdest, "destsky1", destruction);
-        }
-
-        if (activeScene.buildIndex == 28)
-        {
-            lastScore = LoadLevelData("destredhorizon1", destruction);
-            SaveLevelData("RedHorizon", "RedHorizonTier", "destredhorizon", actualdest, "destredhorizon1", destruction);
-        }
-
-        if (activeScene.buildIndex == 29)
-        {
-            lastScore = LoadLevelData("destskystrike1", destruction);
-            SaveLevelData("Skystrike", "SkystrikeTier", "destskystrike", actualdest, "destskystrike1", destruction);
-        }
+       
+        SaveLevelData(actualdest, destruction);
+        
 
         PlayerPrefs.Save();
         yield return new WaitForSecondsRealtime(2f);
@@ -173,18 +256,7 @@ public class FinishLine : MonoBehaviour
         else
             score.text = "Tier: " + scores.GetTier(actualdest) + "\nHighest Combo: " + player0.highestCombo.ToString() + string.Format("\nScore: {0}", scores.destroyedCubes) + string.Format("\nAccuracy: {0:00.00}%", (object)scores.destructionPercentage);
         
-        float currentScore = player0.counter.score;
-        float scoreDifference = currentScore - lastScore;
-        // Add the score difference as XP
-        if (scoreDifference > 0)
-        {
-            float xpToAdd = scoreDifference;
-            LevelSystem.Instance.GainXP(xpToAdd);
-        }
-        else if (lastScore == 0 && scoreDifference <= 0)
-        {
-            LevelSystem.Instance.GainXP(scoreDifference);
-        }
+       
 
         while (currentTime < 3f)
         {

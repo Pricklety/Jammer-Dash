@@ -18,7 +18,7 @@ public class AudioManager : MonoBehaviour
     bool songPlayed = false;
     private float masterVolume = 1.0f;
     public List<string> songPathsList;
-    public int currentClipIndex = 0;
+    public int currentClipIndex = -1;
     public static AudioManager Instance { get; private set; }
 
     public bool isMusicLoaded = false;
@@ -33,6 +33,7 @@ public class AudioManager : MonoBehaviour
     public bool sfx;
     public bool hits;
     float timer = 0f;
+    bool paused = false;
         
     private void Awake()
     {
@@ -42,33 +43,16 @@ public class AudioManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             if (!isMusicLoaded)
             {
+
                 StartCoroutine(LoadAudioClipsAsync());
-            }
-            // Find the menuMusicControl script
-            menuMusicControl musicControl = FindObjectOfType<menuMusicControl>();
-            if (musicControl != null)
-            {
-                // Determine the desired song index
-                int desiredIndex = musicControl.GetDesiredSongIndex(this);
-                if (desiredIndex >= 0 && desiredIndex < songPathsList.Count)
-                {
-                    // Set the current clip index to the desired index
-                    currentClipIndex = desiredIndex;
-                }
-                else
-                {
-                    Debug.LogWarning("Desired song index is out of range.");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("menuMusicControl script not found in the scene.");
             }
         }
         else
         {
             Destroy(gameObject);
         }
+
+        QualitySettings.maxQueuedFrames = 0;
     }
 
     public void Start()
@@ -117,7 +101,15 @@ public class AudioManager : MonoBehaviour
 
     public void Update()
     {
-
+        SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+        if (Application.isFocused && data.selectedFPS >= 30) 
+        {
+            Application.targetFrameRate = data.selectedFPS;
+        }
+        else if (!Application.isFocused && data.selectedFPS >= 30)
+        {
+            Application.targetFrameRate = 30;
+        }
         if (SceneManager.GetActiveScene().buildIndex == 1)
         {
             options = FindObjectOfType<Options>();
@@ -155,7 +147,7 @@ public class AudioManager : MonoBehaviour
     private void FixedUpdate()
     {
         AudioSource audioSource = GetComponent<AudioSource>();
-        if (!songPlayed && (audioSource.time >= audioSource.clip.length || (!audioSource.isPlaying && SceneManager.GetActiveScene().buildIndex == 1)))
+        if (!songPlayed && !paused && (audioSource.time >= audioSource.clip.length || (!audioSource.isPlaying && SceneManager.GetActiveScene().buildIndex == 1)))
         {
             PlayNextSong(songPlayed);
             songPlayed = true;
@@ -166,6 +158,7 @@ public class AudioManager : MonoBehaviour
         {
             songPlayed = false;
         }
+
 
         AudioSource[] audios = FindObjectsOfType<AudioSource>();
         float value1 = Input.GetAxis("Mouse ScrollWheel");
@@ -178,13 +171,8 @@ public class AudioManager : MonoBehaviour
             audio.outputAudioMixerGroup = master;
             audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", Mathf.Clamp(masterS.value, -80f, 0f));
         }
+       
 
-        // Calculate the new volume within the range of -80 to 0
-        float newVolume = Mathf.Clamp(masterS.value + value1 * volumeChangeSpeed, -80f, 0f);
-        float intVol = Mathf.RoundToInt(Mathf.InverseLerp(-80f, 0f, newVolume) * 100f);
-
-        // Update UI slider text outside the loop
-        masterS.GetComponentInChildren<Text>().text = "Master: " + intVol;
 
         if (value1 != 0 && !IsScrollingUI())
         {
@@ -194,7 +182,9 @@ public class AudioManager : MonoBehaviour
             {
                 masterS.gameObject.SetActive(true);
             }
-
+            // Calculate the new volume within the range of -80 to 0
+            float newVolume = Mathf.Clamp(masterS.value + value1 * volumeChangeSpeed, -80f, 0f);
+            float intVol = Mathf.RoundToInt(Mathf.InverseLerp(-80f, 0f, newVolume) * 100f);
             // Loop through each audio source
             foreach (AudioSource audio in audios)
             {
@@ -236,7 +226,9 @@ public class AudioManager : MonoBehaviour
         }
         if (Mathf.Approximately(timer, 2f))
         {
-            options.masterVolumeSlider.value = masterS.value;
+            if (SceneManager.GetActiveScene().buildIndex == 1)
+                options.masterVolumeSlider.value = masterS.value;
+
             SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
             data.volume = masterS.value;
             SettingsFileHandler.SaveSettingsToFile(data);
@@ -244,10 +236,11 @@ public class AudioManager : MonoBehaviour
         }
 
         // Check if the timer has exceeded 2 seconds and masterS is not held
-        if (timer > 2f)
+        if (timer < 2.1f && timer > 2f)
         {
             masterS.gameObject.SetActive(false);
-            masterS.value = options.masterVolumeSlider.value; 
+            if (SceneManager.GetActiveScene().buildIndex == 1)
+                options.masterVolumeSlider.value = masterS.value;
         }
         
     }
@@ -312,14 +305,11 @@ public class AudioManager : MonoBehaviour
     {
         return loadingProgress;
     }
-
     public IEnumerator LoadAudioClipsAsync()
     {
-        if (!isMusicLoaded)
-        {
             yield return null;
 
-            string persistentMusicPath = Path.Combine(Application.persistentDataPath, "music");
+            string persistentMusicPath = Path.Combine(Application.persistentDataPath);
             bool existsFolder = Directory.Exists(persistentMusicPath);
 
             if (!existsFolder)
@@ -330,17 +320,14 @@ public class AudioManager : MonoBehaviour
 
                 if (Directory.Exists(sourceFolderPath))
                 {
-                    string[] musicFiles = Directory.GetFiles(sourceFolderPath, "*.mp3");
-                    List<string> loadedFilesOrder = new List<string>();
+                    string[] musicFiles = Directory.GetFiles(sourceFolderPath, "*.mp3", SearchOption.AllDirectories);
 
                     // Use Task to perform file copying in parallel
                     Task[] copyTasks = new Task[musicFiles.Length];
                     for (int i = 0; i < musicFiles.Length; i++)
                     {
                         string sourceFilePath = musicFiles[i];
-                        string fileName = Path.GetFileName(sourceFilePath);
-                        string destinationFilePath = Path.Combine(persistentMusicPath, fileName);
-                        loadedFilesOrder.Add(destinationFilePath); // Add the path to the list before copying
+                        string destinationFilePath = Path.Combine(persistentMusicPath, "music", Path.GetFileName(sourceFilePath));
 
                         copyTasks[i] = Task.Run(() =>
                         {
@@ -351,81 +338,62 @@ public class AudioManager : MonoBehaviour
 
                     // Wait for all file copy tasks to complete
                     yield return new WaitForAllTasks(copyTasks);
-
-                    string[] files = Directory.GetFiles(persistentMusicPath, "*.mp3");
-                    loadedFilesOrder.AddRange(files);
-                    songPathsList = loadedFilesOrder;
-                    StartCoroutine(LoadAudioClipsAsyncCoroutine(loadedFilesOrder));
                 }
                 else
                 {
                     Debug.LogError($"Source folder not found: {sourceFolderPath}");
                 }
             }
-            else
+
+            // After copying files, add unique file paths to songPathsList
+            string[] copiedFiles = Directory.GetFiles(persistentMusicPath, "*.mp3", SearchOption.AllDirectories);
+            HashSet<string> encounteredFileNames = new HashSet<string>();
+            foreach (string copiedFile in copiedFiles)
             {
-                string sourceFolderPath = Path.Combine(Application.streamingAssetsPath, "music");
-                string[] musicFiles = Directory.GetFiles(sourceFolderPath, "*.mp3");
-                List<string> loadedFilesOrder = new List<string>();
-
-                // Use Task to perform file copying in parallel
-                Task[] copyTasks = new Task[musicFiles.Length];
-                for (int i = 0; i < musicFiles.Length; i++)
+                string fileName = Path.GetFileNameWithoutExtension(copiedFile);
+                if (!encounteredFileNames.Contains(fileName))
                 {
-                    string sourceFilePath = musicFiles[i];
-                    string fileName = Path.GetFileName(sourceFilePath);
-                    string destinationFilePath = Path.Combine(persistentMusicPath, fileName);
-
-                    copyTasks[i] = Task.Run(() =>
-                    {
-                        File.Copy(sourceFilePath, destinationFilePath, true);
-                        Debug.Log($"Copied: {sourceFilePath} to {destinationFilePath}");
-                    });
+                    encounteredFileNames.Add(fileName);
+                    songPathsList.Add(copiedFile);
                 }
-
-                // Wait for all file copy tasks to complete
-                yield return new WaitForAllTasks(copyTasks);
-                string[] files = Directory.GetFiles(persistentMusicPath, "*.mp3");
-                loadedFilesOrder.AddRange(files);
-                // Add all loaded file paths to songPathsList
-                foreach (string filePath in loadedFilesOrder)
-                {
-                    songPathsList.Add(filePath);
-                }
-                ShuffleSongPathsList();
-                StartCoroutine(LoadAudioClipsAsyncCoroutine(loadedFilesOrder));
             }
-        }
 
+            ShuffleSongPathsList(); // Shuffle the list of song paths
+        
     }
 
 
-    private IEnumerator LoadAudioClipsAsyncCoroutine(List<string> loadedFilesOrder)
+    public void PlaySource()
     {
-        foreach (string file in loadedFilesOrder)
-        {
-            loadedSongsCount++;
-            yield return null;
-        }
+        
+        GetComponent<AudioSource>().Play();
 
-        // Shuffle the songPathsList
-        ShuffleSongPathsList();
-
-        OnAudioClipsLoaded();
+        paused = false;
     }
 
+    public void Pause()
+    {
+        GetComponent<AudioSource>().Pause();
+
+        paused = true;
+    }
+
+    public void Stop()
+    {
+        GetComponent<AudioSource>().Pause();
+        paused = true;
+        GetComponent<AudioSource>().Stop();
+    }
     public void ShuffleSongPathsList()
     {
         System.Random rng = new();
         int n = songPathsList.Count;
-        while (n > 1)
+        for (int i = 0; i < n; i++)
         {
-            n--;
-            int k = rng.Next(n + 1);
-            (songPathsList[n], songPathsList[k]) = (songPathsList[k], songPathsList[n]);
+            int k = rng.Next(i, n);
+            (songPathsList[i], songPathsList[k]) = (songPathsList[k], songPathsList[i]);
         }
     }
-
 
     public void PlayPreviousSong()
     {
@@ -573,11 +541,11 @@ public class AudioManager : MonoBehaviour
     public List<string> GetSongPaths()
     {
         List<string> songPathsList = new List<string>();
-        string persistentMusicPath = Path.Combine(Application.persistentDataPath, "music");
+        string persistentMusicPath = Path.Combine(Application.persistentDataPath);
 
         if (Directory.Exists(persistentMusicPath))
         {
-            string[] musicFiles = Directory.GetFiles(persistentMusicPath, "*.mp3");
+            string[] musicFiles = Directory.GetFiles(persistentMusicPath, "*.mp3", SearchOption.AllDirectories);
             songPathsList.AddRange(musicFiles);
         }
         else
@@ -592,8 +560,8 @@ public class AudioManager : MonoBehaviour
 
     public int GetTotalNumberOfSongs()
     {
-        string persistentMusicPath = Path.Combine(Application.persistentDataPath, "music");
-        string[] musicFiles = Directory.GetFiles(persistentMusicPath, "*.mp3");
+        string persistentMusicPath = Path.Combine(Application.persistentDataPath);
+        string[] musicFiles = Directory.GetFiles(persistentMusicPath, "*.mp3", SearchOption.AllDirectories);
         int numberOfMusicFiles = musicFiles.Length;
         return numberOfMusicFiles;
     }

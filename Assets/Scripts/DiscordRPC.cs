@@ -1,110 +1,45 @@
+using Lachee.Discord;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DiscordPresence;
 using UnityEngine.SceneManagement;
-using UnityEditor;
-using System;
-using System.Linq;
 
 public class DiscordRPC : MonoBehaviour
 {
-
-    public string detail;
-    public string state;
-    public string largeimagekey;
-    public string largetext;
-    public string smallimagekey;
-    public string smalltext;
-    public Int64 start;
-
-    GameObject player;
-    GameObject pause;
-
-
-    private void Awake()
+    void Start()
     {
-        DontDestroyOnLoad(this.gameObject);
-        start = GetCurrentTimeAsLong();
+        DiscordManager.current.UpdateStartTime();
     }
+
     private void FixedUpdate()
     {
-        SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-       
-
-        #region Large Text
-        largeimagekey = "logo";
-#if DEBUG
-        state = "Development Build";
-        detail = "Debugging";
-#endif
-        if (SceneManager.GetActiveScene().buildIndex == 0)
+        DiscordManager.current.client.UpdateLargeAsset("logo", $"(No account found): #N/A");
+        DiscordManager.current.client.UpdateSmallAsset("shine", "-- sp");
+        if (SceneManager.GetActiveScene().buildIndex > 2 && SceneManager.GetActiveScene().name != "LevelDefault" && SceneManager.GetActiveScene().name != "SampleScene")
         {
-            state = "Loading up...";
-            detail = $"{Application.version}";
-
+            DiscordManager.current.UpdateDetails(SceneManager.GetActiveScene().name);
+            DiscordManager.current.UpdateState("Clicking boxes and evading saws");
         }
-        if (SceneManager.GetActiveScene().buildIndex == 1)
+        else if (SceneManager.GetActiveScene().name == "LevelDefault")
         {
-            state = "Main Menu";
-            smallimagekey = "shine";
-            smallimagekey = "Total sn: N/A";
-            largetext = "Guest (#N/A)";
-            detail = "";
+            DiscordManager.current.UpdateDetails($"{CustomLevelDataManager.Instance.levelName}{LevelDataManager.Instance.levelName} by {LevelDataManager.Instance.creator}{CustomLevelDataManager.Instance.creator}");
+            DiscordManager.current.UpdateState("Clicking boxes and evading saws");
         }
-        else if (SceneManager.GetActiveScene().buildIndex == 2)
+        else if (SceneManager.GetActiveScene().name == "SampleScene")
         {
-
-            player = GameObject.FindGameObjectWithTag("Player");
-            state = SceneManager.GetActiveScene().name + " by Pricklety";
-            detail = "";
-            smallimagekey = "shine";
-            smalltext = $"-- sn";
-            largetext = "Guest (#N/A)";
-
+            DiscordManager.current.UpdateDetails($"{LevelDataManager.Instance.levelName} - {FindObjectOfType<EditorManager>().objectCount.text}");
+            DiscordManager.current.UpdateState("Editing a level");
         }
-        else if (SceneManager.GetActiveScene().buildIndex == 3)
+        else if (SceneManager.GetActiveScene().name == "MainMenu")
         {
-            state = "Learning";
-            detail = "Tutorial";
+            DiscordManager.current.UpdateDetails($"Idle");
+            DiscordManager.current.UpdateState($"{DiscordManager.current.CurrentUser.username}; Level {LevelSystem.Instance.level} - {LevelSystem.Instance.totalXP:N1}xp");
         }
-
-        if (SceneManager.GetActiveScene().name == "SampleScene")
+        else if (SceneManager.GetActiveScene().name == "intro")
         {
-            state = "Editing " + GameObject.FindObjectOfType<EditorManager>().sceneNameInput.text;
-            detail = GameObject.FindObjectOfType<EditorManager>().objectCount.text + " obj";
-            largetext = "N/A jams";
+            DiscordManager.current.UpdateDetails($"Idle");
+            DiscordManager.current.UpdateState($"Loading up...");
         }
-
-        if (SceneManager.GetActiveScene().buildIndex >= 6)
-        {
-            player = GameObject.FindGameObjectWithTag("Player");
-            state = SceneManager.GetActiveScene().name + " by Pricklety";
-            detail = "";
-            smallimagekey = "shine";
-            smalltext = $"-- sn"; // Implement server connection to server.Level.difficulty
-            largetext = "Guest (#N/A)";
-        }
-
-        if (SceneManager.GetActiveScene().name == "LevelDefault")
-        {
-            player = GameObject.FindGameObjectWithTag("Player");
-            state = "";
-            detail = $"{LevelDataManager.Instance.levelName} by {LevelDataManager.Instance.creator}";
-            smallimagekey = "shine";
-            smalltext = $"{LevelDataManager.Instance.diff} sn";
-            largetext = "Guest (#N/A)";
-        }
-        
-        
-        #endregion
-
-    }
-
-    private long GetCurrentTimeAsLong()
-    {
-        DateTime currentTime = DateTime.UtcNow;
-        long unixTime = ((DateTimeOffset)currentTime).ToUnixTimeSeconds();
-        return unixTime;
+            
     }
 }
