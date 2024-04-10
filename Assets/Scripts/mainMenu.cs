@@ -15,8 +15,9 @@ using Debug = UnityEngine.Debug;
 using System.IO.Compression;
 using Lachee.Discord;
 using Button = UnityEngine.UI.Button;
+using UnityEngine.EventSystems;
 
-public class mainMenu : MonoBehaviour
+public class mainMenu : MonoBehaviour, IPointerClickHandler
 {
     public GameObject musicAsset;
     public Image bg;
@@ -31,14 +32,12 @@ public class mainMenu : MonoBehaviour
     public GameObject playPanel;
     public GameObject creditsPanel;
     public GameObject settingsPanel;
-    public GameObject multiplayerPanel;
     public GameObject additionalPanel;
-    public GameObject onlinePanel;
     public GameObject levelInfo;
     public GameObject quitPanel;
-    public GameObject leaderboard;
     public GameObject community;
-
+    public GameObject musicPanel;
+    public GameObject changelogs;
     
 
     [Header("LevelInfo")]
@@ -611,26 +610,72 @@ public class mainMenu : MonoBehaviour
             Debug.LogError("Failed to load level " + sceneData.ID);
         }
 
+        // Method to toggle menu panels
     }
 
+    // Method to toggle menu panels
+    private void ToggleMenuPanel(GameObject panel)
+    {
+        // Toggle the specified panel directly if it's changelogs or creditsPanel
+        if (panel == changelogs || panel == creditsPanel)
+        {
+            panel.SetActive(!panel.activeSelf);
+
+            if (!panel.active)
+            {
+                mainPanel.SetActive(true);
+            }
+        }
+        else
+        {
+            // Turn off all panels
+            mainPanel.SetActive(false);
+            playPanel.SetActive(false);
+            creditsPanel.SetActive(false);
+            settingsPanel.SetActive(false);
+            musicPanel.SetActive(false);
+            levelInfo.SetActive(false);
+            community.SetActive(false);
+            changelogs.SetActive(false);
+            additionalPanel.SetActive(false);
+
+            // Enable the specified panel if it's not null
+            if (panel != null)
+            {
+                panel.SetActive(true);
+            }
+            // Enable mainPanel if none of the specific panels are active
+            else if (!playPanel.activeSelf && !creditsPanel.activeSelf && !settingsPanel.activeSelf)
+            {
+                mainPanel.SetActive(true);
+            }
+        }
+    }
 
     // Menu buttons
     public void Play()
     {
-        mainPanel.SetActive(false);
-        playPanel.SetActive(true);
+        ToggleMenuPanel(playPanel);
     }
 
     public void Credits()
     {
-        mainPanel.SetActive(false);
-        creditsPanel.SetActive(true);
+        ToggleMenuPanel(creditsPanel);
     }
 
     public void Settings()
     {
-        settingsPanel.SetActive(true);
-        mainPanel.SetActive(false);
+        ToggleMenuPanel(settingsPanel);
+    }
+
+    public void OpenMusic()
+    {
+        musicPanel.SetActive(!musicPanel.activeSelf);
+    }
+
+    public void OpenChangelogs()
+    {
+        ToggleMenuPanel(changelogs);
     }
 
     public void AdditionalOpen()
@@ -642,22 +687,6 @@ public class mainMenu : MonoBehaviour
     {
         additionalPanel.SetActive(false);
     }
-
-   
-
-    public void LBOpen()
-    {
-        multiplayerPanel.SetActive(false);
-        leaderboard.SetActive(true);
-    }
-
-    public void LBClose()
-    {
-        multiplayerPanel.SetActive(true);
-        leaderboard.SetActive(false);
-    }
-
-   
     public void Quit()
     {
         StartCoroutine(QuitGame());
@@ -818,25 +847,7 @@ public class mainMenu : MonoBehaviour
 
 
     // Play section
-    public void Editor()
-    {
-        playPanel.SetActive(false);
-        multiplayerPanel.SetActive(true);
-    }
-
-    public void Story()
-    {
-        if (PlayerPrefs.HasKey("Beginning"))
-        {
-            PlayerPrefs.GetString("Beginning", "itbegan");
-            SceneManager.LoadScene("storySelector");
-        }
-        else
-        {
-            SceneManager.LoadScene("cutscene01");
-        }
-    }
-
+   
     public void CommunityOpen()
     {
         community.SetActive(true);
@@ -844,27 +855,15 @@ public class mainMenu : MonoBehaviour
     }
 
 
-    public void OpenOnline()
-    {
-        onlinePanel.SetActive(true);
-        playPanel.SetActive(false);
-    }
-
-    public void CloseOnline()
-    {
-        onlinePanel.SetActive(false);
-        playPanel.SetActive(true);
-    }
-
     public void OpenInfo()
     {
         levelInfo.SetActive(true);
-        onlinePanel.SetActive(false);
+        mainPanel.SetActive(false);
     }
 
     public void CloseInfo()
     {
-        onlinePanel.SetActive(true);
+        mainPanel.SetActive(true);
         levelInfo.SetActive(false);
     }
 
@@ -941,6 +940,22 @@ public class mainMenu : MonoBehaviour
     }
 
 
+    bool IsPointerOverUIButNotButton()
+    {
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        var results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        foreach (RaycastResult result in results)
+        {
+            // Check if the object under the pointer is a UI button
+            if (result.gameObject.GetComponent<Button>() != null || result.gameObject.GetComponent<Dropdown>() != null || result.gameObject.GetComponent<Slider>() != null)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     public void FixedUpdate()
     {
         LevelSystem.Instance.initialXPRequirement = LevelSystem.Instance.xpRequiredPerLevel[LevelSystem.Instance.level];
@@ -951,25 +966,23 @@ public class mainMenu : MonoBehaviour
             levelText.text = "Level: " + LevelSystem.Instance.level.ToString() + $" (XP: {LevelSystem.Instance.currentXP:N0}; Total: {playerData.totalXP:N0})";
 
         }
-        bool hasInput = Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0 || Input.GetMouseButtonDown(0);
-        idleTimer += Time.fixedDeltaTime;
-        if (!hasInput)
+        bool hasInput = Input.GetMouseButtonDown(0);
+        idleTimer += Time.fixedDeltaTime; 
+        if (!hasInput || Input.GetKeyDown(KeyCode.F1))
         {
             // Player is idle, start the idle animation immediately if it's not already playing
-            if (idleTimer > idleTimeThreshold)
+            if (idleTimer > idleTimeThreshold || Input.GetKeyDown(KeyCode.F1))
             {
                 animator.SetTrigger("StartIdle");
                 animator.ResetTrigger("StopIdle");
-                Cursor.visible = false;
             }
             
         }
-        else
+        else if (hasInput && !IsPointerOverUIButNotButton())
         {
             idleTimer = 0;  // Resetting idleTimer when there is input
             animator.SetTrigger("StopIdle");
             animator.ResetTrigger("StartIdle");
-            Cursor.visible = true;
         }
         
         
@@ -987,4 +1000,14 @@ public class mainMenu : MonoBehaviour
 
     }
 
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        // Check if the clicked position is outside the panel
+        RectTransform rectTransform = musicPanel.GetComponent<RectTransform>();
+        if (!RectTransformUtility.RectangleContainsScreenPoint(rectTransform, Input.mousePosition))
+        {
+            // Click is outside the panel, disable it
+            musicPanel.SetActive(false);
+        }
+    }
 }

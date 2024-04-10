@@ -404,9 +404,10 @@ public class AudioManager : MonoBehaviour
             if (currentClipIndex < 0)
                 currentClipIndex = songPathsList.Count - 1;
 
-            StartCoroutine(ChangeSprite());
             Debug.Log(currentClipIndex);
             PlayCurrentSong();
+            new WaitForSecondsRealtime(1f);
+            StartCoroutine(ChangeSprite());
         }
     }
 
@@ -425,10 +426,11 @@ public class AudioManager : MonoBehaviour
             {
                 currentClipIndex = 0;
             }
-            StartCoroutine(ChangeSprite());
             Debug.Log(currentClipIndex);
             PlayCurrentSong();
             cooldown = 0f;
+            new WaitForSecondsRealtime(1f);
+            StartCoroutine(ChangeSprite());
         }
     }
 
