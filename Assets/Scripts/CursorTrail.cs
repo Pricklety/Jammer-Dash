@@ -41,9 +41,9 @@ public class CursorTrail : MonoBehaviour
         if (Input.GetKey(KeyCode.B) && !Input.GetKeyUp(KeyCode.B)) 
         {
             trailImage.GetComponentInChildren<ParticleSystem>().startLifetime = 5f;
-            trailImage.GetComponentInChildren<ParticleSystem>().maxParticles = 100000;
+            trailImage.GetComponentInChildren<ParticleSystem>().maxParticles = int.MaxValue;
 
-            trailImage.GetComponentInChildren<ParticleSystem>().emissionRate = 500;
+            trailImage.GetComponentInChildren<ParticleSystem>().emissionRate = 3000;
         }
         else
         {
