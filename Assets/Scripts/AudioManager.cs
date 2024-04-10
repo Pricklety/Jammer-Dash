@@ -12,6 +12,7 @@ using UnityEngine.Localization.SmartFormat.Utilities;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class AudioManager : MonoBehaviour
 {
@@ -162,9 +163,8 @@ public class AudioManager : MonoBehaviour
 
         AudioSource[] audios = FindObjectsOfType<AudioSource>();
         float value1 = Input.GetAxis("Mouse ScrollWheel");
-        float volumeChangeSpeed = 2f;
+        float volumeChangeSpeed = 0.25f;
 
-        float volumeAdjustmentDelay = 1f;
 
         foreach (AudioSource audio in audios)
         {
@@ -404,9 +404,10 @@ public class AudioManager : MonoBehaviour
             if (currentClipIndex < 0)
                 currentClipIndex = songPathsList.Count - 1;
 
-            StartCoroutine(ChangeSprite());
             Debug.Log(currentClipIndex);
             PlayCurrentSong();
+            new WaitForSecondsRealtime(0.5f);
+            StartCoroutine(ChangeSprite());
         }
     }
 
@@ -425,49 +426,63 @@ public class AudioManager : MonoBehaviour
             {
                 currentClipIndex = 0;
             }
-            StartCoroutine(ChangeSprite());
             Debug.Log(currentClipIndex);
             PlayCurrentSong();
             cooldown = 0f;
+            new WaitForSecondsRealtime(0.5f);
+            StartCoroutine(ChangeSprite());
         }
     }
 
-  
 
     IEnumerator ChangeSprite()
     {
         mainMenu menu = options.GetComponent<mainMenu>();
 
         // Ensure there are sprites available
-        if (menu.sprite.Length > 0 && menu.data.artBG || menu.sprite.Length > 0 && menu.data.customBG)
+        if (menu.sprite.Length > 0 && (menu.data.artBG || menu.data.customBG))
         {
-
             // Set the new sprite gradually over a specified duration
             float duration = 0.2f; // Adjust the duration as needed
             float elapsedTime = 0f;
 
             Image imageComponent = menu.bg; // Assuming menu.bg is of type Image
 
-            Color startColor = imageComponent.color;
-            Color targetColor = new(startColor.r, startColor.g, startColor.b, 0f);
+            // Determine the target sprite
+            Sprite targetSprite = menu.sprite[Random.Range(0, menu.sprite.Length)];
+
+            // Store the initial alpha value of the image
+            float startAlpha = imageComponent.color.a;
 
             while (elapsedTime < duration)
             {
-                imageComponent.color = Color.Lerp(startColor, targetColor, elapsedTime / duration);
+                // Calculate the interpolation factor
+                float t = elapsedTime / duration;
+
+                // Lerp between the start and target alpha
+                Color currentColor = imageComponent.color;
+                currentColor.a = Mathf.Lerp(startAlpha, 0f, t);
+                imageComponent.color = currentColor;
+
+                // Update elapsed time
                 elapsedTime += Time.deltaTime;
+
                 yield return null;
             }
-            startColor = imageComponent.color;
-            targetColor = Color.white;
-            imageComponent.color = Color.Lerp(startColor, targetColor, 1f);
-            menu.LoadRandomBackground();
+
+            // Set the final sprite and reset alpha
+            imageComponent.sprite = targetSprite;
+            Color finalColor = imageComponent.color;
+            finalColor.a = 1f;
+            imageComponent.color = finalColor;
         }
-        else if (menu.sprite.Length > 0 && !menu.data.customBG || menu.sprite.Length > 0 && !menu.data.customBG)
+        else if (menu.sprite.Length > 0 && (!menu.data.customBG || !menu.data.customBG))
         {
             menu.ChangeBasicCol();
         }
-
     }
+
+
     public void PlayCurrentSong()
     {
         if (songPathsList != null && songPathsList.Count > 0)
