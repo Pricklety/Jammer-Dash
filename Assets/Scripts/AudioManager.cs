@@ -171,7 +171,7 @@ public class AudioManager : MonoBehaviour
             audio.outputAudioMixerGroup = master;
             audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", Mathf.Clamp(masterS.value, -80f, 0f));
         }
-        
+       
 
 
         if (value1 != 0 && !IsScrollingUI())
