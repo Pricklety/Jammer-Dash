@@ -34,10 +34,10 @@ public class introManager : MonoBehaviour
 
             while (true)
             {
-            new WaitForSecondsRealtime(5f);
                 if (operation.progress >= 0.9f)
-                {
-                    if (!sceneActivationAllowed && Input.anyKeyDown)
+            {
+                new WaitForSecondsRealtime(5f);
+                if (!sceneActivationAllowed && Input.anyKeyDown)
                     {
                         sceneActivationAllowed = true;
                         operation.allowSceneActivation = true;

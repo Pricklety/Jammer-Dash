@@ -118,7 +118,7 @@ public class MusicVisualizer : MonoBehaviour
                 // Apply the same effect to the customImage
                 if (customImage != null && data.logoVisualizer)
                 {
-                    float customTargetSize = Mathf.Lerp(1f, 0.8f, rms);
+                    float customTargetSize = Mathf.Lerp(1.25f, 0.8f, rms);
                     float customCurrentSize = customImage.rectTransform.localScale.x;
                     float customNewSize = Mathf.Lerp(customCurrentSize, customTargetSize, Time.unscaledDeltaTime * 10f);
                     customImage.rectTransform.localScale = new Vector3(customNewSize, customNewSize, 1f);
@@ -135,7 +135,7 @@ public class MusicVisualizer : MonoBehaviour
 
     float GetRMS(AudioSource audioSource)
     {
-        int sampleSize = 3000;
+        int sampleSize = 1000;
         float[] samples = new float[sampleSize];
         audioSource.GetOutputData(samples, 1); // Get raw audio data
 

@@ -8,6 +8,8 @@ using UnityEngine.Networking;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -105,7 +107,31 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         acc = GameObject.Find("acc").GetComponent<Text>();
+        // Array to store all loaded audio clips
+        AudioClip[] allHits = new AudioClip[2];
+
+        // Loop through each possible variation of the hit name
+        for (int i = 0; i < allHits.Length; i++)
+        {
+            // Load the audio clip for each variation
+            allHits[i] = Resources.Load<AudioClip>("Audio/SFX/hit" + (i + 1));
+        }
+
+        // Check if any hits were found
+        if (allHits.Length > 0)
+        {
+            // Choose a random hit from the array
+            AudioClip randomHit = allHits[Random.Range(0, allHits.Length)];
+
+            // Now you can play the random hit audio clip
+            hit = randomHit;
+        }
+        else
+        {
+            Debug.LogError("No hits found in the Resources/Audio/SFX folder.");
+        }
     }
+
 
     private void UpdateVignette(int currentHealth)
     {
@@ -462,6 +488,29 @@ public class PlayerMovement : MonoBehaviour
             yield return null;
         }
         lerpTimer = 0f;
+        // Array to store all loaded audio clips
+        AudioClip[] allHits = new AudioClip[2]; // Adjust the size based on the number of hits you have
+
+        // Loop through each possible variation of the hit name
+        for (int i = 0; i < allHits.Length; i++)
+        {
+            // Load the audio clip for each variation
+            allHits[i] = Resources.Load<AudioClip>("Audio/SFX/hit" + (i + 1));
+        }
+
+        // Check if any hits were found
+        if (allHits.Length > 0)
+        {
+            // Choose a random hit from the array
+            AudioClip randomHit = allHits[Random.Range(0, allHits.Length)];
+
+            hit = randomHit;
+        }
+        else
+        {
+            Debug.LogError("No hits found in the Resources/Audio/SFX folder.");
+        }
+    
     }
     IEnumerator ChangeScore()
     {
@@ -487,7 +536,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Time.timeScale > 0)
         {
-           
+            
             sfxS.PlayOneShot(hit);
             Vector3 cubePosition = cube.transform.position;
             Destroy(cube);

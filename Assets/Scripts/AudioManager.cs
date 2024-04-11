@@ -161,8 +161,8 @@ public class AudioManager : MonoBehaviour
 
 
         AudioSource[] audios = FindObjectsOfType<AudioSource>();
-        float value1 = Input.GetAxis("Mouse ScrollWheel");
-        float volumeChangeSpeed = 2f;
+        float value1 = Input.GetAxisRaw("Mouse ScrollWheel");
+        float volumeChangeSpeed = 1f;
 
         float volumeAdjustmentDelay = 1f;
 
@@ -183,7 +183,8 @@ public class AudioManager : MonoBehaviour
                 masterS.gameObject.SetActive(true);
             }
             // Calculate the new volume within the range of -80 to 0
-            float newVolume = Mathf.Clamp(masterS.value + value1 * volumeChangeSpeed, -80f, 0f);
+            float newVolume = Mathf.Clamp(masterS.value + value1,  -80f, 0f);
+            audioSource.PlayOneShot(Resources.Load<AudioClip>("Audio/SFX/volClick"), 0.75f); 
             float intVol = Mathf.RoundToInt(Mathf.InverseLerp(-80f, 0f, newVolume) * 100f);
             // Loop through each audio source
             foreach (AudioSource audio in audios)
@@ -217,7 +218,11 @@ public class AudioManager : MonoBehaviour
             {
                 if (SceneManager.GetActiveScene().buildIndex == 1)
                 {
-                    options.masterVolumeSlider.value = masterS.value;
+                    options.masterVolumeSlider.value = masterS.value;  // Calculate the new volume within the range of -80 to 0
+                    float newVolume = Mathf.Clamp(masterS.value, -80f, 0f);
+                    float intVol = Mathf.RoundToInt(Mathf.InverseLerp(-80f, 0f, newVolume) * 100f);
+                    // Update UI slider text
+                    masterS.GetComponentInChildren<Text>().text = "Master: " + intVol;
                 }
                 timer = 1.95f;
             }

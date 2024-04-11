@@ -621,10 +621,40 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         {
             panel.SetActive(!panel.activeSelf);
 
+            if (changelogs.active && !creditsPanel.active)
+            {
+                mainPanel.SetActive(false);
+                creditsPanel.SetActive(false);
+                playPanel.SetActive(false);
+                creditsPanel.SetActive(false);
+                settingsPanel.SetActive(false);
+                musicPanel.SetActive(false);
+                levelInfo.SetActive(false);
+                community.SetActive(false);
+                additionalPanel.SetActive(false);
+            }
+            else if (creditsPanel.active && !changelogs.active)
+            {
+                mainPanel.SetActive(false);
+                playPanel.SetActive(false);
+                settingsPanel.SetActive(false);
+                musicPanel.SetActive(false);
+                levelInfo.SetActive(false);
+                community.SetActive(false);
+                changelogs.SetActive(false);
+                additionalPanel.SetActive(false);
+            }
+            else if (creditsPanel.active && changelogs.active)
+            {
+                creditsPanel.SetActive(false);
+                changelogs.SetActive(false);
+                panel.SetActive(true);
+            }
             if (!panel.active)
             {
                 mainPanel.SetActive(true);
             }
+
         }
         else
         {
@@ -968,7 +998,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         }
         bool hasInput = Input.GetMouseButtonDown(0);
         idleTimer += Time.fixedDeltaTime; 
-        if (!hasInput || Input.GetKeyDown(KeyCode.F1))
+        if (!hasInput)
         {
             // Player is idle, start the idle animation immediately if it's not already playing
             if (idleTimer > idleTimeThreshold || Input.GetKeyDown(KeyCode.F1))
@@ -978,7 +1008,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
             }
             
         }
-        else if (hasInput && !IsPointerOverUIButNotButton())
+        else if (hasInput && !IsPointerOverUIButNotButton() || Input.GetKeyDown(KeyCode.F2))
         {
             idleTimer = 0;  // Resetting idleTimer when there is input
             animator.SetTrigger("StopIdle");
