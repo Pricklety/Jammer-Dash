@@ -65,14 +65,14 @@ public class PlayerEditorMovement : MonoBehaviour
         {
             new WaitForSeconds(0.14f);
             Debug.Log("hit");
-            AudioClip hitSound = Resources.Load<AudioClip>("Audio/SFX/hit");
+            AudioClip hitSound = Resources.Load<AudioClip>("Audio/SFX/hit0");
             GameObject.Find("sfx").GetComponent<AudioSource>().PlayOneShot(hitSound, 1);
 
         }
         if (collision.tag == "Beat")
         {
             Debug.Log("hit");
-            AudioClip hitSound = Resources.Load<AudioClip>("Audio/SFX/hit");
+            AudioClip hitSound = Resources.Load<AudioClip>("Audio/SFX/hit0");
             GameObject.Find("sfx").GetComponent<AudioSource>().PlayOneShot(hitSound, 1);
 
         }

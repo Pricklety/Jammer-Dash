@@ -101,6 +101,13 @@ public class AudioManager : MonoBehaviour
 
     public void Update()
     {
+        if (Input.GetKeyDown(KeyCode.F9) && SceneManager.GetActiveScene().buildIndex == 1)
+        {
+            songPathsList = new();
+            StartCoroutine(LoadAudioClipsAsync());
+           
+        }
+ 
         SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
         if (Application.isFocused && data.selectedFPS >= 30) 
         {
@@ -158,8 +165,7 @@ public class AudioManager : MonoBehaviour
         {
             songPlayed = false;
         }
-
-
+        
         AudioSource[] audios = FindObjectsOfType<AudioSource>();
         float value1 = Input.GetAxisRaw("Mouse ScrollWheel");
         float volumeChangeSpeed = 1f;
@@ -362,8 +368,10 @@ public class AudioManager : MonoBehaviour
                     songPathsList.Add(copiedFile);
                 }
             }
-
-            ShuffleSongPathsList(); // Shuffle the list of song paths
+           
+                ShuffleSongPathsList(); // Shuffle the list of song paths
+          
+           
         
     }
 
@@ -391,12 +399,36 @@ public class AudioManager : MonoBehaviour
     }
     public void ShuffleSongPathsList()
     {
-        System.Random rng = new();
+        // Initialize System.Random with a unique seed each time
+        System.Random rng = new System.Random(Guid.NewGuid().GetHashCode());
+
         int n = songPathsList.Count;
         for (int i = 0; i < n; i++)
         {
             int k = rng.Next(i, n);
             (songPathsList[i], songPathsList[k]) = (songPathsList[k], songPathsList[i]);
+        }
+        new WaitForChangedResult();
+        if (SceneManager.GetActiveScene().buildIndex == 1)
+        {
+            List<Dropdown.OptionData> optionDataList = new List<Dropdown.OptionData>();
+            foreach (var musicClipPath in songPathsList)
+            {
+                // Get just the file name without the extension
+                string songName = Path.GetFileNameWithoutExtension(musicClipPath);
+
+                // Create a new OptionData object with the song name
+                Dropdown.OptionData optionData = new Dropdown.OptionData(songName);
+
+                // Add the OptionData to the list
+                optionDataList.Add(optionData);
+            }
+
+            // Clear existing options
+            options.playlist.ClearOptions();
+
+            // Add the shuffled list to the dropdown
+            options.playlist.AddOptions(optionDataList);
         }
     }
 

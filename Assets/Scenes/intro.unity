@@ -5239,7 +5239,6 @@ GameObject:
   - component: {fileID: 509521557}
   - component: {fileID: 509521560}
   - component: {fileID: 509521559}
-  - component: {fileID: 509521558}
   - component: {fileID: 509521561}
   m_Layer: 5
   m_Name: screenshot
@@ -5269,26 +5268,6 @@ RectTransform:
   m_AnchoredPosition: {x: -85, y: 50}
   m_SizeDelta: {x: 150, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!95 &509521558
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 509521556}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 5e4c90999ab34514b9fb26f406f0e38d, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
 --- !u!114 &509521559
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5302,7 +5281,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5471698, g: 0.5285867, b: 0.5285867, a: 0.392}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5339,8 +5318,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_EffectColor: {r: 1, g: 0, b: 0, a: 0.64705884}
-  m_EffectDistance: {x: 2, y: -2}
+  m_EffectColor: {r: 1, g: 1, b: 1, a: 0.5}
+  m_EffectDistance: {x: 1, y: -1}
   m_UseGraphicAlpha: 1
 --- !u!1 &787129916
 GameObject:
@@ -6155,7 +6134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e49fe16d1521fde4e80abb935903f6b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  screenshotIndicatorAnimator: {fileID: 509521558}
+  screenshotIndicatorAnimator: {fileID: 0}
 --- !u!4 &1283919107
 Transform:
   m_ObjectHideFlags: 0
