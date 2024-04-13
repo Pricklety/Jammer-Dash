@@ -151,8 +151,8 @@ public class MusicVisualizer : MonoBehaviour
     Color CalculateTargetColor(float intensity, float rms)
     {
         float adjustedIntensity = intensity * rms * 2;
-        float hue = Mathf.Lerp(360, Random.Range(0, 360), adjustedIntensity);
-        return Color.HSVToRGB(hue / 360f, 1.0f, 1.0f);
+        float hue = Mathf.Lerp(rms / intensity, Random.Range(0, 360), adjustedIntensity);
+        return Color.HSVToRGB(hue / 360f, hue / 90f, 1f, true);
     }
 
 }
