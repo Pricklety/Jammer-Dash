@@ -123,6 +123,24 @@ public class LevelDataManager : MonoBehaviour
         {
             Instantiate(Resources.Load<GameObject>("Saws and Spikes/rotateSaw01"), sawPos, Quaternion.identity);
         }
+        for (int i = 0; i < sceneData.longCubePositions.Count; i++)
+        {
+            // Get the current position and width for this long cube
+            Vector3 longCubePos = sceneData.longCubePositions[i];
+            float width = sceneData.longCubeWidth[i];
+
+            // Instantiate the "hitter02" prefab at the current longCubePos
+            GameObject longCubeObject = Instantiate(Resources.Load<GameObject>("hitter02"), longCubePos, Quaternion.identity);
+
+            // Get the SpriteRenderer component of the instantiated object
+            SpriteRenderer longCubeRenderer = longCubeObject.GetComponent<SpriteRenderer>();
+
+            // Set the width of the SpriteRenderer
+            longCubeRenderer.size = new Vector2(width, 1);
+            Debug.Log("Instantiated long cube");
+        }
+
+
         if (sceneData.picLocation != null)
             {
 

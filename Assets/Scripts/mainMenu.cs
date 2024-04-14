@@ -1008,14 +1008,17 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
             }
             
         }
-        else if (hasInput && !IsPointerOverUIButNotButton() || Input.GetKeyDown(KeyCode.F2))
+        else if (hasInput && !IsPointerOverUIButNotButton())
         {
             idleTimer = 0;  // Resetting idleTimer when there is input
             animator.SetTrigger("StopIdle");
             animator.ResetTrigger("StartIdle");
         }
-        
-        
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            additionalPanel.SetActive(!additionalPanel.active);
+        }
+
         if (quitPanel.activeSelf)
         {
             // Set the Lowpass filter parameter on the Master AudioMixer

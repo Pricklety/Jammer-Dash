@@ -6,7 +6,7 @@ using System.Collections;
 public class ScreenshotHandler : MonoBehaviour
 {
     public Animator screenshotIndicatorAnimator; // Reference to the animator for the screenshot indicator
-
+    public AudioClip shutter;
     private bool takeScreenshotOnNextFrame;
 
     private void Start()
@@ -43,6 +43,7 @@ public class ScreenshotHandler : MonoBehaviour
 
         // Capture screenshot
         ScreenCapture.CaptureScreenshot(screenshotPath);
+        GetComponent<AudioSource>().PlayOneShot(shutter);
 
         // Wait for a short period of time before checking if the file exists
         yield return new WaitForSeconds(1f);

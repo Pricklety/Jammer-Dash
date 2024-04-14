@@ -4,10 +4,19 @@ using UnityEngine;
 
 public class itemUnused : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public bool IsLongCube;
+    public float longCubeLength;
     void Start()
     {
-        
+        if (gameObject.name.Contains("hitter02"))
+        {
+            IsLongCube = true;
+            longCubeLength = GetComponent<SpriteRenderer>().size.x;
+        }
+        else
+        {
+            IsLongCube = false;
+        }
     }
 
     // Update is called once per frame

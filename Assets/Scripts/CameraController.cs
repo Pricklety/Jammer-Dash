@@ -36,7 +36,7 @@ public class CameraController : MonoBehaviour
         }
         bool pointerOverUI = EventSystem.current.IsPointerOverGameObject();
         bool isMovingWithMouse = false;
-        if (Input.GetMouseButton(0) && !pointerOverUI)
+        if (!Input.GetKey(KeyCode.LeftShift) && Input.GetMouseButton(0) && !pointerOverUI)
         {
             isMovingWithMouse = true;
         }

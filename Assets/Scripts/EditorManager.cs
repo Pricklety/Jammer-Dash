@@ -100,15 +100,19 @@ public class EditorManager : MonoBehaviour
     public SceneSettings sceneSettings;
     public GameObject cubePrefab; // Replace with your cube prefab
     public GameObject sawPrefab; // Replace with your saw prefab
+    public GameObject longCubePrefab;
     public Transform parentTransform; // Replace with the parent transform for instantiated objects
     public List<Vector3> cubePositions = new();
     public List<Vector3> sawPositions = new();
+    public List<Vector3> longCubePositions = new();
+    public List<float> longCubeWidth = new();
     public string imageTexturePath;
     public string imageParentPath;
     public Color backgroundColor;
     public string sceneNameInBundle;
     public List<GameObject> cubes; // List of cube game objects
     public List<GameObject> saws; // List of saw game objects
+    public List<GameObject> longCubes;
     public InputField bpm;
 
     [Header("Length Calculator")]
@@ -123,7 +127,16 @@ public class EditorManager : MonoBehaviour
     public float delay;
     public float delayLimit = 0.25f;
     public float timer = 0f;
-    
+
+    [Header("Long Cube")]
+    public float minWidth = 1f;
+    public float maxWidth = 5f; // Change this value as needed
+    public float expansionSpeed = 1f; // Adjust as needed
+
+    private Vector3 initialMousePosition;
+    private Vector3 initialScale;
+    private bool isCursorOnRightSide;
+
 
     // Start is called before the first frame update
     void Start()
@@ -541,6 +554,7 @@ public class EditorManager : MonoBehaviour
     {
         cubes = new List<GameObject>();
         saws = new List<GameObject>();
+        longCubes = new();
         string sceneName = sceneNameInput.text.Trim();
         string filePath = GetSceneDataPath(sceneName);
 
@@ -574,6 +588,23 @@ public class EditorManager : MonoBehaviour
                 saws.Add(saw);
             }
 
+
+            for (int i = 0; i < sceneData.longCubePositions.Count; i++)
+            {
+                // Get the current position and width for this long cube
+                Vector3 longCubePos = sceneData.longCubePositions[i];
+                float width = sceneData.longCubeWidth[i];
+
+                // Instantiate the "hitter02" prefab at the current longCubePos
+                GameObject longCubeObject = Instantiate(Resources.Load<GameObject>("hitter02"), longCubePos, Quaternion.identity);
+
+                // Get the SpriteRenderer component of the instantiated object
+                SpriteRenderer longCubeRenderer = longCubeObject.GetComponent<SpriteRenderer>();
+
+                // Set the width of the SpriteRenderer
+                longCubeRenderer.size = new Vector2(width, 1);
+                longCubes.Add(longCubeObject);
+            }
             StartCoroutine(LoadImageCoroutine(sceneData.picLocation));
             Debug.Log("File Path: " + sceneData.songName);
             Debug.Log("Objects and UI loaded successfully");
@@ -759,7 +790,7 @@ public class EditorManager : MonoBehaviour
             $"\nDifficulty: {sceneData.calculatedDifficulty}sn" +
             $"\nLevel Length: {sceneData.levelLength} seconds" +
             $"\nLast saved on: {DateTime.Now}" +
-            $"\nObjects: {cubes.Count + saws.Count} ({cubes.Count}c, {saws.Count}s)" +
+            $"\nObjects: {cubes.Count + saws.Count + longCubes.Count} ({cubes.Count}c, {saws.Count}s, {longCubes.Count}l)" +
             $"\nLevel file loc: {filePath}" +
             $"\nBPM: {sceneData.bpm}" +
             $"\nSaved version: {Application.version}" +
@@ -904,10 +935,70 @@ public class EditorManager : MonoBehaviour
         }
         
     }
+    bool IsCursorOnRightSide()
+    {
+        Debug.Log("test");
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 objectPosition = selectedObject.transform.position;
+        return mousePosition.x >= objectPosition.x;
+    }
 
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift))
+        {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out hit))
+            {
+                if (hit.collider.gameObject.name.Contains("hitter02"))
+                {
+                    selectedObject = hit.collider.transform;
+                    initialMousePosition = Input.mousePosition;
+                    isCursorOnRightSide = IsCursorOnRightSide();
+                }
+            }
+        }
+
+        if (Input.GetMouseButton(0) && Input.GetKey(KeyCode.LeftShift) && selectedObject != null && selectedObject.gameObject.name.Contains("hitter02"))
+        {
+            float mouseSpeed = Input.GetAxis("Mouse X");
+
+            // Calculate the change in size based on the mouse movement direction
+            float newSizeX = selectedObject.GetComponent<SpriteRenderer>().size.x + (mouseSpeed * Time.unscaledDeltaTime * (isCursorOnRightSide ? 1 : -1));
+            // Clamp the size within the specified limits
+            newSizeX = Mathf.Clamp(newSizeX, 1f, 100);
+
+            // Update the size of the SpriteRenderer
+            SpriteRenderer spriteRenderer = selectedObject.GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.size = new Vector2(newSizeX, spriteRenderer.size.y);
+            }
+        }
+        else if (selectedObject != null && DateTime.Now.Day == 1 && DateTime.Now.Month == 4)
+        { // Capture initial mouse position only once
+            if (Input.GetMouseButtonDown(0))
+            {
+                initialMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            }
+            Debug.Log("IT'S " + DateTime.Now.Day + "/" + DateTime.Now.Month);
+           
+            Vector3 currentMousePosition = Input.mousePosition;
+            float delta = currentMousePosition.x - initialMousePosition.x;
+
+            // Calculate new width and position
+            float newWidth = Mathf.Clamp(initialScale.x + delta * expansionSpeed, 1, 100);
+            float widthChange = newWidth - initialScale.x;
+            Vector3 newPosition = selectedObject.transform.position + selectedObject.transform.right * (widthChange / 2f);
+
+            // Update scale and position
+            selectedObject.transform.localScale = new Vector3(newWidth, selectedObject.transform.localScale.y, selectedObject.transform.localScale.z);
+            selectedObject.transform.position = newPosition;
+                
+            Debug.Log("fools");
+        }
         sliderOffset2.GetComponentInChildren<Text>().text = "BPM Offset (" + (sliderOffset2.value / 7).ToString("F2") + "s)";
         if (sliderOffset2.value < 0.15f && sliderOffset2.value > -0.15f)
         {
@@ -954,11 +1045,12 @@ public class EditorManager : MonoBehaviour
         PlayerEditorMovement player = GameObject.FindObjectOfType<PlayerEditorMovement>();
 
 
-        if (cubes.Count > 0 || saws.Count > 0)
+        if (cubes.Count > 0 || saws.Count > 0 || longCubes.Count > 0)
         {
 
             FindFarthestObjectInX(cubes.ToArray());
             FindFarthestObjectInX(saws.ToArray());
+            FindFarthestObjectInX(longCubes.ToArray());
             MeasureTimeToReachDistance();
         }
         bgColorSel.color = cam.backgroundColor;
@@ -984,7 +1076,7 @@ public class EditorManager : MonoBehaviour
         bool pointerOverUI = EventSystem.current.IsPointerOverGameObject();
 
         
-        int accurateCount = cubes.Count + saws.Count;
+        int accurateCount = cubes.Count + saws.Count + longCubes.Count;
         
             objectCount.text = "Objects: " + accurateCount.ToString() + "/6000";
         string file = Path.Combine(Application.persistentDataPath, "scenes", sceneNameInput.text, sceneNameInput.text + ".json");
@@ -997,15 +1089,21 @@ public class EditorManager : MonoBehaviour
 
             Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));// Calculate the distance based on the position of the farthest object and additional distance
         float cdistance = targetObject.position.x + additionalDistance;
-        List<Vector2> cubePositions = new List<Vector2>(); // Declare cubePositions as a List<Vector2>
+            List<Vector2> cubePositions = new List<Vector2>();
 
-        foreach (GameObject cube in cubes)
-        {
-            Vector2 cubePos = cube.transform.position;
-            cubePositions.Add(cubePos); // Add cube position to the list
-        }
-        // Calculate the number of cubes per Y level
-        int[] cubesPerY = CalculateCubesPerY(cubePositions.ToArray());
+            for (int i = 0; i < cubes.Count && i < longCubes.Count; i++)
+            {
+                // Get the position of the cube and add it to the list
+                Vector2 cubePos = cubes[i].transform.position;
+                cubePositions.Add(cubePos);
+
+                // Get the position of the long cube and add it to the list
+                Vector2 longCubePos = longCubes[i].transform.position;
+                cubePositions.Add(longCubePos);
+            }
+
+            // Calculate the number of cubes per Y level
+            int[] cubesPerY = CalculateCubesPerY(cubePositions.ToArray());
         difficulty.text = "Live Level Difficulty: " + CalculateDifficulty(cubesPerY, cubePositions.ToArray(), cdistance / 7);
         }
 
@@ -1020,7 +1118,7 @@ public class EditorManager : MonoBehaviour
         {
             timer = 0f;
             delay = 0;
-
+            Debug.Log(itemButtons[currentButtonPressed]);
             if (worldPos.y < 4.5f && worldPos.x > 1 && worldPos.y > -1.5f && worldPos.x < 20000 && accurateCount < 6000)
             {
                 GameObject[] beatObjects = GameObject.FindGameObjectsWithTag("Beat");
@@ -1080,6 +1178,13 @@ public class EditorManager : MonoBehaviour
                         SelectObject(item.transform);
                     }
 
+                    if (item.CompareTag("LongCube"))
+                    {
+                        longCubes.Add(item);
+
+                        SelectObject(item.transform);
+                    }
+
                 }
                 else
                 {
@@ -1097,7 +1202,11 @@ public class EditorManager : MonoBehaviour
                         // Select the newly instantiated saw
                         SelectObject(item.transform);
                     }
-
+                    if (item.CompareTag("LongCube"))
+                    {
+                        longCubes.Add(item);
+                        SelectObject(item.transform);
+                    }
                 }
                 
             }
@@ -1125,7 +1234,7 @@ public class EditorManager : MonoBehaviour
                 selectedObject = null;
             }
 
-            if (hit.collider != null && hit.collider.transform.CompareTag("Cubes") || hit.collider != null && hit.collider.transform.CompareTag("Saw") || hit.collider != null && hit.collider.transform.CompareTag("Beat"))
+            if (hit.collider != null && hit.collider.transform.CompareTag("Cubes") || hit.collider != null && hit.collider.transform.CompareTag("Saw") || hit.collider != null && hit.collider.transform.CompareTag("Beat") || hit.collider.transform.CompareTag("LongCube"))
             {
                 // Get the GameObject associated with the hit
                 GameObject selected = hit.collider.gameObject;
@@ -1198,6 +1307,7 @@ public class EditorManager : MonoBehaviour
             {
                 cubes.Remove(selectedObject.gameObject);
                 saws.Remove(selectedObject.gameObject);
+                longCubes.Remove(selectedObject.gameObject);
                 Destroy(selectedObject.gameObject);
                 
             }
@@ -1665,7 +1775,22 @@ public class EditorManager : MonoBehaviour
                 Debug.Log($"Added saw position: {sawPos}");
             }
         }
+        if (longCubes != null)
+        {
+            sceneData.longCubePositions = new List<Vector3>();
+            sceneData.longCubeWidth = new();
 
+            foreach (GameObject cube in longCubes)
+            {
+                Vector3 cubePos = cube.transform.position;
+                sceneData.longCubePositions.Add(cubePos);
+                float width = cube.GetComponent<SpriteRenderer>().size.x;
+                sceneData.longCubeWidth.Add(width);
+                Debug.Log($"Added long cube position: {cubePos}");
+                Debug.Log($"Added long cube width: {width}");
+            }
+        
+        }
         return sceneData;
     }
 
@@ -1788,7 +1913,7 @@ public class EditorManager : MonoBehaviour
 
                 
                 // Add difficulty contribution for this pair of cubes
-                difficulty += timingWindow * 2 + (cubeCount / 30f) * (cubes.Count / 100) * (saws.Count / 100) * (precisionFactor / divisor * 100);
+                difficulty += timingWindow * 2 + (cubeCount / 30f) * (cubes.Count / 100) * (saws.Count / 100) * (longCubes.Count / 100) * (precisionFactor / divisor * 100);
             }
         }
 

@@ -212,7 +212,7 @@ public class PauseMenu : MonoBehaviour
     {
         if (!focus) // Only execute when focus is lost
         {
-            if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindObjectOfType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0) && GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().IsPlayerCloseToNextCube() && !GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().IsPlayerInLongSeries()))
+            if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindObjectOfType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
             {
                
                 panel.SetActive(true);

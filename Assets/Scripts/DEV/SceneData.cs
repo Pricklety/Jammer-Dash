@@ -13,6 +13,8 @@ public class SceneData
     public string sceneName;
     public List<Vector3> cubePositions;
     public List<Vector3> sawPositions;
+    public List<Vector3> longCubePositions;
+    public List<float> longCubeWidth;
     public int ID;
     public int bpm;
     public string levelName;

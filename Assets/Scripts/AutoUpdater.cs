@@ -7,6 +7,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Diagnostics;
 using static System.Net.WebRequestMethods;
+using UnityEngine.Networking;
 
 public class AutoUpdater : MonoBehaviour
 {
@@ -37,14 +38,13 @@ public class AutoUpdater : MonoBehaviour
                 if (latestRelease.tag_name != currentVersion)
                 {
                     // Show update panel
-                    updatePanel.SetActive(true);
+                    //updatePanel.SetActive(true);
                     // Enable update button
                     updateButton.interactable = true;
                     // Set button text
                     updateButtonText.text = "Update Available!";
                     // Set download URL
-                    downloadUrl = $"https://api.github.com/repos/Pricklety/Jammer-Dash/zipball/{latestRelease.tag_name}";
-
+                    downloadUrl = $"https://github.com/Pricklety/Jammer-Dash/releases/download/release/Jammer.Dash.{latestRelease.tag_name}.zip";
                 }
             }
             catch (WebException ex)
@@ -58,36 +58,53 @@ public class AutoUpdater : MonoBehaviour
     public void UpdateGame()
     {
         StartCoroutine(DownloadAndExtractUpdate());
+        UnityEngine.Debug.Log(downloadUrl);
     }
 
     private IEnumerator DownloadAndExtractUpdate()
     {
-        using (WebClient client = new WebClient())
+        using (UnityWebRequest www = UnityWebRequest.Get(downloadUrl))
         {
             string tempZipPath = Path.Combine(Application.persistentDataPath, "update.zip");
-            try
-            {
-                // Download the zip file
-                client.DownloadFile(new Uri(downloadUrl), tempZipPath);
+            www.downloadHandler = new DownloadHandlerFile(tempZipPath);
 
-                // Extract the zip file
-                ZipFile.ExtractToDirectory(tempZipPath, Application.persistentDataPath);
+            var operation = www.SendWebRequest();
+
+            while (!operation.isDone)
+            {
+                updateButtonText.text = "Downloading: " + (www.downloadProgress * 100).ToString("F0") + "%";
+                yield return null;
+            }
+
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                string extractionPath = Path.Combine(Application.persistentDataPath, "update");
+                Directory.CreateDirectory(extractionPath); // Ensure the extraction directory exists
+
+                using (ZipArchive archive = ZipFile.OpenRead(tempZipPath))
+                {
+                    foreach (ZipArchiveEntry entry in archive.Entries)
+                    {
+                        string entryDestinationPath = Path.Combine(extractionPath, entry.FullName);
+                        entry.ExtractToFile(entryDestinationPath, true);
+                    }
+                }
 
                 // Clean up the temporary zip file
-                File.Delete(tempZipPath);
+                System.IO.File.Delete(tempZipPath);
 
                 // Run the update script
                 RunUpdateScript();
             }
-            catch (WebException ex)
+            else
             {
-                updateButtonText.text = $"Update download failed: {ex.Message}";
+                updateButtonText.text = "Update download failed: " + www.error;
             }
         }
-        yield return null;
     }
 
-    void RunUpdateScript()
+
+void RunUpdateScript()
     {
         string executablePath = Path.Combine(Application.dataPath, "..", "Jammer Dash.exe");
         Process.Start(executablePath);

@@ -34,7 +34,6 @@ public class GameInfo : MonoBehaviour
 
         DisplayTimeInfo();
         DisplayMusicList();
-        DisplayAudioInfo();
     }
 
    
@@ -50,38 +49,6 @@ public class GameInfo : MonoBehaviour
         string totalMusicCount = "Total Music Count: " + musicFiles.Length + "\n\n";
 
         gameInfoText.text += totalMusicCount + "----------------\n\n";
-    }
-
-    void DisplayAudioInfo()
-    {
-        // Display information about the dynamically found AudioSource
-        if (musicAudioSource != null)
-        {
-            float volume;
-            bool result = musicAudioSource.outputAudioMixerGroup.audioMixer.GetFloat("Master", out volume);
-            
-            string audioInfo = "Audio Source Information:\n";
-            audioInfo += "Is Playing: " + musicAudioSource.isPlaying + "\n";
-            if (result)
-            {
-                float mappedVolume = Mathf.InverseLerp(-80f, 0f, volume);
-                audioInfo += "Volume: " + mappedVolume + "\n";
-            }
-            else
-            {
-                audioInfo += "Volume: Can't access.\n";
-            }
-           
-            audioInfo += "Time: " + FormatTime(musicAudioSource.time) + "\n";
-            audioInfo += "Length: " + FormatTime(musicAudioSource.clip.length) + "\n";
-            
-
-            gameInfoText.text += audioInfo + "----------------\n\n";
-        }
-        else
-        {
-            gameInfoText.text += "No AudioSource found.\n\n" + "----------------\n\n";
-        }
     }
 
     private string FormatTime(float time)
