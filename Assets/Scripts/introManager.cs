@@ -32,12 +32,12 @@ public class introManager : MonoBehaviour
             AsyncOperation operation = SceneManager.LoadSceneAsync(1);
             operation.allowSceneActivation = false;
 
-            while (true)
-            {
-                if (operation.progress >= 0.9f)
-            {
-                new WaitForSecondsRealtime(5f);
-                if (!sceneActivationAllowed && Input.anyKeyDown)
+        new WaitForSecondsRealtime(5f);
+        while (true)
+        {
+            if (operation.progress >= 0.9f)
+                {
+                    if (!sceneActivationAllowed && Input.anyKeyDown)
                     {
                         sceneActivationAllowed = true;
                         operation.allowSceneActivation = true;

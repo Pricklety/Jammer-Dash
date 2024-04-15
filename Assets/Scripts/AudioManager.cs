@@ -45,6 +45,7 @@ public class AudioManager : MonoBehaviour
             {
 
                 StartCoroutine(LoadAudioClipsAsync());
+                PlayCurrentSong();
             }
         }
         else
@@ -101,7 +102,7 @@ public class AudioManager : MonoBehaviour
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F9) && SceneManager.GetActiveScene().buildIndex == 1)
+        if (Input.GetKeyDown(KeyCode.F9) && SceneManager.GetActiveScene().buildIndex <= 1)
         {
             songPathsList = new();
             StartCoroutine(LoadAudioClipsAsync());
@@ -154,7 +155,7 @@ public class AudioManager : MonoBehaviour
     private void FixedUpdate()
     {
         AudioSource audioSource = GetComponent<AudioSource>();
-        if (!songPlayed && !paused && (audioSource.time >= audioSource.clip.length || (!audioSource.isPlaying && SceneManager.GetActiveScene().buildIndex == 1)))
+        if (!songPlayed && !paused && (audioSource.time >= audioSource.clip.length || (!audioSource.isPlaying && SceneManager.GetActiveScene().buildIndex <= 1)))
         {
             PlayNextSong(songPlayed);
             songPlayed = true;
