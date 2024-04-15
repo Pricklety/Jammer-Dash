@@ -1,8 +1,0 @@
-W - Up
-S - Down
-Space - Boost
-LMB - Destroy block
-RMB - Invisible dash (useful for bossfights)
-A - Dash (can pass through walls)
-D - Invincibility Mode (Combo 50+x, cooldown 20s and lasts 5 seconds)
-Tab - Restart to checkpoint (4 min+ levels, story mode only)

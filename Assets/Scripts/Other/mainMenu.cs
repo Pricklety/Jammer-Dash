@@ -466,13 +466,6 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         LoadLevelsFromFiles();
     }
 
-
-    private void GetIPAddress(System.Action<string> callback)
-    {
-        StartCoroutine(IpService.GetPublicIpAddress(callback));
-    }
-
-
     [System.Serializable]
     public class CountryInfo
     {

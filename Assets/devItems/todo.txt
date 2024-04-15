@@ -1,7 +1,0 @@
-JAMMER DASH TO-DO LIST
-
-
-- Improve animations (by December)
-- Finish the secret mode (by March)
-- Finish the levels (by December)
-- Finish the editor (by June)
