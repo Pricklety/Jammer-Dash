@@ -84,8 +84,10 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
 
     [Header("Fun Mode")]
     public GameObject vis2;
-    public GameObject randomSFX;
-    public GameObject confetti;
+
+    [Header("Visualizer V2")]
+    public Text musicText;
+    public Slider musicSlider;
 
     void Start()
     {
@@ -615,42 +617,28 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     private void ToggleMenuPanel(GameObject panel)
     {
         // Toggle the specified panel directly if it's changelogs or creditsPanel
-        if (panel == changelogs || panel == creditsPanel)
+        if (panel == changelogs || panel == creditsPanel || panel == funMode)
         {
             panel.SetActive(!panel.activeSelf);
 
-            if (changelogs.active && !creditsPanel.active)
+            if (panel.active)
             {
+                // Turn off all panels
                 mainPanel.SetActive(false);
-                creditsPanel.SetActive(false);
                 playPanel.SetActive(false);
                 creditsPanel.SetActive(false);
                 settingsPanel.SetActive(false);
                 musicPanel.SetActive(false);
                 levelInfo.SetActive(false);
                 community.SetActive(false);
-                additionalPanel.SetActive(false);
-            }
-            else if (creditsPanel.active && !changelogs.active)
-            {
-                mainPanel.SetActive(false);
-                playPanel.SetActive(false);
-                settingsPanel.SetActive(false);
-                musicPanel.SetActive(false);
-                levelInfo.SetActive(false);
-                community.SetActive(false);
                 changelogs.SetActive(false);
                 additionalPanel.SetActive(false);
-            }
-            else if (creditsPanel.active && changelogs.active)
-            {
-                creditsPanel.SetActive(false);
-                changelogs.SetActive(false);
-                panel.SetActive(true);
+                funMode.SetActive(false);
+                vis2.SetActive(false);
             }
             if (!panel.active)
             {
-                mainPanel.SetActive(true);
+                panel.SetActive(true);
             }
 
         }
@@ -668,8 +656,6 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
             additionalPanel.SetActive(false);
             funMode.SetActive(false);
             vis2.SetActive(false);
-            randomSFX.SetActive(false);
-            confetti.SetActive(false);
 
             // Enable the specified panel if it's not null
             if (panel != null)
@@ -685,14 +671,28 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     }
 
     // Menu buttons
+    public void Home()
+    {
+        ToggleMenuPanel(mainPanel);
+    }
     public void Play()
     {
         ToggleMenuPanel(playPanel);
     }
 
+    public void PlayRandomSFX()
+    {
+        UnityEngine.Object[] clips = Resources.LoadAll("Audio/SFX");
+        foreach (var obj in clips)
+        {
+            Debug.Log("Loaded object: " + obj.name);
+        }
+        FindObjectOfType<AudioSource>().PlayOneShot((AudioClip)clips[Random.Range(0, clips.Length)]);
+
+    }
     public void Credits()
     {
-        ToggleMenuPanel(creditsPanel);
+        ToggleMenuPanel(creditsPanel); 
     }
 
     public void Settings()
@@ -1043,8 +1043,8 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
             // Set the Lowpass filter parameter on the Master AudioMixer
             audioMixer.SetFloat("Lowpass", 22000);
         }
-        
 
+        musicText.text = $"{AudioManager.Instance.GetComponent<AudioSource>().clip.name} - {AudioManager.Instance.GetComponent<AudioSource>().time}/{AudioManager.Instance.GetComponent<AudioSource>().clip.length}";
     }
 
     public void OnPointerClick(PointerEventData eventData)

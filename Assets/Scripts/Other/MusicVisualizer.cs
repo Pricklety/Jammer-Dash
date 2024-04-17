@@ -41,11 +41,11 @@ public class MusicVisualizer : MonoBehaviour
         }
 
         // Automatically add all objects with the name "beat" to the visualizerLines list
-        GameObject[] beatObjects = GameObject.FindObjectsOfType<GameObject>();
+        GameObject[] beatObjects = (GameObject[])FindObjectsOfTypeAll(typeof(GameObject));
 
         foreach (GameObject beatObject in beatObjects)
         {
-            if (beatObject.name == "beat" && (data.allVisualizers || data.lineVisualizer))
+            if (beatObject.CompareTag("Beat") && (data.allVisualizers || data.lineVisualizer))
             {
                 RectTransform rectTransform = beatObject.GetComponent<RectTransform>();
 

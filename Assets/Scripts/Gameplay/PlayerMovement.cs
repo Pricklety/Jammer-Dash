@@ -259,7 +259,12 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Update()
     {
-       
+#if UNITY_EDITOR
+        if (Input.GetKey(KeyCode.H))
+            Time.timeScale = 0.25f;
+        else if (Input.GetKeyUp(KeyCode.H))
+            Time.timeScale = 1f;
+#endif
         // Check for vertical movement
         if (Input.GetKeyDown(KeyCode.W) && transform.position.y < maxY && !isDying || Input.GetKeyDown(KeyCode.UpArrow) && transform.position.y < maxY && !isDying)
         {
@@ -540,7 +545,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (collision.gameObject.name.Contains("hitter02") && bufferActive)
         {
-            StopCoroutine(OnTriggerEnter2DBuffer());
+            StopCoroutine(OnTriggerEnter2DBuffer(collision));
             if (Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L))
             {
                 ShowBadText();
@@ -563,10 +568,9 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    private IEnumerator OnTriggerEnter2DBuffer()
+    private IEnumerator OnTriggerEnter2DBuffer(Collider2D collider)
     {
         bufferActive = true;
-
         Debug.Log("Buffer active!");
 
         float elapsedTime = 0f;
@@ -578,49 +582,58 @@ public class PlayerMovement : MonoBehaviour
         // Ensure the score reaches the final value precisely
         counter.score = newDestroyedCubes;
         health += 0.25f;
-        yield return null;
 
+        if (Input.GetMouseButtonUp(0) || Input.GetKeyUp(KeyCode.Return) || Input.GetMouseButtonUp(1) || Input.GetKeyUp(KeyCode.X) || Input.GetKeyUp(KeyCode.Y) || Input.GetKeyUp(KeyCode.Z) || Input.GetKeyUp(KeyCode.K) || Input.GetKeyUp(KeyCode.L))
+        {
+            Debug.Log("tested by you");
+            ProcessCollision(collider);
+        }
+        yield return null;
     }
+    private void ProcessCollision(Collider2D collision)
+    {
+        StopCoroutine(OnTriggerEnter2DBuffer(collision));
+        bufferActive = false;
+        passedCubes.Add(collision.gameObject);
+        DestroyCube(collision.gameObject);
+
+        Total += 1;
+        Animation anim = combotext.GetComponent<Animation>();
+        if (highestCombo == combo)
+        {
+            highestCombo++;
+        }
+        combo++;
+
+        SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+        if (data.scoreType == 0)
+        {
+            StartCoroutine(ChangeScore());
+        }
+        else
+        {
+            counter.destroyedCubes += 50;
+            scoreText.text = $"{counter.destroyedCubes}";
+        }
+        health += 20;
+        anim.Stop("comboanim");
+        anim.Play("comboanim");
+        comboTime = 0;
+    }
+
     private void OnTriggerStay2D(Collider2D collision)
     {
-
-        // Check if the collision involves the player's CircleCollider2D
         if (collision.gameObject.name.Contains("hitter02") && collision.transform.position.y == transform.position.y)
         {
             if ((Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L)) && !isDying)
             {
                 bufferActive = true;
-                StartCoroutine(OnTriggerEnter2DBuffer());
+                StartCoroutine(OnTriggerEnter2DBuffer(collision));
             }
             else if (Input.GetMouseButtonUp(0) || Input.GetKeyUp(KeyCode.Return) || Input.GetMouseButtonUp(1) || Input.GetKeyUp(KeyCode.X) || Input.GetKeyUp(KeyCode.Y) || Input.GetKeyUp(KeyCode.Z) || Input.GetKeyUp(KeyCode.K) || Input.GetKeyUp(KeyCode.L))
             {
-                StopCoroutine(OnTriggerEnter2DBuffer());
-                bufferActive = false;
-                passedCubes.Add(collision.gameObject);
-                DestroyCube(collision.gameObject);
-
-                Total += 1;
-                Animation anim = combotext.GetComponent<Animation>();
-                if (highestCombo == combo)
-                {
-                    highestCombo++;
-                }
-                combo++;
-
-                SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-                if (data.scoreType == 0)
-                {
-                    StartCoroutine(ChangeScore());
-                }
-                else
-                {
-                    counter.destroyedCubes += 50;
-                    scoreText.text = $"{counter.destroyedCubes}";
-                }
-                health += 20;
-                anim.Stop("comboanim");
-                anim.Play("comboanim");
-                comboTime = 0;
+                Debug.Log("tested by you");
+                ProcessCollision(collision);
             }
         }
         if (collision.tag == "SloMoTutorial")

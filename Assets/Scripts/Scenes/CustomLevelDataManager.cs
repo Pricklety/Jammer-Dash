@@ -170,8 +170,8 @@ public class CustomLevelDataManager : MonoBehaviour
 
             // Set the width of the SpriteRenderer
             longCubeRenderer.size = new Vector2(width, 1);
-            collider.size = new Vector2(width + 0.35f, 1.05f);
-            collider.offset = new Vector2(width / 1.8f, 0f);
+            collider.size = new Vector2(width + 0.75f, 0.75f);
+            collider.offset = new Vector2(width / 1.965f, 0f);
             Debug.Log("Instantiated long cube");
         }
         if (sceneData.picLocation != null)
