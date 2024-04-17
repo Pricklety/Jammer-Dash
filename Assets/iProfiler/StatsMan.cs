@@ -8,11 +8,11 @@ using UnityEditor;
 using System;
 using System.IO;
 using System.Diagnostics;
-using UnityEngine.Networking.Types;
 using Ping = UnityEngine.Ping;
 using System.Collections;
 using Debug = UnityEngine.Debug;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 public class StatsMan : MonoBehaviour
 {
@@ -26,7 +26,7 @@ public class StatsMan : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-            gui.text = $"Debug v10 - Jammer Dash {Application.version} ({Application.unityVersion})\n\n";
+            gui.text = $"Debug v11 - Jammer Dash {Application.version} ({Application.unityVersion})\n\n";
 
             DisplayAudioInfo();
             DisplayInputInfo();
@@ -34,18 +34,19 @@ public class StatsMan : MonoBehaviour
             DisplaySystemInfo();
             DisplayGraphicsInfo();
             DisplayVideoInfo();
-
+            
     } 
     
     void DisplaySystemInfo()
     {
-        gui.text += "System Memory: " + (SystemInfo.systemMemorySize / 1000).ToString("f2") + "GB" +
+        gui.text += "\n\nSystem Memory: " + (SystemInfo.systemMemorySize / 1000).ToString("f2") + "GB" +
                     "\nProcessor Type: " + SystemInfo.processorType +
                     "\nProcessor Count: " + SystemInfo.processorCount +
                     "\nDevice Type: " + SystemInfo.deviceType +
                     "\nOperating System: " + SystemInfo.operatingSystem +
                     "\nCPU Speed: " + SystemInfo.processorFrequency + "MHz" +
                     "\nSystem Language: " + Application.systemLanguage;
+                    
     }
 
     void DisplayGraphicsInfo()
@@ -53,7 +54,7 @@ public class StatsMan : MonoBehaviour
         gui.text += "\n\n" + "GPU: " + SystemInfo.graphicsDeviceName +
                     "\nGPU Type: " + SystemInfo.graphicsDeviceType +
                     "\nGPU Version: " + SystemInfo.graphicsDeviceVersion +
-                    "\nGPU Memory: " + SystemInfo.graphicsMemorySize + "MB\n\n";
+                    "\nGPU Memory: " + SystemInfo.graphicsMemorySize + "MB";
     }
 
     void DisplayAudioInfo()
@@ -63,7 +64,7 @@ public class StatsMan : MonoBehaviour
         if (musicSource != null && musicSource.name == "mainmenu")
         {
             gui.text += "\nMusic Clip: " + (musicSource.clip != null ? musicSource.clip.name : "N/A") + 
-                        "\nCurrent song index: " + musicSource.GetComponent<AudioManager>().currentClipIndex  +"\n\n";
+                        "\nCurrent song index: " + musicSource.GetComponent<AudioManager>().currentClipIndex;
         }
         else
         {
@@ -76,7 +77,7 @@ public class StatsMan : MonoBehaviour
         SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
         bool scoretype = Convert.ToBoolean(data.scoreType);
         string a = scoretype ? "Old" : "New";
-        gui.text += "Resolution value: " + data.resolutionValue + $" ({Screen.width}x{Screen.height})"+
+        gui.text += "\n\nResolution value: " + data.resolutionValue + $" ({Screen.width}x{Screen.height})"+
                     "\nScreen Mode: " + data.windowMode + $" ({Screen.fullScreenMode})"+
                     "\nQuality Level: " + data.qualitySettingsLevel + $" ({GetQualityLevelName()})" +
                     "\nArtistic Backgrounds: " + data.artBG + $" ({Resources.LoadAll<Sprite>("backgrounds").Length} bgs)" +
@@ -92,21 +93,25 @@ public class StatsMan : MonoBehaviour
                     "\nLowpass value: " + data.lowpassValue + 
                     "\nScore Display Type: " + a + 
                     "\nMouse particle count: " + data.mouseParticles + 
-                    "\nShowing FPS: " + data.isShowingFPS + "\n\n";
+                    "\nShowing FPS: " + data.isShowingFPS;
 
     }
         
     void DisplayVideoInfo()
     {
-        gui.text += "Screen Full Screen: " + Screen.fullScreen +
-                    "\nConnected Displays: " + Display.displays.Length + "\n\n";
+        gui.text += "\n\nScreen Full Screen: " + Screen.fullScreen +
+                    "\nConnected Displays: " + Display.displays.Length;
     }
 
 
     void DisplayInputInfo()
     {
-        gui.text += "Touch Support: " + Input.touchSupported +
-                    "\nInput count: " + Input.touchCount + "\n\n";
+        gui.text += "\n\nTouch Support: " + Input.touchSupported +
+                    "\nInput count: " + Input.touchCount + "\n\n" +
+                    "\nPolling frequency: " + InputSystem.pollingFrequency + "Hz" +
+                    "\nButton press point: " + InputSystem.settings.defaultButtonPressPoint +
+                    "\nInput update mode: " + InputSystem.settings.updateMode +
+                    "\nInput processing time: " + InputSystem.metrics.averageProcessingTimePerEvent.ToString("f5") + " seconds";
     }
         
 

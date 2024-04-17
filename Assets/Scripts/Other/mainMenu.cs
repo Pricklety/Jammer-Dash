@@ -38,7 +38,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     public GameObject community;
     public GameObject musicPanel;
     public GameObject changelogs;
-    
+    public GameObject funMode;
 
     [Header("LevelInfo")]
     public GameObject levelInfoPanelPrefab;
@@ -81,6 +81,11 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     public Text levelText;
     public RawImage discordpfp;
     public Text discordName;
+
+    [Header("Fun Mode")]
+    public GameObject vis2;
+    public GameObject randomSFX;
+    public GameObject confetti;
 
     void Start()
     {
@@ -661,6 +666,10 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
             community.SetActive(false);
             changelogs.SetActive(false);
             additionalPanel.SetActive(false);
+            funMode.SetActive(false);
+            vis2.SetActive(false);
+            randomSFX.SetActive(false);
+            confetti.SetActive(false);
 
             // Enable the specified panel if it's not null
             if (panel != null)
@@ -709,6 +718,18 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     public void AdditionalClose()
     {
         additionalPanel.SetActive(false);
+    }
+
+    public void FunMode()
+    {
+        ToggleMenuPanel(funMode);
+    }
+
+    // Fun mode buttons
+
+    public void VisualizerToggle()
+    {
+        vis2.SetActive(true);
     }
     public void Quit()
     {

@@ -41,12 +41,8 @@ public class AudioManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            if (!isMusicLoaded)
-            {
-
-                StartCoroutine(LoadAudioClipsAsync());
-                PlayCurrentSong();
-            }
+            StartCoroutine(LoadAudioClipsAsync());
+            
         }
         else
         {
@@ -102,7 +98,7 @@ public class AudioManager : MonoBehaviour
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F9) && SceneManager.GetActiveScene().buildIndex <= 1)
+        if (Input.GetKeyDown(KeyCode.F9) && SceneManager.GetActiveScene().buildIndex == 1)
         {
             songPathsList = new();
             StartCoroutine(LoadAudioClipsAsync());
@@ -155,7 +151,7 @@ public class AudioManager : MonoBehaviour
     private void FixedUpdate()
     {
         AudioSource audioSource = GetComponent<AudioSource>();
-        if (!songPlayed && !paused && (audioSource.time >= audioSource.clip.length || (!audioSource.isPlaying && SceneManager.GetActiveScene().buildIndex <= 1)))
+        if (!songPlayed && !paused && (audioSource.time >= audioSource.clip.length || (!audioSource.isPlaying && SceneManager.GetActiveScene().buildIndex == 1)))
         {
             PlayNextSong(songPlayed);
             songPlayed = true;
@@ -322,11 +318,9 @@ public class AudioManager : MonoBehaviour
             yield return null;
 
             string persistentMusicPath = Path.Combine(Application.persistentDataPath);
-            bool existsFolder = Directory.Exists(persistentMusicPath);
-
-            if (!existsFolder)
-            {
-                Directory.CreateDirectory(persistentMusicPath);
+            bool existsFolder = Directory.Exists(Path.Combine(Application.persistentDataPath, "music"));
+        if (!existsFolder)
+                Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "music"));
 
                 string sourceFolderPath = Path.Combine(Application.streamingAssetsPath, "music");
 
@@ -355,7 +349,7 @@ public class AudioManager : MonoBehaviour
                 {
                     Debug.LogError($"Source folder not found: {sourceFolderPath}");
                 }
-            }
+            
 
             // After copying files, add unique file paths to songPathsList
             string[] copiedFiles = Directory.GetFiles(persistentMusicPath, "*.mp3", SearchOption.AllDirectories);

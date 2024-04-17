@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
-
+using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     private float click = 0.05f;
@@ -82,7 +82,7 @@ public class PlayerMovement : MonoBehaviour
         vignette.color.value = startColor;
            
         maxHealth = 300;
-
+        InputSystem.pollingFrequency = 1000;
         SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
         if (data.hitType == 0)
         {
@@ -493,76 +493,57 @@ public class PlayerMovement : MonoBehaviour
             collision.GetComponent<Animation>().Play();
         }
 
-        if (collision.tag == "Cubes")
+        if (collision.tag == "Cubes" || collision.gameObject.name.Contains("hitter02"))
         {
             activeCubes.Add(collision.gameObject);
         }
 
-        if (collision.tag == "LongCube")
+        if (collision.tag == "LongCube" && collision.transform.position.y == transform.position.y)
         {
-            if (Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L)) 
-            {
-                if (!passedCubes.Contains(collision.gameObject))
-                {
-                    if (AudioManager.Instance != null)
-                    {
-                        if (AudioManager.Instance.hits)
-                        {
-                            ShowBadText();
-                        }
-                    }
-
-                    Total += 1;
-                    activeCubes.Remove(collision.gameObject);
-                    health -= 75; // Lower health due to passing the cube
-                    combo = 0; // Reset combo
-
-                    StartCoroutine(ChangeTextCombo());
-                }
-            }
+            bufferActive = true;
+          
         }
 
 
     }
 
-  
+
     private void OnTriggerExit2D(Collider2D collision)
     {
-         if (collision.tag == "SloMoTutorial")
-            {
-                GameObject tutg = GameObject.Find("TutorialText");
-            }
+        if (collision.tag == "SloMoTutorial")
+        {
+            GameObject tutg = GameObject.Find("TutorialText");
+        }
 
-            if ((collision.tag == "Cubes" || collision.tag == "LongCube") && activeCubes.Contains(collision.gameObject) && health > 0)
-            {
-                activeCubes.Remove(collision.gameObject);
+        if ((collision.tag == "Cubes" || collision.gameObject.name.Contains("hitter02")) && activeCubes.Contains(collision.gameObject) && health > 0)
+        {
+            activeCubes.Remove(collision.gameObject);
 
-                if (!passedCubes.Contains(collision.gameObject))
+            if (!passedCubes.Contains(collision.gameObject))
+            {
+                if (AudioManager.Instance != null)
                 {
-                    if (AudioManager.Instance != null)
+                    if (AudioManager.Instance.hits)
                     {
-                        if (AudioManager.Instance.hits)
-                        {
-                            ShowBadText();
-                        }
+                        ShowBadText();
                     }
-
-                    Total += 1;
-                    activeCubes.Remove(collision.gameObject);
-                    health -= 75; // Lower health due to passing the cube
-                    combo = 0; // Reset combo
-
-                    StartCoroutine(ChangeTextCombo());
                 }
+
+                Total += 1;
+                activeCubes.Remove(collision.gameObject);
+                health -= 75; // Lower health due to passing the cube
+                combo = 0; // Reset combo
+
+                StartCoroutine(ChangeTextCombo());
             }
-        
-            if (collision.gameObject.name.Contains("hitter02"))
-            {
-                StopCoroutine(OnTriggerEnter2DBuffer());
-            bufferActive = false;
+        }
+
+        if (collision.gameObject.name.Contains("hitter02") && bufferActive)
+        {
+            StopCoroutine(OnTriggerEnter2DBuffer());
             if (Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L))
             {
-                ShowBadText(); 
+                ShowBadText();
                 Total += 1;
                 health -= 50;
                 if (combo >= 100)
@@ -575,57 +556,40 @@ public class PlayerMovement : MonoBehaviour
                 combo = 0;
                 StartCoroutine(ChangeTextCombo());
             }
-            }
+           
+            bufferActive = false;
+
+        }
     }
 
 
     private IEnumerator OnTriggerEnter2DBuffer()
     {
         bufferActive = true;
+
         Debug.Log("Buffer active!");
 
-        // Loop to change combo every 0.14 seconds
-        while (bufferActive) 
-        { 
-            int newDestroyedCubes = counter.score + 10 + combo * 10;
-            float elapsedTime = 0f;
-            float duration = 0.1f;
-            while (elapsedTime < duration)
-            {
-               
-                counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
-                elapsedTime += Time.deltaTime;
-                scoreText.text = counter.score.ToString("N0");
-                yield return null; // Wait for the next frame
-            }
+        float elapsedTime = 0f;
+        float duration = 0.1f;
+        elapsedTime += Time.deltaTime;
+        int newDestroyedCubes = counter.score + 1;
+        counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
+        scoreText.text = counter.score.ToString("N0");
+        // Ensure the score reaches the final value precisely
+        counter.score = newDestroyedCubes;
+        health += 0.25f;
+        yield return null;
 
-            // Ensure the score reaches the final value precisely
-            counter.score = newDestroyedCubes;
-            health += 2f;
-            combo++;
-            if (highestCombo == combo)
-            {
-                highestCombo++;
-            }
-            Animation anim = combotext.GetComponent<Animation>();
-            anim.Stop("comboanim");
-            anim.Play("comboanim");
-            yield return new WaitForSeconds(0.1f); // Wait for 0.14 seconds
-        }
-
-        // Set the bufferActive flag back to false after the loop finishes
-        bufferActive = false;
-
-        Debug.Log("Buffer inactive!");
     }
     private void OnTriggerStay2D(Collider2D collision)
     {
 
         // Check if the collision involves the player's CircleCollider2D
-        if (GetComponent<CircleCollider2D>() != null && collision.gameObject.name.Contains("hitter02"))
+        if (collision.gameObject.name.Contains("hitter02") && collision.transform.position.y == transform.position.y)
         {
-            if (!bufferActive && (Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L)) && !isDying)
+            if ((Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L)) && !isDying)
             {
+                bufferActive = true;
                 StartCoroutine(OnTriggerEnter2DBuffer());
             }
             else if (Input.GetMouseButtonUp(0) || Input.GetKeyUp(KeyCode.Return) || Input.GetMouseButtonUp(1) || Input.GetKeyUp(KeyCode.X) || Input.GetKeyUp(KeyCode.Y) || Input.GetKeyUp(KeyCode.Z) || Input.GetKeyUp(KeyCode.K) || Input.GetKeyUp(KeyCode.L))

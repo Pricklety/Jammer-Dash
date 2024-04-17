@@ -77,8 +77,8 @@ public class LevelDataManager : MonoBehaviour
             {
                 loaded = false;
                 SceneManager.sceneLoaded += OnSceneLoaded;
-                Addressables.LoadScene("Assets/" + SceneManager.GetActiveScene().name + ".unity", LoadSceneMode.Single);
-
+                Addressables.LoadSceneAsync("Assets/" + SceneManager.GetActiveScene().name + ".unity", LoadSceneMode.Single);
+                
             }
         }
         else
@@ -134,9 +134,12 @@ public class LevelDataManager : MonoBehaviour
 
             // Get the SpriteRenderer component of the instantiated object
             SpriteRenderer longCubeRenderer = longCubeObject.GetComponent<SpriteRenderer>();
+            BoxCollider2D collider = longCubeObject.GetComponent<BoxCollider2D>();
 
             // Set the width of the SpriteRenderer
             longCubeRenderer.size = new Vector2(width, 1);
+            collider.size = new Vector2(width + 0.35f, 1.05f);
+            collider.offset = new Vector2(width / 1.8f, 0f);
             Debug.Log("Instantiated long cube");
         }
 

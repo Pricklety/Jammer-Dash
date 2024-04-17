@@ -130,7 +130,7 @@ public class EditorManager : MonoBehaviour
 
     [Header("Long Cube")]
     public float minWidth = 1f;
-    public float maxWidth = 5f; // Change this value as needed
+    public float maxWidth = 999f; // Change this value as needed
     public float expansionSpeed = 1f; // Adjust as needed
 
     private Vector3 initialMousePosition;
@@ -600,9 +600,12 @@ public class EditorManager : MonoBehaviour
 
                 // Get the SpriteRenderer component of the instantiated object
                 SpriteRenderer longCubeRenderer = longCubeObject.GetComponent<SpriteRenderer>();
+                BoxCollider2D collider = longCubeObject.GetComponent<BoxCollider2D>();
 
                 // Set the width of the SpriteRenderer
                 longCubeRenderer.size = new Vector2(width, 1);
+                collider.size = new Vector2(width + 0.5f, 1.05f);
+                collider.offset = new Vector2(width / 2, 0f);
                 longCubes.Add(longCubeObject);
             }
             StartCoroutine(LoadImageCoroutine(sceneData.picLocation));

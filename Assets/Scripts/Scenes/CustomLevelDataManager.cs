@@ -7,6 +7,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Unity;
 
 public class CustomLevelDataManager : MonoBehaviour
 {
@@ -52,7 +53,7 @@ public class CustomLevelDataManager : MonoBehaviour
             ID = sceneData.ID;
             loaded = false;
             SceneManager.sceneLoaded += OnSceneLoaded;
-            Addressables.LoadScene("Assets/" + SceneManager.GetActiveScene().name + ".unity", LoadSceneMode.Single, true, 1000);
+            UnityEngine.AddressableAssets.Addressables.LoadSceneAsync("Assets/" + SceneManager.GetActiveScene().name + ".unity", LoadSceneMode.Single, true, 1000);
 
         }
         else
@@ -165,9 +166,12 @@ public class CustomLevelDataManager : MonoBehaviour
 
             // Get the SpriteRenderer component of the instantiated object
             SpriteRenderer longCubeRenderer = longCubeObject.GetComponent<SpriteRenderer>();
+            BoxCollider2D collider = longCubeObject.GetComponent<BoxCollider2D>();
 
             // Set the width of the SpriteRenderer
             longCubeRenderer.size = new Vector2(width, 1);
+            collider.size = new Vector2(width + 0.35f, 1.05f);
+            collider.offset = new Vector2(width / 1.8f, 0f);
             Debug.Log("Instantiated long cube");
         }
         if (sceneData.picLocation != null)
