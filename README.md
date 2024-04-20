@@ -2,6 +2,7 @@
 <p align="center">
   <img width="500" height="500" src="https://github.com/Pricklety/Jammer-Dash/blob/master/Assets/Resources/discordLogo.png">
 </p>
+
 # Jammer Dash
 Jammer Dash is a 2D Rhythm game made with Unity, with hopes of the best user experience and the best community ever.
 
@@ -18,4 +19,7 @@ You can check your system requirements here:
 | CPU | Intel i3 or above/Ryzen 3 or above |
 | RAM | 512MB or above |
 | VRAM | 2GB or above |
+
+## How can I help improve Jammer Dash?
+It's easy. You can pull the code using `git pull` if you have Git installed and everything set up. You can change the code and then make a pull request for us to check the code. If it's good, we'll get it locally and push the changes.
 
