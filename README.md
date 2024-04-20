@@ -11,8 +11,9 @@ We try to make Mac and Linux work well, so that's why we work with the community
 
 ## Running JD
 You can check your system requirements here:
-| Command | Description |
+| System | Windows |
 | --- | --- |
-| git status | List all new or modified files |
-| git diff | Show file differences that haven't been staged |
+| CPU | Intel i3 or above/Ryzen 3 or above |
+| RAM | 512MB or above |
+| VRAM | 2GB or above |
 
