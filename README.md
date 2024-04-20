@@ -1,5 +1,5 @@
 
-[Logo](https://github.com/Pricklety/Jammer-Dash/blob/master/Assets/Resources/logos/logo.png)
+![Logo](https://github.com/Pricklety/Jammer-Dash/blob/master/Assets/Resources/logos/logo.png)
 # Jammer Dash
 Jammer Dash is a 2D Rhythm game made with Unity, with hopes of the best user experience and the best community ever.
 
