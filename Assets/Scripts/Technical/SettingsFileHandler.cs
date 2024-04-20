@@ -58,6 +58,12 @@ public class SettingsData
     public bool isShowingFPS = false;
     public int hitType = 0;
     public float cursorFade = 0.24f;
+    public bool parallax = true;
+    public bool randomSFX = true;
+    public bool confinedMouse = false;
+    public int gameplayDir = 0;
+    public string lang = "en_US";
+    public bool wheelShortcut = true;
     public string gameVersion = Application.version;
     public string saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
 
