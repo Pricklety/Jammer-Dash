@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img width="460" height="300" src="https://github.com/Pricklety/Jammer-Dash/blob/master/Assets/Resources/discordLogo.png">
+  <img width="500" height="500" src="https://github.com/Pricklety/Jammer-Dash/blob/master/Assets/Resources/discordLogo.png">
 </p>
 # Jammer Dash
 Jammer Dash is a 2D Rhythm game made with Unity, with hopes of the best user experience and the best community ever.
