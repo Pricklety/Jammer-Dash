@@ -89,6 +89,21 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     public Text musicText;
     public Slider musicSlider;
 
+    [Header("Parallax")]
+    public Transform[] parallaxLayers; 
+    public float[] parallaxSpeeds;     
+    public Transform background;        
+    public float backgroundParallaxSpeed; 
+    public float maxMovementOffset;   
+    public float scaleMultiplier;      
+    public float edgeMargin;           
+
+    private Vector3[] initialPositions; 
+    private Vector3 lastMousePosition;  
+
+    private Camera mainCamera;
+    private RectTransform canvasRect;
+
     void Start()
     {
         playerData = LevelSystem.Instance.LoadTotalXP();
@@ -103,6 +118,24 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         discordpfp.texture = DiscordManager.current.CurrentUser.avatar;
         discordName.text = DiscordManager.current.CurrentUser.username + "\n\nID: " +
         DiscordManager.current.CurrentUser.ID;
+        if (data.parallax)
+        {
+            initialPositions = new Vector3[parallaxLayers.Length];
+            for (int i = 0; i < parallaxLayers.Length; i++)
+            {
+                initialPositions[i] = parallaxLayers[i].position;
+            }
+
+            // Set the initial mouse position
+            lastMousePosition = Input.mousePosition;
+
+            // Set the initial scale of the background
+            background.localScale *= scaleMultiplier;
+
+            mainCamera = Camera.main;
+            canvasRect = GetComponentInChildren<Canvas>().GetComponent<RectTransform>();
+
+        }
     }
     public void LoadLevelFromLevels()
     {
@@ -1033,6 +1066,11 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
             additionalPanel.SetActive(!additionalPanel.active);
         }
 
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            FunMode();
+        }
+
         if (quitPanel.activeSelf)
         {
             // Set the Lowpass filter parameter on the Master AudioMixer
@@ -1043,7 +1081,45 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
             // Set the Lowpass filter parameter on the Master AudioMixer
             audioMixer.SetFloat("Lowpass", 22000);
         }
+        data = SettingsFileHandler.LoadSettingsFromFile();
+        if (data.parallax)
+        {
+            background.localScale = new Vector3(1.1f, 1.1f, 1f);
+            // Calculate raw mouse movement delta
+            Vector3 mouseDelta = new Vector3(mainCamera.ScreenToWorldPoint(Input.mousePosition).x * 3, mainCamera.ScreenToWorldPoint(Input.mousePosition).y / 15, 0);
 
+            // Calculate the camera movement based on mouse movement
+            float cameraMovement = Mathf.Clamp(mouseDelta.x, -maxMovementOffset, maxMovementOffset) * backgroundParallaxSpeed * Time.deltaTime;
+
+            // Apply background parallax effect
+            Vector3 backgroundOffset = new Vector3(cameraMovement, 0, 0);
+            background.position = backgroundOffset + new Vector3(mouseDelta.x / 100, mouseDelta.y, mouseDelta.z);
+
+            // Check if the background's edge is at the canvas edge
+            Vector3 backgroundEdgePosition = background.position + new Vector3(background.lossyScale.x / 2f, 0, 0);
+            Vector3 backgroundEdgeViewport = mainCamera.WorldToViewportPoint(backgroundEdgePosition);
+            if (backgroundEdgeViewport.x < 1 - edgeMargin)
+            {
+                background.position += new Vector3(edgeMargin, 0, 0);
+            }
+            else if (backgroundEdgeViewport.x > edgeMargin)
+            {
+                background.position -= new Vector3(edgeMargin, 0, 0);
+            }
+
+            // Apply parallax effect to UI layers
+            for (int i = 0; i < parallaxLayers.Length; i++)
+            {
+                float layerMovement = cameraMovement * parallaxSpeeds[i];
+                Vector3 layerOffset = new Vector3(layerMovement, 0, 0);
+                parallaxLayers[i].position = initialPositions[i] - layerOffset;
+            }
+        }
+        else
+        {
+            background.localScale = Vector3.one;
+            background.position = Vector3.zero;
+        }
         musicText.text = $"{AudioManager.Instance.GetComponent<AudioSource>().clip.name} - {AudioManager.Instance.GetComponent<AudioSource>().time}/{AudioManager.Instance.GetComponent<AudioSource>().clip.length}";
     }
 

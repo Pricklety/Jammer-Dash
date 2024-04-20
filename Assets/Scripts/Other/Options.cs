@@ -51,7 +51,7 @@ public class Options : MonoBehaviour
     public Dropdown hitType;
     public Slider trailFade;
     public Text trailFadeText;
-
+    public Toggle parallax;
     public Image backgroundImage;
 
     public void Start()
@@ -249,6 +249,7 @@ public class Options : MonoBehaviour
         showFPS.isOn = settingsData.isShowingFPS;
         hitType.value = settingsData.hitType;
         trailFade.value = settingsData.cursorFade;
+        parallax.isOn = settingsData.parallax;
     }
 
     public void ApplyOptions()
@@ -285,6 +286,7 @@ public class Options : MonoBehaviour
         settingsData.hitType = hitType.value;
         settingsData.isShowingFPS = showFPS.isOn;
         settingsData.cursorFade = trailFade.value;
+        settingsData.parallax = parallax.isOn;
         // Apply settings to the game
         ApplyWindowMode(settingsData.windowMode);
         ApplyQualitySettings(settingsData.qualitySettingsLevel);
@@ -463,6 +465,7 @@ public class Options : MonoBehaviour
             isShowingFPS = showFPS.isOn,
             hitType = hitType.value,
             cursorFade = trailFade.value,
+            parallax = parallax.isOn,
             saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
             gameVersion = Application.version
     };
