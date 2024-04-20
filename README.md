@@ -8,6 +8,12 @@ Jammer Dash originally never was planned to be open source. But because we want 
 We try to make Mac and Linux work well, so that's why we work with the community to fix platform-specific bugs and also try to get the game on most platforms, as well as optimize the game. The game is always original for Windows, so porting the game is a complicated process.
 
 ## Running JD
-// Dev notes: add windows, mac and linux system requirements.
+You can check your system requirements here:
+
+| System  | | Windows  |
+| ------------- || ---------  |
+| CPU  || Intel i3 and above |
+| RAM || 512MB and above  |
+| VRAM || 2GB VRAM and above  |
 
 
