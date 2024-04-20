@@ -1,3 +1,5 @@
+
+(https://github.com/Pricklety/Jammer-Dash/Assets/Resources/logos/logo.png)
 # Jammer Dash
 Jammer Dash is a 2D Rhythm game made with Unity, with hopes of the best user experience and the best community ever.
 
@@ -9,11 +11,5 @@ We try to make Mac and Linux work well, so that's why we work with the community
 
 ## Running JD
 You can check your system requirements here:
-
-| System  ||       Windows       |
-|:---|| :---: |
-| CPU     || Intel i3 and above  |
-| RAM     || 512MB and above     |
-| VRAM    || 2GB VRAM and above  |
 
 
