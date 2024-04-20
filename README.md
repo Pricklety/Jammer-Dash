@@ -10,10 +10,10 @@ We try to make Mac and Linux work well, so that's why we work with the community
 ## Running JD
 You can check your system requirements here:
 
-| System  | | Windows  |
-| ------------- || ---------  |
-| CPU  || Intel i3 and above |
-| RAM || 512MB and above  |
-| VRAM || 2GB VRAM and above  |
+| System  ||       Windows       |
+| --------|| --------------------|
+| CPU     || Intel i3 and above  |
+| RAM     || 512MB and above     |
+| VRAM    || 2GB VRAM and above  |
 
 
