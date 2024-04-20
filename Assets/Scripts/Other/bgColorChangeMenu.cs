@@ -15,7 +15,7 @@ public class bgColorChangeMenu : MonoBehaviour
     private int previousSample;
     private Color targetColor;
     private Color currentColor;
-
+    SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
 
     private void Start()
     {

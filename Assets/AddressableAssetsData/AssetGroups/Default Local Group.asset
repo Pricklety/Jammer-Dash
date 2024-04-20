@@ -13,15 +13,12 @@ MonoBehaviour:
   m_Name: Default Local Group
   m_EditorClassIdentifier: 
   m_GroupName: Default Local Group
+  m_Data:
+    m_SerializedData: []
   m_GUID: fcff7833a024c424693b9f8d874b5e3a
   m_SerializeEntries:
   - m_GUID: b487c586cb3a93e48b9d12905dc047dd
     m_Address: Assets/LevelDefault.unity
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 5f51e0b22aa8cb84b9f422576ce87ff9
-    m_Address: Packages/com.unity.postprocessing/PostProcessing/Gizmos/PostProcessLayer.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
