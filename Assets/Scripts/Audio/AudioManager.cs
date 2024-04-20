@@ -174,10 +174,10 @@ public class AudioManager : MonoBehaviour
             audio.outputAudioMixerGroup = master;
             audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", Mathf.Clamp(masterS.value, -80f, 0f));
         }
-       
 
 
-        if (value1 != 0 && !IsScrollingUI())
+        SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+        if (value1 != 0 && !IsScrollingUI() && data.wheelShortcut)
         {
             timer = 0f; // Increment timer each frame
             // Activate masterS GameObject if it's not active
@@ -237,7 +237,6 @@ public class AudioManager : MonoBehaviour
             if (SceneManager.GetActiveScene().buildIndex == 1)
                 options.masterVolumeSlider.value = masterS.value;
 
-            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
             data.volume = masterS.value;
             SettingsFileHandler.SaveSettingsToFile(data);
             Debug.Log("asdass");
@@ -249,6 +248,15 @@ public class AudioManager : MonoBehaviour
             masterS.gameObject.SetActive(false);
             if (SceneManager.GetActiveScene().buildIndex == 1)
                 options.masterVolumeSlider.value = masterS.value;
+        }
+
+        if (data.confinedMouse)
+        {
+            Cursor.lockState = CursorLockMode.Confined;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
         }
         
     }

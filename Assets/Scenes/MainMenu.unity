@@ -24486,7 +24486,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 523.2656}
+  m_AnchoredPosition: {x: 0, y: -0.00012207031}
   m_SizeDelta: {x: 0, y: 2660}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &592678527
@@ -32619,8 +32619,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1827324379}
   m_HandleRect: {fileID: 1827324378}
   m_Direction: 2
-  m_Value: 0.7329999
-  m_Size: 0.26323462
+  m_Value: 1
+  m_Size: 0.37238637
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -40459,6 +40459,10 @@ MonoBehaviour:
   trailFadeText: {fileID: 988878019}
   parallax: {fileID: 1159010242}
   backgroundImage: {fileID: 1790811610}
+  gameplayDir: {fileID: 1751956572}
+  randomSFX: {fileID: 755588584}
+  confineMouse: {fileID: 1721577299}
+  wheelShortcut: {fileID: 2038479759}
 --- !u!114 &1082816207
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63858,7 +63862,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Download <b>Library</b> (3.6GB)
+  m_Text: Download library  (3.6GB)
 --- !u!222 &1734322022
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -64847,7 +64851,7 @@ GameObject:
   - component: {fileID: 1751956573}
   - component: {fileID: 1751956572}
   m_Layer: 5
-  m_Name: scoreSystem
+  m_Name: gameplayDir
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -68049,8 +68053,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1675290829}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.540049}
-  m_AnchorMax: {x: 1, y: 0.80328363}
+  m_AnchorMin: {x: 0, y: 0.62761366}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -73571,7 +73575,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000061035156, y: 44.99997}
+  m_AnchoredPosition: {x: -0.00012207031, y: 45}
   m_SizeDelta: {x: 0, y: 90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1945583755

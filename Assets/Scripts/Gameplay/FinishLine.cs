@@ -76,6 +76,7 @@ public class FinishLine : MonoBehaviour
 
         }
 
+        
         if (player0 == null || player == null)
         {
 

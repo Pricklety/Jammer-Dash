@@ -14,11 +14,11 @@ We try to make Mac and Linux work well, so that's why we work with the community
 
 ## Running JD
 You can check your system requirements here:
-| System | Windows |
-| --- | --- |
-| CPU | Intel i3 or above/Ryzen 3 or above |
-| RAM | 512MB or above |
-| VRAM | 2GB or above |
+| System | Windows | MacOS | Linux |
+| --- | --- | --- | --- |
+| CPU | Intel i3 or above/Ryzen 3 or above | Unknown | Unknown |
+| RAM | 512MB or above | Unknown | Unknown |
+| VRAM | 2GB or above | Unknown | Unknown | 
 
 ## How can I help improve Jammer Dash?
 It's easy. You can pull the code using `git pull` if you have Git installed and everything set up. You can change the code and then make a pull request for us to check the code. If it's good, we'll get it locally and push the changes.

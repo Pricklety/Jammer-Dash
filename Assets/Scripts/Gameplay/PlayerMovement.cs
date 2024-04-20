@@ -112,20 +112,19 @@ public class PlayerMovement : MonoBehaviour
         {
 
             // Array to store all loaded audio clips
-            AudioClip[] allHits = new AudioClip[3];
-
+            hitSounds = new AudioClip[3];
             // Loop through each possible variation of the hit name
-            for (int i = 0; i < allHits.Length; i++)
+            for (int i = 0; i < hitSounds.Length; i++)
             {
                 // Load the audio clip for each variation
-                allHits[i] = Resources.Load<AudioClip>("Audio/SFX/hit" + (i + 1));
+                hitSounds[i] = Resources.Load<AudioClip>("Audio/SFX/hit" + i);
             }
 
             // Check if any hits were found
-            if (allHits.Length > 0)
+            if (hitSounds.Length > 0)
             {
                 // Choose a random hit from the array
-                AudioClip randomHit = allHits[Random.Range(0, allHits.Length)];
+                AudioClip randomHit = hitSounds[Random.Range(0, hitSounds.Length)];
 
                 // Now you can play the random hit audio clip
                 hit = randomHit;

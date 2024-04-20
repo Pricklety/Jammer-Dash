@@ -13,10 +13,14 @@ MonoBehaviour:
   m_Name: Localization-Locales
   m_EditorClassIdentifier: 
   m_GroupName: Localization-Locales
-  m_Data:
-    m_SerializedData: []
   m_GUID: 1be31bcc1198bbf4bbc507d76628da73
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: a9b23afd77019894c988fbcd86c041b9
+    m_Address: Japanese
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: 14e912134fea9504ba3b19a082bc5196, type: 2}
   m_SchemaSet:

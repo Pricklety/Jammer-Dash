@@ -53,6 +53,10 @@ public class Options : MonoBehaviour
     public Text trailFadeText;
     public Toggle parallax;
     public Image backgroundImage;
+    public Dropdown gameplayDir;
+    public Toggle randomSFX;
+    public Toggle confineMouse;
+    public Toggle wheelShortcut;
 
     public void Start()
     {
@@ -250,6 +254,10 @@ public class Options : MonoBehaviour
         hitType.value = settingsData.hitType;
         trailFade.value = settingsData.cursorFade;
         parallax.isOn = settingsData.parallax;
+        gameplayDir.value = settingsData.gameplayDir;
+        randomSFX.isOn = settingsData.randomSFX;
+        confineMouse.isOn = settingsData.confinedMouse;
+        wheelShortcut.isOn = settingsData.wheelShortcut;
     }
 
     public void ApplyOptions()
@@ -287,6 +295,10 @@ public class Options : MonoBehaviour
         settingsData.isShowingFPS = showFPS.isOn;
         settingsData.cursorFade = trailFade.value;
         settingsData.parallax = parallax.isOn;
+        settingsData.gameplayDir = gameplayDir.value;
+        settingsData.randomSFX = randomSFX.isOn;
+        settingsData.confinedMouse = confineMouse.isOn;
+        settingsData.wheelShortcut = wheelShortcut.isOn;
         // Apply settings to the game
         ApplyWindowMode(settingsData.windowMode);
         ApplyQualitySettings(settingsData.qualitySettingsLevel);
@@ -455,7 +467,7 @@ public class Options : MonoBehaviour
             cursorTrail = cursorTrail.isOn,
             allVisualizers = allVis.isOn,
             lineVisualizer = lineVis.isOn,
-            logoVisualizer = logoVis.isOn, 
+            logoVisualizer = logoVis.isOn,
             bgVisualizer = bgVis.isOn,
             antialiasing = antiAliasing.value,
             noFocusVolume = unfocusVol.value,
@@ -466,6 +478,10 @@ public class Options : MonoBehaviour
             hitType = hitType.value,
             cursorFade = trailFade.value,
             parallax = parallax.isOn,
+            gameplayDir = gameplayDir.value,
+            randomSFX = randomSFX.isOn,
+            confinedMouse = confineMouse.isOn,
+            wheelShortcut = wheelShortcut.isOn,
             saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
             gameVersion = Application.version
     };

@@ -55,6 +55,15 @@ public class cameraColor : MonoBehaviour
         {
             player0 = GameObject.FindGameObjectWithTag("Player");
         }
+        Canvas[] canvases = FindObjectsOfType<Canvas>();
+        foreach (Canvas canvas in canvases)
+        {
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        }
+        if (data.gameplayDir == 1)
+        {
+            Matrix4x4 mat = Camera.main.projectionMatrix; mat *= Matrix4x4.Scale(new Vector3(-1, 1, 10)); Camera.main.projectionMatrix = mat;
+        }
     }
 
     IEnumerator LateStart()
