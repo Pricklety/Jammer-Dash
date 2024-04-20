@@ -1,5 +1,5 @@
 
-:---:![Logo](https://github.com/Pricklety/Jammer-Dash/blob/master/Assets/Resources/discordLogo.png)
+![Logo](https://github.com/Pricklety/Jammer-Dash/blob/master/Assets/Resources/discordLogo.png)
 # Jammer Dash
 Jammer Dash is a 2D Rhythm game made with Unity, with hopes of the best user experience and the best community ever.
 
@@ -11,5 +11,8 @@ We try to make Mac and Linux work well, so that's why we work with the community
 
 ## Running JD
 You can check your system requirements here:
-
+| Command | Description |
+| --- | --- |
+| git status | List all new or modified files |
+| git diff | Show file differences that haven't been staged |
 
