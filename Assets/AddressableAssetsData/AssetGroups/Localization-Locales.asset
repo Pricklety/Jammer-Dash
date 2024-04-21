@@ -16,7 +16,31 @@ MonoBehaviour:
   m_GUID: 1be31bcc1198bbf4bbc507d76628da73
   m_SerializeEntries:
   - m_GUID: a9b23afd77019894c988fbcd86c041b9
-    m_Address: Japanese
+    m_Address: Locale
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1443fe247ccd16a4da6d3afaaa6b484b
+    m_Address: Japanese (ja)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c1f2ed8327ae47a4eb03c2af417334a7
+    m_Address: Croatian (Croatia) (hr-HR)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f4abbf7a8f13e7f46bb65fe7f73d6bea
+    m_Address: English (en)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 65b408ab21f8240448914f786e8bba92
+    m_Address: Urdu (ur)
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale

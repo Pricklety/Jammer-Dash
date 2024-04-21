@@ -10,19 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: Localization-Assets-Shared
+  m_Name: Localization-String-Tables-Croatian (Croatia) (hr-HR)
   m_EditorClassIdentifier: 
-  m_GroupName: Localization-Assets-Shared
-  m_GUID: 4f1e4f1dcceb7df4c9ffbdc1a322cc06
+  m_GroupName: Localization-String-Tables-Croatian (Croatia) (hr-HR)
+  m_GUID: 6b5fd0c8c0922824b94df3a50ecd6f06
   m_SerializeEntries:
-  - m_GUID: 54df1f75459b1734f8fa2e7d75da6121
-    m_Address: Assets/Locale/Locale v1 Shared Data.asset
+  - m_GUID: 3d0611bf68f272c4086fedf743a817ac
+    m_Address: Locale v1_hr-HR
     m_ReadOnly: 1
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Locale-hr-HR
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: 14e912134fea9504ba3b19a082bc5196, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: d3de55a730a3f604ab7fe7f3f2350b0d, type: 2}
-    - {fileID: 11400000, guid: cff87add10cf62e40ade0ccb1f663742, type: 2}
+    - {fileID: 11400000, guid: 74ac0ef321673d14e81fc01ff22be3fc, type: 2}
+    - {fileID: 11400000, guid: 1e65494fb1f950b488fd5b3adeabb56e, type: 2}
