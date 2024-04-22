@@ -14,13 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_GroupName: Localization-String-Tables-Croatian (Croatia) (hr-HR)
   m_GUID: 6b5fd0c8c0922824b94df3a50ecd6f06
-  m_SerializeEntries:
-  - m_GUID: 3d0611bf68f272c4086fedf743a817ac
-    m_Address: Locale v1_hr-HR
-    m_ReadOnly: 1
-    m_SerializedLabels:
-    - Locale-hr-HR
-    FlaggedDuringContentUpdateRestriction: 0
+  m_SerializeEntries: []
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: 14e912134fea9504ba3b19a082bc5196, type: 2}
   m_SchemaSet:

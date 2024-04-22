@@ -62,7 +62,7 @@ public class SettingsData
     public bool randomSFX = true;
     public bool confinedMouse = false;
     public int gameplayDir = 0;
-    public string lang = "en_US";
+    public int bgTime = 0;
     public bool wheelShortcut = true;
     public string gameVersion = Application.version;
     public string saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();

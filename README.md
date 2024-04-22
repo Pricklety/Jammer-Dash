@@ -16,9 +16,10 @@ Currently Mac and Linux isn't available, but we work with the community to fix p
 You can check your system requirements here:
 | System | Windows | MacOS | Linux |
 | --- | --- | --- | --- |
-| CPU | Intel i3 or above/Ryzen 3 or above | Unknown | Unknown |
-| RAM | 512MB or above | Unknown | Unknown |
-| VRAM | 2GB or above | Unknown | Unknown | 
+| Version | Windows XP or higher | Unknown | Unknown |
+| CPU | 1GHz+ any CPU | 1GHz+ any CPU | 1GHz+ any CPU |
+| RAM | 256MB or above | 512MB or above | 128MB or above |
+| VRAM | 128MB or above | 156MB or above | 64MB or above | 
 
 ## How can I help improve Jammer Dash?
 It's easy. You can pull the code using `git pull` if you have Git installed and everything set up. You can change the code and then make a pull request for us to check the code. If it's good, we'll get it locally and push the changes.

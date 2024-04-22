@@ -62,7 +62,6 @@
     <type fullname="UnityEngine.GameObject" preserve="all" />
     <type fullname="UnityEngine.LightmapSettings" preserve="all" />
     <type fullname="UnityEngine.Material" preserve="all" />
-    <type fullname="UnityEngine.MonoBehaviour" preserve="all" />
     <type fullname="UnityEngine.Object" preserve="all" />
     <type fullname="UnityEngine.RectTransform" preserve="all" />
     <type fullname="UnityEngine.RenderSettings" preserve="all" />

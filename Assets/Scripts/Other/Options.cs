@@ -57,7 +57,7 @@ public class Options : MonoBehaviour
     public Toggle randomSFX;
     public Toggle confineMouse;
     public Toggle wheelShortcut;
-
+    public Dropdown bgTime;
     public void Start()
     {
         audio = FindObjectOfType<AudioManager>();
@@ -258,6 +258,7 @@ public class Options : MonoBehaviour
         randomSFX.isOn = settingsData.randomSFX;
         confineMouse.isOn = settingsData.confinedMouse;
         wheelShortcut.isOn = settingsData.wheelShortcut;
+        bgTime.value = settingsData.bgTime;
     }
 
     public void ApplyOptions()
@@ -299,6 +300,7 @@ public class Options : MonoBehaviour
         settingsData.randomSFX = randomSFX.isOn;
         settingsData.confinedMouse = confineMouse.isOn;
         settingsData.wheelShortcut = wheelShortcut.isOn;
+        settingsData.bgTime = bgTime.value;
         // Apply settings to the game
         ApplyWindowMode(settingsData.windowMode);
         ApplyQualitySettings(settingsData.qualitySettingsLevel);
@@ -462,7 +464,7 @@ public class Options : MonoBehaviour
             vidBG = vidBG.isOn,
             sfx = sfx.isOn,
             hitNotes = hitSounds.isOn,
-            focusVol = focusVol.isOn,
+            focusVol = focusVol.isOn, 
             playerType = playerType.value,
             cursorTrail = cursorTrail.isOn,
             allVisualizers = allVis.isOn,
@@ -482,6 +484,7 @@ public class Options : MonoBehaviour
             randomSFX = randomSFX.isOn,
             confinedMouse = confineMouse.isOn,
             wheelShortcut = wheelShortcut.isOn,
+            bgTime = bgTime.value,
             saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
             gameVersion = Application.version
     };

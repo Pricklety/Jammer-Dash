@@ -17,7 +17,9 @@ public class AudioManager : MonoBehaviour
     bool songPlayed = false;
     private float masterVolume = 1.0f;
     public List<string> songPathsList;
-    public int currentClipIndex = -1;
+    public int currentClipIndex = -1; 
+    float bgtimer = 0f;
+    float spriteChangeInterval = 15f;
     public static AudioManager Instance { get; private set; }
 
     public bool isMusicLoaded = false;
@@ -257,7 +259,21 @@ public class AudioManager : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.None;
         }
-        
+
+        bgtimer += Time.deltaTime;
+        if (bgtimer >= spriteChangeInterval && data.bgTime == 1)
+        {
+            bgtimer = 0f; 
+            StartCoroutine(ChangeSprite());
+            
+        }
+        else if (bgtimer >= spriteChangeInterval && data.bgTime == 2)
+        {
+            spriteChangeInterval = 30f;
+            bgtimer = 0f;
+            StartCoroutine(ChangeSprite());
+        }
+
     }
     bool IsScrollingUI()
     {
@@ -446,7 +462,9 @@ public class AudioManager : MonoBehaviour
             Debug.Log(currentClipIndex);
             PlayCurrentSong();
             new WaitForSecondsRealtime(1f);
-            StartCoroutine(ChangeSprite());
+            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+            if (data.bgTime == 0)
+                StartCoroutine(ChangeSprite());
         }
     }
 
@@ -469,7 +487,9 @@ public class AudioManager : MonoBehaviour
             PlayCurrentSong();
             cooldown = 0f;
             new WaitForSecondsRealtime(1f);
-            StartCoroutine(ChangeSprite());
+            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+            if (data.bgTime == 0)
+                StartCoroutine(ChangeSprite());
         }
     }
 
