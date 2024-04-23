@@ -538,7 +538,7 @@ public class PlayerMovement : MonoBehaviour
 
                 Total += 1;
                 activeCubes.Remove(collision.gameObject);
-                health -= 25; // Lower health due to passing the cube
+                health -= 35; // Lower health due to passing the cube
                 combo = 0; // Reset combo
 
                 StartCoroutine(ChangeTextCombo());
@@ -569,7 +569,7 @@ public class PlayerMovement : MonoBehaviour
 
                     Total += 1;
                     activeCubes.Remove(collision.gameObject);
-                    health -= 25; // Lower health due to passing the cube
+                    health -= 35; // Lower health due to passing the cube
                     combo = 0; // Reset combo
 
                     StartCoroutine(ChangeTextCombo());
