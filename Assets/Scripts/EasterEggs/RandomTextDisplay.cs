@@ -7,8 +7,7 @@ using System.Collections;
 public class RandomTextDisplay : MonoBehaviour
 {
     public Text textComponent;
-    public string filePath = "texts.txt"; // The file should be placed in the StreamingAssets folder.
-    public Animation anim;
+    public string filePath = "texts.txt";
     float time;
 
     void Start()
@@ -56,7 +55,7 @@ public class RandomTextDisplay : MonoBehaviour
     private void FixedUpdate()
     {
         time += Time.fixedDeltaTime;
-        if (Input.GetKeyDown(KeyCode.H) || time > 5f)
+        if (Input.GetKeyDown(KeyCode.H) || time > 10f)
         {
             time = 0f;
             StartCoroutine(Change());
@@ -77,8 +76,6 @@ public class RandomTextDisplay : MonoBehaviour
         }
         string[] lines = File.ReadAllLines(fullPath);
         string randomLine = lines[UnityEngine.Random.Range(0, lines.Length)];
-        anim.Play();
-        yield return new WaitForSeconds(1f);
-        textComponent.text = randomLine;
+        yield return textComponent.text = randomLine;
     }
 }

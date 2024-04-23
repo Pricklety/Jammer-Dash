@@ -349,7 +349,7 @@ public class PlayerMovement : MonoBehaviour
                            
                         }
                     }
-                    health -= 50;
+                    health -= 20;
                     counter.destroyedCubes -= 100 - combo;
                     Total += 1;
                     if (combo >= 100)
@@ -371,7 +371,7 @@ public class PlayerMovement : MonoBehaviour
                 }
 
                 Total += 1;
-                health -= 50;
+                health -= 20;
                 if (combo >= 100)
                 {
                     sfxS.PlayOneShot(fail);
@@ -383,10 +383,10 @@ public class PlayerMovement : MonoBehaviour
                 StartCoroutine(ChangeTextCombo());
             }
         }
-       
-       
-       
+        
     }
+
+
 
     IEnumerator ChangeTextCombo()
     {
@@ -455,7 +455,6 @@ public class PlayerMovement : MonoBehaviour
         {
             
             sfxS.PlayOneShot(hit);
-            Vector3 cubePosition = cube.transform.position;
             Destroy(cube);
             activeCubes.Remove(cube);
             if (AudioManager.Instance != null)
@@ -500,7 +499,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 if (collision.tag == "Saw" && !invincible)
                 {
-                    health -= 150;
+                    health -= 300;
                 }
             }
 
@@ -515,11 +514,6 @@ public class PlayerMovement : MonoBehaviour
             activeCubes.Add(collision.gameObject);
         }
 
-        if (collision.tag == "LongCube" && collision.transform.position.y == transform.position.y)
-        {
-            bufferActive = true;
-          
-        }
 
 
     }
@@ -527,12 +521,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.tag == "SloMoTutorial")
-        {
-            GameObject tutg = GameObject.Find("TutorialText");
-        }
 
-        if ((collision.tag == "Cubes" || collision.gameObject.name.Contains("hitter02")) && activeCubes.Contains(collision.gameObject) && health > 0)
+        if ((collision.tag == "Cubes" || collision.gameObject.name.Contains("hitter02") && !Input.anyKey && activeCubes.Contains(collision.gameObject) && health > 0))
         {
             activeCubes.Remove(collision.gameObject);
 
@@ -548,7 +538,7 @@ public class PlayerMovement : MonoBehaviour
 
                 Total += 1;
                 activeCubes.Remove(collision.gameObject);
-                health -= 75; // Lower health due to passing the cube
+                health -= 35; // Lower health due to passing the cube
                 combo = 0; // Reset combo
 
                 StartCoroutine(ChangeTextCombo());
@@ -557,21 +547,33 @@ public class PlayerMovement : MonoBehaviour
 
         if (collision.gameObject.name.Contains("hitter02") && bufferActive)
         {
-            StopCoroutine(OnTriggerEnter2DBuffer(collision));
+            StopCoroutine(OnTriggerEnter2DBuffer());
             if (Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L))
             {
-                ShowBadText();
-                Total += 1;
-                health -= 50;
-                if (combo >= 100)
-                {
-                    sfxS.PlayOneShot(fail);
-                    counter.destroyedCubes -= 250;
-                }
-                counter.destroyedCubes -= 100 - combo;
+                Debug.Log("tested by you");
+                ProcessCollision(collision);
+            }
+            else
+            {
+                activeCubes.Remove(collision.gameObject);
 
-                combo = 0;
-                StartCoroutine(ChangeTextCombo());
+                if (!passedCubes.Contains(collision.gameObject))
+                {
+                    if (AudioManager.Instance != null)
+                    {
+                        if (AudioManager.Instance.hits)
+                        {
+                            ShowBadText();
+                        }
+                    }
+
+                    Total += 1;
+                    activeCubes.Remove(collision.gameObject);
+                    health -= 35; // Lower health due to passing the cube
+                    combo = 0; // Reset combo
+
+                    StartCoroutine(ChangeTextCombo());
+                }
             }
            
             bufferActive = false;
@@ -580,31 +582,20 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    private IEnumerator OnTriggerEnter2DBuffer(Collider2D collider)
+    private IEnumerator OnTriggerEnter2DBuffer()
     {
         bufferActive = true;
         Debug.Log("Buffer active!");
 
-        float elapsedTime = 0f;
-        float duration = 0.1f;
-        elapsedTime += Time.deltaTime;
         int newDestroyedCubes = counter.score + 1;
-        counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
-        scoreText.text = counter.score.ToString("N0");
-        // Ensure the score reaches the final value precisely
         counter.score = newDestroyedCubes;
+        scoreText.text = counter.score.ToString("N0");
         health += 0.25f;
-
-        if (Input.GetMouseButtonUp(0) || Input.GetKeyUp(KeyCode.Return) || Input.GetMouseButtonUp(1) || Input.GetKeyUp(KeyCode.X) || Input.GetKeyUp(KeyCode.Y) || Input.GetKeyUp(KeyCode.Z) || Input.GetKeyUp(KeyCode.K) || Input.GetKeyUp(KeyCode.L))
-        {
-            Debug.Log("tested by you");
-            ProcessCollision(collider);
-        }
         yield return null;
     }
     private void ProcessCollision(Collider2D collision)
     {
-        StopCoroutine(OnTriggerEnter2DBuffer(collision));
+        StopCoroutine(OnTriggerEnter2DBuffer());
         bufferActive = false;
         passedCubes.Add(collision.gameObject);
         DestroyCube(collision.gameObject);
@@ -640,12 +631,12 @@ public class PlayerMovement : MonoBehaviour
             if ((Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L)) && !isDying)
             {
                 bufferActive = true;
-                StartCoroutine(OnTriggerEnter2DBuffer(collision));
+                StartCoroutine(OnTriggerEnter2DBuffer());
             }
             else if (Input.GetMouseButtonUp(0) || Input.GetKeyUp(KeyCode.Return) || Input.GetMouseButtonUp(1) || Input.GetKeyUp(KeyCode.X) || Input.GetKeyUp(KeyCode.Y) || Input.GetKeyUp(KeyCode.Z) || Input.GetKeyUp(KeyCode.K) || Input.GetKeyUp(KeyCode.L))
             {
                 Debug.Log("tested by you");
-                ProcessCollision(collision);
+                StopCoroutine(OnTriggerEnter2DBuffer());
             }
         }
         if (collision.tag == "SloMoTutorial")

@@ -17,9 +17,7 @@ public class SawRotation : MonoBehaviour
             PlayerMovement playerMovement = collision.gameObject.GetComponent<PlayerMovement>();
             if (playerMovement != null)
             {
-                Debug.Log("Collision detected with player.");
-                playerMovement.health -= 150;
-                Debug.Log("Player health reduced by 150. Current health: " + playerMovement.health);
+                playerMovement.health -= 300;
             }
             else
             {

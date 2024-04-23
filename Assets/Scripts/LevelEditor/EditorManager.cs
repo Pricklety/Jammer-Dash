@@ -1913,13 +1913,18 @@ public class EditorManager : MonoBehaviour
 
                 // Avoid division by zero by ensuring clickTimingWindow + distance is not zero
                 float divisor = clickTimingWindow + distance != 0 ? clickTimingWindow + distance : float.Epsilon;
-
-                
                 // Add difficulty contribution for this pair of cubes
-                difficulty += timingWindow * 2 + (cubeCount / 30f) * (cubes.Count / 100) * (saws.Count / 100) * (longCubes.Count / 100) * (precisionFactor / divisor * 100);
+                float contribution = timingWindow / 0.98f + cubeCount / 30f * (cubes.Count / 100) * (saws.Count / 70) * (longCubes.Count / 300) * (precisionFactor / divisor * 100);
+
+                // Round the contribution to avoid approximate results
+                contribution = Mathf.Round(contribution * 1000000f) / 1000000f; // Round to 6 decimal places
+
+                difficulty += contribution;
+                Debug.Log($"{timingWindow} + {cubeCount} / 30 * ({cubes.Count} / 100) * ({saws.Count} / 70) * ({longCubes.Count} / 300) * ({precisionFactor} / {divisor} * 100)");
             }
         }
-
+        // Round the final difficulty value
+        difficulty = Mathf.Round(difficulty * 1000000f) / 1000000f;
         return difficulty;
     }
     private float CalculateTimingWindow(Vector2 position1, Vector2 position2, int yLevelDifference)
@@ -1936,7 +1941,7 @@ public class EditorManager : MonoBehaviour
 
     private float CalculatePrecisionFactor(float xPositionVariation)
     {
-        float precisionFactor = 1 - xPositionVariation / 10f; 
+        float precisionFactor = 1 - xPositionVariation / 20f; 
 
         return Mathf.Clamp01(precisionFactor); 
     }

@@ -244,8 +244,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -70, y: 30}
-  m_SizeDelta: {x: 140, y: 60}
+  m_AnchoredPosition: {x: -80, y: 40}
+  m_SizeDelta: {x: 160, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &128296609
 MonoBehaviour:
@@ -5946,12 +5946,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2110da0358411749aabb84705780171, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  updateButtonText: {fileID: 0}
-  updatePanel: {fileID: 0}
-  updateButton: {fileID: 0}
-  downloadUrl: 
-  updatePending: 0
-  v: 
 --- !u!1 &1267479039
 GameObject:
   m_ObjectHideFlags: 0
@@ -7061,9 +7055,11 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'fps: 0
+  m_Text: 'FPS: 0/480
 
-    0,00ms'
+    100000000 ms
+
+    Ping: 0ms'
 --- !u!222 &1755215916
 CanvasRenderer:
   m_ObjectHideFlags: 0

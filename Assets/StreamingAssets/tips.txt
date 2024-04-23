@@ -1,4 +1,3 @@
-While loading, you can click H to change the splash egg text.
 You can use WASD together with arrow keys as movement inputs (Space has no alt key)
 Disable hit notes in Settings!
 Download the recommended songs by clicking the "Download library" option!
@@ -6,8 +5,12 @@ Being banned only lets you play the game offline. Your scores won't be uploaded 
 Request for a custom level ID before uploading! (Supporters only)
 The global chat is the only way to communicate in Jammer Dash other than our Discord server!
 Use /play [ID] to play a level without searching for it! (effective once Jammy gets online and in-game connection is established)
-Follow players to gain their new top plays, new levels uploaded and new rates!
-Time scale changes your Cursor trail speed.
+Follow players to be notified of their new top plays, new levels uploaded and new rates!
+Time speed changes your Cursor trail speed.
 Become a supporter and get access to early features!
 Change your RPC State and Detail with supporter!
 The game is in beta, so everything is subject to change.
+Click H to change this text :D
+The editor guide has a lot of useful things. Make sure to check it out!
+Long cubes are very complicated. Hold until you pass them!
+Shift + left click changes the long cube width in the editor.

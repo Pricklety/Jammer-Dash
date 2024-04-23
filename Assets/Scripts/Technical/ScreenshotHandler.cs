@@ -39,7 +39,10 @@ public class ScreenshotHandler : MonoBehaviour
         // Generate file name with current date and time
         string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
         string screenshotFileName = $"Screenshot_{timestamp}.png";
-        string screenshotPath = Path.Combine(Application.persistentDataPath, "screenshots", screenshotFileName);
+        string screenshotFolder = Path.Combine(Application.persistentDataPath, "screenshots");
+        string screenshotPath = Path.Combine(screenshotFolder, screenshotFileName);
+        if (!Directory.Exists(screenshotFolder))
+            Directory.CreateDirectory(screenshotFolder);
 
         // Capture screenshot
         ScreenCapture.CaptureScreenshot(screenshotPath);
