@@ -349,7 +349,7 @@ public class PlayerMovement : MonoBehaviour
                            
                         }
                     }
-                    health -= 50;
+                    health -= 20;
                     counter.destroyedCubes -= 100 - combo;
                     Total += 1;
                     if (combo >= 100)
@@ -371,7 +371,7 @@ public class PlayerMovement : MonoBehaviour
                 }
 
                 Total += 1;
-                health -= 50;
+                health -= 20;
                 if (combo >= 100)
                 {
                     sfxS.PlayOneShot(fail);
@@ -383,16 +383,7 @@ public class PlayerMovement : MonoBehaviour
                 StartCoroutine(ChangeTextCombo());
             }
         }
-        if (bufferActive && (Input.GetMouseButtonUp(0) || Input.GetKeyUp(KeyCode.Return) || Input.GetMouseButtonUp(1) || Input.GetKeyUp(KeyCode.X) || Input.GetKeyUp(KeyCode.Y) || Input.GetKeyUp(KeyCode.Z) || Input.GetKeyUp(KeyCode.K) || Input.GetKeyUp(KeyCode.L)))
-        {
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.right, 1, cubeLayerMask);
-            if (hit.collider != null)
-            {
-            Collider2D hitCollider = hit.collider;
-                Debug.Log("tested by you");
-                ProcessCollision(hit.collider);
-            }
-        }
+        
     }
 
 
@@ -464,7 +455,6 @@ public class PlayerMovement : MonoBehaviour
         {
             
             sfxS.PlayOneShot(hit);
-            Vector3 cubePosition = cube.transform.position;
             Destroy(cube);
             activeCubes.Remove(cube);
             if (AudioManager.Instance != null)
@@ -509,7 +499,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 if (collision.tag == "Saw" && !invincible)
                 {
-                    health -= 150;
+                    health -= 300;
                 }
             }
 
@@ -524,11 +514,6 @@ public class PlayerMovement : MonoBehaviour
             activeCubes.Add(collision.gameObject);
         }
 
-        if (collision.tag == "LongCube" && collision.transform.position.y == transform.position.y)
-        {
-            bufferActive = true;
-          
-        }
 
 
     }
@@ -553,7 +538,7 @@ public class PlayerMovement : MonoBehaviour
 
                 Total += 1;
                 activeCubes.Remove(collision.gameObject);
-                health -= 75; // Lower health due to passing the cube
+                health -= 25; // Lower health due to passing the cube
                 combo = 0; // Reset combo
 
                 StartCoroutine(ChangeTextCombo());
@@ -567,6 +552,28 @@ public class PlayerMovement : MonoBehaviour
             {
                 Debug.Log("tested by you");
                 ProcessCollision(collision);
+            }
+            else
+            {
+                activeCubes.Remove(collision.gameObject);
+
+                if (!passedCubes.Contains(collision.gameObject))
+                {
+                    if (AudioManager.Instance != null)
+                    {
+                        if (AudioManager.Instance.hits)
+                        {
+                            ShowBadText();
+                        }
+                    }
+
+                    Total += 1;
+                    activeCubes.Remove(collision.gameObject);
+                    health -= 25; // Lower health due to passing the cube
+                    combo = 0; // Reset combo
+
+                    StartCoroutine(ChangeTextCombo());
+                }
             }
            
             bufferActive = false;
@@ -629,7 +636,7 @@ public class PlayerMovement : MonoBehaviour
             else if (Input.GetMouseButtonUp(0) || Input.GetKeyUp(KeyCode.Return) || Input.GetMouseButtonUp(1) || Input.GetKeyUp(KeyCode.X) || Input.GetKeyUp(KeyCode.Y) || Input.GetKeyUp(KeyCode.Z) || Input.GetKeyUp(KeyCode.K) || Input.GetKeyUp(KeyCode.L))
             {
                 Debug.Log("tested by you");
-                ProcessCollision(collision);
+                StopCoroutine(OnTriggerEnter2DBuffer());
             }
         }
         if (collision.tag == "SloMoTutorial")
