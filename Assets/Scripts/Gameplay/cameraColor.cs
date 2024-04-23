@@ -58,7 +58,7 @@ public class cameraColor : MonoBehaviour
         Canvas[] canvases = FindObjectsOfType<Canvas>();
         foreach (Canvas canvas in canvases)
         {
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.renderMode = RenderMode.ScreenSpaceCamera;
         }
         if (data.gameplayDir == 1)
         {

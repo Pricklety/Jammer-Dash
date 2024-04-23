@@ -383,10 +383,19 @@ public class PlayerMovement : MonoBehaviour
                 StartCoroutine(ChangeTextCombo());
             }
         }
-       
-       
-       
+        if (bufferActive && (Input.GetMouseButtonUp(0) || Input.GetKeyUp(KeyCode.Return) || Input.GetMouseButtonUp(1) || Input.GetKeyUp(KeyCode.X) || Input.GetKeyUp(KeyCode.Y) || Input.GetKeyUp(KeyCode.Z) || Input.GetKeyUp(KeyCode.K) || Input.GetKeyUp(KeyCode.L)))
+        {
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.right, 1, cubeLayerMask);
+            if (hit.collider != null)
+            {
+            Collider2D hitCollider = hit.collider;
+                Debug.Log("tested by you");
+                ProcessCollision(hit.collider);
+            }
+        }
     }
+
+
 
     IEnumerator ChangeTextCombo()
     {
@@ -527,12 +536,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.tag == "SloMoTutorial")
-        {
-            GameObject tutg = GameObject.Find("TutorialText");
-        }
 
-        if ((collision.tag == "Cubes" || collision.gameObject.name.Contains("hitter02")) && activeCubes.Contains(collision.gameObject) && health > 0)
+        if ((collision.tag == "Cubes" || collision.gameObject.name.Contains("hitter02") && !Input.anyKey && activeCubes.Contains(collision.gameObject) && health > 0))
         {
             activeCubes.Remove(collision.gameObject);
 
@@ -557,21 +562,11 @@ public class PlayerMovement : MonoBehaviour
 
         if (collision.gameObject.name.Contains("hitter02") && bufferActive)
         {
-            StopCoroutine(OnTriggerEnter2DBuffer(collision));
+            StopCoroutine(OnTriggerEnter2DBuffer());
             if (Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L))
             {
-                ShowBadText();
-                Total += 1;
-                health -= 50;
-                if (combo >= 100)
-                {
-                    sfxS.PlayOneShot(fail);
-                    counter.destroyedCubes -= 250;
-                }
-                counter.destroyedCubes -= 100 - combo;
-
-                combo = 0;
-                StartCoroutine(ChangeTextCombo());
+                Debug.Log("tested by you");
+                ProcessCollision(collision);
             }
            
             bufferActive = false;
@@ -580,31 +575,20 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    private IEnumerator OnTriggerEnter2DBuffer(Collider2D collider)
+    private IEnumerator OnTriggerEnter2DBuffer()
     {
         bufferActive = true;
         Debug.Log("Buffer active!");
 
-        float elapsedTime = 0f;
-        float duration = 0.1f;
-        elapsedTime += Time.deltaTime;
         int newDestroyedCubes = counter.score + 1;
-        counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
-        scoreText.text = counter.score.ToString("N0");
-        // Ensure the score reaches the final value precisely
         counter.score = newDestroyedCubes;
+        scoreText.text = counter.score.ToString("N0");
         health += 0.25f;
-
-        if (Input.GetMouseButtonUp(0) || Input.GetKeyUp(KeyCode.Return) || Input.GetMouseButtonUp(1) || Input.GetKeyUp(KeyCode.X) || Input.GetKeyUp(KeyCode.Y) || Input.GetKeyUp(KeyCode.Z) || Input.GetKeyUp(KeyCode.K) || Input.GetKeyUp(KeyCode.L))
-        {
-            Debug.Log("tested by you");
-            ProcessCollision(collider);
-        }
         yield return null;
     }
     private void ProcessCollision(Collider2D collision)
     {
-        StopCoroutine(OnTriggerEnter2DBuffer(collision));
+        StopCoroutine(OnTriggerEnter2DBuffer());
         bufferActive = false;
         passedCubes.Add(collision.gameObject);
         DestroyCube(collision.gameObject);
@@ -640,7 +624,7 @@ public class PlayerMovement : MonoBehaviour
             if ((Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L)) && !isDying)
             {
                 bufferActive = true;
-                StartCoroutine(OnTriggerEnter2DBuffer(collision));
+                StartCoroutine(OnTriggerEnter2DBuffer());
             }
             else if (Input.GetMouseButtonUp(0) || Input.GetKeyUp(KeyCode.Return) || Input.GetMouseButtonUp(1) || Input.GetKeyUp(KeyCode.X) || Input.GetKeyUp(KeyCode.Y) || Input.GetKeyUp(KeyCode.Z) || Input.GetKeyUp(KeyCode.K) || Input.GetKeyUp(KeyCode.L))
             {
