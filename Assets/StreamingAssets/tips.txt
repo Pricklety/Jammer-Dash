@@ -13,4 +13,9 @@ The game is in beta, so everything is subject to change.
 Click H to change this text :D
 The editor guide has a lot of useful things. Make sure to check it out!
 Long cubes are very complicated. Hold until you pass them!
+<<<<<<< HEAD
 Shift + left click changes the long cube width in the editor.
+=======
+Shift + left click changes the long cube width in the editor.
+To get a perfect score, destroy each box on its specific beat
+>>>>>>> 7f9735e (New tips, Added README-hr.md, Updated README.md)
