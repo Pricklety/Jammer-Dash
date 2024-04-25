@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.IO;
 using UnityEngine;
@@ -77,6 +78,8 @@ public class SongProgress : MonoBehaviour
     {
         string filePath = Path.Combine(folderPath, fileName);
         string formattedPath = "file://" + filePath.Replace("\\", "/");
+        formattedPath = Uri.EscapeUriString(formattedPath);
+        formattedPath = formattedPath.Replace("+", "%2B");
         Debug.Log(formattedPath);
         using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(formattedPath, AudioType.MPEG);
 

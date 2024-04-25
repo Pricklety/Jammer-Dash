@@ -120,7 +120,7 @@ public class MusicVisualizer : MonoBehaviour
                 {
                     float customTargetSize = Mathf.Lerp(1.25f, 0.8f, rms);
                     float customCurrentSize = customImage.rectTransform.localScale.x;
-                    float customNewSize = Mathf.Lerp(customCurrentSize, customTargetSize, Time.unscaledDeltaTime * 10f);
+                    float customNewSize = Mathf.Lerp(customCurrentSize, customTargetSize, Time.unscaledDeltaTime * 50f);
                     customImage.rectTransform.localScale = new Vector3(customNewSize, customNewSize, 1f);
                 }
                 else if (customImage != null && !data.logoVisualizer)

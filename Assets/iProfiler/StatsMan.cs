@@ -76,24 +76,44 @@ public class StatsMan : MonoBehaviour
     {
         SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
         bool scoretype = Convert.ToBoolean(data.scoreType);
-        string a = scoretype ? "Old" : "New";
-        gui.text += "\n\nResolution value: " + data.resolutionValue + $" ({Screen.width}x{Screen.height})"+
-                    "\nScreen Mode: " + data.windowMode + $" ({Screen.fullScreenMode})"+
+        string a = scoretype ? "Old" : "New"; 
+        string direction = Convert.ToBoolean(data.gameplayDir) ? "Left" : "Right";
+        string bg = "";
+        switch(data.bgTime)
+        {
+            case 1:
+                bg = "On song change";
+                break;
+            case 2:
+                bg = "Every 15s";
+                break;
+            case 3:
+                bg = "Every 30s";
+                break;
+        }
+
+        gui.text += "\n\nResolution value: " + data.resolutionValue + $" ({Screen.width}x{Screen.height})" +
+                    "\nScreen Mode: " + data.windowMode + $" ({Screen.fullScreenMode})" +
                     "\nQuality Level: " + data.qualitySettingsLevel + $" ({GetQualityLevelName()})" +
                     "\nArtistic Backgrounds: " + data.artBG + $" ({Resources.LoadAll<Sprite>("backgrounds").Length} bgs)" +
                     "\nCustom Backgrounds: " + data.customBG + $" ({Directory.GetFiles(Application.persistentDataPath + "/backgrounds", "*.png").Length} bgs)" +
                     "\nVideo Backgrounds: " + data.vidBG + $" ({Directory.GetFiles(Application.persistentDataPath + "/backgrounds", "*.mp4").Length} bgs)" +
-                    "\nSFX: " + data.sfx + 
-                    "\nHit Notes: " + data.hitNotes + 
-                    "\nPlayer Type: " + data.playerType + 
-                    "\nAntialiasing: " + data.antialiasing + 
-                    "\nCursor Trail: " + data.cursorTrail + 
+                    "\nSFX: " + data.sfx +
+                    "\nHit Notes: " + data.hitNotes +
+                    "\nPlayer Type: " + data.playerType +
+                    "\nAntialiasing: " + data.antialiasing +
+                    "\nCursor Trail: " + data.cursorTrail +
                     "\nVisualizers: {" + data.allVisualizers + "," + data.lineVisualizer + "," + data.logoVisualizer + "," + data.bgVisualizer + "}" +
-                    "\nNo focus volume: " + data.noFocusVolume + 
-                    "\nLowpass value: " + data.lowpassValue + 
-                    "\nScore Display Type: " + a + 
-                    "\nMouse particle count: " + data.mouseParticles + 
-                    "\nShowing FPS: " + data.isShowingFPS;
+                    "\nNo focus volume: " + data.noFocusVolume +
+                    "\nLowpass value: " + data.lowpassValue +
+                    "\nScore Display Type: " + a +
+                    "\nMouse particle count: " + data.mouseParticles +
+                    "\nShowing FPS: " + data.isShowingFPS +
+                    "\nParallax: " + data.parallax +
+                    "\nRandom hit sounds: " + data.randomSFX +
+                    "\nConfined mouse: " + data.confinedMouse +
+                    "\nGameplay Direction: " + direction +
+                    "\nBackground Time: " + bg;
 
     }
         

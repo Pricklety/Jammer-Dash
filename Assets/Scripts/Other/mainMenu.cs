@@ -16,6 +16,7 @@ using System.IO.Compression;
 using Lachee.Discord;
 using Button = UnityEngine.UI.Button;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 public class mainMenu : MonoBehaviour, IPointerClickHandler
 {
@@ -24,7 +25,9 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     public Sprite[] sprite;
     private bool quittingAllowed = false;
     public SettingsData data;
-
+    public float quitTimer = 3f;
+    public float quitTime = 0f;
+    public Image quitPanel2;
     PlayerData playerData;
 
     [Header("Panels")]
@@ -711,6 +714,8 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     public void Play()
     {
         ToggleMenuPanel(playPanel);
+        InputSystem.pollingFrequency = 1000;
+        InputSystem.settings.maxQueuedEventsPerUpdate = 1000;
     }
 
     public void PlayRandomSFX()
@@ -1084,18 +1089,23 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         data = SettingsFileHandler.LoadSettingsFromFile();
         if (data.parallax)
         {
-            background.localScale = new Vector3(1.1f, 1.1f, 1f);
-            // Calculate raw mouse movement delta
-            Vector3 mouseDelta = new Vector3(mainCamera.ScreenToWorldPoint(Input.mousePosition).x * 3, mainCamera.ScreenToWorldPoint(Input.mousePosition).y / 15, 0);
+            const float backgroundScaleFactor = 1.1f;
+            const float cameraMovementFactor = 3f;
+            const float maxMovementOffset = 2f;
+            const float edgeMargin = 0.1f;
+            const float maxLayerMovement = 25f;
 
-            // Calculate the camera movement based on mouse movement
-            float cameraMovement = Mathf.Clamp(mouseDelta.x, -maxMovementOffset, maxMovementOffset) * backgroundParallaxSpeed * Time.deltaTime;
+            // Background parallax effect
+            background.localScale = new Vector3(backgroundScaleFactor, backgroundScaleFactor, 1f);
 
-            // Apply background parallax effect
+            Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 mouseDelta = new Vector3(mouseWorldPos.x * cameraMovementFactor, mouseWorldPos.y / 15, 0);
+
+            float cameraMovement = Mathf.Clamp(mouseDelta.x, -maxMovementOffset, maxMovementOffset) * backgroundParallaxSpeed * Time.unscaledDeltaTime;
             Vector3 backgroundOffset = new Vector3(cameraMovement, 0, 0);
             background.position = backgroundOffset + new Vector3(mouseDelta.x / 100, mouseDelta.y, mouseDelta.z);
 
-            // Check if the background's edge is at the canvas edge
+            // Ensure background stays within viewport bounds
             Vector3 backgroundEdgePosition = background.position + new Vector3(background.lossyScale.x / 2f, 0, 0);
             Vector3 backgroundEdgeViewport = mainCamera.WorldToViewportPoint(backgroundEdgePosition);
             if (backgroundEdgeViewport.x < 1 - edgeMargin)
@@ -1107,12 +1117,13 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
                 background.position -= new Vector3(edgeMargin, 0, 0);
             }
 
-            // Apply parallax effect to UI layers
+            // Parallax effect on UI layers
+            float layerMovement = Mathf.Clamp(mouseDelta.x, -maxMovementOffset, maxMovementOffset) * backgroundParallaxSpeed * Time.unscaledDeltaTime;
+            Vector3 layerMouseDelta = new Vector3(Mathf.Clamp(mouseDelta.x / 3, -25, 25), mouseDelta.y, mouseDelta.z);
+
             for (int i = 0; i < parallaxLayers.Length; i++)
             {
-                float layerMovement = cameraMovement * parallaxSpeeds[i];
-                Vector3 layerOffset = new Vector3(layerMovement, 0, 0);
-                parallaxLayers[i].position = initialPositions[i] - layerOffset;
+                parallaxLayers[i].position = new Vector3(layerMovement - layerMouseDelta.x + 960f, 0, 0);
             }
         }
         else
@@ -1121,6 +1132,28 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
             background.position = Vector3.zero;
         }
         musicText.text = $"{AudioManager.Instance.GetComponent<AudioSource>().clip.name} - {AudioManager.Instance.GetComponent<AudioSource>().time}/{AudioManager.Instance.GetComponent<AudioSource>().clip.length}";
+
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            quitTime += Time.unscaledDeltaTime;
+
+            // Check if quitTime exceeds quitTimer
+            if (quitTime >= quitTimer)
+            {
+                quitPanel2.color = new Color(quitPanel2.color.r, quitPanel2.color.g, quitPanel2.color.b, 1.0f); // Set color to fully opaque
+                Application.Quit(); // Quit application
+            }
+            else
+            {
+                // If quitTime is still less than quitTimer, lerp the color gradually
+                quitPanel2.color = Color.Lerp(quitPanel2.color, new Color(quitPanel2.color.r, quitPanel2.color.g, quitPanel2.color.b, 1.0f), quitTime / quitTimer);
+            }
+        }
+        else
+        {
+            quitTime = 0f;
+            quitPanel2.color = new Color(quitPanel2.color.r, quitPanel2.color.g, quitPanel2.color.b, 0f); // Set color to fully transparent
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)

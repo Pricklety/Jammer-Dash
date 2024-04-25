@@ -3559,7 +3559,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 572398217}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.88683605
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -5404,8 +5404,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1085, y: -486.5}
-  m_SizeDelta: {x: 700, y: 500}
+  m_AnchoredPosition: {x: 1165, y: -486.5}
+  m_SizeDelta: {x: 750, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &158017858
 MonoBehaviour:
@@ -19883,8 +19883,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 355, y: -486.5}
-  m_SizeDelta: {x: 700, y: 500}
+  m_AnchoredPosition: {x: 380, y: -486.5}
+  m_SizeDelta: {x: 750, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &437469918
 MonoBehaviour:
@@ -23800,7 +23800,7 @@ RectTransform:
   m_Father: {fileID: 123900193}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.88683605, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -40835,6 +40835,9 @@ MonoBehaviour:
   musicAsset: {fileID: 2810003822230129094, guid: 3b85ea57d6ecc9144b964fb6ef498752, type: 3}
   bg: {fileID: 1790811610}
   sprite: []
+  quitTimer: 3
+  quitTime: 0
+  quitPanel2: {fileID: 1465062070}
   mainPanel: {fileID: 1854728393}
   playPanel: {fileID: 1761084849}
   creditsPanel: {fileID: 1385183433}
@@ -40872,13 +40875,15 @@ MonoBehaviour:
   vis2: {fileID: 1129554546}
   musicText: {fileID: 237184823}
   musicSlider: {fileID: 0}
-  parallaxLayers: []
-  parallaxSpeeds: []
+  parallaxLayers:
+  - {fileID: 1267479040}
+  parallaxSpeeds:
+  - 0.25
   background: {fileID: 1790811608}
   backgroundParallaxSpeed: 1
   maxMovementOffset: 0.25
-  scaleMultiplier: 1.25
-  edgeMargin: 1
+  scaleMultiplier: 1.15
+  edgeMargin: 0
   elapsedTime: 0
 --- !u!114 &1082816206
 MonoBehaviour:
@@ -45960,6 +45965,98 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1195888046}
   m_CullTransparentMesh: 1
+--- !u!1 &1198781169
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1198781170}
+  - component: {fileID: 1198781173}
+  - component: {fileID: 1198781172}
+  - component: {fileID: 1198781171}
+  m_Layer: 5
+  m_Name: Panel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1198781170
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1198781169}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1557528899}
+  m_Father: {fileID: 1854728394}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -1050}
+  m_SizeDelta: {x: 600, y: 240}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1198781171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1198781169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
+--- !u!114 &1198781172
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1198781169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.6981132, g: 0.6981132, b: 0.6981132, a: 0.21960784}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1198781173
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1198781169}
+  m_CullTransparentMesh: 1
 --- !u!1 &1201572661
 GameObject:
   m_ObjectHideFlags: 0
@@ -46310,24 +46407,55 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "<b>Game changes</b>\n- New major UI change\n- Better accessibility\n-
-    New cursor\n- F9 to reload Audio playlist (will reshuffle the playlist and reload
-    the music)\n- F12 to screenshot (fixed most stuff)\n- The editor purposefully
-    breaks on April 1st.\n- Brand new tutorial with a video background (BETA - DEV
-    ONLY)\n\n<b>Menu changes</b>\n- Universal panel added for useful stuff\n- Moved
-    credits to the new panel\n- Options in new panel\n- Added a changelogs section\n-
-    Reworked the music system to work with new UI\n- Moved the music panel to the
-    new panel\n- Moved additional info panel to the new panel\n- Removed multiplayer
-    options, level download system coming in v0.40 on web\n- Added EDIT button\n-
-    Improved visualizer reaction time as well as added more visualizer lines (to
-    the side)\n- Debug v11\n- F1 to enter idle mode\n- Brand new options screen.\n-
-    F2 toggles additional info\n- F3 enters **fun mode**\n\n<b>Fun mode</b>\n- Visualizer
-    display\n- Play a random sound effect\n- Confetti thrower\n\n<b>Gameplay changes</b>\n-
-    Every fail a new hit combo sound will play\n- New hit object: Long cubes\n- Breaks
-    removed\n- New input management\n\n<b>Editor changes</b>\n- Overhauled the Options
-    and Menu UI\n- System to make a cube width longer or shorter. \n\n<b>New options</b>\n-
-    Toggle random hit sounds\n- Choose default hit sound\n- Gameplay rotation (Go
-    left or right)\n- Localization (Croatian and Japanese)"
+  m_Text: "<b>General</b>\r\n\u203A Added a top panel for some function buttons.\r\n\u203A
+    Added functions (F1-F12):\r\n\u203A\u203A F1 - Idle mode (menu)\r\n\u203A\u203A
+    F2 - Debug mode/Advanced mode (menu)\r\n\u203A\u203A F3 - Enable fun mode (menu)\r\n\u203A\u203A
+    F9 - Reload the playlist and shuffle it (global)\r\n\u203A\u203A F12 - Take a
+    screenshot (global)\r\n\r\n<b>Menu</b>\r\n\u203A Improved menu accessibility
+    by removing \"menu paths\"\r\n\u203A New cursor texture\r\n\u203A New April fools
+    thing (Editor not recommended for use).\r\n\u203A New tutorial with a video background
+    (Only level ever)\r\n\u203A Moved options, music, credits and advanced to the
+    top panel.\r\n\u203A Added a home button for more accessibility\r\n\u203A New
+    changelogs panel (<color=lime>hey!</color>)\r\n\u203A Entire music rework\r\n\u203A
+    Removed the multiplayer panel.\r\n\u203A Added Edit button to the main screen\r\n\u203A
+    Improved visualizer reaction time (7500 > 3000)\r\n\u203A Improved logo reaction
+    time (7500 > 1500)\r\n\u203A Updated Debug to version 11\r\n<b>General</b>\r\n\u203A
+    Added a top panel for some function buttons.\r\n\u203A Added functions (F1-F12):\r\n\u203A\u203A
+    F1 - Idle mode (menu)\r\n\u203A\u203A F2 - Debug mode/Advanced mode (menu)\r\n\u203A\u203A
+    F3 - Enable fun mode (menu)\r\n\u203A\u203A F9 - Reload the playlist and shuffle
+    it (global)\r\n\u203A\u203A F12 - Take a screenshot (global)\r\n\r\n<b>Menu</b>\r\n\u203A
+    Improved menu accessibility by removing \"menu paths\"\r\n\u203A New cursor texture\r\n\u203A
+    New April fools thing (Editor not recommended for use).\r\n\u203A New tutorial
+    with a video background (Only level ever)\r\n\u203A Moved options, music, credits
+    and advanced to the top panel.\r\n\u203A Added a home button for more accessibility\r\n\u203A
+    New changelogs panel (<color=lime>hey!</color>)\r\n\u203A Entire music rework\r\n\u203A
+    Removed the multiplayer panel.\r\n\u203A Added Edit button to the main screen\r\n\u203A
+    Improved visualizer reaction time (7500 > 3000)\r\n\u203A Improved logo reaction
+    time (7500 > 1500)\r\n\u203A Updated Debug to version 11\r\n\u203A Added tips
+    on idle\r\n\r\n<b>Editor</b>\r\n\u203A New editor object: Long cubes. Shift +
+    left click to change width.\r\n\u203A Changed the Options and the Menu UI a little
+    bit.\r\n\r\n<b>Fun Mode</b>\r\n\u203A Visualizer v2\r\n\u203A Random sound effect\r\n\r\n<b>Gameplay</b>\r\n\u203A
+    Each combo will play a random hit sounds (Toggle in settings)\r\n\u203A New hit
+    object: Long cubes.\r\n\u203A Removed level breaks\r\n\u203A InputSystem implementation.
+    Polling rate changed from 60Hz to 1,000Hz\r\n\r\n<b>Options</b>\r\n\u203A Option
+    to confine your mouse to window (disabled by default)\r\n\u203A Option to toggle
+    the menu parallax (enabled by default)\r\n\u203A Option to toggle random hit
+    sounds (enabled by default)\r\n\u203A Option to change gameplay rotation (right
+    by default)\r\n\u203A Option to change background update time (song change by
+    default)\r\n\r\n<b>Bugfixes</b>\r\n\u203A Fixed a bug where some specific file
+    names won't load (Now it's using better URI loading)\r\n\u203A Fixed 50+ bugs\r\n\r\n<b>Editor</b>\r\n\u203A
+    New editor object: Long cubes. Shift + left click to change width.\r\n\u203A
+    Changed the Options and the Menu UI a little bit.\r\n\r\n<b>Fun Mode</b>\r\n\u203A
+    Visualizer v2\r\n\u203A Random sound effect\r\n\r\n<b>Gameplay</b>\r\n\u203A
+    Each combo will play a random hit sounds (Toggle in settings)\r\n\u203A New hit
+    object: Long cubes.\r\n\u203A Removed level breaks\r\n\u203A InputSystem implementation.
+    Polling rate changed from 60Hz to 1,000Hz\r\n\r\n<b>Options</b>\r\n\u203A Option
+    to confine your mouse to window (disabled by default)\r\n\u203A Option to toggle
+    the menu parallax (enabled by default)\r\n\u203A Option to toggle random hit
+    sounds (enabled by default)\r\n\u203A Option to change gameplay rotation (right
+    by default)\r\n\u203A Option to change background update time (song change by
+    default)\r\n\r\n<b>Bugfixes</b>\r\n\u203A Fixed a bug where some specific file
+    names won't load (Now it's using better URI loading)\r\n\u203A Fixed 50+ bugs"
 --- !u!222 &1204106121
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -56137,6 +56265,81 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1464139660}
   m_CullTransparentMesh: 1
+--- !u!1 &1465062068
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1465062069}
+  - component: {fileID: 1465062071}
+  - component: {fileID: 1465062070}
+  m_Layer: 5
+  m_Name: quitPanel2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1465062069
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1465062068}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1512957875}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1465062070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1465062068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 0
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1465062071
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1465062068}
+  m_CullTransparentMesh: 1
 --- !u!1 &1466886170
 GameObject:
   m_ObjectHideFlags: 0
@@ -57368,6 +57571,7 @@ RectTransform:
   - {fileID: 1732503891}
   - {fileID: 1129554547}
   - {fileID: 1546917946}
+  - {fileID: 1465062069}
   m_Father: {fileID: 1082816204}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -58320,81 +58524,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1536754870}
   m_CullTransparentMesh: 1
---- !u!1 &1542693612
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1542693613}
-  - component: {fileID: 1542693615}
-  - component: {fileID: 1542693614}
-  m_Layer: 5
-  m_Name: Panel (2)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1542693613
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1542693612}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1905620040}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1815, y: -486.5}
-  m_SizeDelta: {x: 700, y: 500}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1542693614
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1542693612}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7aa3cbdfc0ed5724aa649d2d2b2b8f77, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &1542693615
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1542693612}
-  m_CullTransparentMesh: 1
 --- !u!1 &1544751884
 GameObject:
   m_ObjectHideFlags: 0
@@ -58905,6 +59034,116 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1556743053}
+  m_CullTransparentMesh: 1
+--- !u!1 &1557528898
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1557528899}
+  - component: {fileID: 1557528903}
+  - component: {fileID: 1557528902}
+  - component: {fileID: 1557528901}
+  - component: {fileID: 1557528900}
+  m_Layer: 5
+  m_Name: Text (Legacy)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1557528899
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557528898}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1198781170}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1557528900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557528898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 1, y: -1}
+  m_UseGraphicAlpha: 1
+--- !u!114 &1557528901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557528898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4625d6d5c44b53f4da1ff23ba80af297, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textComponent: {fileID: 1557528902}
+  filePath: tips.txt
+--- !u!114 &1557528902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557528898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 9037ec9611b9bc448a2aa967a7690eaa, type: 3}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 1
+    m_MinSize: 10
+    m_MaxSize: 32
+    m_Alignment: 4
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: New Text
+--- !u!222 &1557528903
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557528898}
   m_CullTransparentMesh: 1
 --- !u!1 &1559201349
 GameObject:
@@ -70376,6 +70615,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1267479040}
+  - {fileID: 1198781170}
   - {fileID: 578374972}
   - {fileID: 860512667}
   - {fileID: 2124785367}
@@ -72209,13 +72449,12 @@ RectTransform:
   m_Children:
   - {fileID: 437469917}
   - {fileID: 158017857}
-  - {fileID: 1542693613}
   m_Father: {fileID: 926375004}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 245, y: 0}
+  m_SizeDelta: {x: -380, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1905620041
 MonoBehaviour:
@@ -72235,7 +72474,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 30
+  m_Spacing: 35
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
@@ -72255,7 +72494,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_HorizontalFit: 1
+  m_HorizontalFit: 2
   m_VerticalFit: 0
 --- !u!1 &1905780418
 GameObject:

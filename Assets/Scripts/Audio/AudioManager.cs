@@ -544,8 +544,11 @@ public class AudioManager : MonoBehaviour
     public IEnumerator LoadAudioClip(string filePath)
     {
         Resources.UnloadUnusedAssets();
+        // Encode the file path to ensure proper URL encoding
+        string encodedPath = EncodeFilePath(filePath);
 
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + filePath, AudioType.MPEG))
+        Debug.Log(encodedPath);
+        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + encodedPath, AudioType.MPEG))
         {
             var requestOperation = www.SendWebRequest();
 
@@ -583,7 +586,14 @@ public class AudioManager : MonoBehaviour
             }
         }
     }
-
+    private string EncodeFilePath(string filePath)
+    {
+        // Encode the file path to ensure proper URL encoding
+        string encodedPath = Uri.EscapeUriString(filePath);
+        // Replace "+" with "%2B"
+        encodedPath = encodedPath.Replace("+", "%2B");
+        return encodedPath;
+    }
 
     public void Play(int index)
     {
