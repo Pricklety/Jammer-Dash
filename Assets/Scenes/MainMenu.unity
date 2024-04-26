@@ -155,7 +155,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 964, y: -940}
+  m_AnchoredPosition: {x: 964, y: -1290}
   m_SizeDelta: {x: 1000, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1864303
@@ -3948,8 +3948,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 1040}
+  m_AnchoredPosition: {x: 0, y: -0.000061035156}
+  m_SizeDelta: {x: 0, y: 1390}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &105419980
 MonoBehaviour:
@@ -11660,7 +11660,7 @@ GameObject:
   - component: {fileID: 327192812}
   - component: {fileID: 327192814}
   - component: {fileID: 327192813}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Particle System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17382,7 +17382,7 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2028465957}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.048076928}
+  m_AnchorMin: {x: 0, y: 0.2873757}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
@@ -17644,7 +17644,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -200}
+  m_AnchoredPosition: {x: 0, y: -200.00006}
   m_SizeDelta: {x: 1720, y: 1050}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &372026353
@@ -25390,7 +25390,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -45}
+  m_AnchoredPosition: {x: 0, y: -45.000015}
   m_SizeDelta: {x: 0, y: -90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &616947738
@@ -35552,7 +35552,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: -15}
+  m_AnchoredPosition: {x: 0, y: -14.999999}
   m_SizeDelta: {x: 30, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &914081296
@@ -36828,7 +36828,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -45}
+  m_AnchoredPosition: {x: 0, y: -45.000015}
   m_SizeDelta: {x: 0, y: -90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &944663482
@@ -40795,7 +40795,7 @@ GameObject:
   - component: {fileID: 1082816206}
   - component: {fileID: 1082816207}
   - component: {fileID: 1082816208}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40875,10 +40875,7 @@ MonoBehaviour:
   vis2: {fileID: 1129554546}
   musicText: {fileID: 237184823}
   musicSlider: {fileID: 0}
-  parallaxLayers:
-  - {fileID: 1267479040}
-  parallaxSpeeds:
-  - 0.25
+  logo: {fileID: 1267479040}
   background: {fileID: 1790811608}
   backgroundParallaxSpeed: 1
   maxMovementOffset: 0.25
@@ -42543,7 +42540,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -472.62698}
+  m_AnchoredPosition: {x: 0, y: -472.627}
   m_SizeDelta: {x: 100, y: 0}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1115487518
@@ -42784,7 +42781,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -472.62698}
+  m_AnchoredPosition: {x: 0, y: -472.627}
   m_SizeDelta: {x: 100, y: 0}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1122726651
@@ -43161,7 +43158,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -45}
+  m_AnchoredPosition: {x: 0, y: -45.000015}
   m_SizeDelta: {x: 0, y: -90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1129554548
@@ -43479,7 +43476,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 20, y: -25}
+  m_AnchoredPosition: {x: 19.999996, y: -25}
   m_SizeDelta: {x: 30, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1140959224
@@ -46320,149 +46317,6 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1202751153}
-  m_CullTransparentMesh: 1
---- !u!1 &1204106117
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1204106118}
-  - component: {fileID: 1204106121}
-  - component: {fileID: 1204106120}
-  - component: {fileID: 1204106119}
-  m_Layer: 5
-  m_Name: Text (Legacy) (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1204106118
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1204106117}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1705250058}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -50}
-  m_SizeDelta: {x: 0, y: -100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1204106119
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1204106117}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
-  m_EffectDistance: {x: 2, y: -2}
-  m_UseGraphicAlpha: 1
---- !u!114 &1204106120
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1204106117}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_FontData:
-    m_Font: {fileID: 2230732570650464555, guid: b7ac2d3e9a995ef46817dd5bb73e4135, type: 3}
-    m_FontSize: 14
-    m_FontStyle: 0
-    m_BestFit: 1
-    m_MinSize: 1
-    m_MaxSize: 64
-    m_Alignment: 3
-    m_AlignByGeometry: 0
-    m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
-    m_LineSpacing: 1
-  m_Text: "<b>General</b>\r\n\u203A Added a top panel for some function buttons.\r\n\u203A
-    Added functions (F1-F12):\r\n\u203A\u203A F1 - Idle mode (menu)\r\n\u203A\u203A
-    F2 - Debug mode/Advanced mode (menu)\r\n\u203A\u203A F3 - Enable fun mode (menu)\r\n\u203A\u203A
-    F9 - Reload the playlist and shuffle it (global)\r\n\u203A\u203A F12 - Take a
-    screenshot (global)\r\n\r\n<b>Menu</b>\r\n\u203A Improved menu accessibility
-    by removing \"menu paths\"\r\n\u203A New cursor texture\r\n\u203A New April fools
-    thing (Editor not recommended for use).\r\n\u203A New tutorial with a video background
-    (Only level ever)\r\n\u203A Moved options, music, credits and advanced to the
-    top panel.\r\n\u203A Added a home button for more accessibility\r\n\u203A New
-    changelogs panel (<color=lime>hey!</color>)\r\n\u203A Entire music rework\r\n\u203A
-    Removed the multiplayer panel.\r\n\u203A Added Edit button to the main screen\r\n\u203A
-    Improved visualizer reaction time (7500 > 3000)\r\n\u203A Improved logo reaction
-    time (7500 > 1500)\r\n\u203A Updated Debug to version 11\r\n<b>General</b>\r\n\u203A
-    Added a top panel for some function buttons.\r\n\u203A Added functions (F1-F12):\r\n\u203A\u203A
-    F1 - Idle mode (menu)\r\n\u203A\u203A F2 - Debug mode/Advanced mode (menu)\r\n\u203A\u203A
-    F3 - Enable fun mode (menu)\r\n\u203A\u203A F9 - Reload the playlist and shuffle
-    it (global)\r\n\u203A\u203A F12 - Take a screenshot (global)\r\n\r\n<b>Menu</b>\r\n\u203A
-    Improved menu accessibility by removing \"menu paths\"\r\n\u203A New cursor texture\r\n\u203A
-    New April fools thing (Editor not recommended for use).\r\n\u203A New tutorial
-    with a video background (Only level ever)\r\n\u203A Moved options, music, credits
-    and advanced to the top panel.\r\n\u203A Added a home button for more accessibility\r\n\u203A
-    New changelogs panel (<color=lime>hey!</color>)\r\n\u203A Entire music rework\r\n\u203A
-    Removed the multiplayer panel.\r\n\u203A Added Edit button to the main screen\r\n\u203A
-    Improved visualizer reaction time (7500 > 3000)\r\n\u203A Improved logo reaction
-    time (7500 > 1500)\r\n\u203A Updated Debug to version 11\r\n\u203A Added tips
-    on idle\r\n\r\n<b>Editor</b>\r\n\u203A New editor object: Long cubes. Shift +
-    left click to change width.\r\n\u203A Changed the Options and the Menu UI a little
-    bit.\r\n\r\n<b>Fun Mode</b>\r\n\u203A Visualizer v2\r\n\u203A Random sound effect\r\n\r\n<b>Gameplay</b>\r\n\u203A
-    Each combo will play a random hit sounds (Toggle in settings)\r\n\u203A New hit
-    object: Long cubes.\r\n\u203A Removed level breaks\r\n\u203A InputSystem implementation.
-    Polling rate changed from 60Hz to 1,000Hz\r\n\r\n<b>Options</b>\r\n\u203A Option
-    to confine your mouse to window (disabled by default)\r\n\u203A Option to toggle
-    the menu parallax (enabled by default)\r\n\u203A Option to toggle random hit
-    sounds (enabled by default)\r\n\u203A Option to change gameplay rotation (right
-    by default)\r\n\u203A Option to change background update time (song change by
-    default)\r\n\r\n<b>Bugfixes</b>\r\n\u203A Fixed a bug where some specific file
-    names won't load (Now it's using better URI loading)\r\n\u203A Fixed 50+ bugs\r\n\r\n<b>Editor</b>\r\n\u203A
-    New editor object: Long cubes. Shift + left click to change width.\r\n\u203A
-    Changed the Options and the Menu UI a little bit.\r\n\r\n<b>Fun Mode</b>\r\n\u203A
-    Visualizer v2\r\n\u203A Random sound effect\r\n\r\n<b>Gameplay</b>\r\n\u203A
-    Each combo will play a random hit sounds (Toggle in settings)\r\n\u203A New hit
-    object: Long cubes.\r\n\u203A Removed level breaks\r\n\u203A InputSystem implementation.
-    Polling rate changed from 60Hz to 1,000Hz\r\n\r\n<b>Options</b>\r\n\u203A Option
-    to confine your mouse to window (disabled by default)\r\n\u203A Option to toggle
-    the menu parallax (enabled by default)\r\n\u203A Option to toggle random hit
-    sounds (enabled by default)\r\n\u203A Option to change gameplay rotation (right
-    by default)\r\n\u203A Option to change background update time (song change by
-    default)\r\n\r\n<b>Bugfixes</b>\r\n\u203A Fixed a bug where some specific file
-    names won't load (Now it's using better URI loading)\r\n\u203A Fixed 50+ bugs"
---- !u!222 &1204106121
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1204106117}
   m_CullTransparentMesh: 1
 --- !u!1 &1204365742
 GameObject:
@@ -52343,7 +52197,7 @@ GameObject:
   - component: {fileID: 1356364929}
   - component: {fileID: 1356364928}
   - component: {fileID: 1356364927}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: EventSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -53220,7 +53074,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Background
+  m_Text: background
 --- !u!222 &1375089231
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -53833,7 +53687,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -45}
+  m_AnchoredPosition: {x: 0, y: -45.000015}
   m_SizeDelta: {x: 0, y: -90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1385183435
@@ -54968,6 +54822,166 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1420466846}
+  m_CullTransparentMesh: 1
+--- !u!1 &1426683191
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1426683192}
+  - component: {fileID: 1426683194}
+  - component: {fileID: 1426683193}
+  m_Layer: 5
+  m_Name: Text (TMP)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1426683192
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1426683191}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1705250058}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: -50}
+  m_SizeDelta: {x: 0, y: -100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1426683193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1426683191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: "<b>General</b>\r\n\u203A Added a top panel for some function buttons.\r\n\u203A
+    Added functions (F1-F12):\r\n\u203A\u203A F1 - Idle mode (menu)\r\n\u203A\u203A
+    F2 - Debug mode/Advanced mode (menu)\r\n\u203A\u203A F3 - Enable fun mode (menu)\r\n\u203A\u203A
+    F9 - Reload the playlist and shuffle it (global)\r\n\u203A\u203A F12 - Take a
+    screenshot (global)\r\n\r\n<b>Menu</b>\r\n\u203A Improved menu accessibility
+    by removing \"menu paths\"\r\n\u203A New cursor texture\r\n\u203A New April fools
+    thing (Editor not recommended for use).\r\n\u203A New tutorial with a video background
+    (Only level ever)\r\n\u203A Moved options, music, credits and advanced to the
+    top panel.\r\n\u203A Added a home button for more accessibility\r\n\u203A New
+    changelogs panel\r\n\u203A Entire music rework\r\n\u203A Removed the multiplayer
+    panel.\r\n\u203A Added Edit button to the main screen\r\n\u203A Improved visualizer
+    reaction time (7500 > 3000)\r\n\u203A Improved logo reaction time (7500 > 1500)\r\n\u203A
+    Updated Debug to version 11\r\n\u203A Added tips\r\n\u203A Hold ESC to Quit\r\n\r\n<b>Editor</b>\r\n\u203A
+    New editor object: Long cubes. Shift + left click to change width.\r\n\u203A
+    Changed the Options and the Menu UI a little bit.\r\n\r\n<b>Fun Mode</b>\r\n\u203A
+    Visualizer v2\r\n\u203A Random sound effect\r\n\r\n<b>Gameplay</b>\r\n\u203A
+    Each combo will play a random hit sounds (Toggle in settings)\r\n\u203A New hit
+    object: Long cubes.\r\n\u203A Removed level breaks\r\n\u203A InputSystem implementation.
+    Polling rate changed from 60Hz to 1,000Hz\r\n\r\n<b>Options</b>\r\n\u203A Option
+    to confine your mouse to window (disabled by default)\r\n\u203A Option to toggle
+    the menu parallax (enabled by default)\r\n\u203A Option to toggle random hit
+    sounds (enabled by default)\r\n\u203A Option to change gameplay rotation (right
+    by default)\r\n\u203A Option to change background update time (song change by
+    default)\r\n\r\n<b>Bugfixes</b>\r\n\u203A Fixed a bug where some specific file
+    names won't load (Now it's using better URI loading)\r\n\u203A Fixed 50+ bugs\r\n\r"
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 18
+  m_fontSizeBase: 36
+  m_fontWeight: 400
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 16
+  m_fontSizeMax: 18
+  m_fontStyle: 0
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &1426683194
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1426683191}
   m_CullTransparentMesh: 1
 --- !u!1 &1429613320
 GameObject:
@@ -57535,8 +57549,8 @@ Canvas:
   m_GameObject: {fileID: 1512957871}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 1612322275}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -57544,10 +57558,10 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!224 &1512957875
 RectTransform:
@@ -61058,7 +61072,7 @@ GameObject:
   - component: {fileID: 1612322274}
   - component: {fileID: 1612322278}
   - component: {fileID: 1612322277}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -61154,7 +61168,7 @@ MonoBehaviour:
   volumeTrigger: {fileID: 1612322276}
   volumeLayer:
     serializedVersion: 2
-    m_Bits: 2147483647
+    m_Bits: 991
   stopNaNPropagation: 1
   finalBlitToCameraTarget: 0
   antialiasingMode: 0
@@ -63754,13 +63768,13 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2071922754}
-  - {fileID: 1204106118}
+  - {fileID: 1426683192}
   m_Father: {fileID: 105419979}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 964, y: -450}
-  m_SizeDelta: {x: 1000, y: 800}
+  m_AnchoredPosition: {x: 964, y: -625}
+  m_SizeDelta: {x: 1000, y: 1150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1705250059
 MonoBehaviour:
@@ -64531,7 +64545,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -45}
+  m_AnchoredPosition: {x: 0, y: -45.000015}
   m_SizeDelta: {x: 0, y: -90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1732503892
@@ -65947,7 +65961,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -45}
+  m_AnchoredPosition: {x: 0, y: -45.000015}
   m_SizeDelta: {x: 0, y: -90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1761084851
@@ -67096,7 +67110,7 @@ GameObject:
   - component: {fileID: 1790811608}
   - component: {fileID: 1790811611}
   - component: {fileID: 1790811610}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -70628,7 +70642,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -45}
+  m_AnchoredPosition: {x: 0, y: -45.000015}
   m_SizeDelta: {x: 0, y: -90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1854728395
@@ -70703,7 +70717,7 @@ GameObject:
   - component: {fileID: 1860330751}
   - component: {fileID: 1860330750}
   - component: {fileID: 1860330749}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: bg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -70833,7 +70847,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -1000}
+  m_AnchoredPosition: {x: 0, y: -1000.00006}
   m_SizeDelta: {x: 1720, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1861966215
@@ -71561,7 +71575,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 361756907}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.9519231
+  m_Size: 0.7126243
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -76602,7 +76616,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -45}
+  m_AnchoredPosition: {x: 0, y: -45.000015}
   m_SizeDelta: {x: 0, y: -90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2028726037
@@ -78434,7 +78448,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: -35, y: -15}
+  m_AnchoredPosition: {x: -35, y: -14.999999}
   m_SizeDelta: {x: 32, y: 16}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2069987850
@@ -78612,7 +78626,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'v0.32
+  m_Text: 'v0.3.2
 
     <size=6>July 2024</size>'
 --- !u!222 &2071922757
@@ -78980,7 +78994,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -45}
+  m_AnchoredPosition: {x: 0, y: -45.000015}
   m_SizeDelta: {x: 0, y: -90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2080258512

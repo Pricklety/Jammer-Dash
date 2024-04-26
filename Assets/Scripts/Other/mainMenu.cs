@@ -93,15 +93,13 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     public Slider musicSlider;
 
     [Header("Parallax")]
-    public Transform[] parallaxLayers; 
-    public float[] parallaxSpeeds;     
+    public Transform logo;   
     public Transform background;        
     public float backgroundParallaxSpeed; 
     public float maxMovementOffset;   
     public float scaleMultiplier;      
     public float edgeMargin;           
 
-    private Vector3[] initialPositions; 
     private Vector3 lastMousePosition;  
 
     private Camera mainCamera;
@@ -121,24 +119,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         discordpfp.texture = DiscordManager.current.CurrentUser.avatar;
         discordName.text = DiscordManager.current.CurrentUser.username + "\n\nID: " +
         DiscordManager.current.CurrentUser.ID;
-        if (data.parallax)
-        {
-            initialPositions = new Vector3[parallaxLayers.Length];
-            for (int i = 0; i < parallaxLayers.Length; i++)
-            {
-                initialPositions[i] = parallaxLayers[i].position;
-            }
-
-            // Set the initial mouse position
-            lastMousePosition = Input.mousePosition;
-
-            // Set the initial scale of the background
-            background.localScale *= scaleMultiplier;
-
-            mainCamera = Camera.main;
-            canvasRect = GetComponentInChildren<Canvas>().GetComponent<RectTransform>();
-
-        }
+       
     }
     public void LoadLevelFromLevels()
     {
@@ -1089,70 +1070,72 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         data = SettingsFileHandler.LoadSettingsFromFile();
         if (data.parallax)
         {
-            const float backgroundScaleFactor = 1.1f;
-            const float cameraMovementFactor = 3f;
+            const float backgroundScaleFactor = 1.08f;
+            const float cameraMovementFactor = 2f;
             const float maxMovementOffset = 2f;
-            const float edgeMargin = 0.1f;
-            const float maxLayerMovement = 25f;
+            const float edgeMargin = 10f;
+            const float maxLayerMovement = 15f;
 
             // Background parallax effect
-            background.localScale = new Vector3(backgroundScaleFactor, backgroundScaleFactor, 1f);
+            background.localScale = new Vector3(backgroundScaleFactor, backgroundScaleFactor, 1);
 
-            Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3 mouseDelta = new Vector3(mouseWorldPos.x * cameraMovementFactor, mouseWorldPos.y / 15, 0);
 
             float cameraMovement = Mathf.Clamp(mouseDelta.x, -maxMovementOffset, maxMovementOffset) * backgroundParallaxSpeed * Time.unscaledDeltaTime;
             Vector3 backgroundOffset = new Vector3(cameraMovement, 0, 0);
             background.position = backgroundOffset + new Vector3(mouseDelta.x / 100, mouseDelta.y, mouseDelta.z);
 
-            // Ensure background stays within viewport bounds
-            Vector3 backgroundEdgePosition = background.position + new Vector3(background.lossyScale.x / 2f, 0, 0);
-            Vector3 backgroundEdgeViewport = mainCamera.WorldToViewportPoint(backgroundEdgePosition);
-            if (backgroundEdgeViewport.x < 1 - edgeMargin)
-            {
-                background.position += new Vector3(edgeMargin, 0, 0);
-            }
-            else if (backgroundEdgeViewport.x > edgeMargin)
-            {
-                background.position -= new Vector3(edgeMargin, 0, 0);
-            }
+            // Calculate the movement based on the change in mouse position
+            float layerMovement = 0;
 
-            // Parallax effect on UI layers
-            float layerMovement = Mathf.Clamp(mouseDelta.x, -maxMovementOffset, maxMovementOffset) * backgroundParallaxSpeed * Time.unscaledDeltaTime;
+            // Calculate the adjustment based on mouseDelta
             Vector3 layerMouseDelta = new Vector3(Mathf.Clamp(mouseDelta.x / 3, -25, 25), mouseDelta.y, mouseDelta.z);
 
-            for (int i = 0; i < parallaxLayers.Length; i++)
-            {
-                parallaxLayers[i].position = new Vector3(layerMovement - layerMouseDelta.x + 960f, 0, 0);
-            }
+            // Calculate the new position relative to the current position
+            float newPositionX = layerMouseDelta.x / 10;
+
+            // Set the new position
+            logo.position = new Vector3(newPositionX, mouseDelta.y, mouseDelta.z);
         }
         else
         {
             background.localScale = Vector3.one;
             background.position = Vector3.zero;
+            logo.position = new Vector3(0, 0, 0);
         }
         musicText.text = $"{AudioManager.Instance.GetComponent<AudioSource>().clip.name} - {AudioManager.Instance.GetComponent<AudioSource>().time}/{AudioManager.Instance.GetComponent<AudioSource>().clip.length}";
 
         if (Input.GetKey(KeyCode.Escape))
         {
-            quitTime += Time.unscaledDeltaTime;
 
             // Check if quitTime exceeds quitTimer
             if (quitTime >= quitTimer)
             {
+                audioMixer.SetFloat("Lowpass", 500);
                 quitPanel2.color = new Color(quitPanel2.color.r, quitPanel2.color.g, quitPanel2.color.b, 1.0f); // Set color to fully opaque
                 Application.Quit(); // Quit application
             }
             else
             {
-                // If quitTime is still less than quitTimer, lerp the color gradually
-                quitPanel2.color = Color.Lerp(quitPanel2.color, new Color(quitPanel2.color.r, quitPanel2.color.g, quitPanel2.color.b, 1.0f), quitTime / quitTimer);
+                Debug.Log(quitTime);
+                quitTime += Time.unscaledDeltaTime;
+                quitPanel2.color = Color.Lerp(new Color(0, 0, 0, 0), new Color(0, 0, 0, 1), quitTime / quitTimer);
+                float startValue = 22000;
+                float currentValue = Mathf.Lerp(startValue, 500, quitTime / quitTimer);
+
+                audioMixer.SetFloat("Lowpass", currentValue);
+            
             }
+
+                
         }
         else
         {
+
             quitTime = 0f;
             quitPanel2.color = new Color(quitPanel2.color.r, quitPanel2.color.g, quitPanel2.color.b, 0f); // Set color to fully transparent
+            audioMixer.SetFloat("Lowpass", 22000);
         }
     }
 

@@ -98,6 +98,16 @@ public class cameraColor : MonoBehaviour
             t += Time.deltaTime;
             UpdateBackgroundColor();
         }
+        SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+        Canvas[] canvases = FindObjectsOfType<Canvas>();
+        foreach (Canvas canvas in canvases)
+        {
+            canvas.renderMode = RenderMode.ScreenSpaceCamera;
+        }
+        if (data.gameplayDir == 1)
+        {
+            Matrix4x4 mat = Camera.main.projectionMatrix; mat *= Matrix4x4.Scale(new Vector3(-1, 1, 10)); Camera.main.projectionMatrix = mat;
+        }
     }
 
     private void SetRandomTargetColor()

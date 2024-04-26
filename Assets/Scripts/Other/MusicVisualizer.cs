@@ -105,7 +105,7 @@ public class MusicVisualizer : MonoBehaviour
                 if (data.bgVisualizer)
                 {
 
-                    float depthvalue = rms * 300;
+                    float depthvalue = rms * 500;
                     FloatParameter par = new FloatParameter() { value = depthvalue };
                     depth.focalLength.value = par;
 
