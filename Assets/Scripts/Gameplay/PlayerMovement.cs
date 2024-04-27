@@ -384,10 +384,6 @@ public class PlayerMovement : MonoBehaviour
                 StartCoroutine(ChangeTextCombo());
             }
         }
-<<<<<<< HEAD
-=======
-
->>>>>>> f8c0879 (updated some config stuff, long cubes finished, visualizer now plays on the entire foreground (ui included))
         
     }
 
@@ -504,14 +500,8 @@ public class PlayerMovement : MonoBehaviour
         {
             if (collision.tag == "Saw" && !invincible)
             {
-<<<<<<< HEAD
-                if (collision.tag == "Saw" && !invincible)
-                {
-                    health -= 300;
-                }
-=======
+
                 health -= 150;
->>>>>>> f8c0879 (updated some config stuff, long cubes finished, visualizer now plays on the entire foreground (ui included))
             }
         }
 
@@ -526,11 +516,6 @@ public class PlayerMovement : MonoBehaviour
             activeCubes.Add(collision.gameObject);
             Debug.Log(collision.gameObject);
         }
-
-<<<<<<< HEAD
-
-
-=======
         if (collision.tag == "LongCube" && collision.transform.position.y == transform.position.y)
         {
             activeCubes.Add(collision.gameObject);
@@ -540,19 +525,12 @@ public class PlayerMovement : MonoBehaviour
             }
 
         }
-        
->>>>>>> f8c0879 (updated some config stuff, long cubes finished, visualizer now plays on the entire foreground (ui included))
     }
 
 
     private void OnTriggerExit2D(Collider2D collision)
-    {
-
-<<<<<<< HEAD
-        if ((collision.tag == "Cubes" || collision.gameObject.name.Contains("hitter02") && !Input.anyKey && activeCubes.Contains(collision.gameObject) && health > 0))
-=======
+    { 
         if (collision.tag == "Cubes" && activeCubes.Contains(collision.gameObject) && health > 0)
->>>>>>> f8c0879 (updated some config stuff, long cubes finished, visualizer now plays on the entire foreground (ui included))
         {
             activeCubes.Remove(collision.gameObject);
 
@@ -573,41 +551,7 @@ public class PlayerMovement : MonoBehaviour
 
                 StartCoroutine(ChangeTextCombo());
             }
-<<<<<<< HEAD
-        }
-
-        if (collision.gameObject.name.Contains("hitter02") && bufferActive)
-        {
-            StopCoroutine(OnTriggerEnter2DBuffer());
-            if (Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L))
-            {
-                Debug.Log("tested by you");
-                ProcessCollision(collision);
-            }
-            else
-            {
-                activeCubes.Remove(collision.gameObject);
-
-                if (!passedCubes.Contains(collision.gameObject))
-                {
-                    if (AudioManager.Instance != null)
-                    {
-                        if (AudioManager.Instance.hits)
-                        {
-                            ShowBadText();
-                        }
-                    }
-
-                    Total += 1;
-                    activeCubes.Remove(collision.gameObject);
-                    health -= 35; // Lower health due to passing the cube
-                    combo = 0; // Reset combo
-
-                    StartCoroutine(ChangeTextCombo());
-                }
-            }
-=======
->>>>>>> f8c0879 (updated some config stuff, long cubes finished, visualizer now plays on the entire foreground (ui included))
+        
            
         }
         if (collision.gameObject.name.Contains("hitter02"))
@@ -671,16 +615,24 @@ public class PlayerMovement : MonoBehaviour
 
     private IEnumerator OnTriggerEnter2DBuffer()
     {
-<<<<<<< HEAD
-        bufferActive = true;
-        Debug.Log("Buffer active!");
+        if (bufferActive)
+        {
+            float elapsedTime = 0f;
+            float duration = 0.1f;
+            elapsedTime += Time.deltaTime;
+            int newDestroyedCubes = counter.score + 1;
+            counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
+            scoreText.text = counter.score.ToString("N0");
+            // Ensure the score reaches the final value precisely
+            counter.score = newDestroyedCubes;
+            health += 0.25f;
+            yield return null;
+        }
 
-        int newDestroyedCubes = counter.score + 1;
-        counter.score = newDestroyedCubes;
-        scoreText.text = counter.score.ToString("N0");
-        health += 0.25f;
+
         yield return null;
     }
+
     private void ProcessCollision(Collider2D collision)
     {
         StopCoroutine(OnTriggerEnter2DBuffer());
@@ -712,26 +664,7 @@ public class PlayerMovement : MonoBehaviour
         comboTime = 0;
     }
 
-=======
-        if (bufferActive)
-        {
-            float elapsedTime = 0f;
-            float duration = 0.1f;
-            elapsedTime += Time.deltaTime;
-            int newDestroyedCubes = counter.score + 1;
-            counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
-            scoreText.text = counter.score.ToString("N0");
-            // Ensure the score reaches the final value precisely
-            counter.score = newDestroyedCubes;
-            health += 0.25f;
-            yield return null;
-        }
 
-
-        yield return null;
-    }
-   
->>>>>>> f8c0879 (updated some config stuff, long cubes finished, visualizer now plays on the entire foreground (ui included))
     private void OnTriggerStay2D(Collider2D collision)
     {
         if (collision.gameObject.name.Contains("hitter02") && collision.transform.position.y == transform.position.y)
@@ -740,19 +673,11 @@ public class PlayerMovement : MonoBehaviour
             if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.Y) || Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.K) || Input.GetKeyDown(KeyCode.L)) && !isDying)
             {
                 bufferActive = true;
-<<<<<<< HEAD
-                StartCoroutine(OnTriggerEnter2DBuffer());
-=======
->>>>>>> f8c0879 (updated some config stuff, long cubes finished, visualizer now plays on the entire foreground (ui included))
+
             }
             else if ((Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L)) && !isDying)
             {
-<<<<<<< HEAD
-                Debug.Log("tested by you");
-                StopCoroutine(OnTriggerEnter2DBuffer());
-=======
                 StartCoroutine(OnTriggerEnter2DBuffer());
->>>>>>> f8c0879 (updated some config stuff, long cubes finished, visualizer now plays on the entire foreground (ui included))
             }
 
             else if (!(Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L)) && !isDying)
