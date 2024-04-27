@@ -170,13 +170,8 @@ public class CustomLevelDataManager : MonoBehaviour
 
             // Set the width of the SpriteRenderer
             longCubeRenderer.size = new Vector2(width, 1);
-<<<<<<< HEAD
-            collider.size = new Vector2(width - 0.15f, 0.75f);
-            collider.offset = new Vector2(width / 2f, 0f);
-=======
             collider.size = new Vector2(width + 0.5f, 0.75f);
             collider.offset = new Vector2(width / 1.965f, 0f);
->>>>>>> f8c0879 (updated some config stuff, long cubes finished, visualizer now plays on the entire foreground (ui included))
             Debug.Log("Instantiated long cube");
         }
         if (sceneData.picLocation != null)
