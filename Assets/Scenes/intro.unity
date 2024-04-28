@@ -5426,7 +5426,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "v0.32 - \xA9 Pricklety 2021-2024"
+  m_Text: "v0.3.2 - \xA9 Pricklety 2021-2024"
 --- !u!222 &787129919
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5713,7 +5713,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textComponent: {fileID: 1114790789}
   filePath: texts.txt
-  anim: {fileID: 0}
 --- !u!114 &1114790788
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using UnityEngine.Rendering.PostProcessing;
 using System.Collections;
+using NUnit.Framework.Constraints;
 
 [System.Serializable]
 public class VisualizerLine
@@ -24,14 +25,11 @@ public class MusicVisualizer : MonoBehaviour
     private AudioSource musicAudioSource; 
     public Camera cam;
     public PostProcessVolume vol;
-    private DepthOfField depth;
     public Image customImage;
 
     void Start()
     {
         SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-        StartCoroutine(CalculateRMS());
-        vol.profile.TryGetSettings(out depth);
         musicAudioSource = GameObject.Find("mainmenu").GetComponent<AudioSource>();
 
         if (musicAudioSource == null)
@@ -65,6 +63,7 @@ public class MusicVisualizer : MonoBehaviour
                 }
             }
         }
+        StartCoroutine(CalculateRMS());
     }
 
     void OnEnable()
@@ -102,19 +101,7 @@ public class MusicVisualizer : MonoBehaviour
                     }
                 }
 
-                if (data.bgVisualizer)
-                {
-
-                    float depthvalue = rms * 500;
-                    FloatParameter par = new FloatParameter() { value = depthvalue };
-                    depth.focalLength.value = par;
-
-                }
-                else
-                {
-                    depth.focalLength.value = 0;
-
-                }
+               
                 // Apply the same effect to the customImage
                 if (customImage != null && data.logoVisualizer)
                 {
@@ -130,7 +117,9 @@ public class MusicVisualizer : MonoBehaviour
             }
 
             yield return null; // Wait for the next frame
+
         }
+
     }
 
     float GetRMS(AudioSource audioSource)

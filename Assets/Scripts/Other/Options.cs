@@ -38,7 +38,6 @@ public class Options : MonoBehaviour
     public Toggle vidBG;
     public Toggle cursorTrail;
     public Toggle allVis;
-    public Toggle bgVis;
     public Toggle lineVis;
     public Toggle logoVis;
     public Dropdown antiAliasing;
@@ -287,7 +286,6 @@ public class Options : MonoBehaviour
         settingsData.cursorTrail = cursorTrail.isOn;
         settingsData.allVisualizers = allVis.isOn;
         settingsData.lineVisualizer = lineVis.isOn;
-        settingsData.bgVisualizer = bgVis.isOn;
         settingsData.logoVisualizer = logoVis.isOn;
         settingsData.antialiasing = antiAliasing.value;
         settingsData.noFocusVolume = unfocusVol.value;
@@ -470,7 +468,6 @@ public class Options : MonoBehaviour
             allVisualizers = allVis.isOn,
             lineVisualizer = lineVis.isOn,
             logoVisualizer = logoVis.isOn,
-            bgVisualizer = bgVis.isOn,
             antialiasing = antiAliasing.value,
             noFocusVolume = unfocusVol.value,
             lowpassValue = lowpass.value,
@@ -693,15 +690,13 @@ public class Options : MonoBehaviour
         if (allVis.isOn)
         {
             logoVis.isOn = true;
-            bgVis.isOn = true;
             lineVis.isOn = true;
         }
-        else if (!logoVis.isOn || !bgVis.isOn || !lineVis.isOn)
+        else if (!logoVis.isOn || !lineVis.isOn)
             allVis.isOn = false;
         else if (!allVis.isOn)
         {
             logoVis.isOn = false;
-            bgVis.isOn = false;
             lineVis.isOn = false;
         }
 

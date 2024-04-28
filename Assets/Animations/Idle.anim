@@ -383,11 +383,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-<<<<<<< HEAD
-        value: -750
-=======
         value: -1050
->>>>>>> 6b904cf (changes.)
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -407,11 +403,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.y
-<<<<<<< HEAD
-    path: Tips
-=======
     path: Panel
->>>>>>> 6b904cf (changes.)
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -532,11 +524,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-<<<<<<< HEAD
-      path: 3290361398
-=======
       path: 1668086795
->>>>>>> 6b904cf (changes.)
       attribute: 538195251
       script: {fileID: 0}
       typeID: 224
@@ -932,11 +920,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-<<<<<<< HEAD
-        value: -750
-=======
         value: -1050
->>>>>>> 6b904cf (changes.)
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -956,11 +940,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_AnchoredPosition.y
-<<<<<<< HEAD
-    path: Tips
-=======
     path: Panel
->>>>>>> 6b904cf (changes.)
     classID: 224
     script: {fileID: 0}
     flags: 0

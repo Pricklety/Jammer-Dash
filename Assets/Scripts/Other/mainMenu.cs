@@ -766,14 +766,28 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     {
         quitPanel.SetActive(true);
 
-        // Set target value for Lowpass filter
-        lowpassTargetValue = 500;  // Adjust the cutoff frequency as needed
-
-        // Start coroutine for fading
-        StartCoroutine(FadeLowpass());
 
         Application.wantsToQuit += QuitHandler;
-
+        PostProcessVolume volume = FindFirstObjectByType<PostProcessVolume>();
+        if (volume != null)
+        {
+            PostProcessProfile profile = volume.profile;
+            Vignette vignette;
+            if (profile.TryGetSettings(out vignette))
+            {
+                vignette.intensity.value = 0.75f;
+            }
+            else
+            {
+                // Settings couldn't be retrieved
+                Debug.LogWarning("Vignette settings not found in the Post Process Profile.");
+            }
+        }
+        else
+        {
+            // PostProcessVolume not found in the scene
+            Debug.LogWarning("Post Process Volume not found in the scene.");
+        }
     }
 
     // Call this method when hiding the quit panel
@@ -781,21 +795,15 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     {
         quitPanel.SetActive(false);
 
-        // Set target value for Lowpass filter
-        lowpassTargetValue = 22000;  // Adjust the cutoff frequency as needed
-
-        // Start coroutine for fading
-        StartCoroutine(FadeLowpass());
-
         Application.wantsToQuit -= QuitHandler;
-        PostProcessVolume volume = FindObjectOfType<PostProcessVolume>();
+        PostProcessVolume volume = FindFirstObjectByType<PostProcessVolume>();
         if (volume != null)
         {
             PostProcessProfile profile = volume.profile;
             Vignette vignette;
             if (profile.TryGetSettings(out vignette))
             {
-                vignette.intensity.value = 0;
+                vignette.intensity.value = 0f;
             }
             else
             {
@@ -814,6 +822,8 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     private IEnumerator FadeLowpass()
     {
         SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+
+        lowpassTargetValue = data.lowpassValue;
         float timer = 0f;
         float startValue = lowpassTargetValue;  // Initial value based on fade in or out
 
@@ -1110,14 +1120,14 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         {
 
             // Check if quitTime exceeds quitTimer
-            if (quitTime >= quitTimer)
+            if (quitTime >= quitTimer && !quitPanel.active)
             {
                 audioMixer.SetFloat("Lowpass", 500);
                 quitPanel2.color = new Color(quitPanel2.color.r, quitPanel2.color.g, quitPanel2.color.b, 1.0f); // Set color to fully opaque
                 Application.Quit(); // Quit application
             }
-            else
-            {
+            else if (quitTime < quitTimer && !quitPanel.active)
+            { 
                 Debug.Log(quitTime);
                 quitTime += Time.unscaledDeltaTime;
                 quitPanel2.color = Color.Lerp(new Color(0, 0, 0, 0), new Color(0, 0, 0, 1), quitTime / quitTimer);
