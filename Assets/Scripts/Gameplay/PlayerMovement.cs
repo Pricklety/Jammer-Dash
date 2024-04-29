@@ -161,7 +161,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        health -= 0.25f;
+        if (SceneManager.GetActiveScene().buildIndex != 2)
+            health -= 0.25f;
+        else
+            health -= 0.1f;
         hpint = (int)health;
         hpText.text = hpint.ToString() + "/" + maxHealth.ToString("0");
         // Move player right

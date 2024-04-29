@@ -1036,27 +1036,10 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         levelSlider.value = LevelSystem.Instance.currentXP;
         if (LevelSystem.Instance.currentXP > 0)
         {
-            levelText.text = "Level: " + LevelSystem.Instance.level.ToString() + $" (XP: {LevelSystem.Instance.currentXP:N0}; Total: {playerData.totalXP:N0})";
+            levelText.text = "lv" + LevelSystem.Instance.level.ToString() + $" (XP: {playerData.totalXP:N0})";
 
         }
-        bool hasInput = Input.GetMouseButtonDown(0);
-        idleTimer += Time.fixedDeltaTime; 
-        if (!hasInput)
-        {
-            // Player is idle, start the idle animation immediately if it's not already playing
-            if (idleTimer > idleTimeThreshold || Input.GetKeyDown(KeyCode.F1))
-            {
-                animator.SetTrigger("StartIdle");
-                animator.ResetTrigger("StopIdle");
-            }
-            
-        }
-        else if (hasInput && !IsPointerOverUIButNotButton())
-        {
-            idleTimer = 0;  // Resetting idleTimer when there is input
-            animator.SetTrigger("StopIdle");
-            animator.ResetTrigger("StartIdle");
-        }
+        
         if (Input.GetKeyDown(KeyCode.F2))
         {
             additionalPanel.SetActive(!additionalPanel.active);
@@ -1080,17 +1063,15 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         data = SettingsFileHandler.LoadSettingsFromFile();
         if (data.parallax)
         {
-            const float backgroundScaleFactor = 1.08f;
+            const float backgroundScaleFactor = 1.05f;
             const float cameraMovementFactor = 2f;
             const float maxMovementOffset = 2f;
-            const float edgeMargin = 10f;
-            const float maxLayerMovement = 15f;
 
             // Background parallax effect
             background.localScale = new Vector3(backgroundScaleFactor, backgroundScaleFactor, 1);
 
             Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 mouseDelta = new Vector3(mouseWorldPos.x * cameraMovementFactor, mouseWorldPos.y / 15, 0);
+            Vector3 mouseDelta = new Vector3(mouseWorldPos.x / 3, mouseWorldPos.y / 35, 0);
 
             float cameraMovement = Mathf.Clamp(mouseDelta.x, -maxMovementOffset, maxMovementOffset) * backgroundParallaxSpeed * Time.unscaledDeltaTime;
             Vector3 backgroundOffset = new Vector3(cameraMovement, 0, 0);
@@ -1100,7 +1081,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
             float layerMovement = 0;
 
             // Calculate the adjustment based on mouseDelta
-            Vector3 layerMouseDelta = new Vector3(Mathf.Clamp(mouseDelta.x / 3, -25, 25), mouseDelta.y, mouseDelta.z);
+            Vector3 layerMouseDelta = new Vector3(Mathf.Clamp(mouseDelta.x / 1.07f, -25, 25), mouseDelta.y, mouseDelta.z);
 
             // Calculate the new position relative to the current position
             float newPositionX = layerMouseDelta.x / 10;
@@ -1146,6 +1127,28 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
             quitTime = 0f;
             quitPanel2.color = new Color(quitPanel2.color.r, quitPanel2.color.g, quitPanel2.color.b, 0f); // Set color to fully transparent
             audioMixer.SetFloat("Lowpass", 22000);
+        }
+    }
+
+    void Update()
+    {
+        bool hasInput = Input.GetMouseButtonDown(0);
+        idleTimer += Time.fixedDeltaTime;
+        if (!hasInput)
+        {
+            // Player is idle, start the idle animation immediately if it's not already playing
+            if (idleTimer > idleTimeThreshold || Input.GetKeyDown(KeyCode.F1))
+            {
+                animator.SetTrigger("StartIdle");
+                animator.ResetTrigger("StopIdle");
+            }
+
+        }
+        else if (hasInput && !IsPointerOverUIButNotButton())
+        {
+            idleTimer = 0;  // Resetting idleTimer when there is input
+            animator.SetTrigger("StopIdle");
+            animator.ResetTrigger("StartIdle");
         }
     }
 

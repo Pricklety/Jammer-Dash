@@ -52,10 +52,10 @@ public class RandomTextDisplay : MonoBehaviour
     }
 
 
-    private void FixedUpdate()
+    private void Update()
     {
         time += Time.fixedDeltaTime;
-        if (Input.GetKeyDown(KeyCode.H) || time > 10f)
+        if (Input.GetKeyDown(KeyCode.H) || time > 5f)
         {
             time = 0f;
             StartCoroutine(Change());

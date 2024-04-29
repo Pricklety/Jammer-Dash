@@ -22,7 +22,7 @@ public class CustomLevelDataManager : MonoBehaviour
     private void Awake()
     {
         // Singleton pattern
-        if (Instance == null)
+        if (Instance == null)   
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
