@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Windows;
@@ -216,6 +217,9 @@ public class Options : MonoBehaviour
         if (audio != null)
         {
             audio.SetMasterVolume(volume);
+            audio.masterS.value = volume; 
+            float intVol = Mathf.RoundToInt(Mathf.InverseLerp(-80f, 0f, volume) * 100f);
+            audio.masterS.GetComponentInChildren<Text>().text = "Master: " + intVol;
         }
     }
 
@@ -223,6 +227,7 @@ public class Options : MonoBehaviour
     public void PlaySelectedAudio(int index)
     {
         audio.Play(index);
+        StartCoroutine(audio.ChangeSprite());
     }
 
 
@@ -435,7 +440,7 @@ public class Options : MonoBehaviour
     private void ApplyMasterVolume(float volume)
     {
         masterVolumeSlider.value = volume;
-
+        
         // Update AudioManager with the new master volume
         if (audio != null)
         {
@@ -685,7 +690,14 @@ public class Options : MonoBehaviour
             }
             
         }
-
+        if (EventSystem.current.currentSelectedGameObject == masterVolumeSlider.gameObject)
+        {
+            audio.masterS.gameObject.SetActive(true);
+        }
+        else if (EventSystem.current.currentSelectedGameObject == masterVolumeSlider.gameObject && Input.GetAxisRaw("Mouse ScrolLWheel") == 0)
+        {
+            audio.masterS.gameObject.SetActive(false);
+        }
 
         if (allVis.isOn)
         {

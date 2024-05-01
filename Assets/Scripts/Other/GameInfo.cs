@@ -3,6 +3,7 @@ using System.Collections;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class GameInfo : MonoBehaviour
@@ -11,7 +12,6 @@ public class GameInfo : MonoBehaviour
     public string musicFolderPath = "music"; // Now it's PersistentDataPath/music
 
     private AudioSource musicAudioSource; 
-    private float highestRecordedAmplitude = 0f;
 
     void Start()
     {
@@ -24,7 +24,7 @@ public class GameInfo : MonoBehaviour
             musicAudioSource = FindObjectOfType<AudioSource>();
         }
 
-        InvokeRepeating("UpdateGameInfo", 0f, 0.05f);
+        InvokeRepeating("UpdateGameInfo", 0f, 0.25f);
     }
 
     void UpdateGameInfo()
@@ -33,12 +33,12 @@ public class GameInfo : MonoBehaviour
         gameInfoText.text = "";
 
         DisplayTimeInfo();
-        DisplayMusicList();
+        DisplayList();
     }
 
    
 
-    void DisplayMusicList()
+    void DisplayList()
     {
         // Get all music files in the specified folder
         string musicFolderPathFull = Path.Combine(Application.persistentDataPath, musicFolderPath);
@@ -46,21 +46,14 @@ public class GameInfo : MonoBehaviour
 
 
         // Display total music count
-        string totalMusicCount = "Total Music Count: " + musicFiles.Length + "\n\n";
+        string totalMusicCount = "Playlist length: " + musicFiles.Length.ToString("n0") + " songs\n\n" +
+            "Player level: " + LevelSystem.Instance.level + "\n" +
+            "Total score: " + LevelSystem.Instance.totalXP.ToString("N0") + "\n";
 
         gameInfoText.text += totalMusicCount + "----------------\n\n";
     }
 
-    private string FormatTime(float time)
-    {
-        int minutes = Mathf.FloorToInt(time / 60);
-        int seconds = Mathf.FloorToInt(time % 60);
-
-        // Ensure seconds don't go beyond 59
-        seconds = Mathf.Clamp(seconds, 0, 59);
-
-        return string.Format("{0:00}:{1:00}", minutes, seconds);
-    }
+   
 
     void DisplayTimeInfo()
     {

@@ -113,13 +113,44 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         RefreshInternetConnection();
         LoadLevelsFromFiles();
         LoadLevelFromLevels();
-        levelSlider.maxValue = LevelSystem.Instance.xpRequiredPerLevel[LevelSystem.Instance.level];
+        levelSlider.maxValue = LevelSystem.Instance.xpRequiredPerLevel[0];
         levelSlider.value = LevelSystem.Instance.currentXP;
 
         discordpfp.texture = DiscordManager.current.CurrentUser.avatar;
         discordName.text = DiscordManager.current.CurrentUser.username + "\n\nID: " +
         DiscordManager.current.CurrentUser.ID;
-       
+        
+
+    }
+    public string FormatNumber(float number)
+    {
+        string formattedNumber;
+
+        if (number < 1000)
+        {
+            formattedNumber = number.ToString();
+            return formattedNumber;
+        }
+        else if (number < 1000000)
+        {
+            formattedNumber = (number / 1000f).ToString("F2") + "K";
+            return formattedNumber;
+        }
+        else if (number < 1000000000)
+        {
+            formattedNumber = (number / 1000000f).ToString("F2") + "M";
+            return formattedNumber;
+        }
+        else if (number < 1000000000000)
+        {
+            formattedNumber = (number / 1000000000f).ToString("F2") + "B";
+            return formattedNumber;
+        }
+        else
+        {
+            formattedNumber = (number / 1000000000000f).ToString("F2") + "T";
+            return formattedNumber;
+        }
     }
     public void LoadLevelFromLevels()
     {
@@ -1031,13 +1062,28 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     }
     public void FixedUpdate()
     {
-        LevelSystem.Instance.initialXPRequirement = LevelSystem.Instance.xpRequiredPerLevel[LevelSystem.Instance.level];
-        levelSlider.maxValue = LevelSystem.Instance.initialXPRequirement;
-        levelSlider.value = LevelSystem.Instance.currentXP;
+        LevelSystem.Instance.initialXPRequirement = LevelSystem.Instance.xpRequiredPerLevel[0];
+
+        if (LevelSystem.Instance.initialXPRequirement > float.MaxValue)
+        {
+            levelSlider.maxValue = float.MaxValue;
+            float normalizedValue = (float)(LevelSystem.Instance.currentXP / LevelSystem.Instance.initialXPRequirement);
+            levelSlider.value = normalizedValue * levelSlider.maxValue;
+        }
+        else
+        {
+            levelSlider.maxValue = (float)LevelSystem.Instance.initialXPRequirement;
+            levelSlider.value = Mathf.Min((float)LevelSystem.Instance.currentXP, levelSlider.maxValue);
+        }
         if (LevelSystem.Instance.currentXP > 0)
         {
-            levelText.text = "lv" + LevelSystem.Instance.level.ToString() + $" (XP: {playerData.totalXP:N0})";
+            levelText.text = "lv" + LevelSystem.Instance.level.ToString() + $" (XP: {FormatNumber(playerData.totalXP)})";
 
+        }
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            LoadLevelFromLevels();
+            LoadLevelsFromFiles();
         }
         
         if (Input.GetKeyDown(KeyCode.F2))
@@ -1084,7 +1130,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
             Vector3 layerMouseDelta = new Vector3(Mathf.Clamp(mouseDelta.x / 1.07f, -25, 25), mouseDelta.y, mouseDelta.z);
 
             // Calculate the new position relative to the current position
-            float newPositionX = layerMouseDelta.x / 10;
+            float newPositionX = layerMouseDelta.x / 30;
 
             // Set the new position
             logo.position = new Vector3(newPositionX, mouseDelta.y, mouseDelta.z);
@@ -1095,7 +1141,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
             background.position = Vector3.zero;
             logo.position = new Vector3(0, 0, 0);
         }
-        musicText.text = $"{AudioManager.Instance.GetComponent<AudioSource>().clip.name} - {AudioManager.Instance.GetComponent<AudioSource>().time}/{AudioManager.Instance.GetComponent<AudioSource>().clip.length}";
+        musicText.text = $"{AudioManager.Instance.GetComponent<AudioSource>().clip.name} - {AudioManager.Instance.GetComponent<AudioSource>().time:0.00}/{AudioManager.Instance.GetComponent<AudioSource>().clip.length:0.00}";
 
         if (Input.GetKey(KeyCode.Escape))
         {

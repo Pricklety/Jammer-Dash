@@ -164,7 +164,7 @@ public class AudioManager : MonoBehaviour
             songPlayed = false;
         }
         
-        AudioSource[] audios = FindObjectsOfType<AudioSource>();
+        AudioSource[] audios = FindObjectsByType<AudioSource>(FindObjectsSortMode.None);
         float value1 = Input.GetAxisRaw("Mouse ScrollWheel");
         float volumeChangeSpeed = 1f;
 
@@ -178,7 +178,7 @@ public class AudioManager : MonoBehaviour
 
 
         SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-        if (value1 != 0 && !IsScrollingUI() && data.wheelShortcut)
+        if (Input.GetKey(KeyCode.LeftShift) && value1 != 0 && !IsScrollingUI() && data.wheelShortcut)
         {
             timer = 0f; // Increment timer each frame
             // Activate masterS GameObject if it's not active
@@ -289,9 +289,13 @@ public class AudioManager : MonoBehaviour
         // Check if mouse is over a ScrollRect
         if (eventSystem != null && eventSystem.IsPointerOverGameObject())
         {
-            ScrollRect scrollRect = FindObjectOfType<ScrollRect>();
+            ScrollRect scrollRect = FindFirstObjectByType<ScrollRect>();
             if (scrollRect != null && RectTransformUtility.RectangleContainsScreenPoint(scrollRect.viewport, Input.mousePosition))
                 return true;
+        }
+        else
+        {
+            return false;
         }
 
         return false;
@@ -473,29 +477,31 @@ public class AudioManager : MonoBehaviour
     public void PlayNextSong(bool isLoading)
     {
         float cooldown = 0f;
-        cooldown += Time.fixedDeltaTime;
+        cooldown += Time.unscaledDeltaTime;
         if (songPathsList != null && songPathsList.Count > 0 && (!isLoading || cooldown >= 5))
         {
             cooldown = 0f;
             isLoading = true;
-            currentClipIndex++;
-            if (currentClipIndex >= songPathsList.Count) 
-            {
+            if (Input.GetKey(KeyCode.LeftShift))
+                currentClipIndex = UnityEngine.Random.Range(0, songPathsList.Count);
+            else
+                currentClipIndex++;
+            if (currentClipIndex >= songPathsList.Count)
                 currentClipIndex = 0;
-            }
             Debug.Log(currentClipIndex);
-            PlayCurrentSong();
             cooldown = 0f;
             new WaitForSecondsRealtime(1f);
             SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
             if (data.bgTime == 0)
                 StartCoroutine(ChangeSprite());
+
+            PlayCurrentSong();
         }
     }
 
   
 
-    IEnumerator ChangeSprite()
+    public IEnumerator ChangeSprite()
     {
         mainMenu menu = options.GetComponent<mainMenu>();
 

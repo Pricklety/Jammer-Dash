@@ -150,7 +150,7 @@ public class FinishLine : MonoBehaviour
             writer.WriteLine($"{levelID},{tierName},{destName},{actualdest},{destruction}");
         }
     }
-    float LoadLevelData(int levelID, string fileName, float destruction)
+    long LoadLevelData(int levelID, string fileName, long destruction)
     {
         string filePath = Path.Combine(Application.persistentDataPath, fileName + ".dat");
 
@@ -194,18 +194,18 @@ public class FinishLine : MonoBehaviour
     {
         coroutineRunning = true;
         PlayerMovement objectOfType = FindObjectOfType<PlayerMovement>();
-        float destruction = objectOfType.counter.score;
+        long destruction = objectOfType.counter.score;
         float actualdest = (float)player0.counter.destructionPercentage;
         if (SceneManager.GetActiveScene().name != "LevelDefault")
         {
             Scene activeScene = SceneManager.GetActiveScene(); 
-            float lastScore = LoadLevelData(activeScene.buildIndex, "scores", destruction);
-            float currentScore = player0.counter.score;
-            float scoreDifference = currentScore - lastScore;
+            long lastScore = LoadLevelData(activeScene.buildIndex, "scores", destruction);
+            long currentScore = player0.counter.score;
+            long scoreDifference = currentScore - lastScore;
             // Add the score difference as XP
             if (scoreDifference > 0)
             {
-                float xpToAdd = scoreDifference;
+                long xpToAdd = scoreDifference;
                 LevelSystem.Instance.GainXP(xpToAdd);
             }
             else if (lastScore == 0 && scoreDifference <= 0)
@@ -221,13 +221,13 @@ public class FinishLine : MonoBehaviour
             {
                 id = LevelDataManager.Instance.ID;
             }
-            float lastScore = LoadLevelData(id, "scores", destruction); 
-            float currentScore = player0.counter.score;
-            float scoreDifference = currentScore - lastScore;
+            long lastScore = LoadLevelData(id, "scores", destruction);
+            long currentScore = player0.counter.score;
+            long scoreDifference = currentScore - lastScore;
             // Add the score difference as XP
             if (scoreDifference > 0)
             {
-                float xpToAdd = scoreDifference;
+                long xpToAdd = scoreDifference;
                 LevelSystem.Instance.GainXP(xpToAdd);
             }
             else if (lastScore == 0)

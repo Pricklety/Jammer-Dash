@@ -8,19 +8,19 @@ using System.Runtime.Serialization.Formatters.Binary;
 public class PlayerData
 {
     public int level;
-    public float currentXP;
-    public Dictionary<int, float> xpRequiredPerLevel;
-    public float totalXP;
+    public long currentXP;
+    public Dictionary<int, long> xpRequiredPerLevel;
+    public long totalXP;
 }
 
 public class LevelSystem : MonoBehaviour
 {
     public int level = 0;
-    public float currentXP = 0;
-    public float initialXPRequirement = 250000;
-    public float xpGrowthRate = 1.2f;
-    public Dictionary<int, float> xpRequiredPerLevel = new Dictionary<int, float>();
-    public float totalXP = 0;
+    public long currentXP = 0;
+    public double initialXPRequirement = 250000; // Changed to double for better precision
+    public float xpGrowthRate = 1.1f;
+    public Dictionary<int, long> xpRequiredPerLevel = new Dictionary<int, long>();
+    public long totalXP = 0;
 
     public static LevelSystem Instance { get; private set; }
 
@@ -36,21 +36,20 @@ public class LevelSystem : MonoBehaviour
 
     void Start()
     {
-        totalXP = currentXP;
         LoadPlayerData();
     }
 
     void CalculateXPRequirements()
     {
-        float xpRequirement = initialXPRequirement;
+        double xpRequirement = initialXPRequirement;
         for (int i = 0; i < 10000; i++)
         {
-            xpRequiredPerLevel[i] = xpRequirement;
+            xpRequiredPerLevel[i] = Convert.ToInt64(xpRequirement); // Convert to long
             xpRequirement *= xpGrowthRate;
         }
     }
 
-    public void GainXP(float amount)
+    public void GainXP(long amount)
     {
         currentXP += amount;
         totalXP += amount;
@@ -69,8 +68,8 @@ public class LevelSystem : MonoBehaviour
             }
             else
             {
-                initialXPRequirement *= xpGrowthRate;
-                xpRequiredPerLevel[level] = initialXPRequirement;
+                initialXPRequirement = initialXPRequirement * xpGrowthRate;
+                xpRequiredPerLevel[level] = Convert.ToInt64(initialXPRequirement);
             }
             currentXP -= xpRequiredPerLevel[level - 1];
         }
