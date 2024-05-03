@@ -60,8 +60,6 @@ public class EditorManager : MonoBehaviour
     public LineController lineControllerPrefab;
     public Text artistText;
     public Text nameText;
-    public Slider downloadSlider;
-    public Text downloadText;
     public Slider playback;
     public Text playbackText;
     public GameObject linePrefab;
@@ -370,16 +368,8 @@ public class EditorManager : MonoBehaviour
         // Start the request asynchronously
         var operation = www.SendWebRequest();
 
-        // Update loading text to indicate completion
-        downloadSlider.gameObject.SetActive(true);
-        // Keep updating loading progress until the request is done
         while (!operation.isDone)
         {
-            // Calculate loading progress
-            float progress = operation.progress;
-            // Update loading text
-            downloadText.text = $"Downloading: {www.downloadedBytes / 1024768} MB";
-            downloadSlider.value = operation.progress;
             Debug.Log(filePath);
             yield return null;
         }
@@ -389,7 +379,6 @@ public class EditorManager : MonoBehaviour
         {
             LevelDataManager.Instance.LoadLevelData(LevelDataManager.Instance.levelName);
             Debug.LogError($"Failed to load audio clip: {www.error}");
-            downloadText.text = "Failed to download the song. Restarting...";
             Debug.Log(filePath);
 
             yield break;
@@ -397,8 +386,6 @@ public class EditorManager : MonoBehaviour
 
         // Get the loaded audio clip
         AudioClip loadedAudioClip = DownloadHandlerAudioClip.GetContent(www);
-        // Update loading text to indicate completion
-        downloadSlider.gameObject.SetActive(false);
 
         string directoryPath = Path.Combine(Application.persistentDataPath, "scenes", sceneNameInput.text);
 
@@ -456,10 +443,6 @@ public class EditorManager : MonoBehaviour
         // Keep updating loading progress until the request is done
         while (!operation.isDone)
         {
-            downloadSlider.gameObject.SetActive(true);
-            // Update loading text
-            downloadSlider.value = operation.progress;
-            downloadText.text = $"{formattedPath}: {www.downloadedBytes / 1024768} MB";
             Debug.Log(fileName);
             yield return null;
         }
@@ -471,17 +454,16 @@ public class EditorManager : MonoBehaviour
         {
             Debug.LogError($"Failed to load custom audio clip: {www.error}");
             Debug.Log(fileName);
-            downloadText.text = "Failed to download the song.";
         }
 
         else if (www.result == UnityWebRequest.Result.Success)
         {
-            downloadSlider.gameObject.SetActive(false);
             loadedAudioClip = DownloadHandlerAudioClip.GetContent(www);
             lineController.audioClip = loadedAudioClip;
             loadedAudioClip.name = Path.GetFileName(fileName);
             nameText.text = loadedAudioClip.name;
             audio.clip = loadedAudioClip;
+            musicFolderPath = filePath;
 
         }
 
@@ -496,16 +478,10 @@ public class EditorManager : MonoBehaviour
         // Start the request asynchronously
         var operation = www.SendWebRequest();
 
-        // Update loading text to indicate completion
-        downloadSlider.gameObject.SetActive(true);
-        // Keep updating loading progress until the request is done
         while (!operation.isDone)
         {
             // Calculate loading progress
             float progress = operation.progress;
-            // Update loading text
-            downloadText.text = $"Downloading: {www.downloadedBytes / 1024768} MB";
-            downloadSlider.value = operation.progress;
 
             Debug.Log(formattedPath);
 
@@ -516,13 +492,10 @@ public class EditorManager : MonoBehaviour
         if (www.result != UnityWebRequest.Result.Success)
         {
             Debug.LogError($"Failed to load audio clip: {www.error}");
-            downloadText.text = "Failed to download the song. Restarting...";
         }
 
         // Get the loaded audio clip
         AudioClip loadedAudioClip = DownloadHandlerAudioClip.GetContent(www);
-        // Update loading text to indicate completion
-        downloadSlider.gameObject.SetActive(false);
         // Set the audio source clip
         loadedAudioClip.name = Path.GetFileName(fileName);
         nameText.text = loadedAudioClip.name;
@@ -660,6 +633,7 @@ public class EditorManager : MonoBehaviour
 
             // Get the directory path based on the scene name
             string directoryPath = GetLevelDataPath(sceneData.levelName);
+            Debug.Log(directoryPath);
 
             // Check if the directory exists before proceeding
             if (!Directory.Exists(directoryPath))
@@ -967,7 +941,6 @@ public class EditorManager : MonoBehaviour
         if (Input.GetMouseButton(0) && Input.GetKey(KeyCode.LeftShift) && selectedObject != null && selectedObject.gameObject.name.Contains("hitter02"))
         {
             float mouseSpeed = Input.GetAxis("Mouse X");
-
             // Calculate the change in size based on the mouse movement direction
             float newSizeX = selectedObject.GetComponent<SpriteRenderer>().size.x + (mouseSpeed * Time.unscaledDeltaTime * (isCursorOnRightSide ? 1 : -1));
             // Clamp the size within the specified limits
@@ -1086,29 +1059,7 @@ public class EditorManager : MonoBehaviour
         string json = File.ReadAllText(file);
         SceneData data = SceneData.FromJson(json);
         levelID.text = "Level ID: " + data.ID;
-        // Find the farthest object in X direction
-        if (cubes.Count > 0)
-        {
-
-            Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));// Calculate the distance based on the position of the farthest object and additional distance
-        float cdistance = targetObject.position.x + additionalDistance;
-            List<Vector2> cubePositions = new List<Vector2>();
-
-            for (int i = 0; i < cubes.Count && i < longCubes.Count; i++)
-            {
-                // Get the position of the cube and add it to the list
-                Vector2 cubePos = cubes[i].transform.position;
-                cubePositions.Add(cubePos);
-
-                // Get the position of the long cube and add it to the list
-                Vector2 longCubePos = longCubes[i].transform.position;
-                cubePositions.Add(longCubePos);
-            }
-
-            // Calculate the number of cubes per Y level
-            int[] cubesPerY = CalculateCubesPerY(cubePositions.ToArray());
-        difficulty.text = "Live Level Difficulty: " + CalculateDifficulty(cubesPerY, cubePositions.ToArray(), cdistance / 7);
-        }
+       
 
         
 
@@ -1118,7 +1069,30 @@ public class EditorManager : MonoBehaviour
         }
         
         if (Input.GetMouseButtonUp(0) && timer < 0.125f && delay >= delayLimit && itemButtons[currentButtonPressed].clicked && !pointerOverUI && !player.enabled)
-        {
+        { 
+            if (cubes.Count > 0)
+            {
+
+                Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));// Calculate the distance based on the position of the farthest object and additional distance
+                float cdistance = targetObject.position.x + additionalDistance;
+                List<Vector2> cubePositions = new List<Vector2>();
+
+                for (int i = 0; i < cubes.Count && i < longCubes.Count; i++)
+                {
+                    // Get the position of the cube and add it to the list
+                    Vector2 cubePos = cubes[i].transform.position;
+                    cubePositions.Add(cubePos);
+
+                    // Get the position of the long cube and add it to the list
+                    Vector2 longCubePos = longCubes[i].transform.position;
+                    cubePositions.Add(longCubePos);
+                }
+
+
+                // Calculate the number of cubes per Y level
+                int[] cubesPerY = CalculateCubesPerY(cubePositions.ToArray());
+                difficulty.text = "Live Level Difficulty: " + CalculateDifficulty(cubesPerY, cubePositions.ToArray(), cdistance / 7);
+            }
             timer = 0f;
             delay = 0;
             Debug.Log(itemButtons[currentButtonPressed]);
@@ -1726,7 +1700,7 @@ public class EditorManager : MonoBehaviour
         
         string directoryPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
 
-        if (sceneData.songName.Length >= 36)
+        if (sceneData.songName.Length >= 96)
             sceneData.songName += ".mp3";
         string newPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, sceneData.songName);
         newPath = newPath.Replace("/", "\\");
@@ -1799,6 +1773,7 @@ public class EditorManager : MonoBehaviour
 
     private SceneData CreateLevelSceneData()
     {
+        SaveSceneData();
         Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));
 
         // Calculate the distance based on the position of the farthest object and additional distance
@@ -1828,32 +1803,37 @@ public class EditorManager : MonoBehaviour
             clip = audio.clip,
             ground = groundToggle.isOn,
             levelLength = (int)(distance / 7),
-            creator = creator.text
+            creator = creator.text,
+            
         };
+        string newPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", sceneData.levelName, sceneData.songName);
+        newPath = newPath.Replace("\\", "/");
         if (sceneData.ID == 0)
             sceneData.ID = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
         // Get the source and destination paths
         string sourceFolderPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
         string destinationFolderPath = Path.Combine(Application.persistentDataPath, "levels", sceneData.levelName);
+
         // Create the destination directory if it doesn't exist
         Directory.CreateDirectory(destinationFolderPath);
 
-        // Get the files in the source directory and copy them to the destination directory
-        foreach (string filePath in Directory.GetFiles(sourceFolderPath))
+        // Copy files and directories from source to destination
+        foreach (string sourcePath in Directory.GetFiles(sourceFolderPath, "*", SearchOption.AllDirectories))
         {
-            string fileName = Path.GetFileName(filePath);
-            string destFilePath = Path.Combine(destinationFolderPath, fileName);
-            File.Copy(filePath, destFilePath, true);
+            string relativePath = sourcePath.Substring(sourceFolderPath.Length + 1);
+            string destinationPath = Path.Combine(destinationFolderPath, relativePath);
+
+            string destinationDirectory = Path.GetDirectoryName(destinationPath);
+            if (!Directory.Exists(destinationDirectory))
+            {
+                Directory.CreateDirectory(destinationDirectory);
+            }
+
+            File.Copy(sourcePath, destinationPath, true);
         }
 
-        // Recursively copy subdirectories
-        foreach (string subDirPath in Directory.GetDirectories(sourceFolderPath))
-        {
-            string subDirName = Path.GetFileName(subDirPath);
-            string destSubDirPath = Path.Combine(destinationFolderPath, subDirName);
-            File.Copy(subDirPath, destSubDirPath); // Recursive call
-        }
-        string[] existingFiles = Directory.GetFiles(destinationFolderPath, "*.mp3");
+        // Delete files in the destination directory that don't match the current song name
+        string[] existingFiles = Directory.GetFiles(destinationFolderPath, "*.mp3", SearchOption.AllDirectories);
         foreach (string filePath in existingFiles)
         {
             // Get the file name without extension
@@ -1867,6 +1847,7 @@ public class EditorManager : MonoBehaviour
             }
         }
 
+        sceneData.clipPath = newPath;
         // Create a ZIP file with the .jdl extension
         string zipFilePath = Path.Combine(Application.persistentDataPath, "levels", $"{sceneData.levelName}.jdl");
         if (File.Exists(zipFilePath))

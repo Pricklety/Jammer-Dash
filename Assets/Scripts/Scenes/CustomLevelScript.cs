@@ -115,7 +115,7 @@ public class CustomLevelScript : MonoBehaviour
         LevelDataManager.Instance.creator = null;
         LevelDataManager.Instance.diff = 0;
         LevelDataManager.Instance.ID = 0;
-        string json = File.ReadAllText(Application.persistentDataPath + $"/scenes/{levelNameText.text}/" + $"{levelNameText.text}.json");
+        string json = File.ReadAllText(Application.persistentDataPath + $"/levels/extracted/{levelNameText.text}/" + $"{levelNameText.text}.json");
         SceneData sceneData = SceneData.FromJson(json);
         CustomLevelDataManager data = CustomLevelDataManager.Instance;
         data.levelName = levelNameText.text;

@@ -14,7 +14,6 @@ public class introManager : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(LoadMusicAndMenu()); 
         if (!Directory.Exists(Path.Combine(Application.persistentDataPath,"backgrounds")))
         {
             Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "backgrounds"));
@@ -24,6 +23,7 @@ public class introManager : MonoBehaviour
             PlayerPrefs.DeleteAll();
             PlayerPrefs.SetInt("bootSafe031", 1);
         }
+        StartCoroutine(LoadMusicAndMenu());
     }
 
     
@@ -32,24 +32,9 @@ public class introManager : MonoBehaviour
             AsyncOperation operation = SceneManager.LoadSceneAsync(1);
             operation.allowSceneActivation = false;
 
-        new WaitForSecondsRealtime(5f);
-        while (true)
-        {
-            if (operation.progress >= 0.9f)
-                {
-                    if (!sceneActivationAllowed && Input.anyKeyDown)
-                    {
-                        sceneActivationAllowed = true;
-                        operation.allowSceneActivation = true;
-                        break;
-                    }
-                }
-
-                yield return null;
-            }
-
-            
-        
+        yield return new WaitForSecondsRealtime(13f);
+        sceneActivationAllowed = true;
+        operation.allowSceneActivation = true;
     }
 }
 

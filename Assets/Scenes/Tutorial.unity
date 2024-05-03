@@ -3972,9 +3972,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 235796958}
-        m_TargetAssemblyTypeName: RestartCustom, Assembly-CSharp
-        m_MethodName: LoadScene
+      - m_Target: {fileID: 353979856}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
+        m_MethodName: Restart
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7460,9 +7460,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 410889685}
-        m_TargetAssemblyTypeName: RestartCustom, Assembly-CSharp
-        m_MethodName: LoadScene
+      - m_Target: {fileID: 353979856}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
+        m_MethodName: Restart
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -23425,9 +23425,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1411073839}
-        m_TargetAssemblyTypeName: RestartCustom, Assembly-CSharp
-        m_MethodName: LoadScene
+      - m_Target: {fileID: 353979856}
+        m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
+        m_MethodName: Restart
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

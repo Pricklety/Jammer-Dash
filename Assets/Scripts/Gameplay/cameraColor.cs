@@ -114,29 +114,18 @@ public class cameraColor : MonoBehaviour
     {
         if (SceneManager.GetActiveScene().name == "LevelDefault")
         {
-
             startColorG = ground.GetComponent<SpriteRenderer>().color;
-            targetColor = player.combo < 250 ? startColor : Random.ColorHSV();
-            targetColorG = player.combo < 250 ? Color.white : Random.ColorHSV();
+            targetColor = player.combo < 500 ? startColor : Random.ColorHSV();
+            targetColorG = player.combo < 500 ? Color.white : Random.ColorHSV();
             t = 0f; // Reset time
         }
         else if (SceneManager.GetActiveScene().buildIndex < 25)
         {
-            startColor = Camera.main.backgroundColor;
             startColorG = ground.GetComponent<SpriteRenderer>().color;
-            targetColor = player.combo < 250 ? startColor : Random.ColorHSV();
-            targetColorG = player.combo < 250 ? Color.white : Random.ColorHSV();
+            targetColor = player.combo < 500 ? startColor : Random.ColorHSV();
+            targetColorG = player.combo < 500 ? Color.white : Random.ColorHSV();
             t = 0f; // Reset time
         }
-        else
-        {
-            startColor = Camera.main.backgroundColor;
-            startColorG = ground.GetComponent<SpriteRenderer>().color;
-            targetColor = player.combo < 250 ? startColor : Random.ColorHSV();
-            targetColorG = player.combo < 250 ? Color.white : Random.ColorHSV();
-            t = 0f; // Reset time
-        }
-
     }
 
     private void UpdateBackgroundColor()

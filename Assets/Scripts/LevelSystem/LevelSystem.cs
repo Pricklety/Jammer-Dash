@@ -1,82 +1,84 @@
 using UnityEngine;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-[Serializable]
-public class PlayerData
-{
-    public int level;
-    public long currentXP;
-    public Dictionary<int, long> xpRequiredPerLevel;
-    public long totalXP;
-}
-
 public class LevelSystem : MonoBehaviour
 {
-    public int level = 0;
+    public int level = 1;
     public long currentXP = 0;
-    public double initialXPRequirement = 250000; // Changed to double for better precision
-    public float xpGrowthRate = 1.1f;
-    public Dictionary<int, long> xpRequiredPerLevel = new Dictionary<int, long>();
+    public long[] xpRequiredPerLevel; 
     public long totalXP = 0;
-
     public static LevelSystem Instance { get; private set; }
-
 
     private void Awake()
     {
         if (Instance == null)
         {
-            DontDestroyOnLoad(this);
             Instance = this;
         }
-    }
-
-    void Start()
-    {
-        LoadPlayerData();
-    }
-
-    void CalculateXPRequirements()
-    {
-        double xpRequirement = initialXPRequirement;
-        for (int i = 0; i < 10000; i++)
+        else
         {
-            xpRequiredPerLevel[i] = Convert.ToInt64(xpRequirement); // Convert to long
-            xpRequirement *= xpGrowthRate;
+            Debug.LogWarning("Duplicate instance of LevelSystem found. Destroying the new one.");
+            Destroy(gameObject);
         }
     }
-
+    private void Start()
+    {
+        CalculateXPRequirements();
+        LoadTotalXP();
+    }
+    
     public void GainXP(long amount)
     {
         currentXP += amount;
         totalXP += amount;
-        CheckForLevelUp();
-        SavePlayerData();
-    }
-
-    public void CheckForLevelUp()
-    {
-        while (xpRequiredPerLevel.ContainsKey(level) && currentXP >= xpRequiredPerLevel[level])
+        if (currentXP >= xpRequiredPerLevel[level])
         {
-            level++;
-            if (xpRequiredPerLevel.ContainsKey(level))
-            {
-                initialXPRequirement = xpRequiredPerLevel[level];
-            }
-            else
-            {
-                initialXPRequirement = initialXPRequirement * xpGrowthRate;
-                xpRequiredPerLevel[level] = Convert.ToInt64(initialXPRequirement);
-            }
-            currentXP -= xpRequiredPerLevel[level - 1];
+            LevelUp();
+            SavePlayerData();
+        }
+        else
+        {
+            SavePlayerData();
         }
     }
 
+    // Method to level up
+    private void LevelUp()
+    {
+        currentXP -= xpRequiredPerLevel[level];
+        level++;
 
-    void SavePlayerData()
+        if (currentXP >= xpRequiredPerLevel[level])
+        {
+            LevelUp();
+        }
+        Debug.Log("Level Up! You are now level " + level);
+    }
+
+    public void CalculateXPRequirements()
+    {
+        long initialXP = 250000L; 
+        float growthRate = 1.10f;
+        xpRequiredPerLevel = new long[201];
+
+        xpRequiredPerLevel[0] = initialXP;
+        for (int i = 1; i < 201; i++)
+        {
+            Debug.Log((long)(xpRequiredPerLevel[i - 1] * growthRate));
+            xpRequiredPerLevel[i] = (long)(xpRequiredPerLevel[i - 1] * growthRate);
+        }
+
+        // Debug logs to check the array
+        Debug.Log("XP Required Per Level:");
+        for (int i = 0; i < xpRequiredPerLevel.Length; i++)
+        {
+            Debug.Log("Level " + (i + 1) + ": " + xpRequiredPerLevel[i]);
+        }
+    }
+
+    // Method to save player data
+    public void SavePlayerData()
     {
         PlayerData data = new PlayerData
         {
@@ -93,31 +95,6 @@ public class LevelSystem : MonoBehaviour
         formatter.Serialize(stream, data);
         stream.Close();
     }
-
-    public void LoadPlayerData()
-    {
-        string path = Application.persistentDataPath + "/playerData.dat";
-        if (File.Exists(path))
-        {
-            BinaryFormatter formatter = new BinaryFormatter();
-            FileStream stream = new FileStream(path, FileMode.Open);
-
-            PlayerData data = formatter.Deserialize(stream) as PlayerData;
-            stream.Close();
-
-            level = data.level;
-            currentXP = data.currentXP;
-            xpRequiredPerLevel = data.xpRequiredPerLevel;
-            totalXP = data.totalXP;
-
-            CheckForLevelUp();
-        }
-        else
-        {
-            CalculateXPRequirements();
-        }
-    }
-
     public PlayerData LoadTotalXP()
     {
         string path = Application.persistentDataPath + "/playerData.dat";
@@ -132,7 +109,7 @@ public class LevelSystem : MonoBehaviour
 
             level = data.level;
             currentXP = data.currentXP;
-            xpRequiredPerLevel = data.xpRequiredPerLevel;
+            totalXP = data.totalXP;
             return data;
         }
         else
@@ -141,4 +118,13 @@ public class LevelSystem : MonoBehaviour
             return null;
         }
     }
+}
+
+[System.Serializable]
+public class PlayerData
+{
+    public int level;
+    public long currentXP;
+    public long[] xpRequiredPerLevel;
+    public long totalXP;
 }

@@ -133,7 +133,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         }
         else if (number < 1000000)
         {
-            formattedNumber = (number / 1000f).ToString("F2") + "K";
+            formattedNumber = (number / 1000f).ToString("F1") + "K";
             return formattedNumber;
         }
         else if (number < 1000000000)
@@ -143,18 +143,18 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         }
         else if (number < 1000000000000)
         {
-            formattedNumber = (number / 1000000000f).ToString("F2") + "B";
+            formattedNumber = (number / 1000000000f).ToString("F3") + "B";
             return formattedNumber;
         }
         else
         {
-            formattedNumber = (number / 1000000000000f).ToString("F2") + "T";
+            formattedNumber = (number / 1000000000000f).ToString("F4") + "T";
             return formattedNumber;
         }
     }
     public void LoadLevelFromLevels()
     {
-        foreach (Transform child in levelInfoParent)
+        foreach (Transform child in playlevelInfoParent)
         {
             if (child.GetComponent<CustomLevelScript>())
             {
@@ -1062,17 +1062,16 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     }
     public void FixedUpdate()
     {
-        LevelSystem.Instance.initialXPRequirement = LevelSystem.Instance.xpRequiredPerLevel[0];
 
-        if (LevelSystem.Instance.initialXPRequirement > float.MaxValue)
+        if (LevelSystem.Instance.xpRequiredPerLevel[LevelSystem.Instance.level] > float.MaxValue)
         {
             levelSlider.maxValue = float.MaxValue;
-            float normalizedValue = (float)(LevelSystem.Instance.currentXP / LevelSystem.Instance.initialXPRequirement);
+            float normalizedValue = (float)(LevelSystem.Instance.currentXP / LevelSystem.Instance.xpRequiredPerLevel[LevelSystem.Instance.level]);
             levelSlider.value = normalizedValue * levelSlider.maxValue;
         }
         else
         {
-            levelSlider.maxValue = (float)LevelSystem.Instance.initialXPRequirement;
+            levelSlider.maxValue = (float)LevelSystem.Instance.xpRequiredPerLevel[LevelSystem.Instance.level];
             levelSlider.value = Mathf.Min((float)LevelSystem.Instance.currentXP, levelSlider.maxValue);
         }
         if (LevelSystem.Instance.currentXP > 0)
@@ -1084,6 +1083,9 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         {
             LoadLevelFromLevels();
             LoadLevelsFromFiles();
+            LevelSystem.Instance.CalculateXPRequirements();
+            LevelSystem.Instance.GainXP(0);
+            LevelSystem.Instance.LoadTotalXP();
         }
         
         if (Input.GetKeyDown(KeyCode.F2))
