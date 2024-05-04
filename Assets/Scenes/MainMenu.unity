@@ -8702,7 +8702,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000061035156}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 1390}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &105419980
@@ -14964,6 +14964,7 @@ GameObject:
   - component: {fileID: 292500446}
   - component: {fileID: 292500445}
   - component: {fileID: 292500444}
+  - component: {fileID: 292500447}
   m_Layer: 5
   m_Name: Button (Legacy) (2)
   m_TagString: Untagged
@@ -15085,6 +15086,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 292500442}
   m_CullTransparentMesh: 1
+--- !u!114 &292500447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 292500442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db7d01bc933f27143a65ab22c43e8d6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AudioSource: {fileID: 279895835}
+  ClickSound: {fileID: 8300000, guid: b09936d466992064c869725fed1b9bdc, type: 3}
 --- !u!1 &294193783
 GameObject:
   m_ObjectHideFlags: 0
@@ -22126,7 +22141,7 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2028465957}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.2873757}
+  m_AnchorMin: {x: 0, y: 0.28776985}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
@@ -24624,6 +24639,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2104727914}
+  - {fileID: 1850696596}
   m_Father: {fileID: 1546917946}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
@@ -24670,7 +24686,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 437255370}
   m_OnClick:
     m_PersistentCalls:
@@ -55049,6 +55065,7 @@ GameObject:
   - component: {fileID: 1324533659}
   - component: {fileID: 1324533658}
   - component: {fileID: 1324533657}
+  - component: {fileID: 1324533660}
   m_Layer: 5
   m_Name: Button (Legacy) (1)
   m_TagString: Untagged
@@ -55170,6 +55187,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1324533654}
   m_CullTransparentMesh: 1
+--- !u!114 &1324533660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324533654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db7d01bc933f27143a65ab22c43e8d6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AudioSource: {fileID: 0}
+  ClickSound: {fileID: 8300000, guid: b09936d466992064c869725fed1b9bdc, type: 3}
 --- !u!1 &1326720021
 GameObject:
   m_ObjectHideFlags: 0
@@ -55446,6 +55477,7 @@ GameObject:
   - component: {fileID: 1331101058}
   - component: {fileID: 1331101057}
   - component: {fileID: 1331101056}
+  - component: {fileID: 1331101059}
   m_Layer: 5
   m_Name: Button (Legacy) (4)
   m_TagString: Untagged
@@ -55567,6 +55599,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1331101053}
   m_CullTransparentMesh: 1
+--- !u!114 &1331101059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1331101053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db7d01bc933f27143a65ab22c43e8d6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AudioSource: {fileID: 279895835}
+  ClickSound: {fileID: 8300000, guid: b09936d466992064c869725fed1b9bdc, type: 3}
 --- !u!1 &1331432108
 GameObject:
   m_ObjectHideFlags: 0
@@ -59713,28 +59759,32 @@ MonoBehaviour:
   m_text: "<b>General</b>\r\n\u203A Added a top panel for some function buttons.\r\n\u203A
     Added functions (F1-F12):\r\n\u203A\u203A F1 - Idle mode (menu)\r\n\u203A\u203A
     F2 - Debug mode/Advanced mode (menu)\r\n\u203A\u203A F3 - Enable fun mode (menu)\r\n\u203A\u203A
-    F9 - Reload the playlist and shuffle it (global)\r\n\u203A\u203A F12 - Take a
-    screenshot (global)\r\n\r\n<b>Menu</b>\r\n\u203A Improved menu accessibility
-    by removing \"menu paths\"\r\n\u203A New cursor texture\r\n\u203A New April fools
-    thing (Editor not recommended for use).\r\n\u203A New tutorial with a video background
-    (Only level ever)\r\n\u203A Moved options, music, credits and advanced to the
-    top panel.\r\n\u203A Added a home button for more accessibility\r\n\u203A New
-    changelogs panel\r\n\u203A Entire music rework\r\n\u203A Removed the multiplayer
-    panel.\r\n\u203A Added Edit button to the main screen\r\n\u203A Improved visualizer
-    reaction time (7500 > 3000)\r\n\u203A Improved logo reaction time (7500 > 1500)\r\n\u203A
-    Updated Debug to version 11\r\n\u203A Added tips\r\n\u203A Hold ESC to Quit\r\n\r\n<b>Editor</b>\r\n\u203A
+    F5 - Reload level lists and xp system. (menu)\r\n\u203A\u203A F9 - Reload the
+    playlist and shuffle it (global)\r\n\u203A\u203A F12 - Take a screenshot (global)\r\n\r\n<b>Intro</b>\r\n\u203A
+    New warnings.\r\n\u203A Temporarily removed easter egg messages (in v0.3.3 they
+    will be a change between tips and funny messages in options)\r\n\r\n<b>Menu</b>\r\n\u203A
+    Improved menu accessibility by removing \"menu paths\"\r\n\u203A New cursor texture\r\n\u203A
+    New April fools thing (Editor not recommended for use).\r\n\u203A New tutorial
+    with a video background (Only level ever)\r\n\u203A Moved options, music, credits
+    and advanced to the top panel.\r\n\u203A Added a home button for more accessibility\r\n\u203A
+    New changelogs panel\r\n\u203A Entire music loading rework\r\n\u203A Removed
+    the multiplayer panel.\r\n\u203A Added Edit button to the main screen\r\n\u203A
+    Improved visualizer reaction time (7500 > 3000)\r\n\u203A Improved logo reaction
+    time (7500 > 1500)\r\n\u203A Updated Debug to version 11\r\n\u203A Added tips\r\n\u203A
+    Hold ESC to Quit\r\n\u203A Notifications (v0.3.3 will add beta support)\r\n\r\n<b>Editor</b>\r\n\u203A
     New editor object: Long cubes. Shift + left click to change width.\r\n\u203A
     Changed the Options and the Menu UI a little bit.\r\n\r\n<b>Fun Mode</b>\r\n\u203A
     Visualizer v2\r\n\u203A Random sound effect\r\n\r\n<b>Gameplay</b>\r\n\u203A
     Each combo will play a random hit sounds (Toggle in settings)\r\n\u203A New hit
     object: Long cubes.\r\n\u203A Removed level breaks\r\n\u203A InputSystem implementation.
-    Polling rate changed from 60Hz to 1,000Hz\r\n\r\n<b>Options</b>\r\n\u203A Option
-    to confine your mouse to window (disabled by default)\r\n\u203A Option to toggle
-    the menu parallax (enabled by default)\r\n\u203A Option to toggle random hit
-    sounds (enabled by default)\r\n\u203A Option to change gameplay rotation (right
-    by default)\r\n\u203A Option to change background update time (song change by
-    default)\r\n\r\n<b>Bugfixes</b>\r\n\u203A Fixed a bug where some specific file
-    names won't load (Now it's using better URI loading)\r\n\u203A Fixed 50+ bugs\r\n\r"
+    Polling rate changed from 60Hz to 1,000Hz\r\n\r\n\r\n<b>Options</b>\r\n\u203A
+    Option to confine your mouse to window (disabled by default)\r\n\u203A Option
+    to toggle the menu parallax (enabled by default)\r\n\u203A Option to toggle random
+    hit sounds (enabled by default)\r\n\u203A Option to change gameplay rotation
+    (right by default)\r\n\u203A Option to change background update time (song change
+    by default)\r\n\r\n<b>Bugfixes</b>\r\n\u203A Fixed a bug where some specific
+    file names won't load (Now it's using better URI loading)\r\n\u203A Fixed 50+
+    bugs\r"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -59761,7 +59811,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
+  m_fontSize: 16
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -74372,6 +74422,7 @@ GameObject:
   - component: {fileID: 1839379445}
   - component: {fileID: 1839379444}
   - component: {fileID: 1839379443}
+  - component: {fileID: 1839379446}
   m_Layer: 5
   m_Name: Button (Legacy) (3)
   m_TagString: Untagged
@@ -74493,6 +74544,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1839379440}
   m_CullTransparentMesh: 1
+--- !u!114 &1839379446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1839379440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db7d01bc933f27143a65ab22c43e8d6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AudioSource: {fileID: 279895835}
+  ClickSound: {fileID: 8300000, guid: b09936d466992064c869725fed1b9bdc, type: 3}
 --- !u!1 &1839416327
 GameObject:
   m_ObjectHideFlags: 0
@@ -75194,6 +75259,101 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1846836246}
+  m_CullTransparentMesh: 1
+--- !u!1 &1850696595
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1850696596}
+  - component: {fileID: 1850696599}
+  - component: {fileID: 1850696598}
+  - component: {fileID: 1850696597}
+  m_Layer: 5
+  m_Name: Text (Legacy)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1850696596
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1850696595}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 437255368}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: -10, y: -5}
+  m_SizeDelta: {x: 170, y: 30}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1850696597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1850696595}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 1, y: -1}
+  m_UseGraphicAlpha: 1
+--- !u!114 &1850696598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1850696595}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 7c0b515b83a842543b4707fb23261b5c, type: 3}
+    m_FontSize: 16
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 1
+    m_MaxSize: 40
+    m_Alignment: 6
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: Coming in v0.3.3
+--- !u!222 &1850696599
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1850696595}
   m_CullTransparentMesh: 1
 --- !u!1 &1852119695
 GameObject:
@@ -76176,7 +76336,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 361756907}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.7126243
+  m_Size: 0.71223015
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -76555,6 +76715,7 @@ GameObject:
   - component: {fileID: 1885104527}
   - component: {fileID: 1885104526}
   - component: {fileID: 1885104525}
+  - component: {fileID: 1885104528}
   m_Layer: 5
   m_Name: Button (Legacy)
   m_TagString: Untagged
@@ -76676,6 +76837,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1885104523}
   m_CullTransparentMesh: 1
+--- !u!114 &1885104528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885104523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db7d01bc933f27143a65ab22c43e8d6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AudioSource: {fileID: 279895835}
+  ClickSound: {fileID: 8300000, guid: b09936d466992064c869725fed1b9bdc, type: 3}
 --- !u!1 &1896698705
 GameObject:
   m_ObjectHideFlags: 0
@@ -83074,7 +83249,7 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'v0.3.2
 
-    <size=6>May 2024</size>'
+    <size=6>May 4, 2024</size>'
 --- !u!222 &2071922757
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -83967,7 +84142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.38679248, g: 0.38679248, b: 0.38679248, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
