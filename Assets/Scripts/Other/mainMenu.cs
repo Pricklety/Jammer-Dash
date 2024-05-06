@@ -25,7 +25,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     public Sprite[] sprite;
     private bool quittingAllowed = false;
     public SettingsData data;
-    public float quitTimer = 3f;
+    public float quitTimer = 1f;
     public float quitTime = 0f;
     public Image quitPanel2;
     PlayerData playerData;
@@ -537,7 +537,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         string path = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
         string filePath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, $"{sceneData.levelName}.json");
         string musicPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, $"{sceneData.songName}");
-        string defSongPath = Path.Combine(Application.streamingAssetsPath, "music", "Pricklety - Fall'd");
+        string defSongPath = Path.Combine(Application.streamingAssetsPath, "music", "Pricklety - Fall'd.mp3");
         defSongPath.Replace("\\", "/");
         sceneData.clipPath = defSongPath;
         if (Directory.Exists(path))
@@ -665,7 +665,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     private void ToggleMenuPanel(GameObject panel)
     {
         // Toggle the specified panel directly if it's changelogs or creditsPanel
-        if (panel == changelogs || panel == creditsPanel || panel == funMode)
+        if (panel == changelogs || panel == creditsPanel || panel == funMode || panel == community)
         {
             panel.SetActive(!panel.activeSelf);
 
@@ -954,8 +954,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
    
     public void CommunityOpen()
     {
-        community.SetActive(true);
-        mainPanel.SetActive(false);
+        ToggleMenuPanel(community);
     }
 
 
@@ -1119,7 +1118,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
             background.localScale = new Vector3(backgroundScaleFactor, backgroundScaleFactor, 1);
 
             Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 mouseDelta = new Vector3(mouseWorldPos.x / 3, mouseWorldPos.y / 35, 0);
+            Vector3 mouseDelta = new Vector3(-mouseWorldPos.x / 1.5f, -mouseWorldPos.y / 30, 0);
 
             float cameraMovement = Mathf.Clamp(mouseDelta.x, -maxMovementOffset, maxMovementOffset) * backgroundParallaxSpeed * Time.unscaledDeltaTime;
             Vector3 backgroundOffset = new Vector3(cameraMovement, 0, 0);
@@ -1129,13 +1128,14 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
             float layerMovement = 0;
 
             // Calculate the adjustment based on mouseDelta
-            Vector3 layerMouseDelta = new Vector3(Mathf.Clamp(mouseDelta.x / 1.07f, -25, 25), mouseDelta.y, mouseDelta.z);
+            Vector3 layerMouseDelta = new Vector3(Mathf.Clamp(-mouseDelta.x / 1.07f, -25, 25), Mathf.Clamp(-mouseDelta.y / 1.07f, -25, 25), mouseDelta.z);
 
             // Calculate the new position relative to the current position
             float newPositionX = layerMouseDelta.x / 30;
+            float newPositionY = layerMouseDelta.y / 2;
 
             // Set the new position
-            logo.position = new Vector3(newPositionX, mouseDelta.y, mouseDelta.z);
+            logo.position = new Vector3(newPositionX, newPositionY, mouseDelta.z);
         }
         else
         {

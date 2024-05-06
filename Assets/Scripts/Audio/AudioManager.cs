@@ -33,7 +33,7 @@ public class AudioManager : MonoBehaviour
     public Slider masterS;
     public bool sfx;
     public bool hits;
-    float timer = 0f;
+    public float timer = 0f;
     bool paused = false;
         
     private void Awake()

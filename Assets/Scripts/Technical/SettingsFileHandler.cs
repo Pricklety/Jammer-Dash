@@ -61,7 +61,6 @@ public class SettingsData
     public bool parallax = true;
     public bool randomSFX = true;
     public bool confinedMouse = false;
-    public int gameplayDir = 0;
     public int bgTime = 0;
     public bool wheelShortcut = true;
     public string gameVersion = Application.version;

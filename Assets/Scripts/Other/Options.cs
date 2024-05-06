@@ -258,7 +258,6 @@ public class Options : MonoBehaviour
         hitType.value = settingsData.hitType;
         trailFade.value = settingsData.cursorFade;
         parallax.isOn = settingsData.parallax;
-        gameplayDir.value = settingsData.gameplayDir;
         randomSFX.isOn = settingsData.randomSFX;
         confineMouse.isOn = settingsData.confinedMouse;
         wheelShortcut.isOn = settingsData.wheelShortcut;
@@ -299,7 +298,6 @@ public class Options : MonoBehaviour
         settingsData.isShowingFPS = showFPS.isOn;
         settingsData.cursorFade = trailFade.value;
         settingsData.parallax = parallax.isOn;
-        settingsData.gameplayDir = gameplayDir.value;
         settingsData.randomSFX = randomSFX.isOn;
         settingsData.confinedMouse = confineMouse.isOn;
         settingsData.wheelShortcut = wheelShortcut.isOn;
@@ -482,7 +480,6 @@ public class Options : MonoBehaviour
             hitType = hitType.value,
             cursorFade = trailFade.value,
             parallax = parallax.isOn,
-            gameplayDir = gameplayDir.value,
             randomSFX = randomSFX.isOn,
             confinedMouse = confineMouse.isOn,
             wheelShortcut = wheelShortcut.isOn,
@@ -694,7 +691,7 @@ public class Options : MonoBehaviour
         {
             audio.masterS.gameObject.SetActive(true);
         }
-        else if (EventSystem.current.currentSelectedGameObject == masterVolumeSlider.gameObject && Input.GetAxisRaw("Mouse ScrolLWheel") == 0)
+        else if (!EventSystem.current.currentSelectedGameObject == masterVolumeSlider.gameObject && audio.timer > 2f)
         {
             audio.masterS.gameObject.SetActive(false);
         }

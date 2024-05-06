@@ -76,8 +76,7 @@ public class StatsMan : MonoBehaviour
     {
         SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
         bool scoretype = Convert.ToBoolean(data.scoreType);
-        string a = scoretype ? "Old" : "New"; 
-        string direction = Convert.ToBoolean(data.gameplayDir) ? "Left" : "Right";
+        string a = scoretype ? "Old" : "New";
         string bg = "";
         switch(data.bgTime)
         {
@@ -111,8 +110,7 @@ public class StatsMan : MonoBehaviour
                     "\nShowing FPS: " + data.isShowingFPS +
                     "\nParallax: " + data.parallax +
                     "\nRandom hit sounds: " + data.randomSFX +
-                    "\nConfined mouse: " + data.confinedMouse +
-                    "\nGameplay Direction: " + direction +
+                    "\nConfined mouse: " + data.confinedMouse + 
                     "\nBackground Time: " + bg;
 
     }
