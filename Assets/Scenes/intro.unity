@@ -5515,7 +5515,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "v0.3.2.1 - \xA9 Pricklety 2021-2024"
+  m_Text: "v0.3.2.2 - \xA9 Pricklety 2021-2024"
 --- !u!222 &787129919
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6385,8 +6385,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   christmasClip: {fileID: 8300000, guid: 00d4753eb0241904b9a883034988a92f, type: 3}
   normalClip: {fileID: 8300000, guid: 080760d7773622e409370a89f0e77dee, type: 3}
-  normalClipIndex: 1
-  christmasClipIndex: 2
+  normalClipIndex: 0
+  christmasClipIndex: 1
 --- !u!114 &1287563241
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6406,6 +6406,7 @@ MonoBehaviour:
   masterS: {fileID: 12790229}
   sfx: 0
   hits: 0
+  timer: 0
 --- !u!114 &1287563243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7675,7 +7676,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ba780a6bac3c3343a22d9058f20d395, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trailColor: {r: 1, g: 0.996, b: 0.682, a: 1}
+  trailColor: {r: 1, g: 1, b: 1, a: 1}
   distanceFromCamera: 5
   trailImage: {fileID: 0}
 --- !u!114 &2810003823231954469

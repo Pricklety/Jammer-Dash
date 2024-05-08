@@ -28,14 +28,14 @@ public class SongProgress : MonoBehaviour
             string levelJsonFilePath = Path.Combine(levelsFolderPath, $"{levelName}.json");
             string sceneJsonFilePath = Path.Combine(Application.persistentDataPath, "scenes", levelName, $"{levelName}.json");
 
-            if (File.Exists(levelJsonFilePath))
+            if (File.Exists(levelJsonFilePath) && !string.IsNullOrEmpty(CustomLevelDataManager.Instance.levelName))
             {
                 // Load level data from "levels" folder
                 string json = File.ReadAllText(levelJsonFilePath);
                 SceneData sceneData = SceneData.FromJson(json);
                 StartCoroutine(LoadAudioClip(sceneData.songName, levelsFolderPath));
             }
-            else if (File.Exists(sceneJsonFilePath))
+            else if (File.Exists(sceneJsonFilePath) && string.IsNullOrEmpty(CustomLevelDataManager.Instance.levelName))
             {
                 // Load level data from "scenes" folder if "levels" folder doesn't contain the file
                 string json = File.ReadAllText(sceneJsonFilePath);
@@ -79,9 +79,10 @@ public class SongProgress : MonoBehaviour
         string filePath = Path.Combine(folderPath, fileName);
         string formattedPath = "file://" + filePath.Replace("\\", "/");
         formattedPath = Uri.EscapeUriString(formattedPath);
+        Debug.LogWarning(formattedPath);
         formattedPath = formattedPath.Replace("+", "%2B");
         Debug.Log(formattedPath);
-        using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(formattedPath, AudioType.MPEG);
+        using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(formattedPath, AudioType.UNKNOWN);
 
         // Start the request asynchronously
         var operation = www.SendWebRequest();
@@ -104,8 +105,7 @@ public class SongProgress : MonoBehaviour
         {
             Debug.LogError($"Failed to load audio clip: {www.error}");
             GameObject.Find("Canvas/default/loadingText").GetComponent<Text>().text = "Failed to download the song. Restarting...";
-            SceneManager.LoadScene("SampleScene");
-            CustomLevelDataManager.Instance.LoadLevelData(CustomLevelDataManager.Instance.levelName, CustomLevelDataManager.Instance.ID);
+            SceneManager.LoadSceneAsync(1);
             Time.timeScale = 1f;
 
             yield break;

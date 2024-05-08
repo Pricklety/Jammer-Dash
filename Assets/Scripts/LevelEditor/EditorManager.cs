@@ -326,8 +326,8 @@ public class EditorManager : MonoBehaviour
     public void LoadCustomMusic()
     {
         FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserCanvas")).GetComponent<FileBrowser>();
-        FileBrowser.SetFilters(true, new FileBrowser.Filter("Music", ".mp3"));
-        FileBrowser.SetDefaultFilter(".mp3");
+        FileBrowser.SetFilters(true, new FileBrowser.Filter("Music", ".mp3", ".wav", ".ogg"));
+        FileBrowser.SetDefaultFilter("Music");
         FileBrowser.ShowLoadDialog(SongSelected, null, FileBrowser.PickMode.Files, false, null, null, "Load Local song...", "Choose");
     }
     void SongSelected(string[] paths)
@@ -343,8 +343,8 @@ public class EditorManager : MonoBehaviour
     public void OpenDefaultMusic()
     {
         FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserLibraryCanvas")).GetComponent<FileBrowser>();
-        FileBrowser.SetFilters(true, new FileBrowser.Filter("Music", ".mp3"));
-        FileBrowser.SetDefaultFilter(".mp3");
+        FileBrowser.SetFilters(true, new FileBrowser.Filter("Music", ".mp3", ".wav", ".ogg"));
+        FileBrowser.SetDefaultFilter("Music");
         FileBrowser.ShowLoadDialog(DefaultSongSelected, null, FileBrowser.PickMode.Files, false, Application.streamingAssetsPath + "/music", null, "Choose From Library...", "Choose");
     }
 
@@ -360,82 +360,57 @@ public class EditorManager : MonoBehaviour
     public IEnumerator LoadCustomClip(string filePath)
     {
         string path = Path.Combine(Application.persistentDataPath, "scenes", sceneNameInput.text, sceneNameInput.text + ".json");
+        string levelPath = Path.Combine(Application.persistentDataPath, "scenes", sceneNameInput.text);
         string json = File.ReadAllText(path);
         SceneData data = SceneData.FromJson(json);
 
-        using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(filePath, AudioType.MPEG);
-
-        // Start the request asynchronously
-        var operation = www.SendWebRequest();
-
-        while (!operation.isDone)
-        {
-            Debug.Log(filePath);
-            yield return null;
-        }
+        // Load the audio clip directly without the need for asynchronous loading
+        using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(filePath, AudioType.UNKNOWN);
+        yield return www.SendWebRequest();
 
         // Check for errors
         if (www.result != UnityWebRequest.Result.Success)
         {
             LevelDataManager.Instance.LoadLevelData(LevelDataManager.Instance.levelName);
             Debug.LogError($"Failed to load audio clip: {www.error}");
-            Debug.Log(filePath);
-
             yield break;
         }
 
-        // Get the loaded audio clip
-        AudioClip loadedAudioClip = DownloadHandlerAudioClip.GetContent(www);
-
-        string directoryPath = Path.Combine(Application.persistentDataPath, "scenes", sceneNameInput.text);
-
-        // Check if the directory exists
-        if (Directory.Exists(directoryPath))
-        {
-            // Get all MP3 files in the directory
-            string[] mp3Files = Directory.GetFiles(directoryPath, "*.mp3");
-
-            // Iterate over each MP3 file
-            foreach (string mp3File in mp3Files)
-            {
-                // Get the file name without extension
-                string name = Path.GetFileName(mp3File);
-
-                // Check if the file name is not equal to data.songName
-                if (name != data.songName && data.songName != null)
-                {
-                    // Delete the MP3 file
-                    File.Delete(mp3File);
-                }
-            }
-        }
-        else
-        {
-            Debug.LogWarning($"Directory '{directoryPath}' does not exist.");
-        }
+        // Get the downloaded audio clip
+        AudioClip downloadedAudioClip = DownloadHandlerAudioClip.GetContent(www);
 
         // Set the audio source clip
-        loadedAudioClip.name = Path.GetFileName(filePath);
+        downloadedAudioClip.name = Path.GetFileName(filePath);
         Debug.Log(filePath);
-        nameText.text = loadedAudioClip.name;
-        audio.clip = loadedAudioClip;
-        lineController.audioClip = loadedAudioClip;
-        customSongName.text = loadedAudioClip.name;
+        nameText.text = downloadedAudioClip.name;
+        audio.clip = downloadedAudioClip;
+        lineController.audioClip = downloadedAudioClip;
+        customSongName.text = downloadedAudioClip.name;
         musicFolderPath = filePath;
-        
+        string[] audioFiles = Directory.GetFiles(levelPath, "*.wav");
+        audioFiles = audioFiles.Concat(Directory.GetFiles(levelPath, "*.ogg")).ToArray();
+        audioFiles = audioFiles.Concat(Directory.GetFiles(levelPath, "*.mp3")).ToArray();
+        Debug.Log(audioFiles.Length);
+        // Delete all existing audio files
+        foreach (string audioFile in audioFiles)
+        {
+            File.Delete(audioFile);
+            Debug.Log($"Deleted audio file: {audioFile}");
+        }
 
+        // Copy the downloaded audio file to the level path
+        string destinationFilePath = Path.Combine(levelPath, Path.GetFileName(filePath));
+        CopyFileDirectly(filePath, destinationFilePath);
         // Yield return the loaded audio clip
-        yield return loadedAudioClip;
+        yield return downloadedAudioClip;
     }
-
-
 
     private IEnumerator LoadCustomAudioClip(string fileName)
     {
         string filePath = Path.Combine(Application.persistentDataPath, "scenes", sceneNameInput.text, fileName);
         string formattedPath = "file://" + filePath.Replace("\\", "/");
 
-        using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(formattedPath, AudioType.MPEG);
+        using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(formattedPath, AudioType.UNKNOWN);
 
         // Start the request asynchronously
         var operation = www.SendWebRequest();
@@ -447,66 +422,87 @@ public class EditorManager : MonoBehaviour
             yield return null;
         }
 
-        AudioClip loadedAudioClip = null;
-
-
+        // Check for errors
         if (www.result != UnityWebRequest.Result.Success)
         {
             Debug.LogError($"Failed to load custom audio clip: {www.error}");
             Debug.Log(fileName);
+            yield break;
         }
 
-        else if (www.result == UnityWebRequest.Result.Success)
+        // Get the downloaded audio clip
+        AudioClip downloadedAudioClip = DownloadHandlerAudioClip.GetContent(www);
+
+        // Set the audio source clip
+        downloadedAudioClip.name = Path.GetFileNameWithoutExtension(fileName);
+        nameText.text = downloadedAudioClip.name;
+        audio.clip = downloadedAudioClip;
+        lineController.audioClip = downloadedAudioClip;
+        musicFolderPath = filePath;
+        // List all audio files in the directory
+        string[] audioFiles = Directory.GetFiles(Path.GetDirectoryName(filePath), "*.wav"); 
+        audioFiles = audioFiles.Concat(Directory.GetFiles(Path.GetDirectoryName(filePath), "*.ogg")).ToArray();
+        audioFiles = audioFiles.Concat(Directory.GetFiles(Path.GetDirectoryName(filePath), "*.mp3")).ToArray();
+
+        // Delete audio files that don't match the downloaded file name
+        foreach (string audioFile in audioFiles)
         {
-            loadedAudioClip = DownloadHandlerAudioClip.GetContent(www);
-            lineController.audioClip = loadedAudioClip;
-            loadedAudioClip.name = Path.GetFileName(fileName);
-            nameText.text = loadedAudioClip.name;
-            audio.clip = loadedAudioClip;
-            musicFolderPath = filePath;
-
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(audioFile);
+            if (fileNameWithoutExtension != downloadedAudioClip.name)
+            {
+                File.Delete(audioFile);
+                Debug.Log($"Deleted audio file: {audioFile}");
+            }
         }
 
-        yield return loadedAudioClip;
+        yield return downloadedAudioClip;
     }
+
     public IEnumerator LoadClip(string fileName)
     {
         string filePath = Path.Combine(Application.streamingAssetsPath, "music", fileName);
         string formattedPath = "file://" + filePath.Replace("\\", "/");
-        using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(formattedPath, AudioType.MPEG);
 
-        // Start the request asynchronously
-        var operation = www.SendWebRequest();
+        using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(formattedPath, AudioType.UNKNOWN);
+        yield return www.SendWebRequest();
 
-        while (!operation.isDone)
-        {
-            // Calculate loading progress
-            float progress = operation.progress;
-
-            Debug.Log(formattedPath);
-
-            yield return null;
-        }
-
-        // Check for errors
         if (www.result != UnityWebRequest.Result.Success)
         {
             Debug.LogError($"Failed to load audio clip: {www.error}");
+            yield break;
         }
 
-        // Get the loaded audio clip
-        AudioClip loadedAudioClip = DownloadHandlerAudioClip.GetContent(www);
+        // Get the downloaded audio clip
+        AudioClip downloadedAudioClip = DownloadHandlerAudioClip.GetContent(www);
+
         // Set the audio source clip
-        loadedAudioClip.name = Path.GetFileName(fileName);
-        nameText.text = loadedAudioClip.name;
-        audio.clip = loadedAudioClip;
-        lineController.audioClip = loadedAudioClip;
+        downloadedAudioClip.name = Path.GetFileNameWithoutExtension(fileName);
+        nameText.text = downloadedAudioClip.name;
+        audio.clip = downloadedAudioClip;
+        lineController.audioClip = downloadedAudioClip;
         musicFolderPath = filePath;
 
-        customSongName.text = loadedAudioClip.name;
+        customSongName.text = downloadedAudioClip.name;
+
+        string[] audioFiles = Directory.GetFiles(Path.GetDirectoryName(filePath), "*.wav");
+        audioFiles = audioFiles.Concat(Directory.GetFiles(Path.GetDirectoryName(filePath), "*.ogg")).ToArray();
+        audioFiles = audioFiles.Concat(Directory.GetFiles(Path.GetDirectoryName(filePath), "*.mp3")).ToArray();
+
+        // Delete audio files that don't match the downloaded file name
+        foreach (string audioFile in audioFiles)
+        {
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(audioFile);
+            if (fileNameWithoutExtension != downloadedAudioClip.name)
+            {
+                File.Delete(audioFile);
+                Debug.Log($"Deleted audio file: {audioFile}");
+            }
+        }
+
         // Yield return the loaded audio clip
-        yield return loadedAudioClip;
+        yield return downloadedAudioClip;
     }
+
 
     public void LoadSongBPM()
     {
@@ -1628,22 +1624,9 @@ public class EditorManager : MonoBehaviour
         return filePath;
     }
 
-    private string GetMusicDataPath(string sceneName)
-    {
-        string directoryPath = Path.Combine(Application.persistentDataPath, "scenes", sceneName);
-        Directory.CreateDirectory(directoryPath);
-
-        string filePath = Path.Combine(directoryPath + ".mp3");
-        filePath = filePath.Replace("\\", "/");
-        return filePath;
-    }
 
     private SceneData CreateSceneData()
     {
-        if (!customSongName.text.Contains(".mp3"))
-        {
-            customSongName.text += ".mp3";
-        }
         // Find the farthest object in X direction
         Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));
 
@@ -1668,7 +1651,7 @@ public class EditorManager : MonoBehaviour
         {
             levelName = sceneNameInput.text.Trim(),
             sceneName = sceneNameInput.text.Trim(),
-            songName = (audio.clip != null) ? customSongName.text : "Pricklety - Fall'd.mp3",
+            songName = (audio.clip != null) ? customSongName.text : "Pricklety - Fall'd",
             bpm = int.Parse(bpmInput.text),
             calculatedDifficulty = calculatedDifficulty,
             gameVersion = Application.version,
@@ -1700,26 +1683,10 @@ public class EditorManager : MonoBehaviour
         
         string directoryPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
 
-        if (sceneData.songName.Length >= 96)
-            sceneData.songName += ".mp3";
         string newPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, sceneData.songName);
         newPath = newPath.Replace("/", "\\");
         CopyFileDirectly(musicFolderPath, newPath);
         Debug.LogError(newPath);
-        string[] existingFiles = Directory.GetFiles(directoryPath, "*.mp3");
-        // Iterate through each file
-        foreach (string filePath in existingFiles)
-        {
-            // Get the file name without extension
-            string fileName = Path.GetFileName(filePath);
-
-            // Check if the file name is not equal to the current song name
-            if (fileName != sceneData.songName)
-            {
-                // Delete the file
-                File.Delete(filePath);
-            }
-        }
         
         sceneData.clipPath = newPath;
         if (bgPreview.texture != null && bgImage.isOn)
@@ -1796,7 +1763,7 @@ public class EditorManager : MonoBehaviour
         {
             levelName = sceneNameInput.text.Trim(),
             sceneName = sceneNameInput.text.Trim(),
-            songName = (audio.clip != null) ? customSongName.text : "Pricklety - Fall'd.mp3",
+            songName = (audio.clip != null) ? customSongName.text : "Pricklety - Fall'd",
             calculatedDifficulty = calculatedDifficulty,
             gameVersion = Application.version,
             saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
@@ -1832,20 +1799,7 @@ public class EditorManager : MonoBehaviour
             File.Copy(sourcePath, destinationPath, true);
         }
 
-        // Delete files in the destination directory that don't match the current song name
-        string[] existingFiles = Directory.GetFiles(destinationFolderPath, "*.mp3", SearchOption.AllDirectories);
-        foreach (string filePath in existingFiles)
-        {
-            // Get the file name without extension
-            string fileName = Path.GetFileName(filePath);
-
-            // Check if the file name is not equal to the current song name
-            if (fileName != sceneData.songName)
-            {
-                // Delete the file
-                File.Delete(filePath);
-            }
-        }
+        
 
         sceneData.clipPath = newPath;
         // Create a ZIP file with the .jdl extension

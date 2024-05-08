@@ -42,7 +42,7 @@ public class GameInfo : MonoBehaviour
     {
         // Get all music files in the specified folder
         string musicFolderPathFull = Path.Combine(Application.persistentDataPath, musicFolderPath);
-        string[] musicFiles = Directory.GetFiles(musicFolderPathFull, "*.mp3");
+        string[] musicFiles = Directory.GetFiles(musicFolderPathFull);
 
 
         // Display total music count

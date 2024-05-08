@@ -283,7 +283,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
                 {
                     string entryFileName = entry.FullName;
 
-                    if (entryFileName.EndsWith(".mp3"))
+                    if (entryFileName.EndsWith(".mp3") || entryFileName.EndsWith(".wav") || entryFileName.EndsWith(".ogg"))
                     {
                         // Combine the destination directory path with the MP3 filename
                         string destinationFullPath = Path.Combine(destinationFilePath, Path.GetFileName(entryFileName));
@@ -297,7 +297,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         }
         catch (Exception e)
         {
-            Debug.LogError("Error extracting MP3 from JDL: " + e.Message);
+            Debug.LogError("Error extracting Audio from JDL: " + e.Message);
         }
     }
 
@@ -537,7 +537,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         string path = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
         string filePath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, $"{sceneData.levelName}.json");
         string musicPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, $"{sceneData.songName}");
-        string defSongPath = Path.Combine(Application.streamingAssetsPath, "music", "Pricklety - Fall'd.mp3");
+        string defSongPath = Path.Combine(Application.streamingAssetsPath, "music", "Pricklety - Fall'd");
         defSongPath.Replace("\\", "/");
         sceneData.clipPath = defSongPath;
         if (Directory.Exists(path))

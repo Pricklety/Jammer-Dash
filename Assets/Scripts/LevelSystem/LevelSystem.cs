@@ -59,7 +59,7 @@ public class LevelSystem : MonoBehaviour
     public void CalculateXPRequirements()
     {
         long initialXP = 250000L; 
-        float growthRate = 1.10f;
+        float growthRate = 1.05f;
         xpRequiredPerLevel = new long[201];
 
         xpRequiredPerLevel[0] = initialXP;

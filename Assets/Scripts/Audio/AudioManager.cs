@@ -376,11 +376,13 @@ public class AudioManager : MonoBehaviour
                 {
                     Debug.LogError($"Source folder not found: {sourceFolderPath}");
                 }
-            
 
-            // After copying files, add unique file paths to songPathsList
-            string[] copiedFiles = Directory.GetFiles(persistentMusicPath, "*.mp3", SearchOption.AllDirectories);
-            HashSet<string> encounteredFileNames = new HashSet<string>();
+
+        // After copying files, add unique file paths to songPathsList
+        string[] mp3Files = Directory.GetFiles(persistentMusicPath, "*.mp3", SearchOption.AllDirectories);
+        string[] wavFiles = Directory.GetFiles(persistentMusicPath, "*.wav", SearchOption.AllDirectories);
+        string[] copiedFiles = mp3Files.Concat(wavFiles).ToArray();
+        HashSet<string> encounteredFileNames = new HashSet<string>();
             foreach (string copiedFile in copiedFiles)
             {
                 string fileName = Path.GetFileNameWithoutExtension(copiedFile);
@@ -554,7 +556,7 @@ public class AudioManager : MonoBehaviour
         string encodedPath = EncodeFilePath(filePath);
 
         Debug.Log(encodedPath);
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + encodedPath, AudioType.MPEG))
+        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + encodedPath, AudioType.UNKNOWN))
         {
             var requestOperation = www.SendWebRequest();
 
