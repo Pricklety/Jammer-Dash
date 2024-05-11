@@ -16,7 +16,13 @@ public class FinishLine : MonoBehaviour
     public GameObject player;
     public AudioSource finishSound;
     public GameObject finishMenu;
-    private bool coroutineRunning;
+    public Text scoreText;
+    public Animation anim;
+    [Header("Scores")]
+    public Text five;
+    public Text three;
+    public Text one;
+    public Text miss;
 
     private void Start()
     {
@@ -91,10 +97,7 @@ public class FinishLine : MonoBehaviour
         }
 
             float destruction = player0.counter.score;
-            float actualdest = (float)player0.counter.destructionPercentage;
-            deadScore.text = "Your stats for this attempt: \nTier: " + scores.GetTier(actualdest) + "\nHighest Combo: " + player0.highestCombo.ToString() + string.Format("\nScore: {0} ({1})", destruction.ToString("N0"), scores.destroyedCubes);
-
-        
+        deadScore.text = "There's always another time! Maybe it's after you restart?";
     }
 
     void SaveLevelData(float actualdest, float destruction)
@@ -192,7 +195,6 @@ public class FinishLine : MonoBehaviour
     }
     private IEnumerator End()
     {
-        coroutineRunning = true;
         PlayerMovement objectOfType = FindObjectOfType<PlayerMovement>();
         long destruction = objectOfType.counter.score;
         float actualdest = (float)player0.counter.destructionPercentage;
@@ -250,14 +252,14 @@ public class FinishLine : MonoBehaviour
         float targetVolume = 0f;
         float currentTime = 0f;
         finishMenu.SetActive(true);
-        SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-        if (data.scoreType == 0)
-            score.text = "Tier: " + scores.GetTier(actualdest) + "\nHighest Combo: " + player0.highestCombo.ToString() + string.Format("\nScore: {0} ({1})", destruction.ToString("N0"), scores.destroyedCubes) + string.Format("\nAccuracy: {0:00.00}%", (object)scores.destructionPercentage);
-        else
-            score.text = "Tier: " + scores.GetTier(actualdest) + "\nHighest Combo: " + player0.highestCombo.ToString() + string.Format("\nScore: {0}", scores.destroyedCubes) + string.Format("\nAccuracy: {0:00.00}%", (object)scores.destructionPercentage);
-        
-       
+        anim.Play();
+        score.text = $"{player0.SPInt:N0} sp\nAccuracy: {player0.counter.accCount / player0.Total * 100}%\nScore: {player0.counter.score:N0}\nLevel XP: {LevelSystem.Instance.totalXP:N0}";
+        scoreText.text = $"{player0.counter.GetTier(player0.counter.accCount / player0.Total * 100)}";
 
+        five.text = $"{player0.five} (Great!)";
+        three.text = $"{player0.three} (Good)";
+        one.text = $"{player0.one} (Meh)";
+        miss.text = $"{player0.misses} (Bad)";
         while (currentTime < 3f)
         {
 

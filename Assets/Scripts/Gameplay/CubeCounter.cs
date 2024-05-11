@@ -5,7 +5,7 @@ public class CubeCounter : MonoBehaviour
     public int destroyedCubes;
     public int maxScore;
     public int score;
-    public int accCount;
+    public float accCount;
     public double destructionPercentage;
     public GameObject[] cubes;
 
@@ -33,13 +33,21 @@ public class CubeCounter : MonoBehaviour
         }
         if (destructionPercentage == maxScore)
         {
-            return "S+";
+            return "<color=#FFC300>SS+</color>";
         }
-        else if (destructionPercentage >= maxScore * 0.95f)
+        else if (destructionPercentage >= maxScore * 0.99f &&  FindObjectOfType<PlayerMovement>().misses != 1)
+        {
+            return "<color=#B5CE00>SS</color>";
+        }
+        else if (destructionPercentage >= maxScore * 0.95f && FindObjectOfType<PlayerMovement>().misses != 1)
         {
             return "S";
         }
-        else if (destructionPercentage >= maxScore * 0.92f)
+        else if (destructionPercentage <= maxScore && destructionPercentage >= maxScore * 0.92f && FindObjectOfType<PlayerMovement>().misses >= 1)
+        {
+            return "A";
+        }
+        else if (destructionPercentage <= 0.95f && FindObjectOfType<PlayerMovement>().misses >= 0)
         {
             return "A";
         }
@@ -55,7 +63,7 @@ public class CubeCounter : MonoBehaviour
         {
             return "D";
         }
-        else if (destructionPercentage >= maxScore * 0.20f)
+        else if (destructionPercentage >= maxScore * 0.50f)
         {
             return "F";
         }

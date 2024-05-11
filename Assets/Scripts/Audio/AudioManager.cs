@@ -35,6 +35,7 @@ public class AudioManager : MonoBehaviour
     public bool hits;
     public float timer = 0f;
     bool paused = false;
+    public bool songLoaded;
         
     private void Awake()
     {
@@ -259,21 +260,28 @@ public class AudioManager : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.None;
         }
+        if (GetComponent<mainMenu>().mainPanel.activeSelf)
+        {
 
-        bgtimer += Time.deltaTime;
-        if (bgtimer >= spriteChangeInterval && data.bgTime == 1)
-        {
-            bgtimer = 0f; 
-            StartCoroutine(ChangeSprite());
-            
+            bgtimer += Time.deltaTime;
+            if (bgtimer >= spriteChangeInterval && data.bgTime == 1)
+            {
+                bgtimer = 0f;
+                StartCoroutine(ChangeSprite());
+
+            }
+            else if (bgtimer >= spriteChangeInterval && data.bgTime == 2)
+            {
+                spriteChangeInterval = 30f;
+                bgtimer = 0f;
+                StartCoroutine(ChangeSprite());
+            }
+
         }
-        else if (bgtimer >= spriteChangeInterval && data.bgTime == 2)
+        else
         {
-            spriteChangeInterval = 30f;
             bgtimer = 0f;
-            StartCoroutine(ChangeSprite());
         }
-
     }
     bool IsScrollingUI()
     {
@@ -382,15 +390,11 @@ public class AudioManager : MonoBehaviour
         string[] mp3Files = Directory.GetFiles(persistentMusicPath, "*.mp3", SearchOption.AllDirectories);
         string[] wavFiles = Directory.GetFiles(persistentMusicPath, "*.wav", SearchOption.AllDirectories);
         string[] copiedFiles = mp3Files.Concat(wavFiles).ToArray();
-        HashSet<string> encounteredFileNames = new HashSet<string>();
             foreach (string copiedFile in copiedFiles)
             {
                 string fileName = Path.GetFileNameWithoutExtension(copiedFile);
-                if (!encounteredFileNames.Contains(fileName))
-                {
-                    encounteredFileNames.Add(fileName);
                     songPathsList.Add(copiedFile);
-                }
+                
             }
            
                 ShuffleSongPathsList(); // Shuffle the list of song paths
@@ -551,6 +555,7 @@ public class AudioManager : MonoBehaviour
     }
     public IEnumerator LoadAudioClip(string filePath)
     {
+        songLoaded = false;
         Resources.UnloadUnusedAssets();
         // Encode the file path to ensure proper URL encoding
         string encodedPath = EncodeFilePath(filePath);
@@ -582,6 +587,8 @@ public class AudioManager : MonoBehaviour
                     options.musicSlider.value = 0f;
                     options.musicText.text = "";
                     GetComponent<AudioSource>().Play();
+                    new WaitForFixedUpdate();
+                    songLoaded = true;
                 }
                 else
                 {

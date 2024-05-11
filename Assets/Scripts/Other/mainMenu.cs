@@ -107,6 +107,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
 
     void Start()
     {
+        Time.timeScale = 1f;
         playerData = LevelSystem.Instance.LoadTotalXP();
         data = SettingsFileHandler.LoadSettingsFromFile();
         LoadRandomBackground();
@@ -537,7 +538,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
         string path = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
         string filePath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, $"{sceneData.levelName}.json");
         string musicPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, $"{sceneData.songName}");
-        string defSongPath = Path.Combine(Application.streamingAssetsPath, "music", "Pricklety - Fall'd");
+        string defSongPath = Path.Combine(Application.streamingAssetsPath, "music", "Pricklety - Fall'd.mp3");
         defSongPath.Replace("\\", "/");
         sceneData.clipPath = defSongPath;
         if (Directory.Exists(path))
@@ -708,12 +709,29 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
             // Enable the specified panel if it's not null
             if (panel != null)
             {
+                AudioManager.Instance.GetComponent<AudioSource>().loop = false;
                 panel.SetActive(true);
             }
             // Enable mainPanel if none of the specific panels are active
             else if (!playPanel.activeSelf && !creditsPanel.activeSelf && !settingsPanel.activeSelf)
             {
                 mainPanel.SetActive(true);
+                LoadRandomBackground();
+                AudioManager.Instance.GetComponent<AudioSource>().loop = false;
+            }
+
+            if (playPanel.activeSelf)
+            {
+                ButtonClickHandler[] levels = FindObjectsOfType<ButtonClickHandler>();
+
+                foreach (ButtonClickHandler level in levels)
+                {
+                    if (level.isSelected)
+                    {
+                        level.Change();
+                        AudioManager.Instance.GetComponent<AudioSource>().loop = true;
+                    }
+                }
             }
         }
     }
@@ -725,6 +743,7 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     }
     public void Play()
     {
+        AudioManager.Instance.GetComponent<AudioSource>().loop = true;
         ToggleMenuPanel(playPanel);
         InputSystem.pollingFrequency = 1000;
         InputSystem.settings.maxQueuedEventsPerUpdate = 1000;
@@ -942,6 +961,8 @@ public class mainMenu : MonoBehaviour, IPointerClickHandler
     
     public void Menu()
     {
+        AudioManager.Instance.GetComponent<AudioSource>().loop = false;
+        StartCoroutine(AudioManager.Instance.ChangeSprite());
         settingsPanel.SetActive(false);
         creditsPanel.SetActive(false);
         playPanel.SetActive(false);

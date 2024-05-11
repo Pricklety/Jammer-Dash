@@ -1490,8 +1490,8 @@ public class EditorManager : MonoBehaviour
 
     public void MainMenu()
     {
-        Time.timeScale = 1f;
         SceneManager.LoadSceneAsync(1);
+        Time.timeScale = 1f;
     }
 
     private void LoadSceneWithData(SceneData sceneData)

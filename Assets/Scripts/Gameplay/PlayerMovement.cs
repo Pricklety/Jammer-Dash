@@ -8,7 +8,6 @@ using UnityEngine.Networking;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
@@ -17,6 +16,8 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed = 1f;
     public Transform cam;
     public GameObject goodTextPrefab;
+    public GameObject normalTextPrefab;
+    public GameObject okTextPrefab;
     public GameObject badTextPrefab;
     public GameObject destroyParticlesPrefab;
     public LayerMask cubeLayerMask;
@@ -30,7 +31,6 @@ public class PlayerMovement : MonoBehaviour
     private int hpint;
     public float health = 300;
     public float maxHealth;
-    public Text hpText;
     public Slider hpSlider;
     public CubeCounter counter;
     public Text combotext;
@@ -62,6 +62,16 @@ public class PlayerMovement : MonoBehaviour
     [Header("UI")]
     public GameObject deathPanel;
 
+
+    [Header("SP Calculator")]
+    public float accuracyWeight = 0.56f;
+    public float comboWeight = 0.25f;
+    public float movementEfficiencyWeight = 0.14f;
+    public float strategicDecisionMakingWeight = 0.13f;
+    public float adaptabilityWeight = 0.15f;
+    public float levelCompletionTimeWeight = 0.1f;
+
+    [Header("Others")]
     private float jumpHeight = 1f;
     private float minY = -1f;
     private float maxY = 4f;
@@ -74,6 +84,11 @@ public class PlayerMovement : MonoBehaviour
     public int Total = 0;
     private bool bufferActive = false;
     public float longcombo = 0;
+    public int misses;
+    public int five;
+    public int three;
+    public int one;
+    public int SPInt;
     private void Start()
     {
         volume = FindObjectOfType<PostProcessVolume>();
@@ -87,6 +102,8 @@ public class PlayerMovement : MonoBehaviour
         if (data.hitType == 0)
         {
             goodTextPrefab = Resources.Load<GameObject>("good");
+            okTextPrefab = Resources.Load<GameObject>("crap");
+            normalTextPrefab = Resources.Load<GameObject>("ok");
             badTextPrefab = Resources.Load<GameObject>("bad");
             Debug.Log("asd");
         }
@@ -166,7 +183,6 @@ public class PlayerMovement : MonoBehaviour
         else
             health -= 0.1f;
         hpint = (int)health;
-        hpText.text = hpint.ToString() + "/" + maxHealth.ToString("0");
         // Move player right
         transform.Translate(Vector2.right * moveSpeed * Time.deltaTime);
         if(cam.transform.position.x < FindObjectOfType<FinishLine>().transform.position.x)
@@ -219,15 +235,7 @@ public class PlayerMovement : MonoBehaviour
         {
             scoreText.text = $"{counter.destroyedCubes}";
         }
-        if (Total > 0)
-        {
-            float acc = (float)counter.accCount / Total * 100;
-            this.acc.text = $"{acc:F2}%\n{counter.GetTier(acc)}";
-        }
-        else
-        {
-            acc.text = $"100.00%\nS+";
-        }
+        
         float newVolume = 1.0f - (combo / 2) * 0.01f;
         newVolume = Mathf.Clamp(newVolume, 0.25f, 1.0f);
 
@@ -301,7 +309,34 @@ public class PlayerMovement : MonoBehaviour
 
 
         }
+        float maxAdaptability = 1f; // Max adaptability value
+        float maxLevelCompletionTime = 1f; // Max level completion time value
 
+        // Calculate individual skill components
+        float accuracy = Mathf.Clamp01((float)counter.accCount / Total);
+        float comboEfficiency = highestCombo != 0 ? Mathf.Clamp01(combo / highestCombo + 1) : 0;
+        float adaptability = Mathf.Clamp01(CalculateAdaptability() / maxAdaptability);
+        float levelCompletionTime = Mathf.Clamp01(CalculateLevelCompletionTime() / maxLevelCompletionTime);
+
+        // Calculate skill performance point
+        float skillPerformancePoint = Mathf.Max(
+            Mathf.Pow(accuracy, 2) * accuracyWeight +
+            comboEfficiency * comboWeight +
+            adaptability * adaptabilityWeight +
+            levelCompletionTime * levelCompletionTimeWeight,
+            0f
+        );
+
+        SPInt = Mathf.RoundToInt(skillPerformancePoint); 
+        if (Total > 0)
+        {
+            float acc = (float)counter.accCount / Total * 100;
+            this.acc.text = $"{acc:F2}% | {counter.GetTier(acc)} | {SPInt} sp";
+        }
+        else
+        {
+            acc.text = $"";
+        }
 
         if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.Y) || Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.K) || Input.GetKeyDown(KeyCode.L)) && !isDying)
         {
@@ -329,7 +364,7 @@ public class PlayerMovement : MonoBehaviour
                         SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
                         if (data.scoreType == 0)
                         {
-                            StartCoroutine(ChangeScore());
+                            StartCoroutine(ChangeScore(Vector3.Distance(hit.collider.transform.position, transform.position)));
                         }
                         else
                         {
@@ -390,13 +425,24 @@ public class PlayerMovement : MonoBehaviour
         
     }
 
+    private float CalculateAdaptability()
+    {
+        float adaptability = Mathf.Clamp((float)health / maxHealth * 100f, 0f, 100f);
+        return adaptability;
+    }
+
+    private float CalculateLevelCompletionTime()
+    {
+        float levelCompletionTime = Mathf.Clamp(0, 0f, FindObjectOfType<FinishLine>().transform.position.x / 7); 
+        return levelCompletionTime;
+    }
 
 
     IEnumerator ChangeTextCombo()
     {
         float lerpSpeed = 1f;
         float lerpTimer = 0f;
-
+        misses++;
         while (lerpTimer < 1f)
         {
             lerpTimer += Time.fixedDeltaTime * lerpSpeed;
@@ -433,18 +479,104 @@ public class PlayerMovement : MonoBehaviour
         }
     
     }
-    IEnumerator ChangeScore()
+    IEnumerator ChangeScore(float playerDistance)
     {
+        float factor;
+        Debug.Log(playerDistance);
+        if (playerDistance <= 2.04f)
+        {
+            factor = 1f;
+            five++;
+            if (AudioManager.Instance != null)
+            {
+                if (AudioManager.Instance.hits)
+                {
+                    Instantiate(goodTextPrefab, transform.position, Quaternion.identity);
+                }
+            }
+
+        }
+        else if (playerDistance <= 2.06 && playerDistance > 2.04f)
+        {
+            factor = 1f / 3f;
+            three++;
+            if (AudioManager.Instance != null)
+            {
+                if (AudioManager.Instance.hits)
+                {
+                    Instantiate(normalTextPrefab, transform.position, Quaternion.identity);
+                }
+            }
+
+        }
+        else
+        {
+            factor = 1f / 5f;
+            one++;
+            if (AudioManager.Instance != null)
+            {
+                if (AudioManager.Instance.hits)
+                {
+                    Instantiate(okTextPrefab, transform.position, Quaternion.identity);
+                }
+            }
+        }
+
         counter.destroyedCubes += 50;
-        int newDestroyedCubes = counter.score + Mathf.RoundToInt((float)counter.destructionPercentage) * (counter.accCount / Total * 100 / 2) + hpint + combo * 10;
+
+        // Calculate the new destroyed cubes based on the factor
+        float newDestroyedCubes = counter.score + (Mathf.RoundToInt((float)counter.destructionPercentage) * ((int)counter.accCount / Total * 100) + combo * 20 * factor);
+        newDestroyedCubes = Mathf.RoundToInt(newDestroyedCubes);
         float elapsedTime = 0f;
-        float duration = 0.1f; 
-        counter.accCount++;
+        float duration = 0.1f;
+        counter.accCount += 1 * factor;
+
         while (elapsedTime < duration)
         {
-            counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
-            elapsedTime += Time.deltaTime;
-            scoreText.text = counter.score.ToString("N0");
+            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+            if (data.scoreType == 0)
+            {
+                counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
+                elapsedTime += Time.deltaTime;
+                scoreText.text = counter.score.ToString("N0");
+                yield return null;
+            }
+            yield return null; // Wait for the next frame
+        }
+
+        // Ensure the score reaches the final value precisely
+        counter.score = Mathf.RoundToInt(newDestroyedCubes);
+        yield return new WaitForSeconds(0.2f);
+    }
+    public IEnumerator ChangeScoreLong()
+    {
+        counter.destroyedCubes += 50;
+        five++;
+        // Calculate the new destroyed cubes based on the factor
+        int newDestroyedCubes = counter.score + Mathf.RoundToInt((float)counter.destructionPercentage) * ((int)counter.accCount / Total * 100 / 2) + combo * 20;
+        newDestroyedCubes = Mathf.RoundToInt(newDestroyedCubes);
+        if (AudioManager.Instance != null)
+        {
+            if (AudioManager.Instance.hits)
+            {
+                Instantiate(goodTextPrefab, transform.position, Quaternion.identity);
+            }
+        }
+
+        float elapsedTime = 0f;
+        float duration = 0.1f;
+        counter.accCount += 1;
+
+        while (elapsedTime < duration)
+        {
+            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+            if (data.scoreType == 0)
+            {
+                counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
+                elapsedTime += Time.deltaTime;
+                scoreText.text = counter.score.ToString("N0");
+                yield return null;
+            }
             yield return null; // Wait for the next frame
         }
 
@@ -452,6 +584,7 @@ public class PlayerMovement : MonoBehaviour
         counter.score = newDestroyedCubes;
         yield return new WaitForSeconds(0.2f);
     }
+
 
     private void DestroyCube(GameObject cube)
     {
@@ -461,14 +594,7 @@ public class PlayerMovement : MonoBehaviour
             sfxS.PlayOneShot(hit);
             Destroy(cube);
             activeCubes.Remove(cube);
-            if (AudioManager.Instance != null)
-            {
-                if (AudioManager.Instance.hits)
-                {
-                    Instantiate(goodTextPrefab, transform.position, Quaternion.identity);
-                }
-            }
-
+           
             if (counter.destroyedCubes > counter.maxScore)
             {
                 counter.destroyedCubes = counter.maxScore;
@@ -599,10 +725,11 @@ public class PlayerMovement : MonoBehaviour
                 SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
                 if (data.scoreType == 0)
                 {
-                    StartCoroutine(ChangeScore());
+                    StartCoroutine(ChangeScoreLong());
                 }
                 else
                 {
+                    StartCoroutine(ChangeScoreLong());
                     counter.destroyedCubes += 50;
                     scoreText.text = $"{counter.destroyedCubes}";
                 }
@@ -623,7 +750,7 @@ public class PlayerMovement : MonoBehaviour
             float elapsedTime = 0f;
             float duration = 0.1f;
             elapsedTime += Time.deltaTime;
-            int newDestroyedCubes = counter.score + 1;
+            int newDestroyedCubes = counter.score + combo + 1;
             counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
             scoreText.text = counter.score.ToString("N0");
             // Ensure the score reaches the final value precisely
@@ -654,7 +781,7 @@ public class PlayerMovement : MonoBehaviour
         SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
         if (data.scoreType == 0)
         {
-            StartCoroutine(ChangeScore());
+            StartCoroutine(ChangeScoreLong());
         }
         else
         {
@@ -675,6 +802,11 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log(bufferActive);
             if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.Y) || Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.K) || Input.GetKeyDown(KeyCode.L)) && !isDying)
             {
+                combo++;
+                if (highestCombo == combo)
+                {
+                    highestCombo++;
+                }
                 bufferActive = true;
 
             }
