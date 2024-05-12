@@ -100,7 +100,8 @@ public class Options : MonoBehaviour
 
     public void OnMusicSliderValueChanged()
     {
-        audio.GetComponent<AudioSource> ().time = musicSlider.value;
+        if (Input.GetMouseButtonDown(0))
+        audio.GetComponent<AudioSource>().time = musicSlider.value;
     }
 
     void PopulateDropdowns()
@@ -577,14 +578,14 @@ public class Options : MonoBehaviour
             // Get the current audio clip and time
             AudioClip Clip = audio.GetComponent<AudioSource>().clip;
             string clipName = Clip != null ? Clip.name : "Unknown song";
-            float Time = audio.GetComponent<AudioSource>().time;
+            float Time = currentTime;
             float length = audio.GetComponent<AudioSource>().clip.length;
             // Format the text
             string formattedText = $"♪ {clipName}\n{FormatTime(Time)}/{FormatTime(length)}";
 
             // Assign the formatted text to the UI 
             musicText.text = formattedText;
-            musicSlider.value = Time;
+            musicSlider.value = (int)currentTime;
             musicSlider.maxValue = length;
         }
         else

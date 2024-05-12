@@ -150,6 +150,7 @@ public class ButtonClickHandler : MonoBehaviour
             scrollRect.content.localPosition = Vector2.Lerp(scrollRect.content.localPosition, targetPosition, lerpSpeed);
             yield return null;
         }
+        scrollRect.content.localPosition = targetPosition;
     }
     void OnClick()
     {
@@ -172,7 +173,18 @@ public class ButtonClickHandler : MonoBehaviour
             SceneData data = GetComponent<CustomLevelScript>().sceneData;
             lvlInfo.text = $"Length: {data.levelLength:N0} sec | BPM: {data.bpm} | Difficulty: {data.calculatedDifficulty:F2}sn\n{data.cubePositions.Count} cubes, {data.sawPositions.Count} saws, {data.longCubePositions.Count} long cubes\n\nClick Enter to start playing!";
         }
-       
+        if (isSelected)
+        {
+            if (gameObject.GetComponent<CustomLevelScript>() == null)
+            {
+                FindFirstObjectByType<mainMenu>().OpenLevel(GetComponent<RankDisplay>().sceneIndex);
+            }
+            else
+            {
+                // Play custom level
+                this.GetComponent<CustomLevelScript>().PlayLevel();
+            }
+        }
         // Reset other buttons' selection
         ButtonClickHandler[] buttons = scrollRect.content.GetComponentsInChildren<ButtonClickHandler>();
         foreach (ButtonClickHandler otherButton in buttons)
@@ -220,8 +232,8 @@ public class ButtonClickHandler : MonoBehaviour
                     yield return new WaitUntil(() => AudioManager.Instance.songLoaded);
                     yield return new WaitForEndOfFrame();
                     Debug.LogWarning("hi2");
-                    AudioManager.Instance.GetComponent<AudioSource>().time = AudioManager.Instance.GetComponent<AudioSource>().clip.length * 0.46f;
                     AudioManager.Instance.GetComponent<AudioSource>().loop = true;
+                    AudioManager.Instance.GetComponent<AudioSource>().time = UnityEngine.Random.Range(AudioManager.Instance.GetComponent<AudioSource>().clip.length * 0f, AudioManager.Instance.GetComponent<AudioSource>().clip.length * 0.5f);
 
                 }
                 else

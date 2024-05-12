@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -260,25 +261,28 @@ public class AudioManager : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.None;
         }
-        if (GetComponent<mainMenu>().mainPanel.activeSelf)
+        if (SceneManager.GetActiveScene().buildIndex == 1)
         {
-
-            bgtimer += Time.deltaTime;
-            if (bgtimer >= spriteChangeInterval && data.bgTime == 1)
+            if (FindObjectOfType<mainMenu>().mainPanel.activeSelf)
             {
-                bgtimer = 0f;
-                StartCoroutine(ChangeSprite());
+                bgtimer += Time.deltaTime;
+                if (bgtimer >= spriteChangeInterval && data.bgTime == 1)
+                {
+                    bgtimer = 0f;
+                    StartCoroutine(ChangeSprite());
 
-            }
-            else if (bgtimer >= spriteChangeInterval && data.bgTime == 2)
-            {
-                spriteChangeInterval = 30f;
-                bgtimer = 0f;
-                StartCoroutine(ChangeSprite());
+                }
+                else if (bgtimer >= spriteChangeInterval && data.bgTime == 2)
+                {
+                    spriteChangeInterval = 30f;
+                    bgtimer = 0f;
+                    StartCoroutine(ChangeSprite());
+                }
+
             }
 
         }
-        else
+        else if (SceneManager.GetActiveScene().buildIndex != 1)
         {
             bgtimer = 0f;
         }
@@ -563,23 +567,24 @@ public class AudioManager : MonoBehaviour
         Debug.Log(encodedPath);
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + encodedPath, AudioType.UNKNOWN))
         {
+            ((DownloadHandlerAudioClip)www.downloadHandler).streamAudio = true;
+
+
             var requestOperation = www.SendWebRequest();
 
             while (!requestOperation.isDone)
             {
-                options.musicSlider.maxValue = 1;
-                options.musicSlider.value = requestOperation.progress;
-                options.musicText.text = $"Loading song: {www.downloadedBytes / 1024768:0.00} MB / {www.downloadProgress * 100:0.00}%";
                 yield return null; // Wait for the next frame
             }
 
             if (www.result == UnityWebRequest.Result.Success)
             {
-                AudioClip audioClip = ((DownloadHandlerAudioClip)www.downloadHandler).audioClip;
+                AudioClip audioClip = DownloadHandlerAudioClip.GetContent(www);
 
                 if (audioClip != null)
                 {
                     audioClip.name = Path.GetFileNameWithoutExtension(filePath);
+
 
                     // Set the loaded audio clip to the AudioSource component
                     GetComponent<AudioSource>().clip = audioClip;
@@ -587,7 +592,6 @@ public class AudioManager : MonoBehaviour
                     options.musicSlider.value = 0f;
                     options.musicText.text = "";
                     GetComponent<AudioSource>().Play();
-                    new WaitForFixedUpdate();
                     songLoaded = true;
                 }
                 else
