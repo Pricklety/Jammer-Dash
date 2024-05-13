@@ -4,280 +4,285 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using JammerDash.Game.Player;
+using JammerDash.Tech;
 
-public class FinishLine : MonoBehaviour
+namespace JammerDash.Game
 {
-    private Rigidbody2D rb;
-    public PlayerMovement player0;
-    public Text score;
-    public Text deadScore;
-    public CubeCounter scores;
-    public GameObject finishParticles;
-    public GameObject player;
-    public AudioSource finishSound;
-    public GameObject finishMenu;
-    public Text scoreText;
-    public Animation anim;
-    [Header("Scores")]
-    public Text five;
-    public Text three;
-    public Text one;
-    public Text miss;
-
-    private void Start()
+    public class FinishLine : MonoBehaviour
     {
-        
-        float num1 = float.NegativeInfinity;
-        itemUnused itemUnused1 = null;
-        foreach (itemUnused itemUnused2 in FindObjectsOfType<itemUnused>())
+        private Rigidbody2D rb;
+        public PlayerMovement player0;
+        public Text score;
+        public Text deadScore;
+        public CubeCounter scores;
+        public GameObject finishParticles;
+        public GameObject player;
+        public AudioSource finishSound;
+        public GameObject finishMenu;
+        public Text scoreText;
+        public Animation anim;
+        [Header("Scores")]
+        public Text five;
+        public Text three;
+        public Text one;
+        public Text miss;
+
+        private void Start()
         {
-            float num2 = itemUnused2.transform.position.x - transform.position.x;
-            if (num2 > num1)
+
+            float num1 = float.NegativeInfinity;
+            itemUnused itemUnused1 = null;
+            foreach (itemUnused itemUnused2 in FindObjectsOfType<itemUnused>())
             {
-                num1 = num2;
-                itemUnused1 = itemUnused2;
+                float num2 = itemUnused2.transform.position.x - transform.position.x;
+                if (num2 > num1)
+                {
+                    num1 = num2;
+                    itemUnused1 = itemUnused2;
+                }
             }
-        }
-        if (itemUnused1 != null)
-        {
-            transform.position = new Vector3((itemUnused1.transform.position + new Vector3(5f, 0f, 0.0f)).x, 0.0f, 0.0f);
-
-        }
-       
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.tag == "Player")
-        {
-            StartCoroutine(End());
-            player.transform.position = transform.position;
-            finishParticles.transform.position = player.transform.position;
-            Instantiate(finishParticles, new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z), Quaternion.identity);
-            finishSound.Play();
-        }
-            
-        
-    }
-
-    private void Update()
-    {
-        player = GameObject.FindGameObjectWithTag("Player");
-        player0 = player.GetComponent<PlayerMovement>();
-        scores = player.GetComponent<CubeCounter>();
-        float num1 = float.NegativeInfinity;
-        itemUnused itemUnused1 = null;
-        foreach (itemUnused itemUnused2 in FindObjectsOfType<itemUnused>())
-        {
-            float num2 = itemUnused2.transform.position.x - transform.position.x;
-            if (num2 > num1)
+            if (itemUnused1 != null)
             {
-                num1 = num2;
-                itemUnused1 = itemUnused2;
+                transform.position = new Vector3((itemUnused1.transform.position + new Vector3(5f, 0f, 0.0f)).x, 0.0f, 0.0f);
+
             }
-        }
-        if (itemUnused1 != null && transform.position.x < itemUnused1.transform.position.x)
-        {
-            transform.position = new Vector3((itemUnused1.transform.position + new Vector3(5f, 0f, 0.0f)).x, 0.0f, 0.0f);
 
         }
 
-        
-        if (player0 == null || player == null)
+        private void OnTriggerEnter2D(Collider2D collision)
         {
+            if (collision.tag == "Player")
+            {
+                StartCoroutine(End());
+                player.transform.position = transform.position;
+                finishParticles.transform.position = player.transform.position;
+                Instantiate(finishParticles, new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z), Quaternion.identity);
+                finishSound.Play();
+            }
 
+
+        }
+
+        private void Update()
+        {
+            player = GameObject.FindGameObjectWithTag("Player");
             player0 = player.GetComponent<PlayerMovement>();
-            player = player0.gameObject;
-            
-        }
-        if (player.transform.position.x >= transform.position.x && player != null)
-        {
-            player.transform.position = new Vector2(transform.position.x, transform.position.y + 0.5f);
-            player0.enabled = false;
-        }
+            scores = player.GetComponent<CubeCounter>();
+            float num1 = float.NegativeInfinity;
+            itemUnused itemUnused1 = null;
+            foreach (itemUnused itemUnused2 in FindObjectsOfType<itemUnused>())
+            {
+                float num2 = itemUnused2.transform.position.x - transform.position.x;
+                if (num2 > num1)
+                {
+                    num1 = num2;
+                    itemUnused1 = itemUnused2;
+                }
+            }
+            if (itemUnused1 != null && transform.position.x < itemUnused1.transform.position.x)
+            {
+                transform.position = new Vector3((itemUnused1.transform.position + new Vector3(5f, 0f, 0.0f)).x, 0.0f, 0.0f);
+
+            }
+
+
+            if (player0 == null || player == null)
+            {
+
+                player0 = player.GetComponent<PlayerMovement>();
+                player = player0.gameObject;
+
+            }
+            if (player.transform.position.x >= transform.position.x && player != null)
+            {
+                player.transform.position = new Vector2(transform.position.x, transform.position.y + 0.5f);
+                player0.enabled = false;
+            }
 
             float destruction = player0.counter.score;
-        deadScore.text = "There's always another time! Maybe it's after you restart?";
-    }
-
-    void SaveLevelData(float actualdest, float destruction)
-    {
-        string sceneName = SceneManager.GetActiveScene().name;
-        if (sceneName == "LevelDefault")
-        {
-            SaveLevelDataForLevelDefault(actualdest, destruction);
+            deadScore.text = "There's always another time! Maybe it's after you restart?";
         }
-        else
-        {
-            SaveLevelDataDef(SceneManager.GetActiveScene().buildIndex, scores.GetTier(actualdest), "dest" + sceneName, actualdest, "scores", destruction);
-        }
-    }
-    void SaveLevelDataForLevelDefault(float actualdest, float destruction)
-    {
-        // Construct the path based on conditions
-        string levelsPath = Path.Combine(Application.persistentDataPath,
-            string.IsNullOrEmpty(CustomLevelDataManager.Instance.levelName)
-                ? Path.Combine("scenes", LevelDataManager.Instance.levelName)
-                : Path.Combine("levels", "extracted", CustomLevelDataManager.Instance.levelName));
 
-        string[] levelFiles = Directory.GetFiles(levelsPath, "*.json", SearchOption.AllDirectories);
-        string levelName = "";
-
-        foreach (string file in levelFiles)
+        void SaveLevelData(float actualdest, float destruction)
         {
-            if (Path.GetFileName(file).Equals("LevelDefault.jdl"))
+            string sceneName = SceneManager.GetActiveScene().name;
+            if (sceneName == "LevelDefault")
             {
-                continue; // Skip LevelDefault.jdl
+                SaveLevelDataForLevelDefault(actualdest, destruction);
             }
-            levelName = Path.GetFileNameWithoutExtension(file);
-            break; // Stop after finding the first valid level file
-        }
-
-        if (!string.IsNullOrEmpty(levelName))
-        {
-            string json = File.ReadAllText(Path.Combine(levelsPath, levelName + ".json"));
-            SceneData sceneData = SceneData.FromJson(json);
-            Debug.Log(sceneData.levelName);
-            SaveLevelDataDef(sceneData.ID, scores.GetTier(actualdest), "dest" + sceneData.levelName, actualdest, "scores", destruction);
-        }
-        else
-        {
-            Debug.LogWarning("No valid level found in the directory: " + levelsPath);
-        }
-    }
-    void SaveLevelDataDef(int levelID, string tierName, string destName, float actualdest, string fileName, float destruction)
-    {
-        string filePath = Path.Combine(Application.persistentDataPath, fileName + ".dat");
-        using (StreamWriter writer = File.AppendText(filePath))
-        {
-            writer.WriteLine($"{levelID},{tierName},{destName},{actualdest},{destruction}");
-        }
-    }
-    long LoadLevelData(int levelID, string fileName, long destruction)
-    {
-        string filePath = Path.Combine(Application.persistentDataPath, fileName + ".dat");
-
-        if (File.Exists(filePath))
-        {
-            // Read the file and parse data as needed
-            string[] lines = File.ReadAllLines(filePath);
-            foreach (string line in lines)
+            else
             {
-                if (line == SceneManager.GetActiveScene().name)
+                SaveLevelDataDef(SceneManager.GetActiveScene().buildIndex, scores.GetTier(actualdest), "dest" + sceneName, actualdest, "scores", destruction);
+            }
+        }
+        void SaveLevelDataForLevelDefault(float actualdest, float destruction)
+        {
+            // Construct the path based on conditions
+            string levelsPath = Path.Combine(Application.persistentDataPath,
+                string.IsNullOrEmpty(CustomLevelDataManager.Instance.levelName)
+                    ? Path.Combine("scenes", LevelDataManager.Instance.levelName)
+                    : Path.Combine("levels", "extracted", CustomLevelDataManager.Instance.levelName));
+
+            string[] levelFiles = Directory.GetFiles(levelsPath, "*.json", SearchOption.AllDirectories);
+            string levelName = "";
+
+            foreach (string file in levelFiles)
+            {
+                if (Path.GetFileName(file).Equals("LevelDefault.jdl"))
                 {
-                    string[] data = line.Split(',');
-                    // Assuming the file format is consistent with the data you're saving
-                    float actualdest = int.Parse(data[3]);
-                    destruction = int.Parse(data[4]);
-                    // Process the loaded data as needed
-                    return destruction;
+                    continue; // Skip LevelDefault.jdl
                 }
-                else
+                levelName = Path.GetFileNameWithoutExtension(file);
+                break; // Stop after finding the first valid level file
+            }
+
+            if (!string.IsNullOrEmpty(levelName))
+            {
+                string json = File.ReadAllText(Path.Combine(levelsPath, levelName + ".json"));
+                SceneData sceneData = SceneData.FromJson(json);
+                Debug.Log(sceneData.levelName);
+                SaveLevelDataDef(sceneData.ID, scores.GetTier(actualdest), "dest" + sceneData.levelName, actualdest, "scores", destruction);
+            }
+            else
+            {
+                Debug.LogWarning("No valid level found in the directory: " + levelsPath);
+            }
+        }
+        void SaveLevelDataDef(int levelID, string tierName, string destName, float actualdest, string fileName, float destruction)
+        {
+            string filePath = Path.Combine(Application.persistentDataPath, fileName + ".dat");
+            using (StreamWriter writer = File.AppendText(filePath))
+            {
+                writer.WriteLine($"{levelID},{tierName},{destName},{actualdest},{destruction}");
+            }
+        }
+        long LoadLevelData(int levelID, string fileName, long destruction)
+        {
+            string filePath = Path.Combine(Application.persistentDataPath, fileName + ".dat");
+
+            if (File.Exists(filePath))
+            {
+                // Read the file and parse data as needed
+                string[] lines = File.ReadAllLines(filePath);
+                foreach (string line in lines)
                 {
-                    string[] data = line.Split(',');
-                    if (int.Parse(data[0]) == levelID)
+                    if (line == SceneManager.GetActiveScene().name)
                     {
-                        float actualdest = float.Parse(data[3]);
+                        string[] data = line.Split(',');
+                        // Assuming the file format is consistent with the data you're saving
+                        float actualdest = int.Parse(data[3]);
                         destruction = int.Parse(data[4]);
                         // Process the loaded data as needed
-                        Debug.LogError(destruction);    
                         return destruction;
+                    }
+                    else
+                    {
+                        string[] data = line.Split(',');
+                        if (int.Parse(data[0]) == levelID)
+                        {
+                            float actualdest = float.Parse(data[3]);
+                            destruction = int.Parse(data[4]);
+                            // Process the loaded data as needed
+                            Debug.LogError(destruction);
+                            return destruction;
+                        }
                     }
                 }
             }
+            else
+            {
+                Debug.LogWarning("File does not exist: " + filePath);
+            }
+
+            return 0;
         }
-        else
+        private IEnumerator End()
         {
-            Debug.LogWarning("File does not exist: " + filePath);
-        }
-        
-        return 0;
-    }
-    private IEnumerator End()
-    {
-        PlayerMovement objectOfType = FindObjectOfType<PlayerMovement>();
-        long destruction = objectOfType.counter.score;
-        float actualdest = (float)player0.counter.destructionPercentage;
-        if (SceneManager.GetActiveScene().name != "LevelDefault")
-        {
-            Scene activeScene = SceneManager.GetActiveScene(); 
-            long lastScore = LoadLevelData(activeScene.buildIndex, "scores", destruction);
-            long currentScore = player0.counter.score;
-            long scoreDifference = currentScore - lastScore;
-            // Add the score difference as XP
-            if (scoreDifference > 0)
+            PlayerMovement objectOfType = FindObjectOfType<PlayerMovement>();
+            long destruction = objectOfType.counter.score;
+            float actualdest = (float)player0.counter.destructionPercentage;
+            if (SceneManager.GetActiveScene().name != "LevelDefault")
             {
-                long xpToAdd = scoreDifference;
-                LevelSystem.Instance.GainXP(xpToAdd);
+                Scene activeScene = SceneManager.GetActiveScene();
+                long lastScore = LoadLevelData(activeScene.buildIndex, "scores", destruction);
+                long currentScore = player0.counter.score;
+                long scoreDifference = currentScore - lastScore;
+                // Add the score difference as XP
+                if (scoreDifference > 0)
+                {
+                    long xpToAdd = scoreDifference;
+                    LevelSystem.Instance.GainXP(xpToAdd);
+                }
+                else if (lastScore == 0 && scoreDifference <= 0)
+                {
+                    LevelSystem.Instance.GainXP(scoreDifference);
+                }
             }
-            else if (lastScore == 0 && scoreDifference <= 0)
+            else
             {
-                LevelSystem.Instance.GainXP(scoreDifference);
-            }
-        } 
-        else
-        {
 
-            int id = CustomLevelDataManager.Instance.ID;
-            if (CustomLevelDataManager.Instance.levelName == null)
+                int id = CustomLevelDataManager.Instance.ID;
+                if (CustomLevelDataManager.Instance.levelName == null)
+                {
+                    id = LevelDataManager.Instance.ID;
+                }
+                long lastScore = LoadLevelData(id, "scores", destruction);
+                long currentScore = player0.counter.score;
+                long scoreDifference = currentScore - lastScore;
+                // Add the score difference as XP
+                if (scoreDifference > 0)
+                {
+                    long xpToAdd = scoreDifference;
+                    LevelSystem.Instance.GainXP(xpToAdd);
+                }
+                else if (lastScore == 0)
+                {
+                    LevelSystem.Instance.GainXP(scoreDifference);
+                }
+            }
+            player.transform.localScale = Vector3.zero;
+            objectOfType.enabled = false;
+
+
+            SaveLevelData(actualdest, destruction);
+
+
+            PlayerPrefs.Save();
+            yield return new WaitForSecondsRealtime(2f);
+            AudioSource[] audios = FindObjectsOfType<AudioSource>();
+            Debug.Log(audios);
+            float startVolume = 1f;
+            float targetVolume = 0f;
+            float currentTime = 0f;
+            finishMenu.SetActive(true);
+            anim.Play();
+            score.text = $"{player0.SPInt:N0} sp\nAccuracy: {player0.counter.accCount / player0.Total * 100}%\nScore: {player0.counter.score:N0}\nLevel XP: {LevelSystem.Instance.totalXP:N0}";
+            scoreText.text = $"{player0.counter.GetTier(player0.counter.accCount / player0.Total * 100)}";
+
+            five.text = $"{player0.five} (Great!)";
+            three.text = $"{player0.three} (Good)";
+            one.text = $"{player0.one} (Meh)";
+            miss.text = $"{player0.misses} (Bad)";
+            while (currentTime < 3f)
             {
-                id = LevelDataManager.Instance.ID;
+
+                currentTime += Time.deltaTime;
+                foreach (AudioSource audio in audios)
+                {
+                    audio.volume = Mathf.Lerp(startVolume, targetVolume, currentTime / 3f);
+                }
+                yield return null;
+
+
             }
-            long lastScore = LoadLevelData(id, "scores", destruction);
-            long currentScore = player0.counter.score;
-            long scoreDifference = currentScore - lastScore;
-            // Add the score difference as XP
-            if (scoreDifference > 0)
-            {
-                long xpToAdd = scoreDifference;
-                LevelSystem.Instance.GainXP(xpToAdd);
-            }
-            else if (lastScore == 0)
-            {
-                LevelSystem.Instance.GainXP(scoreDifference);
-            }
-        }
-        player.transform.localScale = Vector3.zero;
-        objectOfType.enabled = false;
-
-       
-        SaveLevelData(actualdest, destruction);
-        
-
-        PlayerPrefs.Save();
-        yield return new WaitForSecondsRealtime(2f);
-        AudioSource[] audios = FindObjectsOfType<AudioSource>();
-        Debug.Log(audios);
-        float startVolume = 1f;
-        float targetVolume = 0f;
-        float currentTime = 0f;
-        finishMenu.SetActive(true);
-        anim.Play();
-        score.text = $"{player0.SPInt:N0} sp\nAccuracy: {player0.counter.accCount / player0.Total * 100}%\nScore: {player0.counter.score:N0}\nLevel XP: {LevelSystem.Instance.totalXP:N0}";
-        scoreText.text = $"{player0.counter.GetTier(player0.counter.accCount / player0.Total * 100)}";
-
-        five.text = $"{player0.five} (Great!)";
-        three.text = $"{player0.three} (Good)";
-        one.text = $"{player0.one} (Meh)";
-        miss.text = $"{player0.misses} (Bad)";
-        while (currentTime < 3f)
-        {
-
-            currentTime += Time.deltaTime;
+            // Stop playing the audio after 10 seconds
             foreach (AudioSource audio in audios)
             {
-                audio.volume = Mathf.Lerp(startVolume, targetVolume, currentTime / 3f);
+                audio.Stop();
             }
-            yield return null;
 
-
-        }
-        // Stop playing the audio after 10 seconds
-        foreach (AudioSource audio in audios)
-        {
-            audio.Stop();
         }
 
     }
-
 }

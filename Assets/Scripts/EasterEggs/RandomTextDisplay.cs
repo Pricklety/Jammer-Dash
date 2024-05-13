@@ -4,78 +4,81 @@ using System.IO;
 using System;
 using System.Collections;
 
-public class RandomTextDisplay : MonoBehaviour
+namespace JammerDash.EasterEggs
 {
-    public Text textComponent;
-    public string filePath = "texts.txt";
-    float time;
-
-    void Start()
+    public class RandomTextDisplay : MonoBehaviour
     {
-        if (textComponent == null)
-        {
-            Debug.LogError("Text component not assigned.");
-            return;
-        }
+        public Text textComponent;
+        public string filePath = "texts.txt";
+        float time;
 
-        string fullPath;
-
-        // Check if the application is in the Unity Editor or a build
-        if (Application.isEditor)
+        void Start()
         {
-            fullPath = Path.Combine(Application.streamingAssetsPath, filePath);
-        }
-        else
-        {
-            // If in a build, use the StreamingAssets folder
-            fullPath = Path.Combine(Application.streamingAssetsPath, filePath);
-        }
-
-        try
-        {
-            string[] lines = File.ReadAllLines(fullPath);
-            if (lines.Length > 0)
+            if (textComponent == null)
             {
-                string randomLine = lines[UnityEngine.Random.Range(0, lines.Length)];
-                textComponent.text = randomLine;
+                Debug.LogError("Text component not assigned.");
+                return;
+            }
 
+            string fullPath;
+
+            // Check if the application is in the Unity Editor or a build
+            if (Application.isEditor)
+            {
+                fullPath = Path.Combine(Application.streamingAssetsPath, filePath);
             }
             else
             {
-                Debug.LogWarning("Text file is empty.");
+                // If in a build, use the StreamingAssets folder
+                fullPath = Path.Combine(Application.streamingAssetsPath, filePath);
+            }
+
+            try
+            {
+                string[] lines = File.ReadAllLines(fullPath);
+                if (lines.Length > 0)
+                {
+                    string randomLine = lines[UnityEngine.Random.Range(0, lines.Length)];
+                    textComponent.text = randomLine;
+
+                }
+                else
+                {
+                    Debug.LogWarning("Text file is empty.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Error reading text file: " + e.Message);
             }
         }
-        catch (Exception e)
-        {
-            Debug.LogError("Error reading text file: " + e.Message);
-        }
-    }
 
 
-    private void Update()
-    {
-        time += Time.fixedDeltaTime;
-        if (Input.GetKeyDown(KeyCode.H) || time > 5f)
+        private void Update()
         {
-            time = 0f;
-            StartCoroutine(Change());
+            time += Time.fixedDeltaTime;
+            if (Input.GetKeyDown(KeyCode.H) || time > 5f)
+            {
+                time = 0f;
+                StartCoroutine(Change());
+            }
         }
-    }
 
-    IEnumerator Change()
-    {
-        string fullPath;
-        if (Application.isEditor)
+        IEnumerator Change()
         {
-            fullPath = Path.Combine(Application.streamingAssetsPath, filePath);
+            string fullPath;
+            if (Application.isEditor)
+            {
+                fullPath = Path.Combine(Application.streamingAssetsPath, filePath);
+            }
+            else
+            {
+                // If in a build, use the StreamingAssets folder
+                fullPath = Path.Combine(Application.streamingAssetsPath, filePath);
+            }
+            string[] lines = File.ReadAllLines(fullPath);
+            string randomLine = lines[UnityEngine.Random.Range(0, lines.Length)];
+            yield return textComponent.text = randomLine;
         }
-        else
-        {
-            // If in a build, use the StreamingAssets folder
-            fullPath = Path.Combine(Application.streamingAssetsPath, filePath);
-        }
-        string[] lines = File.ReadAllLines(fullPath);
-        string randomLine = lines[UnityEngine.Random.Range(0, lines.Length)];
-        yield return textComponent.text = randomLine;
     }
 }

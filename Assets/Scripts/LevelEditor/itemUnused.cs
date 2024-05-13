@@ -2,26 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class itemUnused : MonoBehaviour
+namespace JammerDash.Editor.Basics
 {
-    public bool IsLongCube;
-    public float longCubeLength;
-    void Start()
+
+    public class itemUnused : MonoBehaviour
     {
-        if (gameObject.name.Contains("hitter02"))
+        public bool IsLongCube;
+        public float longCubeLength;
+        void Start()
         {
-            IsLongCube = true;
-            longCubeLength = GetComponent<SpriteRenderer>().size.x;
+            if (gameObject.name.Contains("hitter02"))
+            {
+                IsLongCube = true;
+                longCubeLength = GetComponent<SpriteRenderer>().size.x;
+            }
+            else
+            {
+                IsLongCube = false;
+            }
         }
-        else
+
+        // Update is called once per frame
+        void Update()
         {
-            IsLongCube = false;
+            transform.position = new Vector3(transform.position.x, transform.position.y, 2);
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        transform.position = new Vector3(transform.position.x, transform.position.y, 2);
-    }
 }

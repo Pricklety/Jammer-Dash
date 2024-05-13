@@ -3,26 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ItemController : MonoBehaviour
+namespace JammerDash.Editor
 {
-    public int ID;
-    public bool clicked = false;
-    private EditorManager editor;
-    // Start is called before the first frame update
-    public void Start()
+    public class ItemController : MonoBehaviour
     {
-        editor = GameObject.FindGameObjectWithTag("EditorManager").GetComponent<EditorManager>();
-    }
-
-
-    // Update is called once per frame
-    public void ButtonClicked()
-    {
-        if (clicked)
+        public int ID;
+        public bool clicked = false;
+        private EditorManager editor;
+        // Start is called before the first frame update
+        public void Start()
         {
-            GetComponent<Button>().OnDeselect(null);
+            editor = GameObject.FindGameObjectWithTag("EditorManager").GetComponent<EditorManager>();
         }
-        clicked = true;
-        editor.currentButtonPressed = ID;
+
+
+        // Update is called once per frame
+        public void ButtonClicked()
+        {
+            if (clicked)
+            {
+                GetComponent<Button>().OnDeselect(null);
+            }
+            clicked = true;
+            editor.currentButtonPressed = ID;
+        }
     }
 }

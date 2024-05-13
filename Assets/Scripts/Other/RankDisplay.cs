@@ -3,93 +3,98 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class RankDisplay : MonoBehaviour
+namespace JammerDash.Menus.Play
 {
-    public Text rankText;
-    public int sceneIndex;
-    public string keyName;
 
-    private void Start()
+    public class RankDisplay : MonoBehaviour
     {
-        // Accessing the parent GameObject's name as the levelName
-        string levelName = GetComponentInChildren<Text>().text;
-        DisplayRank(levelName);
-    }
+        public Text rankText;
+        public int sceneIndex;
+        public string keyName;
 
-    private void DisplayRank(string levelName)
-    {
-        if (GetComponent<CustomLevelScript>() != null)
+        private void Start()
         {
-            CustomLevelScript script = GetComponent<CustomLevelScript>();
-            levelName = script.sceneData.ID.ToString();
-        }
-        else
-        {
-            levelName = sceneIndex.ToString();
+            // Accessing the parent GameObject's name as the levelName
+            string levelName = GetComponentInChildren<Text>().text;
+            DisplayRank(levelName);
         }
 
-        // Constructing the file path
-        string filePath = Path.Combine(Application.persistentDataPath, "scores.dat");
-
-        // Check if the file exists
-        if (!File.Exists(filePath))
+        private void DisplayRank(string levelName)
         {
-            Debug.LogWarning("Rank data file does not exist.");
-            return;
-        }
-
-        // Variables to store highest rank data found
-        string highestRankData = null;
-        float highestRank = int.MinValue; // Initialize with lowest possible value
-
-        // Reading the file line by line
-        string[] lines = File.ReadAllLines(filePath);
-        foreach (string line in lines)
-        {
-            // Splitting the line into components
-            string[] data = line.Split(',');
-
-            // Ensure that the data array has enough elements
-            if (data.Length >= 4) // Ensure there are at least 6 elements in the array
+            if (GetComponent<CustomLevelScript>() != null)
             {
-                if (data[0] == levelName)
-                {
-                    // Parse the rank value
-                    float rank;
-                    if (float.TryParse(data[4], out rank))
-                    {
-                        // If the current rank is higher than the highest rank found so far
-                        if (rank > highestRank)
-                        {
-                            highestRank = rank;
-                            highestRankData = line;
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Invalid rank data format for level: " + levelName);
-                    }
-                }
+                CustomLevelScript script = GetComponent<CustomLevelScript>();
+                levelName = script.sceneData.ID.ToString();
             }
             else
             {
-                Debug.LogWarning("Invalid data format for line: " + line);
+                levelName = sceneIndex.ToString();
+            }
+
+            // Constructing the file path
+            string filePath = Path.Combine(Application.persistentDataPath, "scores.dat");
+
+            // Check if the file exists
+            if (!File.Exists(filePath))
+            {
+                Debug.LogWarning("Rank data file does not exist.");
+                return;
+            }
+
+            // Variables to store highest rank data found
+            string highestRankData = null;
+            float highestRank = int.MinValue; // Initialize with lowest possible value
+
+            // Reading the file line by line
+            string[] lines = File.ReadAllLines(filePath);
+            foreach (string line in lines)
+            {
+                // Splitting the line into components
+                string[] data = line.Split(',');
+
+                // Ensure that the data array has enough elements
+                if (data.Length >= 4) // Ensure there are at least 6 elements in the array
+                {
+                    if (data[0] == levelName)
+                    {
+                        // Parse the rank value
+                        float rank;
+                        if (float.TryParse(data[4], out rank))
+                        {
+                            // If the current rank is higher than the highest rank found so far
+                            if (rank > highestRank)
+                            {
+                                highestRank = rank;
+                                highestRankData = line;
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Invalid rank data format for level: " + levelName);
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("Invalid data format for line: " + line);
+                }
+            }
+
+
+            // If any rank data for the level ID was found
+            if (highestRankData != null)
+            {
+                // Displaying the highest rank data in the UI
+                string[] highestRankDataArray = highestRankData.Split(',');
+                rankText.text = highestRankDataArray[1]; // Assuming the rank tier is in the second position
+            }
+            else
+            {
+                // If the level data is not found
+                Debug.LogWarning("Rank data not found for level: " + levelName);
             }
         }
 
-
-        // If any rank data for the level ID was found
-        if (highestRankData != null)
-        {
-            // Displaying the highest rank data in the UI
-            string[] highestRankDataArray = highestRankData.Split(',');
-            rankText.text = highestRankDataArray[1]; // Assuming the rank tier is in the second position
-        }
-        else
-        {
-            // If the level data is not found
-            Debug.LogWarning("Rank data not found for level: " + levelName);
-        }
     }
 
 }

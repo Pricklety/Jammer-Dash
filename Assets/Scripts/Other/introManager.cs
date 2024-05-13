@@ -5,36 +5,39 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class introManager : MonoBehaviour
+namespace JammerDash
 {
-    public Text introtext;
-    public AudioSource source;
-
-    private bool sceneActivationAllowed = false;
-
-    void Start()
+    public class introManager : MonoBehaviour
     {
-        if (!Directory.Exists(Path.Combine(Application.persistentDataPath,"backgrounds")))
-        {
-            Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "backgrounds"));
-        }
-        if (!PlayerPrefs.HasKey("bootSafe031"))
-        {
-            PlayerPrefs.DeleteAll();
-            PlayerPrefs.SetInt("bootSafe031", 1);
-        }
-        StartCoroutine(LoadMusicAndMenu());
-    }
+        public Text introtext;
+        public AudioSource source;
 
-    
-    IEnumerator LoadMusicAndMenu()
-    {
+        private bool sceneActivationAllowed = false;
+
+        void Start()
+        {
+            if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "backgrounds")))
+            {
+                Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "backgrounds"));
+            }
+            if (!PlayerPrefs.HasKey("bootSafe031"))
+            {
+                PlayerPrefs.DeleteAll();
+                PlayerPrefs.SetInt("bootSafe031", 1);
+            }
+            StartCoroutine(LoadMusicAndMenu());
+        }
+
+
+        IEnumerator LoadMusicAndMenu()
+        {
             AsyncOperation operation = SceneManager.LoadSceneAsync(1);
             operation.allowSceneActivation = false;
 
-        yield return new WaitForSecondsRealtime(13f);
-        sceneActivationAllowed = true;
-        operation.allowSceneActivation = true;
+            yield return new WaitForSecondsRealtime(13f);
+            sceneActivationAllowed = true;
+            operation.allowSceneActivation = true;
+        }
     }
-}
 
+}
