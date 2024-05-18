@@ -122,6 +122,7 @@ public class AudioProcessor : MonoBehaviour
 
         int average = (int)(sum / entries);
 
+        //Debug.Log("average = " + average);
     }
 
     double[] toDoubleArray(float[] arr)
@@ -217,27 +218,24 @@ public class AudioProcessor : MonoBehaviour
             }
 
             // dobeat array records where we actally place beats
-            dobeat[now] = 0;  // default is no beat this frame
-            ++sinceLast;
+            dobeat[now] = 0; 
             // if current value is largest in the array, probably means we're on a beat
-            if (smaxix == now)
+            if (smaxix == now / 10)
             {
-                tapTempo();
-                // make sure the most recent beat wasn't too recently
-                if (sinceLast > tempopd / 6)
-                {
-                    onBeat.Invoke();
+                tapTempo(); 
+                onBeat.Invoke();
                     blipDelay[0] = 1;
                     // record that we did actually mark a beat this frame
                     dobeat[now] = 1;
                     // reset counter of frames since last beat
                     sinceLast = 0;
-                }
+                
             }
 
             /* update column index (for ring buffer) */
             if (++now == colmax)
                 now = 0;
+
             //Debug.Log(System.Math.Round(60 / (tempopd * framePeriod)) + " bpm");
             //Debug.Log(System.Math.Round(auco.avgBpm()) + " bpm");
         }
@@ -245,7 +243,7 @@ public class AudioProcessor : MonoBehaviour
 
     public void changeCameraColor()
     {
-        Debug.Log("camera");
+        //Debug.Log("camera");
         float r = Random.Range(0f, 1f);
         float g = Random.Range(0f, 1f);
         float b = Random.Range(0f, 1f);
@@ -256,7 +254,6 @@ public class AudioProcessor : MonoBehaviour
         GetComponent<Camera>().clearFlags = CameraClearFlags.Color;
         Camera.main.backgroundColor = color;
 
-        //camera.backgroundColor = color;
     }
 
     public float getBandWidth()

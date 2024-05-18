@@ -2,6 +2,7 @@ using UnityEngine;
 using System.IO;
 using System;
 using System.Collections;
+using UnityEngine.Events;
 
 namespace JammerDash
 {
@@ -65,7 +66,8 @@ namespace JammerDash
             // Trigger animation for screenshot indicator
             if (screenshotIndicatorAnimator != null)
             {
-                screenshotIndicatorAnimator.SetTrigger("ScreenshotTaken");
+                UnityAction action = () => OpenScreenshotFolder();
+                Notifications.Notifications.instance.Notify("Screenshot taken. \nClick to open folder.", action);
             }
 
             Debug.Log("Screenshot captured: " + screenshotPath);

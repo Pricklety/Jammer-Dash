@@ -21,6 +21,8 @@ namespace JammerDash.Tech
         public string creator;
         public int diff;
         public int ID;
+        public int playerhp;
+        public float cubesize;
         bool loaded;
 
         private void Awake()
@@ -55,6 +57,17 @@ namespace JammerDash.Tech
                 creator = sceneData.creator;
                 diff = (int)sceneData.calculatedDifficulty;
                 ID = sceneData.ID;
+                if (sceneData.playerHP != 0)
+                {
+
+                    playerhp = sceneData.playerHP;
+                    cubesize = sceneData.boxSize;
+                }
+                else
+                {
+                    playerhp = 300;
+                    cubesize = 1;
+                }
                 loaded = false;
                 SceneManager.sceneLoaded += OnSceneLoaded;
                 UnityEngine.AddressableAssets.Addressables.LoadSceneAsync("Assets/" + SceneManager.GetActiveScene().name + ".unity", LoadSceneMode.Single, true, 1000);

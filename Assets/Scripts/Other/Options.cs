@@ -7,11 +7,18 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.Windows;
-using Debug = UnityEngine.Debug;
+using Newtonsoft.Json.Linq;
 using Input = UnityEngine.Input;
 using JammerDash.Audio;
 using JammerDash.Menus;
+using File = System.IO.File;
+using Directory = System.IO.Directory;
+using JammerDash.Tech.Levels;
+using System.Net.Http;
+using System.Threading.Tasks;
+using JammerDash.Notifications;
+using UnityEngine.Events;
+using Debug = UnityEngine.Debug;
 namespace JammerDash
 {
     public class Options : MonoBehaviour
@@ -20,11 +27,13 @@ namespace JammerDash
         public Button apply;
         public Dropdown resolutionDropdown;
 
-        // Additional UI elements for new settings
         public InputField fpsInputField;
         public Dropdown qualitySettingsDropdown;
-
+        public GameObject confirm;
+        public Text confirnText;
+        public Button confirmation;
         public GameObject songSel;
+        public GameObject snowObj;
         public Text musicText;
         public Slider musicSlider;
         private SettingsData settingsData;
@@ -36,7 +45,6 @@ namespace JammerDash
         public Toggle artBG;
         public Toggle customBG;
         public Toggle sfx;
-        public Toggle focusVol;
         public Toggle vsync;
         public Dropdown playerType;
         public Toggle vidBG;
@@ -45,7 +53,6 @@ namespace JammerDash
         public Toggle lineVis;
         public Toggle logoVis;
         public Dropdown antiAliasing;
-        public Slider unfocusVol;
         public Slider lowpass;
         public Dropdown scoreType;
         public Dropdown backgrounds;
@@ -60,9 +67,17 @@ namespace JammerDash
         public Toggle randomSFX;
         public Toggle confineMouse;
         public Toggle wheelShortcut;
+        public Toggle snow;
+        public Toggle increaseVol;
         public Dropdown bgTime;
+
+
+
+        private static readonly HttpClient client = new();
+
         public void Start()
         {
+            CheckForUpdate();
             audio = FindObjectOfType<AudioManager>();
             if (audio == null)
             {
@@ -78,7 +93,6 @@ namespace JammerDash
 
             LoadSettings(); // Load settings at the start
             ApplySettings();
-            InvokeRepeating("InitializeMusic", 0, 0.2f);
 
             List<Dropdown.OptionData> optionDataList = new List<Dropdown.OptionData>();
             List<string> shuffledSongPaths = audio.songPathsList;
@@ -98,7 +112,6 @@ namespace JammerDash
 
             // Now you can add the shuffled list to the dropdown
             playlist.AddOptions(optionDataList);
-
         }
 
         public void OnMusicSliderValueChanged()
@@ -222,8 +235,16 @@ namespace JammerDash
             {
                 audio.SetMasterVolume(volume);
                 audio.masterS.value = volume;
-                float intVol = Mathf.RoundToInt(Mathf.InverseLerp(-80f, 0f, volume) * 100f);
-                audio.masterS.GetComponentInChildren<Text>().text = "Master: " + intVol;
+                if (increaseVol.isOn)
+                {
+                    float intVol = Mathf.InverseLerp(-80f, 20f, volume) * 120f;
+                    audio.masterS.GetComponentInChildren<Text>().text = "Master: " + intVol.ToString("f0");
+                }
+                else
+                {
+                    float intVol = Mathf.InverseLerp(-80f, 0f, volume) * 100f;
+                    audio.masterS.GetComponentInChildren<Text>().text = "Master: " + intVol.ToString("f0");
+                }
             }
         }
 
@@ -248,13 +269,11 @@ namespace JammerDash
             vidBG.isOn = settingsData.vidBG;
             sfx.isOn = settingsData.sfx;
             hitSounds.isOn = settingsData.hitNotes;
-            focusVol.isOn = settingsData.focusVol;
             vsync.isOn = settingsData.vsync;
             playerType.value = settingsData.playerType;
             cursorTrail.isOn = settingsData.cursorTrail;
             allVis.isOn = settingsData.allVisualizers;
             antiAliasing.value = settingsData.antialiasing;
-            unfocusVol.value = settingsData.noFocusVolume;
             lowpass.value = settingsData.lowpassValue;
             scoreType.value = settingsData.scoreType;
             trailParticleCount.value = settingsData.mouseParticles;
@@ -266,6 +285,8 @@ namespace JammerDash
             confineMouse.isOn = settingsData.confinedMouse;
             wheelShortcut.isOn = settingsData.wheelShortcut;
             bgTime.value = settingsData.bgTime;
+            snow.isOn = settingsData.snow;
+            increaseVol.isOn = settingsData.volumeIncrease;
         }
 
         public void ApplyOptions()
@@ -288,7 +309,6 @@ namespace JammerDash
             settingsData.vidBG = vidBG.isOn;
             settingsData.hitNotes = hitSounds.isOn;
             settingsData.sfx = sfx.isOn;
-            settingsData.focusVol = focusVol.isOn;
             settingsData.vsync = vsync.isOn;
             settingsData.playerType = playerType.value;
             settingsData.cursorTrail = cursorTrail.isOn;
@@ -296,7 +316,6 @@ namespace JammerDash
             settingsData.lineVisualizer = lineVis.isOn;
             settingsData.logoVisualizer = logoVis.isOn;
             settingsData.antialiasing = antiAliasing.value;
-            settingsData.noFocusVolume = unfocusVol.value;
             settingsData.lowpassValue = lowpass.value;
             settingsData.hitType = hitType.value;
             settingsData.isShowingFPS = showFPS.isOn;
@@ -306,6 +325,8 @@ namespace JammerDash
             settingsData.confinedMouse = confineMouse.isOn;
             settingsData.wheelShortcut = wheelShortcut.isOn;
             settingsData.bgTime = bgTime.value;
+            settingsData.snow = snow.isOn;
+            settingsData.volumeIncrease = increaseVol.isOn;
             // Apply settings to the game
             ApplyWindowMode(settingsData.windowMode);
             ApplyQualitySettings(settingsData.qualitySettingsLevel);
@@ -469,14 +490,12 @@ namespace JammerDash
                 vidBG = vidBG.isOn,
                 sfx = sfx.isOn,
                 hitNotes = hitSounds.isOn,
-                focusVol = focusVol.isOn,
                 playerType = playerType.value,
                 cursorTrail = cursorTrail.isOn,
                 allVisualizers = allVis.isOn,
                 lineVisualizer = lineVis.isOn,
                 logoVisualizer = logoVis.isOn,
                 antialiasing = antiAliasing.value,
-                noFocusVolume = unfocusVol.value,
                 lowpassValue = lowpass.value,
                 scoreType = scoreType.value,
                 mouseParticles = trailParticleCount.value,
@@ -488,6 +507,8 @@ namespace JammerDash
                 confinedMouse = confineMouse.isOn,
                 wheelShortcut = wheelShortcut.isOn,
                 bgTime = bgTime.value,
+                volumeIncrease = increaseVol.isOn,
+                snow = snow.isOn,
                 saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                 gameVersion = Application.version
             };
@@ -570,10 +591,58 @@ namespace JammerDash
             else
             {
                 // Handle the case when audio clips are not loaded yet
-                    UnityEngine.Debug.LogWarning("Audio clips are not loaded. Make sure AudioManager is initialized.");
+                UnityEngine.Debug.LogWarning("Audio clips are not loaded. Make sure AudioManager is initialized.");
             }
         }
 
+        public async void CheckForUpdate()
+        {
+            string user = "pricklety";
+            string repo = "Jammer-Dash";
+            string url = $"https://api.github.com/repos/{user}/{repo}/releases/latest";
+
+            // GitHub API requires a user-agent header
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Jammer Dash");
+
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                JObject release = JObject.Parse(responseBody);
+                string latestVersion = release["tag_name"].ToString();
+                string releaseNotes = release["body"].ToString();
+
+                Debug.Log($"Latest version: {latestVersion}");
+                Debug.Log("Release Notes:");
+                Debug.Log(releaseNotes);
+
+                // Compare the latest version with the current version and notify if there's a new update available
+                if (IsNewVersionAvailable(latestVersion))
+                {
+                    // Create a UnityAction delegate for the update action
+                    UnityAction updateAction = () => OpenUpdate(latestVersion);
+                    Notifications.Notifications.instance.Notify($"There's a new update available! ({latestVersion}).\nClick to download.", updateAction);
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                Debug.LogError("Error fetching the latest release: " + e.Message);
+            }
+        }
+
+        private bool IsNewVersionAvailable(string latestVersion)
+        {
+            string currentVersion = Application.version;
+            return latestVersion != currentVersion;
+        }
+
+        private void OpenUpdate(string latestVersion)
+        {
+            Application.OpenURL($"https://api.github.com/repos/Pricklety/Jammer-Dash/tarball/{latestVersion}");
+        }
+    
         public void DisplayMusicInfo(AudioClip currentClip, float currentTime)
         {
             if (currentClip != null)
@@ -584,7 +653,7 @@ namespace JammerDash
                 float Time = currentTime;
                 float length = audio.GetComponent<AudioSource>().clip.length;
                 // Format the text
-                string formattedText = $"♪ {clipName}\n{FormatTime(Time)}/{FormatTime(length)}";
+                string formattedText = $"♪ {clipName}\n{FormatTime (Time)}/{FormatTime(length)}";
 
                 // Assign the formatted text to the UI 
                 musicText.text = formattedText;
@@ -695,7 +764,7 @@ namespace JammerDash
             {
                 audio.masterS.gameObject.SetActive(true);
             }
-            else if (!EventSystem.current.currentSelectedGameObject == masterVolumeSlider.gameObject && audio.timer > 2f)
+            else if (EventSystem.current.currentSelectedGameObject != masterVolumeSlider.gameObject && audio.timer > 2f)
             {
                 audio.masterS.gameObject.SetActive(false);
             }
@@ -756,10 +825,74 @@ namespace JammerDash
                 artBG.interactable = true;
                 customBG.interactable = true;
             }
+            snowObj.SetActive(snow.isOn);
+
+            if (increaseVol.isOn)
+            {
+                masterVolumeSlider.maxValue = 20f;
+            }
+            else
+            {
+                masterVolumeSlider.maxValue = 0f;
+            }
+
+            if (confineMouse.isOn)
+            {
+                UnityEngine.Cursor.lockState = CursorLockMode.Confined;
+            }
+            else
+            {
+                UnityEngine.Cursor.lockState = CursorLockMode.None;
+            }
         }
 
+        public void CloseConfirm()
+        {
+            confirm.SetActive(false);
+            confirmation.onClick.RemoveAllListeners();
+        }
+        public void DeleteJDLevels()
+        {
+            confirm.SetActive(true);
+            confirnText.text = "Deleting all levels is going to cause irreversible damage, and <color=red>won't create a backup</color>. Do you confirm?";
+            confirmation.onClick.AddListener(Delete);
+        }
 
+        public void Delete()
+        {
+            string path = Path.Combine(Application.persistentDataPath, "levels");
+            if (Directory.Exists(path))
+            {
+                foreach (string file in Directory.GetFiles(path))
+                {
+                    File.Delete(file);
+                }
+            }
 
+            confirmation.onClick.RemoveAllListeners();
+        }
+
+        public void ResetData()
+        {
+            confirm.SetActive(true);
+            confirnText.text = "Deleting the player is going to cause irreversible damage and <color=red>won't create a backup</color>. Do you confirm?";
+            confirmation.onClick.AddListener(ResetPlayer);
+        }
+
+        public void ResetPlayer()
+        {
+            string playerpath = Path.Combine(Application.persistentDataPath, "playerData.dat");
+            string scorespath = Path.Combine(Application.persistentDataPath, "scores.dat");
+            File.Delete(playerpath);
+            File.Delete(scorespath);
+            LevelSystem.Instance.totalXP = 0;
+            LevelSystem.Instance.level = 0;
+            LevelSystem.Instance.currentXP = 0;
+            LevelSystem.Instance.SavePlayerData();
+           FindObjectOfType<mainMenu>().LoadLevelFromLevels();
+            confirmation.onClick.RemoveAllListeners();
+
+        }
         public int FindClosestFPSIndex(int targetFPS)
         {
             List<string> fpsOptions = new List<string> { "60", "144", "240", "360", "500" };
@@ -780,7 +913,6 @@ namespace JammerDash
 
             return closestIndex;
         }
-
         public string FormatTime(float time)
         {
             int minutes = Mathf.FloorToInt(time / 60);

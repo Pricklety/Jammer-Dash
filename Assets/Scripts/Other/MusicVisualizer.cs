@@ -16,6 +16,7 @@ namespace JammerDash.Audio
         public PostProcessVolume vol;
         public Image customImage;
         public ParticleSystem[] particles;
+        public Animation anim; 
 
         void Start()
         {
@@ -59,15 +60,7 @@ namespace JammerDash.Audio
         void OnEnable()
         {
             GetComponent<RectTransform>().sizeDelta = new Vector2(GetComponent<RectTransform>().sizeDelta.x, 1);
-            StartCoroutine(CalculateRMS());
-        }
-        public void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Insert))
-            {
-                StopAllCoroutines();
-                StartCoroutine(CalculateRMS());
-            }
+            StartCoroutine(CalculateRMS()); 
         }
 
         public IEnumerator CalculateRMS()
@@ -90,12 +83,16 @@ namespace JammerDash.Audio
                                 if (particle.gameObject.name == "particleLaser1")
                                 {
                                     var emission = particle.emission;
-                                    emission.rateOverTime = rms * 2400;
+                                    emission.rateOverTime = rms * 2800;
+                                    var shape = particle.shape;
+                                    shape.arcSpeed = rms * 1.6f;
                                 }
                                 if (particle.gameObject.name == "particleLaser2")
                                 {
                                     var emission = particle.emission;
-                                    emission.rateOverTime = rms * 1800;
+                                    emission.rateOverTime = rms * 3800;
+                                    var shape = particle.shape;
+                                    shape.arcSpeed = rms * 0.8f;
                                 }
                                 if (particle.gameObject.name == "overall")
                                 {

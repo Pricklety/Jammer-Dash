@@ -1,3 +1,4 @@
+using JammerDash.Audio;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -34,7 +35,7 @@ namespace JammerDash
             AsyncOperation operation = SceneManager.LoadSceneAsync(1);
             operation.allowSceneActivation = false;
 
-            yield return new WaitForSecondsRealtime(13f);
+            yield return new WaitForSecondsRealtime(2f);
             sceneActivationAllowed = true;
             operation.allowSceneActivation = true;
         }

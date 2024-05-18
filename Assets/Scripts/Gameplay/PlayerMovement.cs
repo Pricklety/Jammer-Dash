@@ -9,6 +9,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 using UnityEngine.InputSystem;
+using JammerDash.Tech;
+using JammerDash.Tech.Levels;
 namespace JammerDash.Game.Player
 {
     public class PlayerMovement : MonoBehaviour
@@ -30,7 +32,7 @@ namespace JammerDash.Game.Player
         public AudioClip impact;
         public AudioClip fail;
         private int hpint;
-        public float health = 300;
+        public float health;
         public float maxHealth;
         public Slider hpSlider;
         public CubeCounter counter;
@@ -96,8 +98,18 @@ namespace JammerDash.Game.Player
             volume.profile.TryGetSettings(out vignette);
             initialIntensity = vignette.intensity.value;
             vignette.color.value = startColor;
-
-            maxHealth = 300;
+            if (LevelDataManager.Instance.playerhp != 0)
+            {
+                maxHealth = LevelDataManager.Instance.playerhp;
+                hpSlider.maxValue = LevelDataManager.Instance.playerhp;
+            }
+            else if (CustomLevelDataManager.Instance.playerhp != 0)
+            {
+                maxHealth = CustomLevelDataManager.Instance.playerhp;
+                hpSlider.maxValue = CustomLevelDataManager.Instance.playerhp;
+            }
+            else
+                maxHealth = 300;
             InputSystem.pollingFrequency = 1000;
             SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
             if (data.hitType == 0)
@@ -156,6 +168,7 @@ namespace JammerDash.Game.Player
             {
                 hit = Resources.Load<AudioClip>("Audio/sfx/hit0");
             }
+            health = maxHealth;
         }
 
 
@@ -230,7 +243,7 @@ namespace JammerDash.Game.Player
             }
             if (data.scoreType == 0)
             {
-                scoreText.text = $"{counter.score:N0}";
+                scoreText.text = $"{counter.score}";
             }
             else if (data.scoreType == 1)
             {
@@ -310,29 +323,27 @@ namespace JammerDash.Game.Player
 
 
             }
-            float maxAdaptability = 1f; // Max adaptability value
-            float maxLevelCompletionTime = 1f; // Max level completion time value
 
             // Calculate individual skill components
-            float accuracy = Mathf.Clamp01((float)counter.accCount / Total);
-            float comboEfficiency = highestCombo != 0 ? Mathf.Clamp01(combo / highestCombo + 1) : 0;
-            float adaptability = Mathf.Clamp01(CalculateAdaptability() / maxAdaptability);
-            float levelCompletionTime = Mathf.Clamp01(CalculateLevelCompletionTime() / maxLevelCompletionTime);
+            float accuracy = Mathf.Clamp(counter.accCount / Total, 0, 1);
+            float comboEfficiency = highestCombo != 0 ? Mathf.Clamp(combo / highestCombo + 1, 0, 1) : 0;
+            float adaptability = five * 0.05f + three + 0.025f + one * -0.1f + misses * -0.5f;
+            float levelCompletionTime = Mathf.Clamp01(CalculateLevelCompletionTime() / 1);
 
             // Calculate skill performance point
-            float skillPerformancePoint = Mathf.Max(
+            float skillPerformancePoint = Mathf.Max((
                 Mathf.Pow(accuracy, 2) * accuracyWeight +
-                comboEfficiency * comboWeight +
-                adaptability * adaptabilityWeight +
-                levelCompletionTime * levelCompletionTimeWeight,
+                comboEfficiency * 10 +
+                adaptability * 5 +
+                levelCompletionTime +
+                CustomLevelDataManager.Instance.diff * 0.35f) / 10,
                 0f
             );
-
             SPInt = Mathf.RoundToInt(skillPerformancePoint);
             if (Total > 0)
             {
                 float acc = (float)counter.accCount / Total * 100;
-                this.acc.text = $"{acc:F2}% | {counter.GetTier(acc)} | {SPInt} sp";
+                this.acc.text = $"{acc:F2}% | {counter.GetTier(acc)} | {skillPerformancePoint:F2} sp";
             }
             else
             {
@@ -356,7 +367,7 @@ namespace JammerDash.Game.Player
                             Total += 1;
 
                             Animation anim = combotext.GetComponent<Animation>();
-                            if (highestCombo == combo)
+                            if (highestCombo <= combo)
                             {
                                 highestCombo++;
                             }
@@ -426,12 +437,7 @@ namespace JammerDash.Game.Player
 
         }
 
-        private float CalculateAdaptability()
-        {
-            float adaptability = Mathf.Clamp((float)health / maxHealth * 100f, 0f, 100f);
-            return adaptability;
-        }
-
+       
         private float CalculateLevelCompletionTime()
         {
             float levelCompletionTime = Mathf.Clamp(0, 0f, FindObjectOfType<FinishLine>().transform.position.x / 7);
@@ -525,8 +531,9 @@ namespace JammerDash.Game.Player
 
             counter.destroyedCubes += 50;
 
-            // Calculate the new destroyed cubes based on the factor
-            float newDestroyedCubes = counter.score + (Mathf.RoundToInt((float)counter.destructionPercentage) * ((int)counter.accCount / Total * 100) + combo * 20 * factor);
+
+            float formula = Mathf.RoundToInt(((LevelDataManager.Instance.diff + CustomLevelDataManager.Instance.diff) * 10) + health / 100 + ((int)counter.accCount / Total * 100) + combo * 3 * factor * 2) * 3;
+            float newDestroyedCubes = counter.score + formula;
             newDestroyedCubes = Mathf.RoundToInt(newDestroyedCubes);
             float elapsedTime = 0f;
             float duration = 0.1f;
@@ -539,7 +546,7 @@ namespace JammerDash.Game.Player
                 {
                     counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
                     elapsedTime += Time.deltaTime;
-                    scoreText.text = counter.score.ToString("N0");
+                    scoreText.text = $"{counter.score}\n<color=lime>(+{formula})</color>";
                     yield return null;
                 }
                 yield return null; // Wait for the next frame
@@ -553,8 +560,9 @@ namespace JammerDash.Game.Player
         {
             counter.destroyedCubes += 50;
             five++;
-            // Calculate the new destroyed cubes based on the factor
-            int newDestroyedCubes = counter.score + Mathf.RoundToInt((float)counter.destructionPercentage) * ((int)counter.accCount / Total * 100 / 2) + combo * 20;
+            int formula = Mathf.RoundToInt((float)counter.destructionPercentage) * ((int)counter.accCount / Total * 100 / 2) + combo * 20;
+            int newDestroyedCubes = counter.score + formula;
+            health += 30f;
             newDestroyedCubes = Mathf.RoundToInt(newDestroyedCubes);
             if (AudioManager.Instance != null)
             {
@@ -575,7 +583,7 @@ namespace JammerDash.Game.Player
                 {
                     counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
                     elapsedTime += Time.deltaTime;
-                    scoreText.text = counter.score.ToString("N0");
+                    scoreText.text = $"{counter.score}\n<color=lime>(+{formula})</color>";
                     yield return null;
                 }
                 yield return null; // Wait for the next frame
@@ -620,7 +628,8 @@ namespace JammerDash.Game.Player
         {
             deathPanel.SetActive(true);
             music.pitch = 0f;
-            gameObject.SetActive(false);
+            transform.localScale = Vector3.zero;
+            LevelSystem.Instance.GainXP(counter.score);
             enabled = false;
         }
 
@@ -717,11 +726,11 @@ namespace JammerDash.Game.Player
                     Total += 1;
 
                     Animation anim = combotext.GetComponent<Animation>();
-                    if (highestCombo == combo)
+                    if (highestCombo <= combo)
                     {
                         highestCombo++;
                     }
-                    combo++;
+                    combo += Mathf.RoundToInt(collision.offset.x);
 
                     SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
                     if (data.scoreType == 0)
@@ -748,15 +757,12 @@ namespace JammerDash.Game.Player
         {
             if (bufferActive)
             {
-                float elapsedTime = 0f;
-                float duration = 0.1f;
-                elapsedTime += Time.deltaTime;
-                int newDestroyedCubes = counter.score + combo + 1;
-                counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
-                scoreText.text = counter.score.ToString("N0");
+                int formula = (combo + 1) * 15;
+                int newDestroyedCubes = counter.score + formula;
+                scoreText.text = $"{counter.score}\n<color=lime>(+{formula})</color>";
                 // Ensure the score reaches the final value precisely
                 counter.score = newDestroyedCubes;
-                health += 0.25f;
+                health += 0.175f;
                 yield return null;
             }
 
@@ -773,7 +779,7 @@ namespace JammerDash.Game.Player
 
             Total += 1;
             Animation anim = combotext.GetComponent<Animation>();
-            if (highestCombo == combo)
+            if (highestCombo <= combo)
             {
                 highestCombo++;
             }
@@ -803,17 +809,16 @@ namespace JammerDash.Game.Player
                 UnityEngine.Debug.Log(bufferActive);
                 if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.Y) || Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.K) || Input.GetKeyDown(KeyCode.L)) && !isDying)
                 {
-                    combo++;
-                    if (highestCombo == combo)
+                    if (highestCombo <= combo)
                     {
                         highestCombo++;
                     }
                     bufferActive = true;
-
                 }
                 else if ((Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L)) && !isDying)
                 {
                     StartCoroutine(OnTriggerEnter2DBuffer());
+                    
                 }
 
                 else if (!(Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L)) && !isDying)

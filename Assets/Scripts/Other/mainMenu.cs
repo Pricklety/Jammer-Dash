@@ -126,33 +126,48 @@ namespace JammerDash.Menus
 
 
         }
-        public string FormatNumber(float number)
+        public string FormatTime(float time)
+        {
+            int minutes = Mathf.FloorToInt(time / 60);
+            int seconds = Mathf.FloorToInt(time % 60);
+
+            // Ensure seconds don't go beyond 59
+            seconds = Mathf.Clamp(seconds, 0, 59);
+
+            return string.Format("{0:00}:{1:00}", minutes, seconds);
+        }
+        public string FormatNumber(long number)
         {
             string formattedNumber;
-
+             
             if (number < 1000)
             {
                 formattedNumber = number.ToString();
                 return formattedNumber;
             }
-            else if (number < 1000000)
+            else if (number >= 1000 && number < 1000000)
             {
                 formattedNumber = (number / 1000f).ToString("F1") + "K";
                 return formattedNumber;
             }
-            else if (number < 1000000000)
+            else if (number >= 1000000 && number < 1000000000)
             {
                 formattedNumber = (number / 1000000f).ToString("F2") + "M";
                 return formattedNumber;
             }
-            else if (number < 1000000000000)
+            else if (number >= 1000000000 && number < 1000000000000)
             {
-                formattedNumber = (number / 1000000000f).ToString("F3") + "B";
+                formattedNumber = (number / 1000000000f).ToString("F2") + "B";
+                return formattedNumber;
+            }
+            else if (number >= 1000000000000 && number <= 1000000000000000)
+            {
+                formattedNumber = (number / 1000000000000f).ToString("F2") + "T";
                 return formattedNumber;
             }
             else
             {
-                formattedNumber = (number / 1000000000000f).ToString("F4") + "T";
+                formattedNumber = (number / 1000000000000f).ToString("F3") + "Q";
                 return formattedNumber;
             }
         }
@@ -694,6 +709,10 @@ namespace JammerDash.Menus
                 }
 
             }
+            else if (panel == settingsPanel)
+            {
+                settingsPanel.SetActive(!panel.activeSelf);
+            }
             else
             {
                 // Turn off all panels
@@ -899,34 +918,7 @@ namespace JammerDash.Menus
         }
 
 
-        public void OnApplicationFocus(bool focus)
-        {
-
-            source = GameObject.Find("mainmenu").GetComponent<AudioSource>();
-            if (source == null)
-            {
-                return;
-            }
-
-            Options options = GetComponent<Options>();
-            if (options == null)
-            {
-                return;
-            }
-            focus = options.focusVol.isOn;
-            float ogvol = options.masterVolumeSlider.value;
-            float focVol = options.unfocusVol.value;
-
-            if (!focus && this.focus)
-            {
-                source.outputAudioMixerGroup.audioMixer.SetFloat("Master", focVol);
-            }
-            else if (focus && this.focus)
-            {
-                source.outputAudioMixerGroup.audioMixer.SetFloat("Master", ogvol);
-            }
-
-        }
+      
 
 
 
@@ -1086,9 +1078,9 @@ namespace JammerDash.Menus
         public void FixedUpdate()
         {
 
-            if (LevelSystem.Instance.xpRequiredPerLevel[LevelSystem.Instance.level] > float.MaxValue)
+            if (LevelSystem.Instance.xpRequiredPerLevel[LevelSystem.Instance.level] >= 2000000)
             {
-                levelSlider.maxValue = float.MaxValue;
+                levelSlider.maxValue = 2000000;
                 float normalizedValue = (float)(LevelSystem.Instance.currentXP / LevelSystem.Instance.xpRequiredPerLevel[LevelSystem.Instance.level]);
                 levelSlider.value = normalizedValue * levelSlider.maxValue;
             }
@@ -1097,29 +1089,12 @@ namespace JammerDash.Menus
                 levelSlider.maxValue = (float)LevelSystem.Instance.xpRequiredPerLevel[LevelSystem.Instance.level];
                 levelSlider.value = Mathf.Min((float)LevelSystem.Instance.currentXP, levelSlider.maxValue);
             }
-            if (LevelSystem.Instance.currentXP > 0)
+            if (LevelSystem.Instance.currentXP >= 0)
             {
-                levelText.text = "lv" + LevelSystem.Instance.level.ToString() + $" (XP: {FormatNumber(playerData.totalXP)})";
+                levelText.text = "lv" + LevelSystem.Instance.level.ToString() + $" (XP: {FormatNumber(LevelSystem.Instance.totalXP)})";
 
             }
-            if (Input.GetKeyDown(KeyCode.F5))
-            {
-                LoadLevelFromLevels();
-                LoadLevelsFromFiles();
-                LevelSystem.Instance.CalculateXPRequirements();
-                LevelSystem.Instance.GainXP(0);
-                LevelSystem.Instance.LoadTotalXP();
-            }
-
-            if (Input.GetKeyDown(KeyCode.F2))
-            {
-                additionalPanel.SetActive(!additionalPanel.active);
-            }
-
-            if (Input.GetKeyDown(KeyCode.F3))
-            {
-                FunMode();
-            }
+          
 
             if (quitPanel.activeSelf)
             {
@@ -1173,13 +1148,13 @@ namespace JammerDash.Menus
             {
 
                 // Check if quitTime exceeds quitTimer
-                if (quitTime >= quitTimer && !quitPanel.active)
+                if (quitTime >= quitTimer && !quitPanel.activeSelf)
                 {
                     audioMixer.SetFloat("Lowpass", 500);
                     quitPanel2.color = new Color(quitPanel2.color.r, quitPanel2.color.g, quitPanel2.color.b, 1.0f); // Set color to fully opaque
                     Application.Quit(); // Quit application
                 }
-                else if (quitTime < quitTimer && !quitPanel.active)
+                else if (quitTime < quitTimer && !quitPanel.activeSelf)
                 {
                     UnityEngine.Debug.Log(quitTime);
                     quitTime += Time.unscaledDeltaTime;
@@ -1199,6 +1174,11 @@ namespace JammerDash.Menus
                 quitTime = 0f;
                 quitPanel2.color = new Color(quitPanel2.color.r, quitPanel2.color.g, quitPanel2.color.b, 0f); // Set color to fully transparent
                 audioMixer.SetFloat("Lowpass", 22000);
+            }
+
+            if ((quitTime < quitTimer || quitTime >= quitTimer) && quitPanel.activeSelf)
+            {
+                audioMixer.SetFloat("Lowpass", data.lowpassValue);
             }
         }
 
@@ -1221,6 +1201,24 @@ namespace JammerDash.Menus
                 idleTimer = 0;  // Resetting idleTimer when there is input
                 animator.SetTrigger("StopIdle");
                 animator.ResetTrigger("StartIdle");
+            }
+            if (Input.GetKeyDown(KeyCode.F5))
+            {
+                LoadLevelFromLevels();
+                LoadLevelsFromFiles();
+                LevelSystem.Instance.CalculateXPRequirements();
+                LevelSystem.Instance.GainXP(0);
+                LevelSystem.Instance.LoadTotalXP();
+                Notifications.Notifications.instance.Notify($"Level list, levels and xp are reloaded. \n{levelInfoParent.childCount} levels total, {LevelSystem.Instance.totalXP} xp", null);
+            }
+            if (Input.GetKeyDown(KeyCode.F2))
+            {
+                additionalPanel.SetActive(!additionalPanel.active);
+            }
+
+            if (Input.GetKeyDown(KeyCode.F3))
+            {
+                FunMode();
             }
         }
 

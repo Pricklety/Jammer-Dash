@@ -73,6 +73,9 @@ namespace JammerDash.Editor
         public Text levelID;
         public Text difficulty;
 
+        public Slider hp;
+        public Slider size;
+
         [Header("Post Processing")]
         public PostProcessVolume vol;
         public Vignette vignette;
@@ -586,6 +589,8 @@ namespace JammerDash.Editor
                 StartCoroutine(LoadCustomAudioClip(sceneData.songName));
                 creator.text = sceneData.creator;
                 customSongName.text = sceneData.songName;
+                hp.value = sceneData.playerHP;
+                size.value = sceneData.boxSize;
             }
             else
             {
@@ -761,15 +766,15 @@ namespace JammerDash.Editor
 
                 text.text = $"{sceneData.levelName} successfully saved." +
                 $"\nSong: {sceneData.songName} at ID: {sceneData.clip.GetInstanceID()}" +
-                $"\nDifficulty: {sceneData.calculatedDifficulty}sn" +
-                $"\nLevel Length: {sceneData.levelLength} seconds" +
+                $"\nSN: {sceneData.calculatedDifficulty}sn" +
+                $"\nLength: {sceneData.levelLength} seconds" +
                 $"\nLast saved on: {DateTime.Now}" +
                 $"\nObjects: {cubes.Count + saws.Count + longCubes.Count} ({cubes.Count}c, {saws.Count}s, {longCubes.Count}l)" +
-                $"\nLevel file loc: {filePath}" +
                 $"\nBPM: {sceneData.bpm}" +
-                $"\nSaved version: {Application.version}" +
-                $"\nLocal Level ID: {sceneData.ID:0000000000}" +
-                $"\nUploaded: {sceneData.isUploaded}";
+                $"\nVersion: {Application.version}" +
+                $"\nID: {sceneData.ID:0000000000}" +
+                $"\nHP: {sceneData.playerHP}" +
+                $"\nCS: {sceneData.boxSize}";
             }
             catch (Exception e)
             {
@@ -920,6 +925,9 @@ namespace JammerDash.Editor
         // Update is called once per frame
         void Update()
         {
+
+            size.gameObject.GetComponentInChildren<Text>().text = $"Cube size: {size.value}x";
+            hp.gameObject.GetComponentInChildren<Text>().text = $"Player health: {hp.value}";
             if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift))
             {
                 RaycastHit hit;
@@ -1057,12 +1065,34 @@ namespace JammerDash.Editor
             SceneData data = SceneData.FromJson(json);
             levelID.text = "Level ID: " + data.ID;
 
-
-
+           
 
             if (Input.GetMouseButton(0))
             {
                 timer += Time.unscaledDeltaTime;
+               
+            }
+            if (Input.GetMouseButtonUp(0))
+            {
+
+                // Find the farthest object in X direction
+                Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));
+
+                // Calculate the distance based on the position of the farthest object and additional distance
+                float distance = targetObject.position.x + additionalDistance;
+                List<Vector2> cubePositions = new List<Vector2>(); // Declare cubePositions as a List<Vector2>
+
+                foreach (GameObject cube in cubes)
+                {
+                    Vector2 cubePos = cube.transform.position;
+                    cubePositions.Add(cubePos); // Add cube position to the list
+                }
+                // Calculate the number of cubes per Y level
+                int[] cubesPerY = CalculateCubesPerY(cubePositions.ToArray());
+
+                // Calculate the difficulty based on cubes per Y level and other parameters
+                float calculatedDifficulty = CalculateDifficulty(cubesPerY, cubePositions.ToArray(), distance / 7);
+                difficulty.text = "Level Difficulty: " + calculatedDifficulty.ToString("f2");
             }
 
             if (Input.GetMouseButtonUp(0) && timer < 0.125f && delay >= delayLimit && itemButtons[currentButtonPressed].clicked && !pointerOverUI && !player.enabled)
@@ -1070,8 +1100,6 @@ namespace JammerDash.Editor
                 if (cubes.Count > 0)
                 {
 
-                    Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));// Calculate the distance based on the position of the farthest object and additional distance
-                    float cdistance = targetObject.position.x + additionalDistance;
                     List<Vector2> cubePositions = new List<Vector2>();
 
                     for (int i = 0; i < cubes.Count && i < longCubes.Count; i++)
@@ -1086,9 +1114,7 @@ namespace JammerDash.Editor
                     }
 
 
-                    // Calculate the number of cubes per Y level
-                    int[] cubesPerY = CalculateCubesPerY(cubePositions.ToArray());
-                    difficulty.text = "Live Level Difficulty: " + CalculateDifficulty(cubesPerY, cubePositions.ToArray(), cdistance / 7);
+                    
                 }
                 timer = 0f;
                 delay = 0;
@@ -1208,7 +1234,7 @@ namespace JammerDash.Editor
                     selectedObject = null;
                 }
 
-                if (hit.collider != null && hit.collider.transform.CompareTag("Cubes") || hit.collider != null && hit.collider.transform.CompareTag("Saw") || hit.collider != null && hit.collider.transform.CompareTag("Beat") || hit.collider.transform.CompareTag("LongCube"))
+                if (hit.collider != null && hit.collider.transform.CompareTag("Cubes") || hit.collider != null && hit.collider.transform.CompareTag("Saw") || hit.collider != null && hit.collider.transform.CompareTag("Beat") || hit.collider != null && hit.collider.transform.CompareTag("LongCube"))
                 {
                     // Get the GameObject associated with the hit
                     GameObject selected = hit.collider.gameObject;
@@ -1654,13 +1680,15 @@ namespace JammerDash.Editor
                 sceneName = sceneNameInput.text.Trim(),
                 songName = (audio.clip != null) ? customSongName.text : "Pricklety - Fall'd",
                 bpm = int.Parse(bpmInput.text),
-                calculatedDifficulty = calculatedDifficulty,
+                calculatedDifficulty = calculatedDifficulty % 150,
                 gameVersion = Application.version,
                 saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 clip = audio.clip,
                 ground = groundToggle.isOn,
                 levelLength = (int)(distance / 7),
-                creator = creator.text
+                creator = creator.text,
+                playerHP = (int)hp.value,
+                boxSize = size.value
             };
             if (data.ID == 0)
             {
@@ -1850,13 +1878,19 @@ namespace JammerDash.Editor
                     // Avoid division by zero by ensuring clickTimingWindow + distance is not zero
                     float divisor = clickTimingWindow + distance != 0 ? clickTimingWindow + distance : float.Epsilon;
                     // Add difficulty contribution for this pair of cubes
-                    float contribution = timingWindow / 0.98f + cubeCount / 30f * (cubes.Count / 100) * (saws.Count / 70) * (longCubes.Count / 300) * (precisionFactor / divisor * 100);
+                    float contribution = timingWindow / 1.04f
+                     + cubeCount / 20f
+                     * (cubes.Count / 80f)
+                     * (saws.Count / 20f)
+                     * (longCubes.Count / 100f)
+                     * (precisionFactor / divisor * 100f)
+                     + 1 / (hp.value + 1) * 15f
+                     +Mathf.Exp(0.1f * (0.5f - size.value) * 70f);
 
                     // Round the contribution to avoid approximate results
                     contribution = Mathf.Round(contribution * 1000000f) / 1000000f; // Round to 6 decimal places
 
                     difficulty += contribution;
-                    UnityEngine.Debug.Log($"{timingWindow} + {cubeCount} / 30 * ({cubes.Count} / 100) * ({saws.Count} / 70) * ({longCubes.Count} / 300) * ({precisionFactor} / {divisor} * 100)");
                 }
             }
             // Round the final difficulty value

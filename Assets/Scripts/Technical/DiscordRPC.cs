@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using JammerDash.Editor;
-
+using JammerDash.Tech.Levels;
 namespace JammerDash.Tech
 {
     public class DiscordRPC : MonoBehaviour
@@ -16,6 +16,12 @@ namespace JammerDash.Tech
 
         private void FixedUpdate()
         {
+#if UNITY_EDITOR
+            DiscordManager.current.client.UpdateLargeAsset("logo", $"Development Build");
+            DiscordManager.current.client.UpdateSmallAsset("shine", "Testing"); 
+            DiscordManager.current.UpdateDetails("Unity: " + SceneManager.GetActiveScene().name);
+            DiscordManager.current.UpdateState("Playtesting");
+#else
             DiscordManager.current.client.UpdateLargeAsset("logo", $"(No account found): #N/A");
             DiscordManager.current.client.UpdateSmallAsset("shine", "-- sp");
             if (SceneManager.GetActiveScene().buildIndex > 2 && SceneManager.GetActiveScene().name != "LevelDefault" && SceneManager.GetActiveScene().name != "SampleScene")
@@ -43,7 +49,7 @@ namespace JammerDash.Tech
                 DiscordManager.current.UpdateDetails($"Idle");
                 DiscordManager.current.UpdateState($"Loading up...");
             }
-
+#endif
         }
     }
 }

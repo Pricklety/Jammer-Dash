@@ -1,6 +1,8 @@
+using JammerDash.Tech;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace JammerDash.Editor.Basics
 {
@@ -26,6 +28,23 @@ namespace JammerDash.Editor.Basics
         void Update()
         {
             transform.position = new Vector3(transform.position.x, transform.position.y, 2);
+
+            if (SceneManager.GetActiveScene().name == "LevelDefault")
+            {
+
+                if (gameObject.name.Contains("hitter") && LevelDataManager.Instance.cubesize != 0)
+                {
+                    transform.localScale = new Vector2(LevelDataManager.Instance.cubesize, LevelDataManager.Instance.cubesize);
+                }
+                else if (LevelDataManager.Instance.cubesize == 0)
+                {
+                    transform.localScale = new Vector2(CustomLevelDataManager.Instance.cubesize, CustomLevelDataManager.Instance.cubesize);
+                }
+            }
+            else
+            {
+                transform.localScale = new Vector2(FindObjectOfType<EditorManager>().size.value, FindObjectOfType<EditorManager>().size.value);
+            }
         }
     }
 

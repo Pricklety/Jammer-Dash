@@ -7,7 +7,7 @@ namespace JammerDash.Tech.Levels
 
     public class LevelSystem : MonoBehaviour
     {
-        public int level = 1;
+        public int level = 0;
         public long currentXP = 0;
         public long[] xpRequiredPerLevel;
         public long totalXP = 0;
@@ -52,7 +52,7 @@ namespace JammerDash.Tech.Levels
             currentXP -= xpRequiredPerLevel[level];
             level++;
 
-            if (currentXP >= xpRequiredPerLevel[level])
+            if (currentXP >= xpRequiredPerLevel[level] && level <= 199)
             {
                 LevelUp();
             }
@@ -66,7 +66,7 @@ namespace JammerDash.Tech.Levels
             xpRequiredPerLevel = new long[201];
 
             xpRequiredPerLevel[0] = initialXP;
-            for (int i = 1; i < 201; i++)
+            for (int i = 1; i < xpRequiredPerLevel.Length; i++)
             {
                 Debug.Log((long)(xpRequiredPerLevel[i - 1] * growthRate));
                 xpRequiredPerLevel[i] = (long)(xpRequiredPerLevel[i - 1] * growthRate);
@@ -76,7 +76,7 @@ namespace JammerDash.Tech.Levels
             Debug.Log("XP Required Per Level:");
             for (int i = 0; i < xpRequiredPerLevel.Length; i++)
             {
-                Debug.Log("Level " + (i + 1) + ": " + xpRequiredPerLevel[i]);
+                Debug.Log("Level " + i + ": " + xpRequiredPerLevel[i]);
             }
         }
 
@@ -123,12 +123,13 @@ namespace JammerDash.Tech.Levels
         }
     }
 
-    [System.Serializable]
-    public class PlayerData
-    {
-        public int level;
-        public long currentXP;
-        public long[] xpRequiredPerLevel;
-        public long totalXP;
-    }
+   
+}
+[System.Serializable]
+public class PlayerData
+{
+    public int level;
+    public long currentXP;
+    public long[] xpRequiredPerLevel;
+    public long totalXP;
 }

@@ -65,6 +65,8 @@ namespace JammerDash
         public bool confinedMouse = false;
         public int bgTime = 0;
         public bool wheelShortcut = true;
+        public bool volumeIncrease = false;
+        public bool snow = false;
         public string gameVersion = Application.version;
         public string saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
 

@@ -8,6 +8,7 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using JammerDash.Editor;
+using JammerDash.Editor.Basics;
 
 namespace JammerDash.Tech
 {
@@ -18,6 +19,8 @@ namespace JammerDash.Tech
         public string levelName;
         public string creator;
         public int diff;
+        public int playerhp;
+        public float cubesize;
         public int ID;
         bool loaded;
 
@@ -166,6 +169,8 @@ namespace JammerDash.Tech
             creator = sceneData.creator;
             diff = (int)sceneData.calculatedDifficulty;
             ID = sceneData.ID;
+            playerhp = sceneData.playerHP;
+            cubesize = sceneData.boxSize;
 
             FindObjectOfType<Camera>().backgroundColor = sceneData.defBGColor;
 

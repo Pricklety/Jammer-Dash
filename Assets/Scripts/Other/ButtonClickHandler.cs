@@ -18,10 +18,15 @@ namespace JammerDash.Menus.Play
         public float maxSize = 1020f; // Maximum size of the button when centered
         public float minSize = 1000f; // Minimum size of the button when not centered
         public Image bg;
+        public Image levelImage;
         private Button button;
         private RectTransform buttonRectTransform;
         public bool isSelected = false;
-        public Text lvlInfo;
+        public Text levelLength;
+        public Text levelBPM;
+        public Text diff;
+        public Text levelObj;
+        public Text bonus;  
         public leaderboard lb;
         void Start()
         {
@@ -30,6 +35,16 @@ namespace JammerDash.Menus.Play
             button.onClick.AddListener(OnClick);
             button.onClick.RemoveAllListeners();
             scrollRect = GetComponentInParent<ScrollRect>();
+        }
+        public string FormatTime(float time)
+        {
+            int minutes = Mathf.FloorToInt(time / 60);
+            int seconds = Mathf.FloorToInt(time % 60);
+
+            // Ensure seconds don't go beyond 59
+            seconds = Mathf.Clamp(seconds, 0, 59);
+
+            return string.Format("{0:00}:{1:00}", minutes, seconds);
         }
         void DisplayLB(string levelName)
         {
@@ -89,16 +104,17 @@ namespace JammerDash.Menus.Play
                 scorePanel.rankText.text = scoreData[0];
             }
         }
-
+        
         void Update()
         {
             bg = GameObject.FindGameObjectWithTag("BG").GetComponent<Image>();
+            levelImage = GameObject.Find("levelImage").GetComponent<Image>();
             if (button.onClick.GetPersistentEventCount() == 0)
             {
                 button.onClick.RemoveAllListeners();
                 button.onClick.AddListener(OnClick);
             }
-            if (Input.GetKeyDown(KeyCode.F4))
+            if (Input.GetKeyDown(KeyCode.F4) && isSelected)
             {
                 StartCoroutine(Move(0));
             }
@@ -173,9 +189,23 @@ namespace JammerDash.Menus.Play
             {
                 DestroyLeaderboard();
                 DisplayLB(GetComponent<CustomLevelScript>().sceneData.ID.ToString());
-                lvlInfo = GameObject.Find("info").GetComponent<Text>();
+                levelLength = GameObject.Find("info").GetComponent<Text>();
+                levelBPM = GameObject.Find("infoBPM").GetComponent<Text>();
+                diff = GameObject.Find("infodiff").GetComponent<Text>();
+                levelObj = GameObject.Find("infoobj").GetComponent<Text>();
+                bonus = GameObject.Find("levelbonusinfoi").GetComponent<Text>();
                 SceneData data = GetComponent<CustomLevelScript>().sceneData;
-                lvlInfo.text = $"Length: {data.levelLength:N0} sec | BPM: {data.bpm} | Difficulty: {data.calculatedDifficulty:F2}sn\n{data.cubePositions.Count} cubes, {data.sawPositions.Count} saws, {data.longCubePositions.Count} long cubes\n\nClick Enter to start playing!";
+                levelLength.text = $"{FormatTime(data.levelLength):N0}";
+                levelBPM.text = $"{data.bpm}";
+                diff.text = $"{data.calculatedDifficulty:F2}";
+                levelObj.text = $"{(data.cubePositions.Count + data.sawPositions.Count + data.longCubePositions.Count):N0} ({data.cubePositions.Count}, {data.sawPositions.Count}, {data.longCubePositions.Count})";
+                long unixTime = Convert.ToInt64(data.saveTime);
+                DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(unixTime).ToUniversalTime();
+
+                TimeZoneInfo timeZone = TimeZoneInfo.Local;
+                DateTimeOffset EUTime = TimeZoneInfo.ConvertTime(dateTimeOffset, timeZone);
+                string formattedEUTime = EUTime.ToString("yyyy-MM-dd hh:MM:ss"); 
+                bonus.text = $"mapper: {data.creator}, ID: {data.ID}, last saved on {formattedEUTime}";
             }
             if (isSelected)
             {
@@ -274,9 +304,11 @@ namespace JammerDash.Menus.Play
                     UnityEngine.Debug.Log(bg);
                     yield return new WaitForSecondsRealtime(0.2f);
                     bg.sprite = sprite;
+                    levelImage.sprite = sprite;
                 }
                 else
                 {
+                    levelImage.sprite = Resources.Load<Sprite>("backgrounds/basic/basic.png");
                     StartCoroutine(AudioManager.Instance.ChangeSprite());
                 }
             }
