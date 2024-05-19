@@ -125,7 +125,7 @@ namespace JammerDash.Menus.Play
             float ratio = distanceFromCenter / (scrollRect.content.rect.height - 2);
 
             // Calculate the size of the button based on the ratio
-            float newSize = Mathf.Lerp(300, 820, 1 - ratio); // Buttons closer to the center will have larger sizes
+            float newSize = Mathf.Lerp(400, 820, 1 - ratio); // Buttons closer to the center will have larger sizes
 
             // Set the size of the button
             buttonRectTransform.sizeDelta = new Vector2(newSize, buttonRectTransform.sizeDelta.y);
@@ -236,17 +236,16 @@ namespace JammerDash.Menus.Play
             {
                 if (GetComponent<CustomLevelScript>().sceneData.clipPath != null)
                 {
-                    string clipPath = GetComponent<CustomLevelScript>().sceneData.clipPath;
+                    string clipPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", GetComponent<CustomLevelScript>().sceneData.sceneName, Path.GetFileName(GetComponent<CustomLevelScript>().sceneData.clipPath));
                     int audioClipIndex = -1; // Initialize to a value that indicates no match found
-
                     // Normalize the clipPath
-                    clipPath = Path.GetFullPath(clipPath);
-
+                    clipPath.Replace("/", "\\");
+                    Debug.Log(clipPath);
                     // Iterate through the songPathsList
                     for (int i = 0; i < AudioManager.Instance.songPathsList.Count; i++)
                     {
                         // Normalize the current path in songPathsList
-                        string normalizedSongPath = Path.GetFullPath(AudioManager.Instance.songPathsList[i]);
+                        string normalizedSongPath = AudioManager.Instance.songPathsList[i];
 
                         if (string.Equals(normalizedSongPath, clipPath, StringComparison.OrdinalIgnoreCase)) // Case-insensitive comparison
                         {

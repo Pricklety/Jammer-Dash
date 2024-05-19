@@ -1,5 +1,8 @@
 <linker>
   <assembly fullname="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <type fullname="AccessibleButton" preserve="all" />
+    <type fullname="AccessibleLabel" preserve="all" />
+    <type fullname="AccessibleUIGroupRoot" preserve="all" />
     <type fullname="JammerDash.Editor.Basics.CubeManager" preserve="all" />
     <type fullname="JammerDash.Editor.Basics.itemUnused" preserve="all" />
     <type fullname="JammerDash.Game.cameraColor" preserve="all" />
@@ -9,6 +12,7 @@
     <type fullname="JammerDash.Game.Player.PlayerMovement" preserve="all" />
     <type fullname="JammerDash.Game.RestartCustom" preserve="all" />
     <type fullname="JammerDash.Game.SongProgress" preserve="all" />
+    <type fullname=".UAP_BaseElement/UAPHighlightCallback" preserve="nothing" serialized="true" />
   </assembly>
   <assembly fullname="Unity.Addressables, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" preserve="all">
     <type fullname="UnityEngine.AddressableAssets.Addressables" preserve="all" />
@@ -73,6 +77,7 @@
     <type fullname="UnityEngine.Events.ArgumentCache" preserve="nothing" serialized="true" />
     <type fullname="UnityEngine.Events.PersistentCallGroup" preserve="nothing" serialized="true" />
     <type fullname="UnityEngine.Events.PersistentListenerMode" preserve="nothing" serialized="true" />
+    <type fullname="UnityEngine.Events.UnityEvent" preserve="nothing" serialized="true" />
     <type fullname="UnityEngine.RectOffset" preserve="nothing" serialized="true" />
   </assembly>
   <assembly fullname="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">

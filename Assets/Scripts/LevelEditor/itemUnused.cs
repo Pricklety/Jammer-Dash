@@ -41,7 +41,7 @@ namespace JammerDash.Editor.Basics
                     transform.localScale = new Vector2(CustomLevelDataManager.Instance.cubesize, CustomLevelDataManager.Instance.cubesize);
                 }
             }
-            else
+            else if (SceneManager.GetActiveScene().name == "SampleScene")
             {
                 transform.localScale = new Vector2(FindObjectOfType<EditorManager>().size.value, FindObjectOfType<EditorManager>().size.value);
             }

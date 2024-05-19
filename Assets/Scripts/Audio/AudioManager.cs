@@ -15,6 +15,7 @@ using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 using JammerDash.Menus;
 using UnityEditor;
+using UnityEditor.Experimental;
 
 namespace JammerDash.Audio
 {
@@ -113,11 +114,8 @@ namespace JammerDash.Audio
         {
             if (Input.GetKeyDown(KeyCode.F9) && SceneManager.GetActiveScene().buildIndex == 1)
             {
-                songPathsList = new();
                 StartCoroutine(LoadAudioClipsAsync());
-
             }
-
             SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
             if (Application.isFocused && data.selectedFPS >= 30)
             {
@@ -384,10 +382,7 @@ namespace JammerDash.Audio
         {
             yield return null;
 
-            string persistentMusicPath = Path.Combine(Application.persistentDataPath);
-            bool existsFolder = Directory.Exists(Path.Combine(Application.persistentDataPath, "music"));
-            if (!existsFolder)
-                Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "music"));
+            string persistentPath = Application.persistentDataPath;
 
             string sourceFolderPath = Path.Combine(Application.streamingAssetsPath, "music");
 
@@ -400,42 +395,61 @@ namespace JammerDash.Audio
                 for (int i = 0; i < musicFiles.Length; i++)
                 {
                     string sourceFilePath = musicFiles[i];
-                    string destinationFilePath = Path.Combine(persistentMusicPath, "music", Path.GetFileName(sourceFilePath));
+                    string destinationFilePath = Path.Combine(persistentPath, Path.GetFileName(sourceFilePath));
 
                     copyTasks[i] = Task.Run(() =>
                     {
                         File.Copy(sourceFilePath, destinationFilePath, true);
-                        UnityEngine.Debug.Log($"Copied: {sourceFilePath} to {destinationFilePath}");
+                        Debug.Log($"Copied: {sourceFilePath} to {destinationFilePath}");
                     });
                 }
 
                 // Wait for all file copy tasks to complete
-                yield return new WaitForAllTasks(copyTasks);
+                yield return new WaitUntil(() => copyTasks.All(t => t.IsCompleted));
             }
             else
             {
-                UnityEngine.Debug.LogError($"Source folder not found: {sourceFolderPath}");
+                Debug.LogError($"Source folder not found: {sourceFolderPath}");
             }
-
 
             // After copying files, add unique file paths to songPathsList
-            string[] mp3Files = Directory.GetFiles(persistentMusicPath, "*.mp3", SearchOption.AllDirectories);
-            string[] wavFiles = Directory.GetFiles(persistentMusicPath, "*.wav", SearchOption.AllDirectories);
+            string[] mp3Files = Directory.GetFiles(persistentPath, "*.mp3", SearchOption.AllDirectories);
+            string[] wavFiles = Directory.GetFiles(persistentPath, "*.wav", SearchOption.AllDirectories);
             string[] copiedFiles = mp3Files.Concat(wavFiles).ToArray();
+
+            Debug.Log($"Found {copiedFiles.Length} audio files in {persistentPath}");
+
+            bool newFilesAdded = false;
             foreach (string copiedFile in copiedFiles)
             {
-                string fileName = Path.GetFileNameWithoutExtension(copiedFile);
-                songPathsList.Add(copiedFile);
-
+                if (!songPathsList.Contains(copiedFile))
+                {
+                    songPathsList.Add(copiedFile);
+                    newFilesAdded = true;
+                    Debug.Log($"Added new file to songPathsList: {copiedFile}");
+                }
+                else
+                {
+                    Debug.Log($"File already in songPathsList: {copiedFile}");
+                }
             }
 
-            ShuffleSongPathsList(); // Shuffle the list of song paths
+            foreach (string name in songPathsList)
+            {
+                name.Replace("/", "\\");
+            }
 
-            Notifications.Notifications.instance.Notify($"Playlist loaded. \n{songPathsList.Count} songs found.", null); // Display notification
-
+            // Shuffle the list of song paths only if new files were added
+            if (newFilesAdded)
+            {
+                ShuffleSongPathsList();
+                Notifications.Notifications.instance.Notify($"Playlist loaded. \n{songPathsList.Count} songs found.", null); // Display notification
+            }
+            else
+            {
+                Notifications.Notifications.instance.Notify($"No new songs found. \n{songPathsList.Count} songs in the playlist.", null); // Display notification
+            }
         }
-
-
         public void PlaySource()
         {
 
@@ -591,12 +605,11 @@ namespace JammerDash.Audio
             Resources.UnloadUnusedAssets();
             // Encode the file path to ensure proper URL encoding
             string encodedPath = EncodeFilePath(filePath);
-
+            string fileUri = "file://" + encodedPath;
             UnityEngine.Debug.Log(encodedPath);
-            using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + encodedPath, AudioType.UNKNOWN))
+            using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(fileUri, AudioType.UNKNOWN))
             {
                 ((DownloadHandlerAudioClip)www.downloadHandler).streamAudio = true;
-
 
                 var requestOperation = www.SendWebRequest();
 
@@ -659,18 +672,10 @@ namespace JammerDash.Audio
         public List<string> GetSongPaths()
         {
             List<string> songPathsList = new List<string>();
-            string persistentMusicPath = Path.Combine(Application.persistentDataPath);
 
-            if (Directory.Exists(persistentMusicPath))
-            {
-                string[] musicFiles = Directory.GetFiles(persistentMusicPath, "*.mp3", SearchOption.AllDirectories);
+                string[] musicFiles = Directory.GetFiles(Application.persistentDataPath, "*.mp3", SearchOption.AllDirectories);
                 songPathsList.AddRange(musicFiles);
-            }
-            else
-            {
-                UnityEngine.Debug.LogError("Music folder not found in the persistent data path.");
-            }
-
+            
             return songPathsList;
         }
 
@@ -678,8 +683,8 @@ namespace JammerDash.Audio
 
         public int GetTotalNumberOfSongs()
         {
-            string persistentMusicPath = Path.Combine(Application.persistentDataPath);
-            string[] musicFiles = Directory.GetFiles(persistentMusicPath, "*.mp3", SearchOption.AllDirectories);
+           
+            string[] musicFiles = Directory.GetFiles(Application.persistentDataPath, "*.mp3", SearchOption.AllDirectories);
             int numberOfMusicFiles = musicFiles.Length;
             return numberOfMusicFiles;
         }

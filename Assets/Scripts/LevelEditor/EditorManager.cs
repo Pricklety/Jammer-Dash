@@ -1079,7 +1079,9 @@ namespace JammerDash.Editor
                 Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));
 
                 // Calculate the distance based on the position of the farthest object and additional distance
-                float distance = targetObject.position.x + additionalDistance;
+                if (targetObject != null)
+                { 
+                    float distance = targetObject.position.x + additionalDistance;
                 List<Vector2> cubePositions = new List<Vector2>(); // Declare cubePositions as a List<Vector2>
 
                 foreach (GameObject cube in cubes)
@@ -1092,7 +1094,8 @@ namespace JammerDash.Editor
 
                 // Calculate the difficulty based on cubes per Y level and other parameters
                 float calculatedDifficulty = CalculateDifficulty(cubesPerY, cubePositions.ToArray(), distance / 7);
-                difficulty.text = "Level Difficulty: " + calculatedDifficulty.ToString("f2");
+                    difficulty.text = "Level Difficulty: " + calculatedDifficulty.ToString("f2");
+                }
             }
 
             if (Input.GetMouseButtonUp(0) && timer < 0.125f && delay >= delayLimit && itemButtons[currentButtonPressed].clicked && !pointerOverUI && !player.enabled)

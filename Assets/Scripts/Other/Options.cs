@@ -750,13 +750,13 @@ namespace JammerDash
                 playlist.value = audio.currentClipIndex;
 
 
-                if (Input.GetKeyDown(KeyCode.LeftArrow))
+                if (Input.GetKeyDown(KeyCode.F6))
                 {
                     PlayPreviousSong();
                 }
-                else if (Input.GetKeyDown(KeyCode.RightArrow))
+                else if (Input.GetKeyDown(KeyCode.F7))
                 {
-                    PlayNextSong();
+                    PlayNextSong();  
                 }
 
             }

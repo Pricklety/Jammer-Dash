@@ -105,7 +105,6 @@ namespace JammerDash.Game
                 player0.enabled = false;
             }
 
-            float destruction = player0.counter.score;
             deadScore.text = "There's always another time! Maybe it's after you restart?";
         }
 
@@ -214,6 +213,7 @@ namespace JammerDash.Game
             float actualdest = (float)player0.counter.destructionPercentage;
             LevelSystem.Instance.GainXP(destruction); 
             score.text = $"{player0.SPInt:N0} sp\nAccuracy: {player0.counter.accCount / player0.Total * 100}%\nScore: {player0.counter.score:N0}\nLevel XP: {LevelSystem.Instance.totalXP:N0} <color=lime>(+{player0.counter.score})</color>\nCombo: {player0.highestCombo}x\n";
+           if (scoreText != null)
             scoreText.text = $"{player0.counter.GetTier(player0.counter.accCount / player0.Total * 100)}";
             player.transform.localScale = Vector3.zero;
             objectOfType.enabled = false;
@@ -222,11 +222,11 @@ namespace JammerDash.Game
             SaveLevelData(actualdest, destruction);
 
 
-            PlayerPrefs.Save();
             yield return new WaitForSecondsRealtime(2f);
             AudioSource[] audios = FindObjectsOfType<AudioSource>();
             Debug.Log(audios);
             finishMenu.SetActive(true);
+            if (anim != null)
             anim.Play();
            
 

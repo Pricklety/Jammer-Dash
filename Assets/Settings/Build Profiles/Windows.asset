@@ -46,7 +46,8 @@ MonoBehaviour:
     m_path: Assets/Scenes/Epilogue.unity
   - m_enabled: 1
     m_path: Assets/Scenes/Shape Of The Sun.unity
-  m_ScriptingDefines: []
+  m_ScriptingDefines:
+  - OpenLevel
   m_PlayerSettingsYaml:
     m_Settings: []
   references:

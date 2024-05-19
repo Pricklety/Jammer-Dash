@@ -45,6 +45,7 @@ namespace JammerDash.Menus
         public GameObject musicPanel;
         public GameObject changelogs;
         public GameObject funMode;
+        public GameObject overPanel;
 
         [Header("LevelInfo")]
         public GameObject levelInfoPanelPrefab;
@@ -1184,7 +1185,20 @@ namespace JammerDash.Menus
 
         void Update()
         {
-            bool hasInput = Input.GetMouseButtonDown(0);
+
+
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                if (EventSystem.current.currentSelectedGameObject.transform.parent == overPanel)
+                {
+                    mainPanel.SetActive(true);
+                }
+                else
+                {
+                    overPanel.SetActive(true);
+                }
+            }
+            bool hasInput = Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return);
             idleTimer += Time.fixedDeltaTime;
             if (!hasInput)
             {

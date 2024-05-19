@@ -30,8 +30,8 @@ namespace JammerDash
         public bool isVerified;
         public bool isUploaded;
         public int playerScore;
-        public int playerHP;
-        public float boxSize;
+        public int playerHP = 300;
+        public float boxSize = 1;
         public string rank;
         public string picLocation;
 
