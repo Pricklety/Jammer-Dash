@@ -13,7 +13,6 @@ using JammerDash.Audio;
 using JammerDash.Menus;
 using File = System.IO.File;
 using Directory = System.IO.Directory;
-using JammerDash.Tech.Levels;
 using System.Net.Http;
 using System.Threading.Tasks;
 using JammerDash.Notifications;
@@ -23,7 +22,6 @@ namespace JammerDash
 {
     public class Options : MonoBehaviour
     {
-        public Dropdown windowModeDropdown;
         public Button apply;
         public Dropdown resolutionDropdown;
 
@@ -54,7 +52,6 @@ namespace JammerDash
         public Toggle logoVis;
         public Dropdown antiAliasing;
         public Slider lowpass;
-        public Dropdown scoreType;
         public Dropdown backgrounds;
         public Slider trailParticleCount;
         public Toggle showFPS;
@@ -70,7 +67,9 @@ namespace JammerDash
         public Toggle snow;
         public Toggle increaseVol;
         public Dropdown bgTime;
-
+        public Toggle bass;
+        public Slider bassGain;
+        public Toggle visualizerColor;
 
 
         private static readonly HttpClient client = new();
@@ -123,10 +122,7 @@ namespace JammerDash
         void PopulateDropdowns()
         {
             // Populate window mode dropdown
-            windowModeDropdown.ClearOptions();
-            List<string> windowModes = new List<string> { "Windowed", "Windowed Fullscreen", "Fullscreen" };
-            windowModeDropdown.AddOptions(windowModes);
-
+           
             // Populate quality dropdown
             qualitySettingsDropdown.ClearOptions();
             List<string> qualityLevels = new List<string>(QualitySettings.names);
@@ -260,7 +256,6 @@ namespace JammerDash
         {
             Application.targetFrameRate = settingsData.selectedFPS;
             fpsInputField.text = settingsData.selectedFPS.ToString();
-            windowModeDropdown.value = settingsData.windowMode;
             qualitySettingsDropdown.value = settingsData.qualitySettingsLevel;
             resolutionDropdown.value = settingsData.resolutionValue;
             masterVolumeSlider.value = settingsData.volume;
@@ -275,7 +270,6 @@ namespace JammerDash
             allVis.isOn = settingsData.allVisualizers;
             antiAliasing.value = settingsData.antialiasing;
             lowpass.value = settingsData.lowpassValue;
-            scoreType.value = settingsData.scoreType;
             trailParticleCount.value = settingsData.mouseParticles;
             showFPS.isOn = settingsData.isShowingFPS;
             hitType.value = settingsData.hitType;
@@ -287,6 +281,9 @@ namespace JammerDash
             bgTime.value = settingsData.bgTime;
             snow.isOn = settingsData.snow;
             increaseVol.isOn = settingsData.volumeIncrease;
+            bass.isOn = settingsData.bass;
+            bassGain.value = settingsData.bassgain;
+            visualizerColor.isOn = settingsData.visualizerColor;
         }
 
         public void ApplyOptions()
@@ -301,7 +298,6 @@ namespace JammerDash
         public void ApplySettings()
         {
             settingsData.selectedFPS = int.TryParse(fpsInputField.text, out int fpsCap) ? Mathf.Clamp(fpsCap, 1, 9999) : 60;
-            settingsData.windowMode = windowModeDropdown.value;
             settingsData.qualitySettingsLevel = qualitySettingsDropdown.value;
             settingsData.volume = masterVolumeSlider.value;
             settingsData.artBG = artBG.isOn;
@@ -327,12 +323,13 @@ namespace JammerDash
             settingsData.bgTime = bgTime.value;
             settingsData.snow = snow.isOn;
             settingsData.volumeIncrease = increaseVol.isOn;
-            // Apply settings to the game
-            ApplyWindowMode(settingsData.windowMode);
+            settingsData.bass = bass.isOn;
+            settingsData.bassgain = bassGain.value;
+            settingsData.visualizerColor = visualizerColor.isOn;
             ApplyQualitySettings(settingsData.qualitySettingsLevel);
             ApplyMasterVolume(settingsData.volume);
             ApplyFPSCap(settingsData.selectedFPS);
-            ApplyResolution(settingsData.windowMode);
+            ApplyResolution();
             HitNotes(settingsData.hitNotes);
             SFX(settingsData.sfx);
             Focus(settingsData.focusVol);
@@ -421,35 +418,16 @@ namespace JammerDash
             playlist.AddOptions(optionDataList);
         }
 
-        private void ApplyWindowMode(int windowMode)
+      
+        private void ApplyResolution()
         {
-            // Set window mode based on the dropdown selection
-            switch (windowMode)
-            {
-                case 0: // Windowed
-                    Screen.fullScreenMode = FullScreenMode.Windowed;
-                    break;
-                case 1: // Windowed Fullscreen
-                    Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
-                    break;
-                case 2:
-                    Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
-                    break;
-            }
-
-            settingsData.windowMode = windowMode;
-        }
-        private void ApplyResolution(int windowMode)
-        {
-            if (windowMode == 0)
-            {
                 string[] resolutionValues = resolutionDropdown.options[resolutionDropdown.value].text.Split('x');
                 int width = int.Parse(resolutionValues[0]);
                 int height = int.Parse(resolutionValues[1]);
-
+            
                 // Set the screen resolution
-                Screen.SetResolution(width, height, false);
-            }
+                Screen.SetResolution(width, height, Screen.fullScreenMode);
+            
 
         }
 
@@ -481,7 +459,6 @@ namespace JammerDash
             {
                 selectedFPS = int.TryParse(fpsInputField.text, out int fpsCap) ? Mathf.Clamp(fpsCap, 1, 9999) : 60,
                 vsync = vsync.isOn,
-                windowMode = windowModeDropdown.value,
                 qualitySettingsLevel = qualitySettingsDropdown.value,
                 volume = masterVolumeSlider.value,
                 resolutionValue = resolutionDropdown.value,
@@ -497,7 +474,6 @@ namespace JammerDash
                 logoVisualizer = logoVis.isOn,
                 antialiasing = antiAliasing.value,
                 lowpassValue = lowpass.value,
-                scoreType = scoreType.value,
                 mouseParticles = trailParticleCount.value,
                 isShowingFPS = showFPS.isOn,
                 hitType = hitType.value,
@@ -509,6 +485,9 @@ namespace JammerDash
                 bgTime = bgTime.value,
                 volumeIncrease = increaseVol.isOn,
                 snow = snow.isOn,
+                bass = bass.isOn,
+                bassgain = bassGain.value,
+                visualizerColor = visualizerColor.isOn,
                 saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                 gameVersion = Application.version
             };
@@ -532,8 +511,7 @@ namespace JammerDash
             // Reset all settings to default values
 
 
-            // Window Mode
-            windowModeDropdown.value = 0; // Set to default windowed mode index
+           
 
             int fpsCap;
             if (int.TryParse(fpsInputField.text, out fpsCap))
@@ -623,7 +601,7 @@ namespace JammerDash
                 {
                     // Create a UnityAction delegate for the update action
                     UnityAction updateAction = () => OpenUpdate(latestVersion);
-                    Notifications.Notifications.instance.Notify($"There's a new update available! ({latestVersion}).\nClick to download.", updateAction);
+                    Notifications.Notifications.instance.Notify($"There's a new update available! ({latestVersion}).\nClick to update (manual).", updateAction);
                 }
             }
             catch (HttpRequestException e)
@@ -885,10 +863,10 @@ namespace JammerDash
             string scorespath = Path.Combine(Application.persistentDataPath, "scores.dat");
             File.Delete(playerpath);
             File.Delete(scorespath);
-            LevelSystem.Instance.totalXP = 0;
-            LevelSystem.Instance.level = 0;
-            LevelSystem.Instance.currentXP = 0;
-            LevelSystem.Instance.SavePlayerData();
+            Account.Instance.totalXP = 0;
+            Account.Instance.level = 0;
+            Account.Instance.currentXP = 0;
+            Account.Instance.SavePlayerData();
            FindObjectOfType<mainMenu>().LoadLevelFromLevels();
             confirmation.onClick.RemoveAllListeners();
 

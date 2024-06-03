@@ -1,4 +1,4 @@
-using JammerDash.Tech.Levels;
+
 using System;
 using System.Collections;
 using System.IO;
@@ -51,8 +51,8 @@ namespace JammerDash.Tech
 
             // Display total music count
             string totalMusicCount = "Playlist length: " + musicFiles.Length.ToString("n0") + " songs\n\n" +
-                "Player level: " + LevelSystem.Instance.level + "\n" +
-                "Total score: " + LevelSystem.Instance.totalXP.ToString("N0") + "\n";
+                "Player level: " + Account.Instance.level + "\n" +
+                "Total score: " + Account.Instance.totalXP.ToString("N0") + "\n";
 
             gameInfoText.text += totalMusicCount + "----------------\n\n";
         }

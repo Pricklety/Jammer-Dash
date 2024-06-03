@@ -21,6 +21,12 @@ namespace JammerDash.Audio
 {
     public class AudioManager : MonoBehaviour
     {
+
+        bool isLogoSFX = false;
+        int counter = 0;
+        public AudioClip sfxShort;
+        public AudioClip sfxLong;
+
         bool songPlayed = false;
         private float masterVolume = 1.0f;
         public List<string> songPathsList;
@@ -69,6 +75,12 @@ namespace JammerDash.Audio
             devText.gameObject.SetActive(true);
             else
             devText.gameObject.SetActive(false);
+
+
+            if (isLogoSFX)
+                GetComponent<AudioSource>().PlayOneShot(sfxShort);
+
+            Debug.unityLogger.logEnabled = false;
         }
         public void OnMasterVolumeChanged(float volume)
         {
@@ -262,6 +274,8 @@ namespace JammerDash.Audio
 
                 timer += Time.fixedDeltaTime;
             }
+
+          
             if (Mathf.Approximately(timer, 2f))
             {
                 if (SceneManager.GetActiveScene().buildIndex == 1)
@@ -290,16 +304,61 @@ namespace JammerDash.Audio
             {
                 songPlayed = false;
             }
+
+            if (Input.GetMouseButtonDown(2) && !data.loadedLogoSFX)
+            {
+                counter++;
+                if (counter == 3)
+                {
+                    GetComponent<AudioSource>().volume *= 0.8f;
+                    GetComponent<AudioSource>().PlayOneShot(sfxLong, 1);
+                    data.loadedLogoSFX = true;
+                    SettingsFileHandler.SaveSettingsToFile(data);
+                    Notifications.Notifications.instance.Notify("Jammer Dash :)", null);
+                    new WaitForSecondsRealtime(8f);
+                        GetComponent<AudioSource>().volume = 1;
+
+                }
+            }
+            else if (data.loadedLogoSFX && Input.GetMouseButtonDown(2))
+            {
+                counter++;
+                if (counter == 3)
+                {
+                    GetComponent<AudioSource>().volume *= 0.8f;
+                    GetComponent<AudioSource>().PlayOneShot(sfxLong, 1);
+                    data.loadedLogoSFX = false;
+                    Notifications.Notifications.instance.Notify("oh :(", null);
+                    SettingsFileHandler.SaveSettingsToFile(data);
+
+                    new WaitForSecondsRealtime(8f);
+                    GetComponent<AudioSource>().volume = 1;
+
+                }
+            }
+            master.audioMixer.SetFloat("Gain", data.bass ? data.bassgain : 1f);
+
+
+
         }
-     
+
         private void FixedUpdate()
         {
-            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-          
 
-            
+            if (Input.GetKey(KeyCode.Plus))
+            {
+                masterS.value++;
+                timer = 0f;
+            }
+            else if (Input.GetKey(KeyCode.Minus))
+            {
+                timer = 0f;
+                masterS.value--;
+            }
+
             if (SceneManager.GetActiveScene().buildIndex == 1)
             {
+                SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
                 if (FindObjectOfType<mainMenu>().mainPanel.activeSelf)
                 {
                     bgtimer += Time.deltaTime;
@@ -412,10 +471,16 @@ namespace JammerDash.Audio
                 Debug.LogError($"Source folder not found: {sourceFolderPath}");
             }
 
-            // After copying files, add unique file paths to songPathsList
+            // Get all .mp3 and .wav files from the persistent path
             string[] mp3Files = Directory.GetFiles(persistentPath, "*.mp3", SearchOption.AllDirectories);
             string[] wavFiles = Directory.GetFiles(persistentPath, "*.wav", SearchOption.AllDirectories);
-            string[] copiedFiles = mp3Files.Concat(wavFiles).ToArray();
+
+            // Get all .mp3 files from the streaming assets path
+            string[] defaultFiles = Directory.GetFiles(Application.streamingAssetsPath, "*.mp3", SearchOption.AllDirectories);
+
+            // Combine all arrays into one
+            string[] copiedFiles = mp3Files.Concat(wavFiles).Concat(defaultFiles).ToArray();
+
 
             Debug.Log($"Found {copiedFiles.Length} audio files in {persistentPath}");
 
@@ -443,7 +508,7 @@ namespace JammerDash.Audio
             if (newFilesAdded)
             {
                 ShuffleSongPathsList();
-                Notifications.Notifications.instance.Notify($"Playlist loaded. \n{songPathsList.Count} songs found.", null); // Display notification
+                Notifications.Notifications.instance.Notify($"Playlist loaded. \n{copiedFiles.Length} songs found.", null); // Display notification
             }
             else
             {

@@ -1,18 +1,15 @@
+using JammerDash.Editor.Basics;
 using System;
 using System.Collections;
 using System.IO;
-using System.IO.Compression;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Unity;
-using JammerDash.Editor.Basics;
 
 namespace JammerDash.Tech
 {
-
     public class CustomLevelDataManager : MonoBehaviour
     {
         // Singleton instance
@@ -23,7 +20,7 @@ namespace JammerDash.Tech
         public int ID;
         public int playerhp;
         public float cubesize;
-        bool loaded;
+        public bool sceneLoaded = false;
 
         private void Awake()
         {
@@ -32,7 +29,6 @@ namespace JammerDash.Tech
             {
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
-
             }
             else
             {
@@ -43,6 +39,12 @@ namespace JammerDash.Tech
         // Function to load SceneData based on the scene name
         public SceneData LoadLevelData(string sceneName, int id)
         {
+            if (sceneLoaded)
+            {
+                Debug.LogWarning("Scene already loaded.");
+                return null;
+            }
+
             levelName = sceneName;
             ID = id;
             string filePath = Path.Combine(Application.persistentDataPath, "levels", sceneName + ".jdl");
@@ -57,21 +59,11 @@ namespace JammerDash.Tech
                 creator = sceneData.creator;
                 diff = (int)sceneData.calculatedDifficulty;
                 ID = sceneData.ID;
-                if (sceneData.playerHP != 0)
-                {
-
-                    playerhp = sceneData.playerHP;
-                    cubesize = sceneData.boxSize;
-                }
-                else
-                {
-                    playerhp = 300;
-                    cubesize = 1;
-                }
-                loaded = false;
+                playerhp = sceneData.playerHP != 0 ? sceneData.playerHP : 300;
+                cubesize = sceneData.boxSize != 0 ? sceneData.boxSize : 1;
+                sceneLoaded = true; // Set the flag to true
                 SceneManager.sceneLoaded += OnSceneLoaded;
-                UnityEngine.AddressableAssets.Addressables.LoadSceneAsync("Assets/" + SceneManager.GetActiveScene().name + ".unity", LoadSceneMode.Single, true, 1000);
-
+                Addressables.LoadSceneAsync("Assets/LevelDefault.unity", LoadSceneMode.Single);
             }
             else
             {
@@ -81,7 +73,6 @@ namespace JammerDash.Tech
             return null;
         }
 
-
         IEnumerator LoadImage(string url)
         {
             using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))
@@ -90,20 +81,11 @@ namespace JammerDash.Tech
 
                 if (www.result == UnityWebRequest.Result.Success)
                 {
-                    // Enable the GameObject with the RawImage component
                     RawImage rawImage = FindInactiveObjectOfType<RawImage>();
                     if (rawImage != null)
                     {
-                        // Enable the GameObject with the RawImage component
                         rawImage.gameObject.SetActive(true);
-                    }
-
-                    // Create a Sprite from the downloaded texture and set it to the Image component
-                    Texture2D texture = DownloadHandlerTexture.GetContent(www);
-                    if (rawImage != null)
-                    {
-                        // Enable the GameObject with the RawImage component
-                        rawImage.texture = texture;
+                        rawImage.texture = DownloadHandlerTexture.GetContent(www);
                     }
                 }
                 else
@@ -112,40 +94,32 @@ namespace JammerDash.Tech
                 }
             }
         }
-        // Function to find an inactive object of a specific type
-        private T FindInactiveObjectOfType<T>() where T : Component
-        {
-            // Find all objects of type T in the scene
-            T[] components = Resources.FindObjectsOfTypeAll<T>();
 
-            // Iterate through the found components
+        private T FindInactiveObjectOfType<T>() where T : Component
+        { 
+            T[] components = Resources.FindObjectsOfTypeAll<T>();
             foreach (T component in components)
             {
-                // Check if the GameObject of the component is inactive
                 if (!component.gameObject.activeSelf)
                 {
-                    // Return the component if it's inactive
                     return component;
                 }
             }
-
-            // If no inactive object of the specified type is found, return null
             return null;
         }
 
-        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             if (scene.name == "LevelDefault")
             {
-                StartCoroutine(ProcessAfterSceneLoaded());
-
                 SceneManager.sceneLoaded -= OnSceneLoaded;
+                StartCoroutine(ProcessAfterSceneLoaded());
             }
         }
 
         private IEnumerator ProcessAfterSceneLoaded()
         {
-            new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
             string filePath = Path.Combine(Application.persistentDataPath, "levels", "extracted", levelName, $"{levelName}.json");
             filePath = filePath.Replace("/", "\\");
             Debug.Log(filePath);
@@ -159,51 +133,43 @@ namespace JammerDash.Tech
             foreach (itemUnused gobject in obj)
             {
                 Destroy(gobject.gameObject);
-
             }
+
             foreach (Vector3 cubePos in sceneData.cubePositions)
             {
                 GameObject cubeObject = Instantiate(Resources.Load<GameObject>("hitter01"), cubePos, Quaternion.identity);
                 Debug.Log("Cube instantiated: " + cubeObject);
-
             }
 
             foreach (Vector3 sawPos in sceneData.sawPositions)
             {
                 Instantiate(Resources.Load<GameObject>("Saws and Spikes/rotateSaw01"), sawPos, Quaternion.identity);
             }
+
             for (int i = 0; i < sceneData.longCubePositions.Count; i++)
             {
-                // Get the current position and width for this long cube
                 Vector3 longCubePos = sceneData.longCubePositions[i];
                 float width = sceneData.longCubeWidth[i];
-
-                // Instantiate the "hitter02" prefab at the current longCubePos
                 GameObject longCubeObject = Instantiate(Resources.Load<GameObject>("hitter02"), longCubePos, Quaternion.identity);
-
-                // Get the SpriteRenderer component of the instantiated object
                 SpriteRenderer longCubeRenderer = longCubeObject.GetComponent<SpriteRenderer>();
                 BoxCollider2D collider = longCubeObject.GetComponent<BoxCollider2D>();
 
-                // Set the width of the SpriteRenderer
                 longCubeRenderer.size = new Vector2(width, 1);
                 collider.size = new Vector2(width + 0.5f, 0.75f);
                 collider.offset = new Vector2(width / 1.965f, 0f);
                 Debug.Log("Instantiated long cube");
             }
+
             if (sceneData.picLocation != null)
             {
                 StartCoroutine(LoadImage(sceneData.picLocation));
             }
 
             Camera[] cams = FindObjectsOfType<Camera>();
-
             foreach (Camera cam in cams)
             {
                 cam.backgroundColor = sceneData.defBGColor;
             }
-
-
 
             levelName = sceneData.levelName;
             creator = sceneData.creator;
@@ -212,9 +178,7 @@ namespace JammerDash.Tech
             GameObject.Find("Cube").SetActive(sceneData.ground);
 
             FindObjectOfType<Camera>().backgroundColor = sceneData.defBGColor;
-
             yield return null;
         }
     }
-
 }

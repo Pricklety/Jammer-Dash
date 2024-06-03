@@ -107,8 +107,16 @@ namespace JammerDash.Audio
                             float intensity = rms * line.intensitymultiplier;
                             line.rectTransform.sizeDelta = new Vector2(line.rectTransform.sizeDelta.x, intensity);
                             float num2 = 15f * rms;
-                            Color targetColor = CalculateTargetColor(Mathf.Lerp(0.0f, intensity, (float)(Time.fixedDeltaTime * num2 * 5.0)), Mathf.Lerp(0.0f, rms, (float)(Time.fixedDeltaTime * num2 / 20.0)));
-                            line.rectTransform.GetComponent<Image>().color = targetColor;
+                            if (data.visualizerColor)
+                            {
+                                Color targetColor = CalculateTargetColor(Mathf.Lerp(0.0f, intensity, (float)(Time.fixedDeltaTime * num2 * 5.0)), Mathf.Lerp(0.0f, rms, (float)(Time.fixedDeltaTime * num2 / 20.0)));
+                                line.rectTransform.GetComponent<Image>().color = targetColor;
+
+                            }
+                            else
+                            {
+                                line.rectTransform.GetComponent<Image>().color = new Color(255, 255, 255, 150);
+                            }
 
                         }
                         else if (line.rectTransform != null && !data.lineVisualizer)

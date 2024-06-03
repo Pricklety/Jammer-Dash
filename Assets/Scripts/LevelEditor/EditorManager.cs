@@ -1881,23 +1881,18 @@ namespace JammerDash.Editor
                     // Avoid division by zero by ensuring clickTimingWindow + distance is not zero
                     float divisor = clickTimingWindow + distance != 0 ? clickTimingWindow + distance : float.Epsilon;
                     // Add difficulty contribution for this pair of cubes
-                    float contribution = timingWindow / 1.04f
-                     + cubeCount / 20f
-                     * (cubes.Count / 80f)
+                    float contribution = (timingWindow / 0.64f
+                     + cubeCount / 200f
+                     * (cubes.Count / 120f)
                      * (saws.Count / 20f)
                      * (longCubes.Count / 100f)
-                     * (precisionFactor / divisor * 100f)
-                     + 1 / (hp.value + 1) * 15f
-                     +Mathf.Exp(0.1f * (0.5f - size.value) * 70f);
-
-                    // Round the contribution to avoid approximate results
-                    contribution = Mathf.Round(contribution * 1000000f) / 1000000f; // Round to 6 decimal places
+                     * (precisionFactor / divisor)
+                     * 1 / (hp.value + 1) * 500f
+                     + Mathf.Exp(0.1f * (0.5f - size.value) * 70f)) / 10f;
 
                     difficulty += contribution;
                 }
             }
-            // Round the final difficulty value
-            difficulty = Mathf.Round(difficulty * 1000000f) / 1000000f;
             return difficulty;
         }
         private float CalculateTimingWindow(Vector2 position1, Vector2 position2, int yLevelDifference)

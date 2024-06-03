@@ -28,6 +28,8 @@ namespace JammerDash.Menus.Play
         public Text levelObj;
         public Text bonus;  
         public leaderboard lb;
+        public AudioSource sfx;
+        public AudioClip sfxclip;
         void Start()
         {
             button = GetComponent<Button>();
@@ -69,15 +71,20 @@ namespace JammerDash.Menus.Play
                 string[] data = line.Split(',');
 
                 // Ensure that the data array has enough elements
-                if (data.Length >= 5) // Ensure there are at least 5 elements in the array
+                if (data.Length >= 10) // Ensure there are at least 10 elements in the array
                 {
                     string level = data[0];
                     if (level == levelName)
                     {
-                        string[] scoreData = new string[3];
+                        string[] scoreData = new string[8];
                         scoreData[0] = data[1]; // Ranking
                         scoreData[1] = data[4]; // Score
                         scoreData[2] = data[3]; // Accuracy
+                        scoreData[3] = data[5]; // Five
+                        scoreData[4] = data[6]; // Three
+                        scoreData[5] = data[7]; // One
+                        scoreData[6] = data[8]; // Miss
+                        scoreData[7] = data[9]; // Username
 
                         scoresList.Add(scoreData);
                     }
@@ -99,9 +106,12 @@ namespace JammerDash.Menus.Play
 
                 // Display each ranking, score, and accuracy
                 string displayText = string.Format("Score: {0:N0}, Accuracy: {1:F2}%", Convert.ToInt64(scoreData[1]), Convert.ToSingle(scoreData[2]));
+                string acc = string.Format("5: {0}\n3: {1}\n1: {2}\n0: {3}", scoreData[3], scoreData[4], scoreData[5], scoreData[6]);
 
                 scorePanel.scoreText.text = displayText;
                 scorePanel.rankText.text = scoreData[0];
+                scorePanel.accuracyText.text = acc;
+                scorePanel.username.text = scoreData[7];
             }
         }
         
@@ -138,7 +148,7 @@ namespace JammerDash.Menus.Play
                 else
                 {
                     // Play custom level
-                    this.GetComponent<CustomLevelScript>().PlayLevel();
+                    GetComponent<CustomLevelScript>().PlayLevel();
                 }
             }
         }
@@ -211,12 +221,17 @@ namespace JammerDash.Menus.Play
             {
                 if (gameObject.GetComponent<CustomLevelScript>() == null)
                 {
+                    sfx.PlayOneShot(sfxclip);
                     FindFirstObjectByType<mainMenu>().OpenLevel(GetComponent<RankDisplay>().sceneIndex);
+                    StopAllCoroutines();
                 }
                 else
                 {
+
+                    sfx.PlayOneShot(sfxclip);
                     // Play custom level
-                    this.GetComponent<CustomLevelScript>().PlayLevel();
+                    GetComponent<CustomLevelScript>().PlayLevel();
+                    StopAllCoroutines();
                 }
             }
             // Reset other buttons' selection
@@ -240,7 +255,6 @@ namespace JammerDash.Menus.Play
                     int audioClipIndex = -1; // Initialize to a value that indicates no match found
                     // Normalize the clipPath
                     clipPath.Replace("/", "\\");
-                    Debug.Log(clipPath);
                     // Iterate through the songPathsList
                     for (int i = 0; i < AudioManager.Instance.songPathsList.Count; i++)
                     {

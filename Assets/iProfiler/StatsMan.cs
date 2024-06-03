@@ -78,8 +78,8 @@ namespace JammerDash.Tech
         void DisplayOptionsInfo()
         {
             SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-            bool scoretype = Convert.ToBoolean(data.scoreType);
-            string a = scoretype ? "Old" : "New";
+          
+
             string bg = "";
             switch (data.bgTime)
             {
@@ -95,7 +95,6 @@ namespace JammerDash.Tech
             }
 
             gui.text += "\n\nResolution value: " + data.resolutionValue + $" ({Screen.width}x{Screen.height})" +
-                        "\nScreen Mode: " + data.windowMode + $" ({Screen.fullScreenMode})" +
                         "\nQuality Level: " + data.qualitySettingsLevel + $" ({GetQualityLevelName()})" +
                         "\nArtistic Backgrounds: " + data.artBG + $" ({Resources.LoadAll<Sprite>("backgrounds").Length} bgs)" +
                         "\nCustom Backgrounds: " + data.customBG + $" ({Directory.GetFiles(Application.persistentDataPath + "/backgrounds", "*.png").Length} bgs)" +
@@ -108,7 +107,6 @@ namespace JammerDash.Tech
                         "\nVisualizers: {" + data.allVisualizers + "," + data.lineVisualizer + "," + data.logoVisualizer + "," + data.bgVisualizer + "}" +
                         "\nNo focus volume: " + data.noFocusVolume +
                         "\nLowpass value: " + data.lowpassValue +
-                        "\nScore Display Type: " + a +
                         "\nMouse particle count: " + data.mouseParticles +
                         "\nShowing FPS: " + data.isShowingFPS +
                         "\nParallax: " + data.parallax +

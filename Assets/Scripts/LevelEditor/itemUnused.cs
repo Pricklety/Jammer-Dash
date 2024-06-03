@@ -27,8 +27,6 @@ namespace JammerDash.Editor.Basics
         // Update is called once per frame
         void Update()
         {
-            transform.position = new Vector3(transform.position.x, transform.position.y, 2);
-
             if (SceneManager.GetActiveScene().name == "LevelDefault")
             {
 
@@ -41,9 +39,10 @@ namespace JammerDash.Editor.Basics
                     transform.localScale = new Vector2(CustomLevelDataManager.Instance.cubesize, CustomLevelDataManager.Instance.cubesize);
                 }
             }
-            else if (SceneManager.GetActiveScene().name == "SampleScene")
+            else if (SceneManager.GetActiveScene().name == "SampleScene" && Input.GetMouseButtonUp(0) )
             {
-                transform.localScale = new Vector2(FindObjectOfType<EditorManager>().size.value, FindObjectOfType<EditorManager>().size.value);
+                if (transform.localScale != new Vector3(FindObjectOfType<EditorManager>().size.value, FindObjectOfType<EditorManager>().size.value, 0))
+                transform.localScale = new Vector3(FindObjectOfType<EditorManager>().size.value, FindObjectOfType<EditorManager>().size.value, 0);
             }
         }
     }

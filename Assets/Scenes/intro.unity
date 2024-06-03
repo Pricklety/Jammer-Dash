@@ -428,12 +428,32 @@ PrefabInstance:
       value: Accessibility Manager
       objectReference: {fileID: 0}
     - target: {fileID: 11475380, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
+      propertyPath: m_HandleUI
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11475380, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
+      propertyPath: m_CyclicMenus
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11475380, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
+      propertyPath: m_DefaultState
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11475380, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
       propertyPath: m_EditorOverride
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11475380, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
       propertyPath: m_EditorEnabledState
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11475380, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
+      propertyPath: m_ReadDisabledInteractables
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 22474968, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -1.500061
       objectReference: {fileID: 0}
     - target: {fileID: 4973883477652662, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
       propertyPath: m_LocalPosition.x
@@ -6274,10 +6294,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a982b32e1da81a749914168cb7f567f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  username: Guest
   level: 0
   currentXP: 0
   xpRequiredPerLevel: 
   totalXP: 0
+  usernameInput: {fileID: 0}
+  buttonCreate: {fileID: 0}
 --- !u!1 &1267479039
 GameObject:
   m_ObjectHideFlags: 0
@@ -6657,6 +6680,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eba2f26c4e6b2974d851370bfc0fa386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sfxShort: {fileID: 8300000, guid: b43f9ec356b93504e949ab8bf20ae1a5, type: 3}
+  sfxLong: {fileID: 8300000, guid: d323d0049e7ee7f4e8596f58e2021b19, type: 3}
   songPathsList: []
   currentClipIndex: 0
   isMusicLoaded: 0

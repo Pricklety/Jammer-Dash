@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using JammerDash.Editor;
-using JammerDash.Tech.Levels;
 namespace JammerDash.Tech
 {
     public class DiscordRPC : MonoBehaviour
@@ -22,7 +21,7 @@ namespace JammerDash.Tech
             DiscordManager.current.UpdateDetails("Unity: " + SceneManager.GetActiveScene().name);
             DiscordManager.current.UpdateState("Playtesting");
 #else
-            DiscordManager.current.client.UpdateLargeAsset("logo", $"(No account found): #N/A");
+            DiscordManager.current.client.UpdateLargeAsset("logo", $"{JammerDash.Account.Instance.username}: #N/A");
             DiscordManager.current.client.UpdateSmallAsset("shine", "-- sp");
             if (SceneManager.GetActiveScene().buildIndex > 2 && SceneManager.GetActiveScene().name != "LevelDefault" && SceneManager.GetActiveScene().name != "SampleScene")
             {
@@ -42,7 +41,7 @@ namespace JammerDash.Tech
             else if (SceneManager.GetActiveScene().name == "MainMenu")
             {
                 DiscordManager.current.UpdateDetails($"Idle");
-                DiscordManager.current.UpdateState($"{DiscordManager.current.CurrentUser.username}; Level {LevelSystem.Instance.level} - {LevelSystem.Instance.totalXP:N1}xp");
+                DiscordManager.current.UpdateState($"{DiscordManager.current.CurrentUser.username}; Level {Account.Instance.level} - {Account.Instance.totalXP:N1}xp");
             }
             else if (SceneManager.GetActiveScene().name == "intro")
             {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace JammerDash
@@ -35,7 +36,6 @@ namespace JammerDash
     public class SettingsData
     {
         public int resolutionValue = 99;
-        public int windowMode = 1;
         public int selectedFPS = 60;
         public bool vsync = true;
         public float volume = 1;
@@ -55,7 +55,6 @@ namespace JammerDash
         public bool bgVisualizer = true;
         public float noFocusVolume = -20f;
         public float lowpassValue = 500;
-        public int scoreType = 0;
         public float mouseParticles = 1000;
         public bool isShowingFPS = false;
         public int hitType = 0;
@@ -67,6 +66,11 @@ namespace JammerDash
         public bool wheelShortcut = true;
         public bool volumeIncrease = false;
         public bool snow = false;
+        public bool loadedLogoSFX = false;
+        public bool canvasOff = false;
+        public bool bass = false;
+        public float bassgain = 2.5f;
+        public bool visualizerColor = false;
         public string gameVersion = Application.version;
         public string saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
 

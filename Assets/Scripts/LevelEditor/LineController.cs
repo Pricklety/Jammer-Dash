@@ -44,7 +44,7 @@ namespace JammerDash.Editor
                 Vector3 movement = Vector3.right * Time.deltaTime * 7f; // Adjust the speed as needed
                 if (currentLine != null)
                 {
-                    currentLine.transform.Translate(movement);
+                    currentLine.transform.position = new Vector2(GameObject.Find("Music").GetComponent<AudioSource>().time * 7f, 0);
                 }
 
 

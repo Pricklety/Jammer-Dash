@@ -20,17 +20,13 @@ namespace JammerDash.Game
         public Text creator;
         public Text info;
         public int attint;
-        private float startTime;
-        private Animator anim;
-        private SceneData data;
+        public GameObject canvas;
         public AudioSource music;
         // Start is called before the first frame update
         void Start()
         {
 
             GameObject animA = GameObject.Find("Main Camera");
-            anim = animA.GetComponent<Animator>();
-            startTime = Time.time;
             if (SceneManager.GetActiveScene().name != "LevelDefault")
             {
                 song.text = SceneManager.GetActiveScene().name;
@@ -123,6 +119,18 @@ namespace JammerDash.Game
                     attint = 1;
                 }
             }
+            ;
+        }
+
+        public IEnumerator CheckUI()
+        {
+            SettingsData sd = SettingsFileHandler.LoadSettingsFromFile();
+            if (sd.canvasOff)
+            {
+                canvas.SetActive(false);
+                Notifications.Notifications.instance.Notify("Playfield UI is off.\nClick Shift+F1 to turn it back on.", null);
+                yield return null;
+            }
         }
         private void CheckSceneDataExists(string levelName, string folder)
         {
@@ -171,7 +179,7 @@ namespace JammerDash.Game
                 music = GameObject.Find("Music").GetComponent<AudioSource>();
 
 
-            if (Input.GetKeyDown(KeyCode.Escape) && GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindObjectOfType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
+            if (Input.GetKeyDown(KeyCode.Escape) && canvas.activeSelf && GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindObjectOfType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
             {
 
                 PlayerPrefs.SetInt("attempts", attint);
@@ -200,6 +208,10 @@ namespace JammerDash.Game
                 }
 
             }
+            else if (!canvas.activeSelf)
+            {
+                Notifications.Notifications.instance.Notify("Playfield UI is off\nClick Shift+F1 to re-enable it.", null);
+            }
             bool focus = Application.isFocused;
             if (!focus)
             {
@@ -214,7 +226,7 @@ namespace JammerDash.Game
 
         void OnApplicationFocus(bool focus)
         {
-            if (!focus) // Only execute when focus is lost
+            if (!focus && canvas.activeSelf) // Only execute when focus is lost
             {
                 if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindObjectOfType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
                 {

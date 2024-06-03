@@ -150,8 +150,6 @@ namespace JammerDash.Menus.Play
             data.levelName = levelNameText.text;
             LoadSceneAddressable("Assets/LevelDefault.unity", () =>
             {
-
-                SceneManager.UnloadSceneAsync("MainMenu");
                 LevelDataManager data = LevelDataManager.Instance;
                 data.levelName = levelNameText.text;
                 LevelDataManager.Instance.LoadLevelData(levelNameText.text);
@@ -166,7 +164,6 @@ namespace JammerDash.Menus.Play
             if (sceneData != null)
             {
 
-                PlayerPrefs.SetString("CurrentLevelData", sceneData.ToJson());
                 SceneManager.LoadSceneAsync("SampleScene").completed += operation =>
                 {
                     LevelDataManager data = LevelDataManager.Instance;
@@ -178,7 +175,7 @@ namespace JammerDash.Menus.Play
             }
             else
             {
-                Debug.LogError("SceneData is not set for this level.");
+                Notifications.Notifications.instance.Notify("Error (ID: J1)\nThis level does not exist.", null);
             }
         }
 

@@ -39,15 +39,20 @@ namespace JammerDash.Menus.Play
                 string[] data = line.Split(',');
 
                 // Ensure that the data array has enough elements
-                if (data.Length >= 5) // Ensure there are at least 5 elements in the array
+                if (data.Length >= 10) // Ensure there are at least 10 elements in the array
                 {
                     string level = data[2];
                     if (level == levelName)
                     {
-                        string[] scoreData = new string[3];
+                        string[] scoreData = new string[8];
                         scoreData[0] = data[1]; // Ranking
                         scoreData[1] = data[4]; // Score
                         scoreData[2] = data[3]; // Accuracy
+                        scoreData[3] = data[5]; // Five
+                        scoreData[4] = data[6]; // Three
+                        scoreData[5] = data[7]; // One
+                        scoreData[6] = data[8]; // Miss
+                        scoreData[7] = data[9]; // Username
 
                         // Add the score data to the scores dictionary
                         if (!scoresDictionary.ContainsKey(levelName))
@@ -63,22 +68,34 @@ namespace JammerDash.Menus.Play
                 }
             }
 
-            // Instantiate a panel for the selected level
-            foreach (string levelName2 in scoresDictionary.Keys)
+            // Clear existing panels
+            foreach (Transform child in panelContainer)
             {
-                GameObject panel = Instantiate(GetComponent<leaderboard>().panelPrefab, GetComponent<leaderboard>().panelContainer);
+                Destroy(child.gameObject);
+            }
+
+            // Instantiate a panel for each score entry in the selected level
+            foreach (string[] scoreData in scoresDictionary[levelName])
+            {
+                GameObject panel = Instantiate(panelPrefab, panelContainer);
                 ScorePanel scorePanel = panel.GetComponent<ScorePanel>();
 
-                // Display each ranking, score, and accuracy
-                string displayText = "";
-                string rankText = "";
-                foreach (string[] scoreData in scoresDictionary[levelName2])
-                {
-                    displayText = string.Format("Score: {0:N0}, Accuracy: {1}%\n", scoreData[1], scoreData[2]);
-                    rankText = string.Format("{0}", scoreData[0]);
-                }
+                // Display the ranking, score, accuracy, and other data
+                string displayText = string.Format("Score: {0:N0}, Accuracy: {1}%\n", scoreData[1], scoreData[2]);
+                string rankText = string.Format("{0}", scoreData[0]);
+                string acc = string.Format("5: {0}\n3: {1}\n1: {2}\n0: {3}", scoreData[3], scoreData[4], scoreData[5], scoreData[6]);
+                string user = scoreData[7];
+
+                // Debug logs to ensure data is correct
+                Debug.Log("Rank: " + rankText);
+                Debug.Log("Score: " + displayText);
+                Debug.Log("Accuracy breakdown: " + acc);
+                Debug.Log("Username: " + user);
+
                 scorePanel.rankText.text = rankText;
                 scorePanel.scoreText.text = displayText;
+                scorePanel.accuracyText.text = acc;
+                scorePanel.username.text = user;
             }
         }
     }

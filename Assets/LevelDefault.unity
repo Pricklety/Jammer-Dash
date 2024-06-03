@@ -1123,6 +1123,7 @@ MonoBehaviour:
   creator: {fileID: 1738070220}
   info: {fileID: 416489149}
   attint: 0
+  canvas: {fileID: 73053371}
   music: {fileID: 0}
 --- !u!114 &353979857
 MonoBehaviour:
@@ -1890,7 +1891,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Level info not loaded. invalid file.
+  m_Text: 
 --- !u!222 &416489150
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4029,9 +4030,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61b8ed8a1982c3745b6fb7dd1a6cce2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_PopUp: 0
+  m_PopUp: 1
   m_AllowExternalJoining: 0
-  m_AutoRead: 0
+  m_AutoRead: 1
   m_Priority: 0
   m_ContainerName: 
   m_IsLocalizationKey: 0
@@ -5265,6 +5266,8 @@ MonoBehaviour:
   acc: {fileID: 0}
   vignetteStartHealthPercentage: 0.5
   startColor: {r: 1, g: 0, b: 0, a: 1}
+  shortCube: {fileID: 8300000, guid: c238758dc8f96b54da29878a2e379973, type: 3}
+  longCube: {fileID: 8300000, guid: 4e6feb5bcc49eb049b98dedac3059d1b, type: 3}
   clip01: {fileID: 0}
   clip02: {fileID: 0}
   clip03: {fileID: 0}
@@ -5287,6 +5290,7 @@ MonoBehaviour:
   three: 0
   one: 0
   SPInt: 0
+  canvas: {fileID: 73053371}
 --- !u!114 &1467467704
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5878,9 +5882,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61b8ed8a1982c3745b6fb7dd1a6cce2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_PopUp: 0
+  m_PopUp: 1
   m_AllowExternalJoining: 0
-  m_AutoRead: 0
+  m_AutoRead: 1
   m_Priority: 0
   m_ContainerName: 
   m_IsLocalizationKey: 0
@@ -6649,6 +6653,8 @@ MonoBehaviour:
   acc: {fileID: 0}
   vignetteStartHealthPercentage: 0.5
   startColor: {r: 1, g: 0, b: 0, a: 1}
+  shortCube: {fileID: 8300000, guid: c238758dc8f96b54da29878a2e379973, type: 3}
+  longCube: {fileID: 8300000, guid: 4e6feb5bcc49eb049b98dedac3059d1b, type: 3}
   clip01: {fileID: 0}
   clip02: {fileID: 0}
   clip03: {fileID: 0}
@@ -6671,6 +6677,7 @@ MonoBehaviour:
   three: 0
   one: 0
   SPInt: 0
+  canvas: {fileID: 73053371}
 --- !u!111 &1765330808
 Animation:
   m_ObjectHideFlags: 0
@@ -7790,9 +7797,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61b8ed8a1982c3745b6fb7dd1a6cce2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_PopUp: 0
+  m_PopUp: 1
   m_AllowExternalJoining: 0
-  m_AutoRead: 0
+  m_AutoRead: 1
   m_Priority: 0
   m_ContainerName: 
   m_IsLocalizationKey: 0

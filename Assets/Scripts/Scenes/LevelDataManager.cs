@@ -96,11 +96,12 @@ namespace JammerDash.Tech
         }
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            mode = LoadSceneMode.Single;
             if (scene.name == "LevelDefault")
             {
-                StartCoroutine(ProcessAfterSceneLoaded());
 
-                SceneManager.sceneLoaded -= OnSceneLoaded;
+                SceneManager.sceneLoaded -= OnSceneLoaded; 
+                StartCoroutine(ProcessAfterSceneLoaded());
             }
         }
         private IEnumerator ProcessAfterSceneLoaded()

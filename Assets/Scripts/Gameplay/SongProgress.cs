@@ -125,10 +125,10 @@ namespace JammerDash.Game
             // Update loading text to indicate completion
             GameObject.Find("Canvas/default/loadingText").GetComponent<Text>().text = $"";
 
-            // Hide progress bar or loading UI elements if necessary
-
             // Yield return the loaded audio clip
             yield return loadedAudioClip;
+
+            StopAllCoroutines();
         }
 
     }

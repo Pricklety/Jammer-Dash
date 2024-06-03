@@ -17,7 +17,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using JammerDash.Audio;
 using JammerDash.Menus.Play;
-using JammerDash.Tech.Levels;
+using SimpleFileBrowser;
+using System.Linq;
 
 namespace JammerDash.Menus
 {
@@ -32,7 +33,10 @@ namespace JammerDash.Menus
         public float quitTime = 0f;
         public Image quitPanel2;
         PlayerData playerData;
-
+        public GameObject accessoverPanel;
+        public GameObject accessibilityButton;
+        public Text nolevelerror;
+        public GameObject[] disableAccess;
         [Header("Panels")]
         public GameObject mainPanel;
         public GameObject playPanel;
@@ -46,6 +50,7 @@ namespace JammerDash.Menus
         public GameObject changelogs;
         public GameObject funMode;
         public GameObject overPanel;
+        public GameObject accPanel;
 
         [Header("LevelInfo")]
         public GameObject levelInfoPanelPrefab;
@@ -86,8 +91,9 @@ namespace JammerDash.Menus
         [Header("Profile")]
         public Slider levelSlider;
         public Text levelText;
-        public RawImage discordpfp;
+        public RawImage[] discordpfp;
         public Text discordName;
+        public Text[] usernames;
 
         [Header("Fun Mode")]
         public GameObject vis2;
@@ -112,20 +118,34 @@ namespace JammerDash.Menus
         void Start()
         {
             Time.timeScale = 1f;
-            playerData = LevelSystem.Instance.LoadTotalXP();
+            playerData = Account.Instance.LoadData();
             data = SettingsFileHandler.LoadSettingsFromFile();
             LoadRandomBackground();
             RefreshInternetConnection();
             LoadLevelsFromFiles();
             LoadLevelFromLevels();
-            levelSlider.maxValue = LevelSystem.Instance.xpRequiredPerLevel[0];
-            levelSlider.value = LevelSystem.Instance.currentXP;
-
-            discordpfp.texture = DiscordManager.current.CurrentUser.avatar;
+            levelSlider.maxValue = Account.Instance.xpRequiredPerLevel[0];
+            levelSlider.value = Account.Instance.currentXP;
+          
             discordName.text = DiscordManager.current.CurrentUser.username + "\n\nID: " +
             DiscordManager.current.CurrentUser.ID;
-
-
+            if (UAP_AccessibilityManager.IsActive())
+            {
+                foreach (GameObject go in disableAccess)
+                {
+                    go.SetActive(false);
+                }
+                accessibilityButton.SetActive(true);
+            }
+            else
+            {
+                foreach (GameObject go in disableAccess)
+                {
+                    go.SetActive(true);
+                }
+                accessibilityButton.SetActive(false);
+            }
+            
         }
         public string FormatTime(float time)
         {
@@ -176,12 +196,10 @@ namespace JammerDash.Menus
         {
             foreach (Transform child in playlevelInfoParent)
             {
-                if (child.GetComponent<CustomLevelScript>())
-                {
-                    Destroy(child.gameObject);
-                }
+                Destroy(child.gameObject);
             }
 
+            string defaultLevelsPath = Path.Combine(Application.streamingAssetsPath, "levels");
             string levelsPath = Path.Combine(Application.persistentDataPath, "levels");
 
             if (!Directory.Exists(levelsPath))
@@ -192,8 +210,15 @@ namespace JammerDash.Menus
             }
 
             string[] levelFiles = Directory.GetFiles(levelsPath, "*.jdl", SearchOption.AllDirectories);
+            string[] defaultLevelFiles = Directory.GetFiles(defaultLevelsPath, "*.jdl");
 
-            foreach (string filePath in levelFiles)
+            string[] allLevelFiles = new string[levelFiles.Length + defaultLevelFiles.Length];
+            levelFiles.CopyTo(allLevelFiles, 0);
+            defaultLevelFiles.CopyTo(allLevelFiles, levelFiles.Length);
+
+            HashSet<int> processedIDs = new HashSet<int>();
+
+            foreach (string filePath in allLevelFiles)
             {
                 if (Path.GetFileName(filePath).Equals("LevelDefault.jdl"))
                 {
@@ -227,6 +252,15 @@ namespace JammerDash.Menus
                         continue;
                     }
 
+                    // Check if the sceneData.ID has already been processed
+                    if (processedIDs.Contains(sceneData.ID))
+                    {
+                        continue; // Skip duplicate levels
+                    }
+
+                    // Add the ID to the processed set
+                    processedIDs.Add(sceneData.ID);
+
                     // Log the level name to verify if sceneData is successfully deserialized
                     UnityEngine.Debug.LogWarning(sceneData.levelName);
 
@@ -255,8 +289,36 @@ namespace JammerDash.Menus
                 }
             }
         }
+        public void Import()
+        {
+            FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserCanvas")).GetComponent<FileBrowser>();
+            FileBrowser.SetFilters(false, new FileBrowser.Filter("Jammer Dash Level", ".jdl"));
+            FileBrowser.SetDefaultFilter("Music");
+            FileBrowser.ShowLoadDialog(ImportLevel, null, FileBrowser.PickMode.Files, true, null, null, "Import Level...", "Import");
+        }
 
+        void ImportLevel(string[] paths)
+        {
+            if (paths.Length >= 0)
+            {
+                foreach (string path in paths)
+                {
+                    File.Move(path, Path.Combine(Application.persistentDataPath, "levels", Path.GetFileName(path)));
+                }
+            }
 
+            LoadLevelFromLevels();
+        }
+        public void Accounts()
+        {
+            accPanel.SetActive(!accPanel.activeSelf);
+        }
+
+        public void SaveAcc()
+        {
+            Account.Instance.username = Account.Instance.usernameInput.text;
+            Account.Instance.SavePlayerData();
+        }
         public static string ExtractJSONFromJDL(string jdlFilePath)
         {
             try
@@ -1078,24 +1140,42 @@ namespace JammerDash.Menus
         }
         public void FixedUpdate()
         {
+        
+            foreach (RawImage pfp in discordpfp)
+            {
+                 
+                pfp.texture = DiscordManager.current.CurrentUser.avatar;
 
-            if (LevelSystem.Instance.xpRequiredPerLevel[LevelSystem.Instance.level] >= 2000000)
+            }
+            foreach (Text text in usernames)
+            {
+                if (string.IsNullOrEmpty(Account.Instance.username))
+                {
+                    text.text = "Guest";
+                }
+                else
+                {
+                    text.text = Account.Instance.username;
+                }
+
+            }
+            if (Account.Instance.xpRequiredPerLevel[Account.Instance.level] >= 2000000)
             {
                 levelSlider.maxValue = 2000000;
-                float normalizedValue = (float)(LevelSystem.Instance.currentXP / LevelSystem.Instance.xpRequiredPerLevel[LevelSystem.Instance.level]);
+                float normalizedValue = (float)(Account.Instance.currentXP / Account.Instance.xpRequiredPerLevel[Account.Instance.level]);
                 levelSlider.value = normalizedValue * levelSlider.maxValue;
             }
             else
             {
-                levelSlider.maxValue = (float)LevelSystem.Instance.xpRequiredPerLevel[LevelSystem.Instance.level];
-                levelSlider.value = Mathf.Min((float)LevelSystem.Instance.currentXP, levelSlider.maxValue);
+                levelSlider.maxValue = (float)Account.Instance.xpRequiredPerLevel[Account.Instance.level];
+                levelSlider.value = Mathf.Min((float)Account.Instance.currentXP, levelSlider.maxValue);
             }
-            if (LevelSystem.Instance.currentXP >= 0)
+            if (Account.Instance.currentXP >= 0)
             {
-                levelText.text = "lv" + LevelSystem.Instance.level.ToString() + $" (XP: {FormatNumber(LevelSystem.Instance.totalXP)})";
+                levelText.text = "lv" + Account.Instance.level.ToString() + $" (XP: {FormatNumber(Account.Instance.totalXP)})";
 
             }
-          
+
 
             if (quitPanel.activeSelf)
             {
@@ -1110,7 +1190,7 @@ namespace JammerDash.Menus
             data = SettingsFileHandler.LoadSettingsFromFile();
             if (data.parallax)
             {
-                const float backgroundScaleFactor = 1.05f;
+                const float backgroundScaleFactor = 1.15f;
                 const float cameraMovementFactor = 2f;
                 const float maxMovementOffset = 2f;
 
@@ -1181,26 +1261,41 @@ namespace JammerDash.Menus
             {
                 audioMixer.SetFloat("Lowpass", data.lowpassValue);
             }
+
+            if (mainPanel.activeSelf && AudioManager.Instance.GetComponent<AudioSource>().loop)
+            {
+                AudioManager.Instance.GetComponent<AudioSource>().loop = false;
+            }
+            if (playlevelInfoParent.childCount == 0)
+            {
+                nolevelerror.gameObject.SetActive(true);
+                LoadLevelFromLevels();
+            }
+            else
+            {
+                nolevelerror.gameObject.SetActive(false);
+
+            }
+        }
+
+        public void Accessibility()
+        {
+            if (UAP_AccessibilityManager.IsActive())
+            {
+                ToggleMenuPanel(overPanel);
+            }
         }
 
         void Update()
         {
 
-
-            if (Input.GetKeyDown(KeyCode.Tab))
+            if (Input.GetKeyDown(KeyCode.Escape))
             {
-                if (EventSystem.current.currentSelectedGameObject.transform.parent == overPanel)
-                {
-                    mainPanel.SetActive(true);
-                }
-                else
-                {
-                    overPanel.SetActive(true);
-                }
+                ToggleMenuPanel(mainPanel);
             }
-            bool hasInput = Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return);
+            bool hasInput = Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space);
             idleTimer += Time.fixedDeltaTime;
-            if (!hasInput)
+            if (!hasInput && !UAP_AccessibilityManager.IsActive())
             {
                 // Player is idle, start the idle animation immediately if it's not already playing
                 if (idleTimer > idleTimeThreshold || Input.GetKeyDown(KeyCode.F1))
@@ -1210,7 +1305,7 @@ namespace JammerDash.Menus
                 }
 
             }
-            else if (hasInput && !IsPointerOverUIButNotButton())
+            else if (hasInput && !IsPointerOverUIButNotButton() && !UAP_AccessibilityManager.IsActive())
             {
                 idleTimer = 0;  // Resetting idleTimer when there is input
                 animator.SetTrigger("StopIdle");
@@ -1220,10 +1315,10 @@ namespace JammerDash.Menus
             {
                 LoadLevelFromLevels();
                 LoadLevelsFromFiles();
-                LevelSystem.Instance.CalculateXPRequirements();
-                LevelSystem.Instance.GainXP(0);
-                LevelSystem.Instance.LoadTotalXP();
-                Notifications.Notifications.instance.Notify($"Level list, levels and xp are reloaded. \n{levelInfoParent.childCount} levels total, {LevelSystem.Instance.totalXP} xp", null);
+                Account.Instance.CalculateXPRequirements();
+                Account.Instance.GainXP(0);
+                Account.Instance.LoadData();
+                Notifications.Notifications.instance.Notify($"Level list, levels and xp are reloaded. \n{levelInfoParent.childCount} levels total, {Account.Instance.totalXP} xp", null);
             }
             if (Input.GetKeyDown(KeyCode.F2))
             {

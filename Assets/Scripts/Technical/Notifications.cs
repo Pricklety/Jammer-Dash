@@ -28,6 +28,10 @@ namespace JammerDash.Notifications
         public void Notify(string message, UnityAction buttonEvent)
         {
             main.text = $"{message}";
+            if (UAP_AccessibilityManager.IsActive())
+            {
+                UAP_AccessibilityManager.Say(message, false, true);
+            } 
             panel.GetComponent<Animation>().Stop();
             panel.GetComponent<Animation>().Play();
             action.onClick.AddListener(buttonEvent);

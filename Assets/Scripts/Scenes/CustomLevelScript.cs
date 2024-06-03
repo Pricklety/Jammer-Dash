@@ -6,7 +6,6 @@ using System.IO.Compression;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
@@ -26,6 +25,7 @@ namespace JammerDash.Menus.Play
         public SceneData sceneData;
         private List<GameObject> cubes = new List<GameObject>();
         private List<GameObject> saws = new List<GameObject>();
+
         // Set the level data for this script
         public void SetSceneData(SceneData data)
         {
@@ -71,7 +71,6 @@ namespace JammerDash.Menus.Play
             }
         }
 
-
         public void SetDifficulty(string difficulty)
         {
             if (difficultyText != null)
@@ -83,6 +82,7 @@ namespace JammerDash.Menus.Play
                 Debug.LogError("difficultyText is not assigned in the inspector.");
             }
         }
+
         public static string ExtractJSONFromJDL(string jdlFilePath)
         {
             try
@@ -111,30 +111,37 @@ namespace JammerDash.Menus.Play
             return null;
         }
 
-
         public void PlayLevel()
         {
+            CustomLevelDataManager data = CustomLevelDataManager.Instance;
+
+            if (data.sceneLoaded)
+            {
+                Debug.LogWarning("Scene already loaded, skipping loading.");
+                return;
+            }
+
             LevelDataManager.Instance.levelName = null;
             LevelDataManager.Instance.creator = null;
             LevelDataManager.Instance.diff = 0;
             LevelDataManager.Instance.ID = 0;
-            string json = File.ReadAllText(Application.persistentDataPath + $"/levels/extracted/{levelNameText.text}/" + $"{levelNameText.text}.json");
-            SceneData sceneData = SceneData.FromJson(json);
-            CustomLevelDataManager data = CustomLevelDataManager.Instance;
-            data.levelName = levelNameText.text;
-            LoadSceneAddressable("Assets/LevelDefault.unity", () =>
-            {
 
-                SceneManager.UnloadSceneAsync("MainMenu");
-                CustomLevelDataManager data = CustomLevelDataManager.Instance;
+            string jsonFilePath = Path.Combine(Application.persistentDataPath, "levels", "extracted", levelNameText.text, $"{levelNameText.text}.json");
+            if (File.Exists(jsonFilePath))
+            {
+                string json = File.ReadAllText(jsonFilePath);
+                SceneData sceneData = SceneData.FromJson(json);
                 data.levelName = levelNameText.text;
-                CustomLevelDataManager.Instance.LoadLevelData(levelNameText.text, data.ID);
-            });
+                Debug.Log(data.levelName);
+                CustomLevelDataManager.Instance.LoadLevelData(sceneData.sceneName, sceneData.ID);
+            }
+            else
+            {
+                Debug.LogError("JSON file not found: " + jsonFilePath);
+            }
         }
 
-
-
-        private void LoadSceneAddressable(string sceneKey, System.Action onComplete)
+        private void LoadSceneAddressable(string sceneKey, Action onComplete)
         {
             AsyncOperationHandle<SceneInstance> loadOperation = Addressables.LoadSceneAsync(sceneKey, LoadSceneMode.Additive);
             loadOperation.Completed += operation =>
@@ -150,5 +157,4 @@ namespace JammerDash.Menus.Play
             };
         }
     }
-
 }

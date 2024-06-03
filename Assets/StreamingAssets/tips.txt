@@ -15,3 +15,4 @@ The editor guide has a lot of useful things. Make sure to check it out!
 Long cubes are very complicated. Hold until you pass them!¸
 Shift + left click changes the long cube width in the editor.
 To get a perfect score, destroy each box on its specific beat
+Switch between fullscreen and windowed with "Alt+Enter"!
