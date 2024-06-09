@@ -70,12 +70,11 @@ namespace JammerDash
         public Toggle bass;
         public Slider bassGain;
         public Toggle visualizerColor;
-
-
-        private static readonly HttpClient client = new();
+        private static readonly HttpClient client = new(); 
 
         public void Start()
         {
+           
             CheckForUpdate();
             audio = FindObjectOfType<AudioManager>();
             if (audio == null)
@@ -112,7 +111,7 @@ namespace JammerDash
             // Now you can add the shuffled list to the dropdown
             playlist.AddOptions(optionDataList);
         }
-
+       
         public void OnMusicSliderValueChanged()
         {
             if (Input.GetMouseButtonDown(0))
@@ -717,13 +716,15 @@ namespace JammerDash
                 }
             }
         }
-
+       
+       
         public void Update()
         {
+           
             if (audio != null)
             {
                 DisplayMusicInfo(audio.GetComponent<AudioSource>().clip, audio.GetComponent<AudioSource>().time);
-                musicSlider.maxValue = audio.GetComponent<AudioSource>().clip.length;
+                musicSlider.maxValue = (int)audio.GetComponent<AudioSource>().clip.length;
                 UpdateDropdownSelection();
                 playlist.value = audio.currentClipIndex;
 

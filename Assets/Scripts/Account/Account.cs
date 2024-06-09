@@ -4,6 +4,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
+using System.Data;
 
 namespace JammerDash
 {
@@ -21,6 +22,10 @@ namespace JammerDash
         [Header("UI")]
         public InputField usernameInput;
         public GameObject buttonCreate;
+
+        [Header("Internet Check")]
+        public GameObject checkInternet;
+
         public static Account Instance { get; private set; }
 
         private void Awake()
@@ -146,6 +151,15 @@ namespace JammerDash
                 usernameInput = GameObject.Find("usernameField").GetComponent<InputField>();
                 usernameInput.text = username;
                 buttonCreate = GameObject.Find("create account");
+            }
+
+            if (Application.internetReachability == NetworkReachability.NotReachable)
+            {
+                checkInternet.SetActive(true);
+            }
+            else
+            {
+                checkInternet.SetActive(false);
             }
            
         }

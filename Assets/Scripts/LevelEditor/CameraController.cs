@@ -31,11 +31,6 @@ namespace JammerDash.Editor
                 moveSpeed = Input.GetAxisRaw("Mouse X");
             }
 
-            if (transform.position.x > 20000)
-            {
-                transform.position = new Vector3(19999.9f, transform.position.y, transform.position.z);
-                moveSpeed = 0;
-            }
             bool pointerOverUI = EventSystem.current.IsPointerOverGameObject();
             bool isMovingWithMouse = false;
             if (!Input.GetKey(KeyCode.LeftShift) && Input.GetMouseButton(0) && !pointerOverUI)

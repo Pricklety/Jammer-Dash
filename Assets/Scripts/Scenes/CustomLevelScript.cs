@@ -125,27 +125,15 @@ namespace JammerDash.Menus.Play
             LevelDataManager.Instance.creator = null;
             LevelDataManager.Instance.diff = 0;
             LevelDataManager.Instance.ID = 0;
-
-            string jsonFilePath = Path.Combine(Application.persistentDataPath, "levels", "extracted", levelNameText.text, $"{levelNameText.text}.json");
-            if (File.Exists(jsonFilePath))
-            {
-                string json = File.ReadAllText(jsonFilePath);
-                SceneData sceneData = SceneData.FromJson(json);
-                data.levelName = levelNameText.text;
-                Debug.Log(data.levelName);
-                CustomLevelDataManager.Instance.LoadLevelData(sceneData.sceneName, sceneData.ID);
-            }
-            else
-            {
-                Debug.LogError("JSON file not found: " + jsonFilePath);
-            }
+            CustomLevelDataManager.Instance.LoadLevelData(sceneData.sceneName, sceneData.ID);
+           
         }
 
         private void LoadSceneAddressable(string sceneKey, Action onComplete)
         {
             AsyncOperationHandle<SceneInstance> loadOperation = Addressables.LoadSceneAsync(sceneKey, LoadSceneMode.Additive);
             loadOperation.Completed += operation =>
-            {
+            { 
                 if (operation.Status == AsyncOperationStatus.Succeeded)
                 {
                     onComplete?.Invoke();

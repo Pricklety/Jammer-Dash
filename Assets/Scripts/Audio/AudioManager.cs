@@ -50,6 +50,7 @@ namespace JammerDash.Audio
         bool paused = false;
         public bool songLoaded;
         public Text devText;
+
         private void Awake()
         {
             if (Instance == null)

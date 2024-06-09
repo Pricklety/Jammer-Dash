@@ -1122,7 +1122,7 @@ namespace JammerDash.Editor
                 timer = 0f;
                 delay = 0;
                 UnityEngine.Debug.Log(itemButtons[currentButtonPressed]);
-                if (worldPos.y < 4.5f && worldPos.x > 1 && worldPos.y > -1.5f && worldPos.x < 20000 && accurateCount < 6000)
+                if (worldPos.y < 4.5f && worldPos.x > 1 && worldPos.y > -1.5f)
                 {
                     GameObject[] beatObjects = GameObject.FindGameObjectsWithTag("Beat");
                     GameObject previousBeatObject = null;

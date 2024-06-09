@@ -73,16 +73,8 @@ namespace JammerDash.Tech
                 {
                     panel.SetActive(false);
                 }
-                if (QualitySettings.vSyncCount == 1)
-                {
-                    Text.text = $"FPS: {_currentAveraged} / {Screen.currentResolution.refreshRate} \n{drawingTimeMs:F2} ms";
-                    Text.color = _currentColor;
-                }
-                else
-                {
-                    Text.text = $"FPS: {_currentAveraged} / {Application.targetFrameRate} \n{drawingTimeMs:F2} ms";
-                    Text.color = _currentColor;
-                }
+                    Text.text = $"FPS: <color=#{ColorUtility.ToHtmlStringRGBA(_currentColor)}>{_currentAveraged}</color>\n{drawingTimeMs:F2} ms";
+                
 
             }
         }
@@ -90,9 +82,9 @@ namespace JammerDash.Tech
 
         Color GetColorForFPS(int fps)
         {
-            if (fps < 30)
+            if (fps < 50)
                 return Color.red;
-            else if (fps < 90)
+            else if (fps < 120)
                 return Color.yellow;
             else
                 return Color.green;

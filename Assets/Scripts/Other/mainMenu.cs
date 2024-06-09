@@ -19,6 +19,9 @@ using JammerDash.Audio;
 using JammerDash.Menus.Play;
 using SimpleFileBrowser;
 using System.Linq;
+using System.Threading.Tasks;
+using UnityEngine.Networking;
+using Debug = UnityEngine.Debug;
 
 namespace JammerDash.Menus
 {
@@ -62,12 +65,7 @@ namespace JammerDash.Menus
         public GameObject playPrefab;
         public Transform playlevelInfoParent;
 
-        [Header("Internet Check")]
-        public Text internetStatusText;
-        public GameObject checkInternet;
-        public Button refreshButton;
-        public Image ccIMG;
-
+      
         [Header("Video Background")]
         public GameObject videoPlayerObject;
         public VideoPlayer videoPlayer;
@@ -121,7 +119,6 @@ namespace JammerDash.Menus
             playerData = Account.Instance.LoadData();
             data = SettingsFileHandler.LoadSettingsFromFile();
             LoadRandomBackground();
-            RefreshInternetConnection();
             LoadLevelsFromFiles();
             LoadLevelFromLevels();
             levelSlider.maxValue = Account.Instance.xpRequiredPerLevel[0];
@@ -404,28 +401,15 @@ namespace JammerDash.Menus
                 if (videoPlayerObject != null)
                     videoPlayerObject.SetActive(false);
             }
-            else if (data.artBG)
+            if (data.artBG)
             {
                 sprite = Resources.LoadAll<Sprite>("backgrounds/default");
                 if (videoPlayerObject != null)
                     videoPlayerObject.SetActive(false);
             }
-            else if (data.customBG)
+            if (data.customBG)
             {
-                string[] files = Directory.GetFiles(Application.persistentDataPath + "/backgrounds", "*.png");
-                List<Sprite> sprites = new List<Sprite>();
-                foreach (string file in files)
-                {
-                    byte[] fileData = File.ReadAllBytes(file);
-                    Texture2D texture = new Texture2D(2, 2);
-                    texture.LoadImage(fileData); // LoadImage overwrites texture dimensions
-                    Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                    sprites.Add(sprite);
-                }
-                if (videoPlayerObject != null)
-                    videoPlayerObject.SetActive(false);
-
-                sprite = sprites.ToArray();
+                _ = LoadCustomBackgroundAsync();
             }
             else if (data.vidBG)
             {
@@ -451,7 +435,7 @@ namespace JammerDash.Menus
                 // Assign the video clips array
                 videoClips = clips.ToArray();
             }
-            else
+            else if (!data.artBG && !data.vidBG && !data.customBG)
             {
                 sprite = Resources.LoadAll<Sprite>("backgrounds/basic");
                 if (videoPlayerObject != null)
@@ -469,7 +453,52 @@ namespace JammerDash.Menus
                 ChangeBasicCol();
             }
         }
-        private void LoadVideoClipFromFile(string filePath)
+        private async Task LoadCustomBackgroundAsync()
+        {
+            string path = Application.persistentDataPath + "/backgrounds";
+            string[] files = Directory.GetFiles(path, "*.png");
+
+            if (files.Length == 0)
+            {
+                Debug.LogWarning("No PNG files found in the directory: " + path);
+                return;
+            }
+
+            string randomFilePath = files[UnityEngine.Random.Range(0, files.Length)]; // Choose a random file path
+            await LoadSpriteAsync(randomFilePath);
+        }
+
+        private async Task LoadSpriteAsync(string filePath)
+        {
+            using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture("file://" + filePath))
+            {
+                await uwr.SendWebRequest();
+
+                if (uwr.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError($"Failed to download texture: {uwr.error}");
+                    return;
+                }
+
+                Texture2D texture = DownloadHandlerTexture.GetContent(uwr);
+                Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+
+                // Set the loaded sprite
+                SetBackgroundSprite(sprite);
+            }
+        }
+
+        private void SetBackgroundSprite(Sprite sprite)
+        {
+            if (videoPlayerObject != null)
+            {
+                videoPlayerObject.SetActive(false);
+            }
+
+            this.sprite = new Sprite[1];
+            this.sprite[0] = sprite;
+        }
+            private void LoadVideoClipFromFile(string filePath)
         {
             string[] files = Directory.GetFiles(Application.persistentDataPath + "/backgrounds", "*.mp4");
             List<string> urls = new List<string>();
@@ -547,33 +576,9 @@ namespace JammerDash.Menus
         }
 
 
-        void CheckInternetConnection()
-        {
-            if (Application.internetReachability == NetworkReachability.NotReachable)
-            {
-                internetStatusText.text = "Not connected to the internet";
-                refreshButton.gameObject.SetActive(true);
-            }
-            else
-            {
-                internetStatusText.text = "";
-                refreshButton.gameObject.SetActive(false);
-            }
-        }
+       
 
-        public void RefreshInternetConnection()
-        {
-            StartCoroutine(RefreshInternetStatus());
-        }
-
-        IEnumerator RefreshInternetStatus()
-        {
-            checkInternet.SetActive(true);
-            refreshButton.gameObject.SetActive(false);
-            yield return new WaitForSeconds(2f); // Simulating a delay for the check
-            checkInternet.SetActive(false);
-            CheckInternetConnection();
-        }
+      
         public void CreatePanel()
         {
             levelCreatePanel.SetActive(true);
@@ -731,7 +736,7 @@ namespace JammerDash.Menus
                 // Assuming YourPanelScript has methods to set text or image properties
                 level.SetLevelName($"{sceneData.levelName}");
                 level.SetSongName($"♫ {sceneData.songName}");
-                level.SetDifficulty($"{Mathf.RoundToInt(sceneData.calculatedDifficulty):0}");
+                level.SetDifficulty($"{(int)sceneData.calculatedDifficulty:0}");
                 level.SetCreator($"mapped by {sceneData.creator}");
             }
             else
@@ -1188,14 +1193,11 @@ namespace JammerDash.Menus
                 audioMixer.SetFloat("Lowpass", 22000);
             }
             data = SettingsFileHandler.LoadSettingsFromFile();
-            if (data.parallax)
+            if (data.parallax && (Screen.fullScreenMode == FullScreenMode.FullScreenWindow || Screen.fullScreenMode == FullScreenMode.ExclusiveFullScreen))
             {
-                const float backgroundScaleFactor = 1.15f;
-                const float cameraMovementFactor = 2f;
-                const float maxMovementOffset = 2f;
 
                 // Background parallax effect
-                background.localScale = new Vector3(backgroundScaleFactor, backgroundScaleFactor, 1);
+                background.localScale = new Vector3(scaleMultiplier, scaleMultiplier, 1);
 
                 Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 Vector3 mouseDelta = new Vector3(-mouseWorldPos.x / 1.5f, -mouseWorldPos.y / 30, 0);
