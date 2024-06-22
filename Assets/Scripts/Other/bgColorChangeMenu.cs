@@ -2,57 +2,59 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
-public class bgColorChangeMenu : MonoBehaviour
+namespace JammerDash.Additional
 {
-
-    private Image backgroundImage;
-    public AudioSource musicAudioSource;
-    public float beatThreshold = 0.1f;  // Adjust the threshold for detecting a beat
-    public float highBeatThreshold = 0.5f;  // Adjust the threshold for detecting a high beat
-    public float colorPulseDuration = 0.1f;  // Adjust the duration of the color pulse
-    public float colorLerpSpeed = 2f;  // Adjust the speed of lerping to black
-
-    private int previousSample;
-    private Color targetColor;
-    private Color currentColor;
-
-
-    private void Start()
+    public class bgColorChangeMenu : MonoBehaviour
     {
-        backgroundImage = this.GetComponent<Image>();  // Assuming this script is attached to the same GameObject as the Image
 
-        if (backgroundImage == null)
+        private Image backgroundImage;
+        public AudioSource musicAudioSource;
+        public float beatThreshold = 0.1f;  // Adjust the threshold for detecting a beat
+        public float highBeatThreshold = 0.5f;  // Adjust the threshold for detecting a high beat
+        public float colorPulseDuration = 0.1f;  // Adjust the duration of the color pulse
+        public float colorLerpSpeed = 2f;  // Adjust the speed of lerping to black
+
+        private int previousSample;
+        private Color targetColor;
+        private Color currentColor;
+
+
+        private void Start()
         {
-            Debug.LogError("Image component not found on the GameObject.");
-            enabled = false;
-            return;
-        }
+            backgroundImage = this.GetComponent<Image>();  // Assuming this script is attached to the same GameObject as the Image
 
-        if (musicAudioSource == null)
-        {
-            musicAudioSource = FindObjectOfType<AudioSource>();
-
-            if (musicAudioSource == null)
+            if (backgroundImage == null)
             {
-                Debug.LogError("AudioSource not found in the scene.");
+                Debug.LogError("Image component not found on the GameObject.");
                 enabled = false;
                 return;
             }
+
+            if (musicAudioSource == null)
+            {
+                musicAudioSource = FindObjectOfType<AudioSource>();
+
+                if (musicAudioSource == null)
+                {
+                    Debug.LogError("AudioSource not found in the scene.");
+                    enabled = false;
+                    return;
+                }
+            }
+
+            // Initialize the previousSample to the current sample
+            previousSample = musicAudioSource.timeSamples;
+
+            // Initialize colors
+            targetColor = Color.black;
+            currentColor = targetColor;
+
+            // Start the color-changing coroutine
+            StartCoroutine(ChangeColorCoroutine());
         }
 
-        // Initialize the previousSample to the current sample
-        previousSample = musicAudioSource.timeSamples;
-
-        // Initialize colors
-        targetColor = Color.black;
-        currentColor = targetColor;
-
-        // Start the color-changing coroutine
-        StartCoroutine(ChangeColorCoroutine());
-    }
-
-    private void Update()
-    {
+        private void Update()
+        {
             if (musicAudioSource != null && musicAudioSource.isPlaying)
             {
                 float rms = GetRMS(musicAudioSource);
@@ -73,49 +75,50 @@ public class bgColorChangeMenu : MonoBehaviour
                 // Update the previous sample for the next frame
                 previousSample = currentSample;
             }
-        
-       
-    }
 
-    private float GetRMS(AudioSource audioSource)
-    {
-        float[] samples = new float[1024];
-        audioSource.GetOutputData(samples, 0);
-        float sum = 0f;
-        foreach (float sample in samples)
-        {
-            sum += sample * sample;
-        }
-        return Mathf.Sqrt(sum / samples.Length);
-    }
 
-    private IEnumerator LerpToBlack()
-    {
-        float elapsedTime = 0f;
-
-        while (elapsedTime < colorPulseDuration)
-        {
-            currentColor = Color.Lerp(targetColor, Color.black, elapsedTime / colorPulseDuration);
-            elapsedTime += Time.deltaTime;
-
-            yield return null;
         }
 
-        // Ensure the final color is set to black
-        currentColor = Color.black;
-    }
-
-    public IEnumerator ChangeColorCoroutine()
-    {
-        while (true)
+        private float GetRMS(AudioSource audioSource)
         {
-            // Wait for the next color pulse
-            new WaitForSeconds(colorPulseDuration);
+            float[] samples = new float[1024];
+            audioSource.GetOutputData(samples, 0);
+            float sum = 0f;
+            foreach (float sample in samples)
+            {
+                sum += sample * sample;
+            }
+            return Mathf.Sqrt(sum / samples.Length);
+        }
 
-            // Pulse to a random color
-            targetColor = new Color(Random.value, Random.value, Random.value, 1f);
+        private IEnumerator LerpToBlack()
+        {
+            float elapsedTime = 0f;
 
-            yield return targetColor;
+            while (elapsedTime < colorPulseDuration)
+            {
+                currentColor = Color.Lerp(targetColor, Color.black, elapsedTime / colorPulseDuration);
+                elapsedTime += Time.deltaTime;
+
+                yield return null;
+            }
+
+            // Ensure the final color is set to black
+            currentColor = Color.black;
+        }
+
+        public IEnumerator ChangeColorCoroutine()
+        {
+            while (true)
+            {
+                // Wait for the next color pulse
+                new WaitForSeconds(colorPulseDuration);
+
+                // Pulse to a random color
+                targetColor = new Color(Random.value, Random.value, Random.value, 1f);
+
+                yield return targetColor;
+            }
         }
     }
 }

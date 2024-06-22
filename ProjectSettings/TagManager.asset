@@ -2,7 +2,7 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
+  serializedVersion: 3
   tags:
   - Cubes
   - Saw
@@ -13,6 +13,7 @@ TagManager:
   - Beat
   - BadNote
   - GoodNote
+  - BG
   layers:
   - Default
   - TransparentFX
@@ -53,3 +54,5 @@ TagManager:
   - name: trail
     uniqueID: 2931457087
     locked: 0
+  m_RenderingLayers:
+  - Default

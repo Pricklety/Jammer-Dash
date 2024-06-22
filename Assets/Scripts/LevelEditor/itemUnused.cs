@@ -1,27 +1,50 @@
+using JammerDash.Tech;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class itemUnused : MonoBehaviour
+namespace JammerDash.Editor.Basics
 {
-    public bool IsLongCube;
-    public float longCubeLength;
-    void Start()
+
+    public class itemUnused : MonoBehaviour
     {
-        if (gameObject.name.Contains("hitter02"))
+        public bool IsLongCube;
+        public float longCubeLength;
+        void Start()
         {
-            IsLongCube = true;
-            longCubeLength = GetComponent<SpriteRenderer>().size.x;
+            if (gameObject.name.Contains("hitter02"))
+            {
+                IsLongCube = true;
+                longCubeLength = GetComponent<SpriteRenderer>().size.x;
+            }
+            else
+            {
+                IsLongCube = false;
+            }
         }
-        else
+
+        // Update is called once per frame
+        void Update()
         {
-            IsLongCube = false;
+            if (SceneManager.GetActiveScene().name == "LevelDefault")
+            {
+
+                if (gameObject.name.Contains("hitter") && LevelDataManager.Instance.cubesize != 0)
+                {
+                    transform.localScale = new Vector2(LevelDataManager.Instance.cubesize, LevelDataManager.Instance.cubesize);
+                }
+                else if (LevelDataManager.Instance.cubesize == 0)
+                {
+                    transform.localScale = new Vector2(CustomLevelDataManager.Instance.cubesize, CustomLevelDataManager.Instance.cubesize);
+                }
+            }
+            else if (SceneManager.GetActiveScene().name == "SampleScene" && Input.GetMouseButtonUp(0) )
+            {
+                if (transform.localScale != new Vector3(FindObjectOfType<EditorManager>().size.value, FindObjectOfType<EditorManager>().size.value, 0))
+                transform.localScale = new Vector3(FindObjectOfType<EditorManager>().size.value, FindObjectOfType<EditorManager>().size.value, 0);
+            }
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        transform.position = new Vector3(transform.position.x, transform.position.y, 2);
-    }
 }

@@ -1,14 +1,18 @@
 <linker>
   <assembly fullname="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-    <type fullname="cameraColor" preserve="all" />
-    <type fullname="CubeCounter" preserve="all" />
-    <type fullname="CubeManager" preserve="all" />
-    <type fullname="FinishLine" preserve="all" />
-    <type fullname="itemUnused" preserve="all" />
-    <type fullname="PauseMenu" preserve="all" />
-    <type fullname="PlayerMovement" preserve="all" />
-    <type fullname="RestartCustom" preserve="all" />
-    <type fullname="SongProgress" preserve="all" />
+    <type fullname="AccessibleButton" preserve="all" />
+    <type fullname="AccessibleLabel" preserve="all" />
+    <type fullname="AccessibleUIGroupRoot" preserve="all" />
+    <type fullname="JammerDash.Editor.Basics.CubeManager" preserve="all" />
+    <type fullname="JammerDash.Editor.Basics.itemUnused" preserve="all" />
+    <type fullname="JammerDash.Game.cameraColor" preserve="all" />
+    <type fullname="JammerDash.Game.CubeCounter" preserve="all" />
+    <type fullname="JammerDash.Game.FinishLine" preserve="all" />
+    <type fullname="JammerDash.Game.PauseMenu" preserve="all" />
+    <type fullname="JammerDash.Game.Player.PlayerMovement" preserve="all" />
+    <type fullname="JammerDash.Game.RestartCustom" preserve="all" />
+    <type fullname="JammerDash.Game.SongProgress" preserve="all" />
+    <type fullname=".UAP_BaseElement/UAPHighlightCallback" preserve="nothing" serialized="true" />
   </assembly>
   <assembly fullname="Unity.Addressables, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" preserve="all">
     <type fullname="UnityEngine.AddressableAssets.Addressables" preserve="all" />
@@ -73,6 +77,7 @@
     <type fullname="UnityEngine.Events.ArgumentCache" preserve="nothing" serialized="true" />
     <type fullname="UnityEngine.Events.PersistentCallGroup" preserve="nothing" serialized="true" />
     <type fullname="UnityEngine.Events.PersistentListenerMode" preserve="nothing" serialized="true" />
+    <type fullname="UnityEngine.Events.UnityEvent" preserve="nothing" serialized="true" />
     <type fullname="UnityEngine.RectOffset" preserve="nothing" serialized="true" />
   </assembly>
   <assembly fullname="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
@@ -101,6 +106,7 @@
     <type fullname="UnityEngine.UI.RawImage" preserve="all" />
     <type fullname="UnityEngine.UI.Slider" preserve="all" />
     <type fullname="UnityEngine.UI.Text" preserve="all" />
+    <type fullname="UnityEngine.UI.VerticalLayoutGroup" preserve="all" />
     <type fullname="UnityEngine.UI.AnimationTriggers" preserve="nothing" serialized="true" />
     <type fullname="UnityEngine.UI.Button/ButtonClickedEvent" preserve="nothing" serialized="true" />
     <type fullname="UnityEngine.UI.ColorBlock" preserve="nothing" serialized="true" />
