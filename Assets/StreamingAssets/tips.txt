@@ -1,0 +1,25 @@
+You can use WASD together with arrow keys as movement inputs (Space has no alt key)
+Disable hit notes in Settings!
+Being banned only lets you play the game offline. Your scores won't be uploaded online.
+Click on your profile to enter "Community Tab"! There, you can chat with others and see the latest news!
+Use /play [ID] to play a level without searching for it! (effective once Jammy gets online and in-game connection is established)
+Follow players to be notified of their new top plays, new levels uploaded and new rates!
+Time speed changes your Cursor trail speed.
+Become a supporter and get access to early features!
+Click H to change this text :D
+The editor guide has a lot of useful things. Make sure to check it out!
+Shift + left click changes the long cube width in the editor.
+To get a perfect score, destroy each box with as little mistakes as possible.
+Switch between fullscreen and windowed with "Alt+Enter"!
+Take occassional breaks. Jammer Dash isn't going to change your life drastically.
+Grinding to be the best isn't the goal. The goal is to have fun!
+Check out the latest news in the Discord!
+Are you a fan of snow? Enable the snow option in the options to have snow falling in the menu!!
+Imported new levels? Click F5 to refresh your play screen!
+Playing ranked-only levels will give you a massive disadvantage in score. Play Approved, Checked and Reviewed maps as well. They give out score to your level too!
+Regularly check your notifications. Randomly we give out a chance to win supporter to free users (MONTHLY)!
+If there's spam parts in levels you play, switch between keys (by default it's K and L, but you can change it in options).
+If you don't like the default game keybind layout, feel free to change it in the Options (Works in versions v0.4.2 and newer)
+You think you're better than your friends? Challenge them to a head-to-head match using "Multiplayer Mode" (versions v0.5.1 and newer)
+If you ever get notified of a new update, download it. Something new just dropped :eyes:
+Play screen is laggy? Delete the levels you don't play. Your scores will still be saved online (This game can support up to 500 levels in one screen)!

@@ -226,7 +226,7 @@ namespace JammerDash.Game
 
         void OnApplicationFocus(bool focus)
         {
-            if (!focus && canvas.activeSelf) // Only execute when focus is lost
+            if (!focus && canvas.activeSelf && GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().FindNearestCubeDistance() < 21) // Only execute when focus is lost
             {
                 if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindObjectOfType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
                 {

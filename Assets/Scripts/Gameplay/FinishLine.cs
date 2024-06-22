@@ -23,36 +23,18 @@ namespace JammerDash.Game
         public GameObject finishMenu;
         public Text scoreText;
         public Animation anim;
+        public SceneData data;
         [Header("Scores")]
         public Text five;
         public Text three;
         public Text one;
         public Text miss;
 
-        private void Start()
-        {
+        [Header("Level Info + more")]
+        public Text main;
+        public Slider level;
+        public Text lvl;
 
-            float num1 = float.NegativeInfinity;
-            itemUnused itemUnused1 = null;
-            foreach (itemUnused itemUnused2 in FindObjectsOfType<itemUnused>())
-            {
-                float num2 = itemUnused2.transform.position.x - transform.position.x;
-                if (num2 > num1)
-                {
-                    num1 = num2;
-                    itemUnused1 = itemUnused2;
-                }
-            }
-            if (itemUnused1 != null)
-            {
-                transform.position = new Vector3((itemUnused1.transform.position + new Vector3(5f, 0f, 0.0f)).x, 0.0f, 0.0f);
-                if (itemUnused1.GetComponent<SpriteRenderer>().size.x > 1)
-                {
-                    transform.position = new Vector3((itemUnused1.transform.position + new Vector3(5f + itemUnused1.GetComponent<SpriteRenderer>().size.x, 0f, 0.0f)).x, 0.0f, 0.0f);
-                }
-            }
-
-        }
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
@@ -73,23 +55,7 @@ namespace JammerDash.Game
             player = GameObject.FindGameObjectWithTag("Player");
             player0 = player.GetComponent<PlayerMovement>();
             scores = player.GetComponent<CubeCounter>();
-            float num1 = float.NegativeInfinity;
-            itemUnused itemUnused1 = null;
-            foreach (itemUnused itemUnused2 in FindObjectsOfType<itemUnused>())
-            {
-                float num2 = itemUnused2.transform.position.x - transform.position.x;
-                if (num2 > num1)
-                {
-                    num1 = num2;
-                    itemUnused1 = itemUnused2;
-                }
-            }
-            if (itemUnused1 != null && transform.position.x < itemUnused1.transform.position.x)
-            {
-                transform.position = new Vector3((itemUnused1.transform.position + new Vector3(5f, 0f, 0.0f)).x, 0.0f, 0.0f);
-
-            }
-
+            transform.position = new Vector3(player0.music.clip.length * 7, 0.0f, 0.0f);
 
             if (player0 == null || player == null)
             {
@@ -145,6 +111,7 @@ namespace JammerDash.Game
                 string json = File.ReadAllText(Path.Combine(levelsPath, levelName + ".json"));
                 SceneData sceneData = SceneData.FromJson(json);
                 Debug.Log(sceneData.levelName);
+                data = sceneData;
                 SaveLevelDataDef(sceneData.ID, scores.GetTier(actualdest), "dest" + sceneData.levelName, actualdest, "scores", destruction, player0.five, player0.three, player0.one, player0.misses, Account.Instance.username);
             }
             else
@@ -205,6 +172,8 @@ namespace JammerDash.Game
 
             return 0;
         }
+
+        [Obsolete]
         private IEnumerator End()
         {
             PlayerMovement objectOfType = FindObjectOfType<PlayerMovement>();
@@ -229,12 +198,18 @@ namespace JammerDash.Game
             anim.Play();
            
 
-            five.text = $"{player0.five} (Great!)";
-            three.text = $"{player0.three} (Good)";
-            one.text = $"{player0.one} (Meh)";
-            miss.text = $"{player0.misses} (Bad)";
+            five.text = $"{player0.five}";
+            three.text = $"{player0.three}";
+            one.text = $"{player0.one}";
+            miss.text = $"{player0.misses}";
+            main.text = $"{data.artist}\r\n{data.songName}\r\n\r\n<size=6>played by {Account.Instance.username} at {DateTime.Now:dd-MM-yyyy hh:mm.ss tt}</size>";
+            level.value = Account.Instance.currentXP / Account.Instance.xpRequiredPerLevel[Account.Instance.level];
+            lvl.text = $"lv{Account.Instance.level}";
+
+
+
             yield return new WaitForSecondsRealtime(0.75f);
-            FindAnyObjectByType<AudioSource>().PlayOneShot(Resources.Load<AudioClip>($"Audio/SFX/ranking/{player0.counter.GetNoColorTier(player0.counter.accCount / player0.Total * 100)} Rank"));
+            FindObjectOfType<AudioSource>().PlayOneShot(Resources.Load<AudioClip>($"Audio/SFX/ranking/{player0.counter.GetNoColorTier(player0.counter.accCount / player0.Total * 100)} Rank"));
                
 
         }

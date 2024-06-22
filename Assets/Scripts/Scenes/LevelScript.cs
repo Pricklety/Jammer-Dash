@@ -62,7 +62,7 @@ namespace JammerDash.Menus.Play
 
         public void DeleteLevel()
         {
-            string levelPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
+            string levelPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.sceneName);
 
             // Check if the level path exists
             if (Directory.Exists(levelPath))

@@ -17,7 +17,9 @@ namespace JammerDash
         public int bpm;
         public string levelName;
         public int levelLength;
-        public string songName = "Pricklety - Fall'd.mp3";
+        public string artist;
+        public string songName;
+        public float songLength;
         public float calculatedDifficulty = 0f;
         public string gameVersion;
         public float saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();

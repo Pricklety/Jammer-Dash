@@ -22,6 +22,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
+using Lachee.Discord.Control;
 
 namespace JammerDash.Menus
 {
@@ -60,11 +61,18 @@ namespace JammerDash.Menus
         public Transform levelInfoParent;
         public GameObject levelCreatePanel;
         public InputField newLevelNameInput;
+        public InputField song;
+        public InputField artists;
+        public InputField map;
         public GameObject cubePrefab;
         public GameObject sawPrefab;
         public GameObject playPrefab;
         public Transform playlevelInfoParent;
-
+        public string songName;
+        public string mapper;
+        public string artist;
+        public string path;
+        public Text songMP3Name;
       
         [Header("Video Background")]
         public GameObject videoPlayerObject;
@@ -123,7 +131,7 @@ namespace JammerDash.Menus
             LoadLevelFromLevels();
             levelSlider.maxValue = Account.Instance.xpRequiredPerLevel[0];
             levelSlider.value = Account.Instance.currentXP;
-          
+            Debug.unityLogger.logEnabled = true;
             discordName.text = DiscordManager.current.CurrentUser.username + "\n\nID: " +
             DiscordManager.current.CurrentUser.ID;
             if (UAP_AccessibilityManager.IsActive())
@@ -593,11 +601,19 @@ namespace JammerDash.Menus
             // Get input values for the new level
             string newLevelName = newLevelNameInput.text;
             float newDifficulty = 0;
+
+            songName = song.text;
+            artist = artists.text;
+            mapper = map.text;
             SceneData newLevelData = new SceneData
             {
                 sceneName = newLevelName, // You may want to customize the scene name
                 levelName = newLevelName,
-                calculatedDifficulty = newDifficulty
+                calculatedDifficulty = newDifficulty,
+                songName = songName,
+                artist = artist,
+                creator = mapper,
+                clipPath = Path.Combine(Application.persistentDataPath, "scenes", newLevelName, $"{artist} - {songName}.mp3")
             };
 
             // Save the new level data to a JSON file
@@ -621,23 +637,18 @@ namespace JammerDash.Menus
             string json = sceneData.ToJson();
 
             // Save JSON to a new file in the persistentDataPath + scenes & levels folder
-            string path = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
-            string filePath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, $"{sceneData.levelName}.json");
-            string musicPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName, $"{sceneData.songName}");
-            string defSongPath = Path.Combine(Application.streamingAssetsPath, "music", "Pricklety - Fall'd.mp3");
-            defSongPath.Replace("\\", "/");
-            sceneData.clipPath = defSongPath;
-            if (Directory.Exists(path))
+            string namepath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
+            string filePath = Path.Combine(namepath, $"{sceneData.levelName}.json");
+            string musicPath = Path.Combine(namepath, $"{sceneData.artist} - {sceneData.songName}.mp3");
+            if (Directory.Exists(namepath))
             {
-                File.WriteAllText(filePath, json);
-                File.Delete(musicPath);
-                File.Copy(defSongPath, musicPath);
+                songMP3Name.text = "A level with this name currently exists. Try something else or delete the level.";
             }
             else
             {
-                Directory.CreateDirectory(path);
+                Directory.CreateDirectory(namepath);
                 File.WriteAllText(filePath, json);
-                File.Copy(defSongPath, musicPath);
+                File.Copy(path, Path.Combine(Application.persistentDataPath, "scenes", sceneData.sceneName, $"{artist} - {songName}.mp3"));
             }
 
         }
@@ -714,8 +725,8 @@ namespace JammerDash.Menus
             {
                 UnityEngine.Debug.Log(sceneData);
                 // Assuming YourPanelScript has methods to set text or image properties
-                level.SetLevelName($"{sceneData.levelName}");
-                level.SetSongName($"♫ {sceneData.songName}");
+                level.SetLevelName($"{sceneData.sceneName}");
+                level.SetSongName($"♫ {sceneData.artist} - {sceneData.songName}");
                 level.SetDifficulty($"{sceneData.calculatedDifficulty:0.00} sn");
 
             }
@@ -726,6 +737,27 @@ namespace JammerDash.Menus
             }
 
         }
+        public void LoadCustomMusic()
+        {
+            FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserCanvas")).GetComponent<FileBrowser>();
+            FileBrowser.SetFilters(false, new FileBrowser.Filter("Music", ".mp3"));
+            FileBrowser.SetDefaultFilter("Music");
+            FileBrowser.ShowLoadDialog(SongSelected, null, FileBrowser.PickMode.Files, false, null, null, "Load Local song...", "Choose");
+        }
+        void SongSelected(string[] paths)
+        {
+            if (paths.Length == 1)
+            {
+                path = paths[0];
+                songMP3Name.text = path;
+            }
+
+            else
+            {
+                songMP3Name.text = "You can't have more than one song selected.";
+            }
+        }
+
 
         void DisplayCustomLevelInfo(SceneData sceneData, CustomLevelScript level)
         {
@@ -734,10 +766,8 @@ namespace JammerDash.Menus
             if (level != null)
             {
                 // Assuming YourPanelScript has methods to set text or image properties
-                level.SetLevelName($"{sceneData.levelName}");
-                level.SetSongName($"♫ {sceneData.songName}");
-                level.SetDifficulty($"{(int)sceneData.calculatedDifficulty:0}");
-                level.SetCreator($"mapped by {sceneData.creator}");
+                level.SetLevelName($"{sceneData.sceneName}");
+                level.SetInfo($"♫ {sceneData.artist} - {sceneData.songName} // mapped by {sceneData.creator}");
             }
             else
             {
@@ -1193,7 +1223,7 @@ namespace JammerDash.Menus
                 audioMixer.SetFloat("Lowpass", 22000);
             }
             data = SettingsFileHandler.LoadSettingsFromFile();
-            if (data.parallax && (Screen.fullScreenMode == FullScreenMode.FullScreenWindow || Screen.fullScreenMode == FullScreenMode.ExclusiveFullScreen))
+            if (data.parallax && (Screen.fullScreenMode == FullScreenMode.FullScreenWindow || Screen.fullScreenMode == FullScreenMode.ExclusiveFullScreen || Application.isEditor))
             {
 
                 // Background parallax effect
@@ -1214,7 +1244,7 @@ namespace JammerDash.Menus
 
                 // Calculate the new position relative to the current position
                 float newPositionX = layerMouseDelta.x / 30;
-                float newPositionY = layerMouseDelta.y / 2;
+                float newPositionY = layerMouseDelta.y / 10;
 
                 // Set the new position
                 logo.position = new Vector3(newPositionX, newPositionY, mouseDelta.z);
@@ -1224,8 +1254,9 @@ namespace JammerDash.Menus
                 background.localScale = Vector3.one;
                 background.position = Vector3.zero;
                 logo.position = new Vector3(0, 0, 0);
-            }
-            musicText.text = $"{AudioManager.Instance.GetComponent<AudioSource>().clip.name} - {AudioManager.Instance.GetComponent<AudioSource>().time:0.00}/{AudioManager.Instance.GetComponent<AudioSource>().clip.length:0.00}";
+            }  
+            musicText.text = $"{AudioManager.Instance.GetComponent<AudioSource>().clip.name}: {AudioManager.Instance.GetComponent<AudioSource>().time:0.00}/{AudioManager.Instance.GetComponent<AudioSource>().clip.length:0.00}";
+            musicSlider.value = AudioManager.Instance.GetComponent<AudioSource>().time / AudioManager.Instance.GetComponent<AudioSource>().clip.length;
 
             if (Input.GetKey(KeyCode.Escape))
             {

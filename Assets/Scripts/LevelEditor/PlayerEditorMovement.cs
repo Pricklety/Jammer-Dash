@@ -26,7 +26,7 @@ namespace JammerDash.Editor
         private void Update()
         {
             // Move player right
-            transform.Translate(Vector2.right * moveSpeed * Time.deltaTime);
+            transform.position = new Vector2(music.time * 7, transform.position.y);
             text.text = "X: " + transform.position.x.ToString("F1") + ", Y: " + transform.position.y.ToString("F0");
             cam.transform.position = new Vector3(transform.position.x + 6, 0.7f, -10);
 

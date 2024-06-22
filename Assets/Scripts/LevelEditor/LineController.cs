@@ -97,7 +97,6 @@ namespace JammerDash.Editor
         public IEnumerator LoadAudioClip(string songName)
         {
             string filePath = Path.Combine(Application.persistentDataPath, "music", songName);
-            filePath = filePath.Replace("\\", "/");
             using (UnityWebRequest www = UnityWebRequest.Get("file://" + filePath))
             {
                 yield return www.SendWebRequest();

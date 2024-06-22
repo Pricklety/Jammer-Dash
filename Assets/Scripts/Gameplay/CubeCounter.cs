@@ -45,7 +45,7 @@ namespace JammerDash.Game
             {
                 return "S";
             }
-            else if ((destructionPercentage <= maxScore && destructionPercentage >= maxScore * 0.92f && FindObjectOfType<PlayerMovement>().misses >= 1) || (destructionPercentage <= 0.95f && FindObjectOfType<PlayerMovement>().misses >= 0))
+            else if ((destructionPercentage <= maxScore && destructionPercentage >= maxScore * 0.92f && FindObjectOfType<PlayerMovement>().misses >= 1) || (destructionPercentage <= 0.95f && FindObjectOfType<PlayerMovement>().misses == 0))
             {
                 return "A";
             }

@@ -81,7 +81,6 @@ namespace JammerDash.Audio
             if (isLogoSFX)
                 GetComponent<AudioSource>().PlayOneShot(sfxShort);
 
-            Debug.unityLogger.logEnabled = false;
         }
         public void OnMasterVolumeChanged(float volume)
         {
@@ -500,10 +499,7 @@ namespace JammerDash.Audio
                 }
             }
 
-            foreach (string name in songPathsList)
-            {
-                name.Replace("/", "\\");
-            }
+          
 
             // Shuffle the list of song paths only if new files were added
             if (newFilesAdded)

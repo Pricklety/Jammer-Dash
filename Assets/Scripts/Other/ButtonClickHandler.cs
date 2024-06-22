@@ -129,13 +129,13 @@ namespace JammerDash.Menus.Play
                 StartCoroutine(Move(0));
             }
             // Calculate the button's distance from the center of the scroll view
-            float distanceFromCenter = Mathf.Abs(-buttonRectTransform.localPosition.y - scrollRect.content.localPosition.y - 485);
+            float distanceFromCenter = Mathf.Abs(-buttonRectTransform.localPosition.y - scrollRect.content.localPosition.y - 495);
 
             // Calculate the ratio of distance from center to the total scroll view height
             float ratio = distanceFromCenter / (scrollRect.content.rect.height - 2);
 
             // Calculate the size of the button based on the ratio
-            float newSize = Mathf.Lerp(400, 820, 1 - ratio); // Buttons closer to the center will have larger sizes
+            float newSize = Mathf.Lerp(0, 820, 1 - ratio); // Buttons closer to the center will have larger sizes
 
             // Set the size of the button
             buttonRectTransform.sizeDelta = new Vector2(newSize, buttonRectTransform.sizeDelta.y);
@@ -166,21 +166,26 @@ namespace JammerDash.Menus.Play
             {
                 lerpSpeed = 0f;
             }
+
             Vector3 buttonWorldPos = button.transform.position;
-            Vector3 topObjectWorldPos = new Vector3(0, -1, 0);
 
+            // Convert the button's world position to the scrollRect's content parent local position
             Vector3 buttonLocalPos = scrollRect.content.parent.InverseTransformPoint(buttonWorldPos);
-            Vector3 topObjectLocalPos = scrollRect.content.parent.InverseTransformPoint(topObjectWorldPos);
 
-            float yOffset = topObjectLocalPos.y - buttonLocalPos.y + 72.5f;
-            Vector2 targetPosition = new Vector2(scrollRect.content.localPosition.x, scrollRect.content.localPosition.y + yOffset);
+            // Calculate the target position directly to match the button's local position
+            Vector2 targetPosition = new Vector2(scrollRect.content.localPosition.x, scrollRect.content.localPosition.y - buttonLocalPos.y - 495);
+
+            // Smoothly move the content to the target position
             while (lerpSpeed < 0.25f)
             {
                 lerpSpeed += Time.unscaledDeltaTime;
                 scrollRect.content.localPosition = Vector2.Lerp(scrollRect.content.localPosition, targetPosition, lerpSpeed);
                 yield return null;
             }
+
+            // Ensure the final position is set
             scrollRect.content.localPosition = targetPosition;
+
         }
         void OnClick()
         {
@@ -205,7 +210,7 @@ namespace JammerDash.Menus.Play
                 levelObj = GameObject.Find("infoobj").GetComponent<Text>();
                 bonus = GameObject.Find("levelbonusinfoi").GetComponent<Text>();
                 SceneData data = GetComponent<CustomLevelScript>().sceneData;
-                levelLength.text = $"{FormatTime(data.levelLength):N0}";
+                levelLength.text = $"{FormatTime(data.songLength):N0} ({FormatTime(data.songLength):N0})";
                 levelBPM.text = $"{data.bpm}";
                 diff.text = $"{data.calculatedDifficulty:F2}";
                 levelObj.text = $"{(data.cubePositions.Count + data.sawPositions.Count + data.longCubePositions.Count):N0} ({data.cubePositions.Count}, {data.sawPositions.Count}, {data.longCubePositions.Count})";
@@ -287,6 +292,7 @@ namespace JammerDash.Menus.Play
                     {
                         // Handle case where no match was found
                         UnityEngine.Debug.LogError("Clip path not found in songPathsList!");
+                        Debug.LogError(clipPath);
                     }
                 }
 

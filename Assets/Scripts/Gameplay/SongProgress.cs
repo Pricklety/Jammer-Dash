@@ -37,14 +37,14 @@ namespace JammerDash.Game
                     // Load level data from "levels" folder
                     string json = File.ReadAllText(levelJsonFilePath);
                     SceneData sceneData = SceneData.FromJson(json);
-                    StartCoroutine(LoadAudioClip(sceneData.songName, levelsFolderPath));
+                    StartCoroutine(LoadAudioClip(sceneData.clipPath));
                 }
                 else if (File.Exists(sceneJsonFilePath) && string.IsNullOrEmpty(CustomLevelDataManager.Instance.levelName))
                 {
                     // Load level data from "scenes" folder if "levels" folder doesn't contain the file
                     string json = File.ReadAllText(sceneJsonFilePath);
                     SceneData sceneData = SceneData.FromJson(json);
-                    StartCoroutine(LoadAudioClip(sceneData.songName, Path.Combine(Application.persistentDataPath, "scenes", levelName)));
+                    StartCoroutine(LoadAudioClip(Path.Combine(Application.persistentDataPath, "levels", "extracted", sceneData.sceneName, sceneData.artist + " - " + sceneData.songName + ".mp3")));
                 }
                 else
                 {
@@ -78,15 +78,12 @@ namespace JammerDash.Game
 
         }
 
-        private IEnumerator LoadAudioClip(string fileName, string folderPath)
+        private IEnumerator LoadAudioClip(string filePath)
         {
-            string filePath = Path.Combine(folderPath, fileName);
-            string formattedPath = "file://" + filePath.Replace("\\", "/");
-            formattedPath = Uri.EscapeUriString(formattedPath);
-            Debug.LogWarning(formattedPath);
-            formattedPath = formattedPath.Replace("+", "%2B");
-            Debug.Log(formattedPath);
-            using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(formattedPath, AudioType.UNKNOWN);
+            filePath = filePath.Replace("+", "%2B");
+            filePath = filePath.Replace("\\", "/");
+            Debug.LogWarning(filePath);
+            using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(filePath, AudioType.UNKNOWN);
 
             // Start the request asynchronously
             var operation = www.SendWebRequest();
@@ -98,7 +95,7 @@ namespace JammerDash.Game
                 float progress = operation.progress;
                 Time.timeScale = 0f;
                 // Update loading text
-                GameObject.Find("Canvas/default/loadingText").GetComponent<Text>().text = $"Downloading Song: {fileName}: {www.downloadedBytes / 1024768} MB ({progress * 100}%)";
+                GameObject.Find("Canvas/default/loadingText").GetComponent<Text>().text = $"Downloading Song: {Path.GetFileName(filePath)}: {www.downloadedBytes / 1024768} MB ({progress * 100}%)";
 
 
                 yield return null;
@@ -108,6 +105,7 @@ namespace JammerDash.Game
             if (www.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError($"Failed to load audio clip: {www.error}");
+                Debug.LogError(filePath);
                 GameObject.Find("Canvas/default/loadingText").GetComponent<Text>().text = "Failed to download the song. Restarting...";
                 SceneManager.LoadSceneAsync(1);
                 Time.timeScale = 1f;
@@ -118,7 +116,7 @@ namespace JammerDash.Game
             // Get the loaded audio clip
             AudioClip loadedAudioClip = DownloadHandlerAudioClip.GetContent(www);
             // Set the audio source clip
-            loadedAudioClip.name = Path.GetFileName(fileName);
+            loadedAudioClip.name = Path.GetFileName(filePath);
             audioSource.clip = loadedAudioClip;
             Time.timeScale = 1f;
 

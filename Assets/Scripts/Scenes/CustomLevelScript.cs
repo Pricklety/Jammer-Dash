@@ -17,8 +17,6 @@ namespace JammerDash.Menus.Play
     {
         public Text levelNameText;
         public Text songNameText;
-        public Text difficultyText;
-        public Text creatorText;
         public UnityEvent onPlay;
         public GameObject cubePrefab;
         public GameObject sawPrefab;
@@ -30,7 +28,7 @@ namespace JammerDash.Menus.Play
         public void SetSceneData(SceneData data)
         {
             sceneData = data;
-            sceneData.clipPath = sceneData.clipPath.Replace("scenes", "levels\\extracted");
+            sceneData.clipPath = sceneData.clipPath.Replace("scenes", "levels/extracted");
         }
 
         public void SetLevelName(string levelName)
@@ -46,7 +44,7 @@ namespace JammerDash.Menus.Play
             }
         }
 
-        public void SetSongName(string songName)
+        public void SetInfo(string songName)
         {
             if (songNameText != null)
             {
@@ -63,25 +61,9 @@ namespace JammerDash.Menus.Play
             }
         }
 
-        public void SetCreator(string creatorName)
-        {
-            if (creatorText != null)
-            {
-                creatorText.text = creatorName;
-            }
-        }
+     
 
-        public void SetDifficulty(string difficulty)
-        {
-            if (difficultyText != null)
-            {
-                difficultyText.text = difficulty;
-            }
-            else
-            {
-                Debug.LogError("difficultyText is not assigned in the inspector.");
-            }
-        }
+     
 
         public static string ExtractJSONFromJDL(string jdlFilePath)
         {
