@@ -415,91 +415,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1001 &286811593
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 123566, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_Name
-      value: Accessibility Manager
-      objectReference: {fileID: 0}
-    - target: {fileID: 11475380, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_HandleUI
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11475380, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_CyclicMenus
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 11475380, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_DefaultState
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 11475380, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_EditorOverride
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11475380, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_EditorEnabledState
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 11475380, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_ReadDisabledInteractables
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 22474968, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -1.500061
-      objectReference: {fileID: 0}
-    - target: {fileID: 4973883477652662, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -46.724373
-      objectReference: {fileID: 0}
-    - target: {fileID: 4973883477652662, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -48.229156
-      objectReference: {fileID: 0}
-    - target: {fileID: 4973883477652662, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4973883477652662, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4973883477652662, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4973883477652662, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4973883477652662, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4973883477652662, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4973883477652662, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4973883477652662, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 89f4a0ae7ea3fa84ea56c91291d7bd87, type: 3}
 --- !u!1 &308173038
 GameObject:
   m_ObjectHideFlags: 0
@@ -5544,9 +5459,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02b94f09e36073145858b6ad1223baa8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  panel: {fileID: 509521556}
-  main: {fileID: 1449445007}
-  action: {fileID: 1449445009}
 --- !u!111 &509521564
 Animation:
   m_ObjectHideFlags: 0
@@ -6074,8 +5986,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4625d6d5c44b53f4da1ff23ba80af297, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textComponent: {fileID: 1114790789}
-  filePath: texts.txt
 --- !u!114 &1114790788
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6224,6 +6134,7 @@ GameObject:
   - component: {fileID: 1177968659}
   - component: {fileID: 1177968661}
   - component: {fileID: 1177968662}
+  - component: {fileID: 1177968663}
   m_Layer: 0
   m_Name: manager
   m_TagString: Untagged
@@ -6283,6 +6194,35 @@ MonoBehaviour:
   playerhp: 0
   cubesize: 0
   sceneLoaded: 0
+  data:
+    sceneName: 
+    cubePositions: []
+    sawPositions: []
+    longCubePositions: []
+    longCubeWidth: []
+    ID: 0
+    bpm: 0
+    levelName: 
+    levelLength: 0
+    artist: 
+    songName: 
+    songLength: 0
+    calculatedDifficulty: 0
+    gameVersion: 
+    saveTime: 1.7192411e+9
+    clip: {fileID: 0}
+    clipPath: 
+    creator: 
+    ground: 1
+    defBGColor: {r: 0, g: 0, b: 0, a: 0}
+    defGColor: {r: 0, g: 0, b: 0, a: 0}
+    isVerified: 0
+    isUploaded: 0
+    playerScore: 0
+    playerHP: 300
+    boxSize: 1
+    rank: 
+    picLocation: 
 --- !u!114 &1177968662
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6292,10 +6232,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1177968658}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a982b32e1da81a749914168cb7f567f2, type: 3}
+  m_Script: {fileID: 11500000, guid: 30b85f025bc03ed47b65ebe7fccabaf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  username: Guest
+  username: 
   level: 0
   currentXP: 0
   xpRequiredPerLevel: 
@@ -6303,6 +6243,20 @@ MonoBehaviour:
   usernameInput: {fileID: 0}
   buttonCreate: {fileID: 0}
   checkInternet: {fileID: 1574443850}
+--- !u!114 &1177968663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1177968658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17b10177fd5adfd479747e9ff8dc58ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scoreMultiplier: 1
+  master: {fileID: 24100000, guid: 76ec4ab55b2647249be5e774ca82f6b3, type: 2}
 --- !u!1 &1267479039
 GameObject:
   m_ObjectHideFlags: 0
@@ -6532,11 +6486,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1283919105}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e49fe16d1521fde4e80abb935903f6b0, type: 3}
+  m_Script: {fileID: 11500000, guid: 136db7419a0dd30408e4332c71bc8215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  screenshotIndicatorAnimator: {fileID: 509521562}
-  shutter: {fileID: 8300000, guid: 0072c353ad01a7948bd8af9d0a4dd80f, type: 3}
+  panel: {fileID: 509521556}
+  main: {fileID: 1449445007}
+  action: {fileID: 1449445009}
 --- !u!4 &1283919107
 Transform:
   m_ObjectHideFlags: 0
@@ -7077,7 +7032,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: -50, y: 60}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 30, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1574443852
 MonoBehaviour:
@@ -7114,7 +7069,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 46a8e70b19cda9f49b51e1ac24305263, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f4e135e519e44d24aa057c08278d6241, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -7989,7 +7944,7 @@ PrefabInstance:
     - target: {fileID: 2810003822230129095, guid: 3b85ea57d6ecc9144b964fb6ef498752, type: 3}
       propertyPath: OutputAudioMixerGroup
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 24300002, guid: 76ec4ab55b2647249be5e774ca82f6b3, type: 2}
     - target: {fileID: 2810003822230129095, guid: 3b85ea57d6ecc9144b964fb6ef498752, type: 3}
       propertyPath: reverbZoneMixCustomCurve.m_Curve.Array.data[0].value
       value: 0
@@ -8203,4 +8158,3 @@ SceneRoots:
   - {fileID: 1177968660}
   - {fileID: 1616578517}
   - {fileID: 1283919107}
-  - {fileID: 286811593}
