@@ -72,6 +72,7 @@ namespace JammerDash.Editor
         public InputField songArtist;
         public Text levelID;
         public Text difficulty;
+        public InputField offsetmarker;
 
         public Slider hp;
         public Slider size;
@@ -131,8 +132,8 @@ namespace JammerDash.Editor
 
         [Header("Long Cube")]
         public float minWidth = 1f;
-        public float maxWidth = 999f; // Change this value as needed
-        public float expansionSpeed = 1f; // Adjust as needed
+        public float maxWidth = 999f; 
+        public float expansionSpeed = 1f; 
 
         private Vector3 initialMousePosition;
         private Vector3 initialScale;
@@ -413,6 +414,7 @@ namespace JammerDash.Editor
                 creator.text = sceneData.creator; 
                 hp.value = sceneData.playerHP;
                 size.value = sceneData.boxSize;
+                offsetmarker.text = sceneData.offset.ToString();
             }
             else
             {
@@ -592,6 +594,7 @@ namespace JammerDash.Editor
                 $"\nLast saved on: {DateTime.Now}" +
                 $"\nObjects: {cubes.Count + saws.Count + longCubes.Count} ({cubes.Count}c, {saws.Count}s, {longCubes.Count}l)" +
                 $"\nBPM: {sceneData.bpm}" +
+                $"\nOffset: {sceneData.offset}" +
                 $"\nVersion: {Application.version}" +
                 $"\nID: {sceneData.ID:0000000000}" +
                 $"\nHP: {sceneData.playerHP}" +
@@ -725,7 +728,7 @@ namespace JammerDash.Editor
         }
         public void ChangeBPMOffset()
         {
-            float value = 0;
+            float value = float.Parse(offsetmarker.text);
             value = sliderOffset2.value;
             GameObject[] beats = GameObject.FindGameObjectsWithTag("Beat");
 
@@ -746,7 +749,14 @@ namespace JammerDash.Editor
         // Update is called once per frame
         void Update()
         {
+            
+            float value = float.Parse(offsetmarker.text);
+            GameObject[] beats = GameObject.FindGameObjectsWithTag("Beat");
 
+            for (int i = 0; i < beats.Length; i++)
+            {
+                beats[i].transform.position = new Vector3(originalPositions[i].x + (value / 700), 0, 0);
+            }
             size.gameObject.GetComponentInChildren<Text>().text = $"Cube size: {size.value}x";
             hp.gameObject.GetComponentInChildren<Text>().text = $"Player health: {hp.value}";
             if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift))
@@ -861,7 +871,6 @@ namespace JammerDash.Editor
 
             if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.Delete))
             {
-                GameObject[] beats = GameObject.FindGameObjectsWithTag("Beat");
                 foreach (GameObject beat in beats)
                 {
                     Destroy(beat);
@@ -1504,7 +1513,8 @@ namespace JammerDash.Editor
                 playerHP = (int)hp.value,
                 boxSize = size.value,
                 artist = songArtist.text,
-                songName = customSongName.text
+                songName = customSongName.text,
+                offset = float.Parse(offsetmarker.text)
             };
             if (data.ID == 0)
             {
@@ -1613,6 +1623,7 @@ namespace JammerDash.Editor
                 ground = groundToggle.isOn,
                 levelLength = (int)(distance / 7),
                 creator = creator.text,
+                offset = float.Parse(offsetmarker.text)
 
             };
             sceneData.clipPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", sceneNameInput.text, songArtist.text + " - " + customSongName.text + ".mp3");
@@ -1686,7 +1697,6 @@ namespace JammerDash.Editor
 
                     // Avoid division by zero by ensuring clickTimingWindow + distance is not zero
                     float divisor = clickTimingWindow + distance != 0 ? clickTimingWindow + distance : float.Epsilon;
-                    // Add difficulty contribution for this pair of cubes
                     float contribution = (timingWindow / 0.64f
                      + cubeCount / 200f
                      * (cubes.Count / 120f)

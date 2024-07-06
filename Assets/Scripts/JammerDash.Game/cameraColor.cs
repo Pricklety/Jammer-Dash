@@ -26,8 +26,7 @@ namespace JammerDash.Game
         public GameObject player0;
         public GameObject player1;
         bool started = false;
-        public TextMeshPro artist;
-        public TextMeshPro songname;
+        public TextMeshProUGUI infotext;
 
         public Transform ground;
 
@@ -76,8 +75,7 @@ namespace JammerDash.Game
             song.pitch = 0;
             player.enabled = false;
             new WaitForSecondsRealtime(0.5f);
-            songname.text = CustomLevelDataManager.Instance.data.songName;
-            artist.text = CustomLevelDataManager.Instance.data.artist;
+            
             yield return new WaitForSeconds(4f); // Delay for 4 seconds
 
             started = true;
@@ -90,6 +88,8 @@ namespace JammerDash.Game
 
         private void Update()
         {
+            infotext.text = $"{CustomLevelDataManager.Instance.levelName} by {CustomLevelDataManager.Instance.creator}\n" +
+                $"? {CustomLevelDataManager.Instance.data.artist} - {CustomLevelDataManager.Instance.data.songName}";
            
             player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>();
             song = GameObject.Find("Music").GetComponent<AudioSource>();

@@ -110,7 +110,7 @@ namespace JammerDash.Audio
                             if (data.visualizerColor)
                             {
                                 Color targetColor = CalculateTargetColor(Mathf.Lerp(0.0f, intensity, (float)(Time.fixedDeltaTime * num2 * 5.0)), Mathf.Lerp(0.0f, rms, (float)(Time.fixedDeltaTime * num2 / 20.0)));
-                                line.rectTransform.GetComponent<Image>().color = targetColor;
+                                line.rectTransform.GetComponent<Image>().color = new Color(targetColor.r, targetColor.g, targetColor.b, 155);
 
                             }
                             else

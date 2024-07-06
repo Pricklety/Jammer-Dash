@@ -14,8 +14,9 @@ using JammerDash.Game.Player;
 using UnityEngine.InputSystem.Controls;
 namespace JammerDash.Game.Player
 {
-    public class PlayerMovement : MonoBehaviour
+    public class PlayerMovement : MonoBehaviour 
     {
+
         private float click = 0.05f;
         public float moveSpeed = 1f;
         public Transform cam;
@@ -183,7 +184,57 @@ namespace JammerDash.Game.Player
             }
             health = maxHealth;
         }
-       
+      
+
+        private void OnJump()
+        {
+            if (transform.position.y < maxY)
+              transform.position += new Vector3(0f, jumpHeight, 0f);
+            
+        }
+        private void OnBoost()
+        {
+            transform.position += new Vector3(0f, jumpHeight * 2f, 0f);
+            sfxS.PlayOneShot(jump);
+
+        }
+        private void OnCrouch()
+        {
+            if (transform.position.y > minY && !isDying)
+            {
+                transform.position -= new Vector3(0f, jumpHeight, 0f);
+            }
+        }
+
+        private void OnHit()
+        {
+            if (Input.GetKey(KeybindingManager.hit1))
+                k++;
+            else if (Input.GetKey(KeybindingManager.hit2))
+                l++;
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1f, cubeLayerMask);
+
+            if (hit.collider != null)
+            {
+                HandleHit(hit);
+            }
+            else
+            {
+                HandleMiss();
+            }
+        }
+
+        private void OnResetPosition()
+        {
+            if (transform.position.y > -1)
+            {
+                if (transform.position.y > 0)
+                {
+                    sfxS.PlayOneShot(impact);
+                }
+                transform.position = new Vector3(transform.position.x, -1, transform.position.z);
+            }
+        }
         private void UpdateVignette(int currentHealth)
         {
             vignette.color.Override(Color.red);
@@ -295,7 +346,30 @@ namespace JammerDash.Game.Player
             else if (Input.GetKeyUp(KeyCode.H))
                 Time.timeScale = 1f;
 #endif
-
+            if (!isDying)
+            {
+                if (Input.GetKeyDown(KeybindingManager.up))
+                {
+                    OnJump();
+                }
+                if (Input.GetKeyDown(KeybindingManager.down))
+                {
+                    OnCrouch();
+                }
+                if (Input.GetKeyDown(KeybindingManager.boost))
+                {
+                    OnBoost();
+                }
+                if (Input.GetKeyDown(KeybindingManager.ground))
+                {
+                    OnResetPosition();
+                }
+                if (Input.GetKeyDown(KeybindingManager.hit1) || Input.GetKeyDown(KeybindingManager.hit2))
+                {
+                    OnHit();
+                }
+            }
+            
             if (Input.GetKeyDown(KeyCode.F5))
             {
                 var parentGameObject = debug.transform.parent.gameObject;
@@ -331,33 +405,7 @@ namespace JammerDash.Game.Player
 
                 }
             }   
-            // Check for vertical movement
-            if (Input.GetKeyDown(KeyCode.W) && transform.position.y < maxY && !isDying || Input.GetKeyDown(KeyCode.UpArrow) && transform.position.y < maxY && !isDying)
-            {
-                transform.position += new Vector3(0f, jumpHeight, 0f);
-            }
-            else if (Input.GetKeyDown(KeyCode.Space) && transform.position.y < maxY - jumpHeight && !isDying)
-            {
-                transform.position += new Vector3(0f, jumpHeight * 2f, 0f);
-                sfxS.PlayOneShot(jump);
-            } 
-            else if (Input.GetKeyDown(KeyCode.S) && transform.position.y > minY && !isDying || Input.GetKeyDown(KeyCode.DownArrow) && transform.position.y > minY && !isDying)
-            {
-                transform.position -= new Vector3(0f, jumpHeight, 0f);
-            }
-
-            if (Input.GetKeyDown(KeyCode.A) && transform.position.y > -1 || Input.GetKeyDown(KeyCode.LeftArrow) && transform.position.y > -1)
-            {
-                if (transform.position.y > 0)
-                {
-                    sfxS.PlayOneShot(impact);
-                }
-
-                transform.position = new Vector3(transform.position.x, -1, transform.position.z);
-
-
-            }
-
+           
 
             // Calculate skill performance point
             float distanceInPercent = Mathf.Abs(cam.transform.position.x / FindObjectOfType<FinishLine>().transform.position.x);
@@ -374,23 +422,6 @@ namespace JammerDash.Game.Player
                 acc.text = $"";
             }
 
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.K) || Input.GetKeyDown(KeyCode.L)) && !isDying)
-            {
-                if (Input.GetKeyDown(KeyCode.K))
-                    k++;
-                else if (Input.GetKeyDown(KeyCode.L))
-                    l++;
-                RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1f, cubeLayerMask);
-
-                if (hit.collider != null)
-                {
-                    HandleHit(hit);
-                }
-                else
-                {
-                    HandleMiss();
-                }
-            }
 
             if (FindNearestCubeDistance() > 21)
             {
@@ -722,7 +753,7 @@ namespace JammerDash.Game.Player
             if (collision.tag == "LongCube" && collision.transform.position.y == transform.position.y)
             {
                 activeCubes.Add(collision.gameObject);
-                if ((Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L)) && !isDying)
+                if ((Input.GetKey(KeybindingManager.hit1) ||Input.GetKey(KeybindingManager.hit2)) && !isDying)
                 {
                     bufferActive = false;
                 }
@@ -864,7 +895,7 @@ namespace JammerDash.Game.Player
             if (collision.gameObject.name.Contains("hitter02") && collision.transform.position.y == transform.position.y)
             {
                 UnityEngine.Debug.Log(bufferActive);
-                if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.Y) || Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.K) || Input.GetKeyDown(KeyCode.L)) && !isDying)
+                if ((Input.GetKeyDown(KeybindingManager.hit1) || Input.GetKeyDown(KeybindingManager.hit2)) && !isDying)
                 {
                     if (highestCombo <= combo)
                     {
@@ -877,13 +908,13 @@ namespace JammerDash.Game.Player
                     }
                     bufferActive = true;
                 }
-                else if ((Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L)) && !isDying)
+                else if ((Input.GetKey(KeybindingManager.hit1) || Input.GetKey(KeybindingManager.hit2)) && !isDying)
                 {
                     StartCoroutine(OnTriggerEnter2DBuffer());
                     
                 }
 
-                else if (!(Input.GetMouseButton(0) || Input.GetKey(KeyCode.Return) || Input.GetMouseButton(1) || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.K) || Input.GetKey(KeyCode.L)) && !isDying)
+                else if (!(Input.GetKey(KeybindingManager.hit1) || Input.GetKey(KeybindingManager.hit2)) && !isDying)
                 {
                     bufferActive = false;
                 }

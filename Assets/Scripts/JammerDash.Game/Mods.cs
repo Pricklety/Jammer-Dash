@@ -20,7 +20,7 @@ namespace JammerDash.Game
             {
                 if (mod != ModType.None)
                 {
-                    modStates[mod] = false;
+                    ResetMods();
                 }
             }
 

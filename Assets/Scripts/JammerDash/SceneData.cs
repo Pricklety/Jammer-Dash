@@ -36,6 +36,7 @@ namespace JammerDash
         public float boxSize = 1;
         public string rank;
         public string picLocation;
+        public float offset = 0;
 
         public string ToJson()
         {

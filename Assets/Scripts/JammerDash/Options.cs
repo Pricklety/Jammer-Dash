@@ -24,7 +24,7 @@ namespace JammerDash
     {
         public Button apply;
         public Dropdown resolutionDropdown;
-
+        public GameObject keybind;
         public InputField fpsInputField;
         public Dropdown qualitySettingsDropdown;
         public GameObject confirm;
@@ -112,6 +112,10 @@ namespace JammerDash
             playlist.AddOptions(optionDataList);
         }
        
+        public void ToggleKeybinds()
+        {
+            keybind.SetActive(!keybind.activeSelf);
+        }
         public void OnMusicSliderValueChanged()
         {
             if (Input.GetMouseButtonDown(0))

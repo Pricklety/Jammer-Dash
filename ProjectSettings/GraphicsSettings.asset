@@ -109,7 +109,7 @@ GraphicsSettings:
   m_FogKeepExp2: 1
   m_AlbedoSwatchInfos: []
   m_RenderPipelineGlobalSettingsMap:
-    UnityEngine.Rendering.Universal.UniversalRenderPipeline: {fileID: 11400000, guid: 8a62d102fbc887a40b5556f26fd203de, type: 2}
+    UnityEngine.Rendering.Universal.UniversalRenderPipeline: {fileID: 11400000, guid: 6109866598e33334b9ec53956a1013b5, type: 2}
   m_LightsUseLinearIntensity: 0
   m_LightsUseColorTemperature: 0
   m_LogWhenShaderIsCompiled: 0

@@ -26,6 +26,8 @@ namespace JammerDash.Menus.Play
         public Text levelBPM;
         public Text diff;
         public Text levelObj;
+        public Text hp;
+        public Text size;
         public Text bonus;  
         public leaderboard lb;
         public AudioSource sfx;
@@ -209,12 +211,16 @@ namespace JammerDash.Menus.Play
                 levelBPM = GameObject.Find("infoBPM").GetComponent<Text>();
                 diff = GameObject.Find("infodiff").GetComponent<Text>();
                 levelObj = GameObject.Find("infoobj").GetComponent<Text>();
+                hp = GameObject.Find("health").GetComponent<Text>();
+                size = GameObject.Find("cubeSize").GetComponent<Text>();
                 bonus = GameObject.Find("levelbonusinfoi").GetComponent<Text>();
                 SceneData data = GetComponent<CustomLevelScript>().sceneData;
                 levelLength.text = $"{FormatTime(data.songLength):N0} ({FormatTime(data.levelLength):N0})"; 
                 levelBPM.text = $"{data.bpm}";
                 diff.text = $"{data.calculatedDifficulty:F2}";
                 levelObj.text = $"{(data.cubePositions.Count + data.sawPositions.Count + data.longCubePositions.Count):N0} ({data.cubePositions.Count}, {data.sawPositions.Count}, {data.longCubePositions.Count})";
+                hp.text = $"Player HP: {data.playerHP}";
+                size.text = $"Object size: {data.boxSize}";
                 long unixTime = Convert.ToInt64(data.saveTime);
                 DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(unixTime).ToUniversalTime();
 
@@ -249,7 +255,7 @@ namespace JammerDash.Menus.Play
                     otherButton.isSelected = false;
                 }
             }
-
+            isSelected = true;
             yield return StartCoroutine(Move(0));
 
             button.onClick.RemoveAllListeners();
@@ -305,8 +311,6 @@ namespace JammerDash.Menus.Play
             }
 
 
-            // Toggle selection
-            isSelected = !isSelected;
         }
 
         // Coroutine to load image from URL

@@ -5342,8 +5342,6 @@ GameObject:
   - component: {fileID: 509521560}
   - component: {fileID: 509521559}
   - component: {fileID: 509521561}
-  - component: {fileID: 509521562}
-  - component: {fileID: 509521563}
   - component: {fileID: 509521564}
   m_Layer: 5
   m_Name: notification
@@ -5425,40 +5423,6 @@ MonoBehaviour:
   m_EffectColor: {r: 1, g: 1, b: 1, a: 0.5}
   m_EffectDistance: {x: 1, y: -1}
   m_UseGraphicAlpha: 1
---- !u!95 &509521562
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 509521556}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 5e4c90999ab34514b9fb26f406f0e38d, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
---- !u!114 &509521563
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 509521556}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02b94f09e36073145858b6ad1223baa8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!111 &509521564
 Animation:
   m_ObjectHideFlags: 0
@@ -6223,6 +6187,7 @@ MonoBehaviour:
     boxSize: 1
     rank: 
     picLocation: 
+    offset: 0
 --- !u!114 &1177968662
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6252,11 +6217,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1177968658}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 17b10177fd5adfd479747e9ff8dc58ad, type: 3}
+  m_Script: {fileID: 11500000, guid: 93fa513f8053b0245aad1cc2353b2fa0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreMultiplier: 1
-  master: {fileID: 24100000, guid: 76ec4ab55b2647249be5e774ca82f6b3, type: 2}
 --- !u!1 &1267479039
 GameObject:
   m_ObjectHideFlags: 0
@@ -8145,9 +8108,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 156647891}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5127ffe284365b645890dde8f50a7982, type: 3}
+  m_Script: {fileID: 11500000, guid: a9ea3d40c109f554289ad91be1318c5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shutter: {fileID: 8300000, guid: 0072c353ad01a7948bd8af9d0a4dd80f, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
