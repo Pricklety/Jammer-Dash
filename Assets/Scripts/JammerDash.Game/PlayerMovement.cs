@@ -194,8 +194,12 @@ namespace JammerDash.Game.Player
         }
         private void OnBoost()
         {
-            transform.position += new Vector3(0f, jumpHeight * 2f, 0f);
-            sfxS.PlayOneShot(jump);
+            if (transform.position.y < maxY - 1)
+            {
+                transform.position += new Vector3(0f, jumpHeight * 2f, 0f);
+                sfxS.PlayOneShot(jump);
+
+            }
 
         }
         private void OnCrouch()

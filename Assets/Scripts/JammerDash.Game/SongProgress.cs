@@ -109,7 +109,7 @@ namespace JammerDash.Game
                 GameObject.Find("Canvas/default/loadingText").GetComponent<Text>().text = "Failed to download the song. Restarting...";
                 SceneManager.LoadSceneAsync(1);
                 Time.timeScale = 1f;
-
+                CustomLevelDataManager.Instance.sceneLoaded = false;
                 yield break;
             }
 

@@ -22,10 +22,14 @@ namespace JammerDash.Game
         public int attint;
         public GameObject canvas;
         public AudioSource music;
+        public Slider dim;
+        public RawImage image;
         // Start is called before the first frame update
         void Start()
         {
 
+            SettingsData sd = SettingsFileHandler.LoadSettingsFromFile();
+            dim.value = sd.dim;
             GameObject animA = GameObject.Find("Main Camera");
             if (SceneManager.GetActiveScene().name != "LevelDefault")
             {
@@ -178,7 +182,7 @@ namespace JammerDash.Game
             if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>() != null)
                 music = GameObject.Find("Music").GetComponent<AudioSource>();
 
-
+            image.color = new(image.color.r, image.color.g, image.color.b, dim.value);
             if (Input.GetKeyDown(KeyCode.Escape) && canvas.activeSelf && GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindObjectOfType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
             {
 

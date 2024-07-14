@@ -49,13 +49,30 @@ namespace JammerDash.Game
 
 
         }
-
         private void Update()
         {
+            float num1 = float.NegativeInfinity;
+            itemUnused itemUnused1 = null;
+            foreach (itemUnused itemUnused2 in FindObjectsOfType<itemUnused>())
+            {
+                float num2 = itemUnused2.transform.position.x - transform.position.x;
+                if (num2 > num1)
+                {
+                    num1 = num2;
+                    itemUnused1 = itemUnused2;
+                }
+            }
+            if (itemUnused1 != null)
+            {
+                transform.position = new Vector3((itemUnused1.transform.position + new Vector3(5f, 0f, 0.0f)).x, 0.0f, 0.0f);
+                if (itemUnused1.GetComponent<SpriteRenderer>().size.x > 1)
+                {
+                    transform.position = new Vector3((itemUnused1.transform.position + new Vector3(5f + itemUnused1.GetComponent<SpriteRenderer>().size.x, 0f, 0.0f)).x, 0.0f, 0.0f);
+                }
+            }
             player = GameObject.FindGameObjectWithTag("Player");
             player0 = player.GetComponent<PlayerMovement>();
             scores = player.GetComponent<CubeCounter>();
-            transform.position = new Vector3(player0.music.clip.length * 7, 0.0f, 0.0f);
 
             if (player0 == null || player == null)
             {

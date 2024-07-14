@@ -16,16 +16,19 @@ Currently Mac and Linux isn't available, but we work with the community to fix p
 You can check the minimal system requirements here:
 | System | Windows | MacOS | Linux |
 | --- | --- | --- | --- |
-| Version | Windows XP or higher | Unknown | Unknown |
+| Version | Windows XP or higher | Unknown | Ubuntu/Arch |
 | CPU | 1GHz+ any CPU | 1GHz+ any CPU | 1GHz+ any CPU |
 | RAM | 512MB or above | 620MB or above | 256MB or above |
 | VRAM | 256MB or above | 512MB or above | 128MB or above | 
 | Storage | 500MB | 500MB | 550MB |
 
+
+Note for Linux: You have to use Proton and Steam to run the build. Your platform shares the same files as Windows.
+
 The recommended system requirements are here:
 | System | Windows | MacOS | Linux |
 | --- | --- | --- | --- |
-| Version | Windows 8 or higher | Unknown | Unknown |
+| Version | Windows 8 or higher | Unknown | Ubuntu/Arch |
 | CPU | 3GHz+ any CPU | 1GHz+ any CPU | 1GHz+ any CPU |
 | RAM | 1GB or above | 1.2GB or above | 640MB or above |
 | VRAM | 1GB or above | 1.5GB or above | 512MB or above | 

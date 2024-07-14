@@ -17,11 +17,6 @@ namespace JammerDash.Game
         public float duration = 1f;
 
         public PlayerMovement player;
-        private float t = 0f;
-        private Color startColor;
-        private Color startColorG;
-        private Color targetColor;
-        private Color targetColorG;
         public AudioSource song;
         public GameObject player0;
         public GameObject player1;
@@ -32,7 +27,6 @@ namespace JammerDash.Game
 
         private void Start()
         {
-            UpdateBackgroundColor();
 
             song.pitch = 0;
             player.enabled = false;
@@ -88,6 +82,7 @@ namespace JammerDash.Game
 
         private void Update()
         {
+            duration = 60 / CustomLevelDataManager.Instance.data.bpm;
             infotext.text = $"{CustomLevelDataManager.Instance.levelName} by {CustomLevelDataManager.Instance.creator}\n" +
                 $"? {CustomLevelDataManager.Instance.data.artist} - {CustomLevelDataManager.Instance.data.songName}";
            
@@ -101,44 +96,9 @@ namespace JammerDash.Game
 
             }
 
-            if (player.gameObject.activeSelf)
-            {
-
-                t += Time.deltaTime;
-                UpdateBackgroundColor();
-            }
-
+            
         }
 
-        private void SetRandomTargetColor()
-        {
-            if (SceneManager.GetActiveScene().name == "LevelDefault")
-            {
-                startColorG = ground.GetComponent<SpriteRenderer>().color;
-                targetColor = player.combo < 500 ? startColor : Random.ColorHSV();
-                targetColorG = player.combo < 500 ? Color.white : Random.ColorHSV();
-                t = 0f; // Reset time
-            }
-            else if (SceneManager.GetActiveScene().buildIndex < 25)
-            {
-                startColorG = ground.GetComponent<SpriteRenderer>().color;
-                targetColor = player.combo < 500 ? startColor : Random.ColorHSV();
-                targetColorG = player.combo < 500 ? Color.white : Random.ColorHSV();
-                t = 0f; // Reset time
-            }
-        }
-
-        private void UpdateBackgroundColor()
-        {
-            Camera.main.backgroundColor = Color.Lerp(startColor, targetColor, t / duration);
-
-            if (player.combo >= 0 && t >= duration)
-            {
-                SetRandomTargetColor();
-
-                ground.GetComponent<SpriteRenderer>().color = Color.Lerp(startColorG, targetColorG, t / duration);
-            }
-
-        }
+       
     }
 }

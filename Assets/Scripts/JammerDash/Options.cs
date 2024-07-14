@@ -70,7 +70,9 @@ namespace JammerDash
         public Toggle bass;
         public Slider bassGain;
         public Toggle visualizerColor;
-        private static readonly HttpClient client = new(); 
+        private static readonly HttpClient client = new();
+        public Text version;
+        public Slider dim;
 
         public void Start()
         {
@@ -110,6 +112,7 @@ namespace JammerDash
 
             // Now you can add the shuffled list to the dropdown
             playlist.AddOptions(optionDataList);
+            version.text = Application.version;
         }
        
         public void ToggleKeybinds()
@@ -287,6 +290,7 @@ namespace JammerDash
             bass.isOn = settingsData.bass;
             bassGain.value = settingsData.bassgain;
             visualizerColor.isOn = settingsData.visualizerColor;
+            dim.value = settingsData.dim;
         }
 
         public void ApplyOptions()
@@ -329,6 +333,7 @@ namespace JammerDash
             settingsData.bass = bass.isOn;
             settingsData.bassgain = bassGain.value;
             settingsData.visualizerColor = visualizerColor.isOn;
+            settingsData.dim = dim.value;
             ApplyQualitySettings(settingsData.qualitySettingsLevel);
             ApplyMasterVolume(settingsData.volume);
             ApplyFPSCap(settingsData.selectedFPS);
@@ -491,6 +496,7 @@ namespace JammerDash
                 bass = bass.isOn,
                 bassgain = bassGain.value,
                 visualizerColor = visualizerColor.isOn,
+                dim = dim.value,
                 saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                 gameVersion = Application.version
             };
@@ -910,6 +916,7 @@ namespace JammerDash
         public void FixedUpdate()
         {
             trailFadeText.text = $"Trail fade ({trailFade.value:0.00}s)";
+            dim.GetComponentInChildren<Text>().text = $"Background visibility ({dim.value * 100}%)";
         }
     }
 }
