@@ -24,6 +24,7 @@ namespace JammerDash.Game
         public Text scoreText;
         public Animation anim;
         public SceneData data;
+        public float maxPos;
         [Header("Scores")]
         public Text five;
         public Text three;
@@ -47,39 +48,58 @@ namespace JammerDash.Game
                 finishSound.Play();
             }
 
-
         }
-        private void Update()
+
+        private void SetLinePos()
         {
-            float num1 = float.NegativeInfinity;
-            itemUnused itemUnused1 = null;
-            foreach (itemUnused itemUnused2 in FindObjectsOfType<itemUnused>())
+            float maxDistance = float.NegativeInfinity;
+            itemUnused farthestItem = null;
+
+            // Iterate over all itemUnused objects in the scene
+            foreach (itemUnused currentItem in FindObjectsOfType<itemUnused>())
             {
-                float num2 = itemUnused2.transform.position.x - transform.position.x;
-                if (num2 > num1)
+                float distance = currentItem.transform.position.x - transform.position.x;
+
+                // Find the itemUnused with the greatest x distance
+                if (distance > maxDistance)
                 {
-                    num1 = num2;
-                    itemUnused1 = itemUnused2;
+                    maxDistance = distance;
+                    farthestItem = currentItem;
                 }
             }
-            if (itemUnused1 != null)
+
+            // If a farthestItem is found, update the position
+            if (farthestItem != null)
             {
-                transform.position = new Vector3((itemUnused1.transform.position + new Vector3(5f, 0f, 0.0f)).x, 0.0f, 0.0f);
-                if (itemUnused1.GetComponent<SpriteRenderer>().size.x > 1)
+                float newXPosition = farthestItem.transform.position.x + 5f;
+
+                // If the SpriteRenderer's size in the x direction is greater than 1, add its size to the position
+                SpriteRenderer spriteRenderer = farthestItem.GetComponent<SpriteRenderer>();
+                if (spriteRenderer != null && spriteRenderer.size.x > 1)
                 {
-                    transform.position = new Vector3((itemUnused1.transform.position + new Vector3(5f + itemUnused1.GetComponent<SpriteRenderer>().size.x, 0f, 0.0f)).x, 0.0f, 0.0f);
+                    newXPosition += spriteRenderer.size.x;
                 }
+
+                // Update the current object's position
+                maxPos = newXPosition;
             }
+        }
+        private void FixedUpdate()
+        {
+            if (maxPos < 5)
+            {
+                SetLinePos();
+                return;
+            }
+            transform.position = new Vector3(maxPos, 0, 0);
             player = GameObject.FindGameObjectWithTag("Player");
             player0 = player.GetComponent<PlayerMovement>();
             scores = player.GetComponent<CubeCounter>();
 
             if (player0 == null || player == null)
             {
-
                 player0 = player.GetComponent<PlayerMovement>();
                 player = player0.gameObject;
-
             }
             if (player.transform.position.x >= transform.position.x && player != null)
             {
@@ -88,6 +108,7 @@ namespace JammerDash.Game
             }
 
             deadScore.text = "There's always another time! Maybe it's after you restart?";
+
         }
 
         void SaveLevelData(float actualdest, float destruction)
@@ -190,7 +211,6 @@ namespace JammerDash.Game
             return 0;
         }
 
-        [Obsolete]
         private IEnumerator End()
         {
             PlayerMovement objectOfType = FindObjectOfType<PlayerMovement>();

@@ -555,7 +555,7 @@ namespace JammerDash.Menus
                 bg.sprite = sprite[0];
                 Color targetColor = new Color(Random.Range(0.5f, 1f), Random.Range(0.5f, 1f), Random.Range(0.5f, 1f), 1f);
 
-                float duration = 5f;  // Adjust the duration as needed
+                float duration = 0.5f;  // Adjust the duration as needed
 
                 while (elapsedTime < duration)
                 {

@@ -596,7 +596,7 @@ namespace JammerDash.Game.Player
         {
             float factor;
             UnityEngine.Debug.Log(playerDistance);
-            if (playerDistance <= 0.25f)
+            if (playerDistance <= 0.29f)
             {
                 factor = 1f;
                 five++;
@@ -609,7 +609,7 @@ namespace JammerDash.Game.Player
                 }
                  
             }
-            else if (playerDistance <= 0.4 && playerDistance > 0.25f)
+            else if (playerDistance <= 0.45 && playerDistance > 0.29f)
             {
                 factor = 1f / 3f;
                 three++;

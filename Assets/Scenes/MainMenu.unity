@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -82123,7 +82122,7 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'b0.4.1
 
-    <size=6>August 28, 2024</size>'
+    <size=6>July 17, 2024</size>'
 --- !u!222 &1731654553
 CanvasRenderer:
   m_ObjectHideFlags: 0

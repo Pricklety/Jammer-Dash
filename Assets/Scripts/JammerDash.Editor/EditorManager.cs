@@ -64,7 +64,6 @@ namespace JammerDash.Editor
         public Slider playback;
         public Text playbackText;
         public GameObject linePrefab;
-        public Slider sliderOffset2;
         public InputField bpmInput;
         public Slider bpmMultiplier;
         public InputField creator;
@@ -213,7 +212,6 @@ namespace JammerDash.Editor
                 }
             }
 
-            sliderOffset2.value = 0f;
 
         }
         private void MeasureTimeToReachDistance()
@@ -716,28 +714,13 @@ namespace JammerDash.Editor
                 }
             }
 
-            sliderOffset2.value = 0f;
 
 
         }
-        private bool slider1Selected = false;
+       
         private Vector3[] originalPositions;
-        public void SetSlider1Selected(bool isSelected)
-        {
-            slider1Selected = isSelected;
-        }
-        public void ChangeBPMOffset()
-        {
-            float value = float.Parse(offsetmarker.text);
-            value = sliderOffset2.value;
-            GameObject[] beats = GameObject.FindGameObjectsWithTag("Beat");
-
-            for (int i = 0; i < beats.Length; i++)
-            {
-                beats[i].transform.position = new Vector3(originalPositions[i].x + value, 0, 0); // Move the GameObjects by adding the offset to the original position
-            }
-
-        }
+       
+       
         bool IsCursorOnRightSide()
         {
             UnityEngine.Debug.Log("test");
@@ -811,12 +794,7 @@ namespace JammerDash.Editor
 
                 UnityEngine.Debug.Log("fools");
             }
-            sliderOffset2.GetComponentInChildren<Text>().text = "BPM Offset (" + (sliderOffset2.value / 7).ToString("F2") + "s)";
-            if (sliderOffset2.value < 0.15f && sliderOffset2.value > -0.15f)
-            {
-                sliderOffset2.value = 0f;
-            }
-
+           
             if (!Input.GetKey(KeyCode.R))
             {
 
