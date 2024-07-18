@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using JammerDash.Notifications;
 using UnityEngine.Events;
 using Debug = UnityEngine.Debug;
+using TMPro;
 namespace JammerDash
 {
     public class Options : MonoBehaviour
@@ -74,6 +75,11 @@ namespace JammerDash
         public Text version;
         public Slider dim;
 
+        [Header("Next Update")]
+        public GameObject nextChangelogs;
+        public TMP_Text changelogs;
+        public Text updateName;
+        public Button update;
         public void Start()
         {
            
@@ -599,6 +605,7 @@ namespace JammerDash
 
                 JObject release = JObject.Parse(responseBody);
                 string latestVersion = release["tag_name"].ToString();
+                string uploadDate = release["published_at"].ToString();
                 string releaseNotes = release["body"].ToString();
 
                 Debug.Log($"Latest version: {latestVersion}");
@@ -609,8 +616,12 @@ namespace JammerDash
                 if (IsNewVersionAvailable(latestVersion))
                 {
                     // Create a UnityAction delegate for the update action
-                    UnityAction updateAction = () => OpenUpdate(latestVersion);
-                    Notifications.Notifications.instance.Notify($"There's a new update available! ({latestVersion}).\nClick to update (manual).", updateAction);
+                    UnityAction updateAction = () => OpenChangelog();
+                    UnityAction update = () => OpenUpdate(latestVersion);
+                    this.update.onClick.AddListener(update);
+                    changelogs.text = releaseNotes;
+                    updateName.text = $"{latestVersion}\n<size=6>{uploadDate}</size>";
+                    Notifications.Notifications.instance.Notify($"There's a new update available! ({latestVersion}).\nClick to open changelogs and update.", updateAction);
                 }
             }
             catch (HttpRequestException e)
@@ -624,10 +635,13 @@ namespace JammerDash
             string currentVersion = Application.version;
             return latestVersion != currentVersion;
         }
-
+        private void OpenChangelog()
+        {
+            nextChangelogs.SetActive(true);
+        }
         private void OpenUpdate(string latestVersion)
         {
-            Application.OpenURL($"https://api.github.com/repos/Pricklety/Jammer-Dash/tarball/{latestVersion}");
+            Application.OpenURL($"https://github.com/Pricklety/Jammer-Dash/releases/download/{latestVersion}/Jammer.Dash.{latestVersion}.zip");
         }
     
         public void DisplayMusicInfo(AudioClip currentClip, float currentTime)

@@ -30,14 +30,13 @@ namespace JammerDash.Notifications
             main.text = $"{message}";
             
             panel.GetComponent<Animation>().Stop();
-            panel.GetComponent<Animation>().Play();
+            panel.GetComponent<Animation>().Play();                                                                                                                                                                                                                                                                                                                                                                                     
             action.onClick.AddListener(buttonEvent);
             Invoke("End", 6f);
         }
 
         public void End()
         {
-            panel.GetComponent<Animator>().ResetTrigger("ScreenshotTaken");
             action.onClick.RemoveAllListeners();
         }
     }
