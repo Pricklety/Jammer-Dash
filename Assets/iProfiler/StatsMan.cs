@@ -93,6 +93,7 @@ namespace JammerDash.Tech
                     bg = "Every 30s";
                     break;
             }
+            string v = data.canvasOff ? "Off" : "On";
 
             gui.text += "\n\nResolution value: " + data.resolutionValue + $" ({Screen.width}x{Screen.height})" +
                         "\nQuality Level: " + data.qualitySettingsLevel + $" ({GetQualityLevelName()})" +
@@ -104,7 +105,6 @@ namespace JammerDash.Tech
                         "\nPlayer Type: " + data.playerType +
                         "\nAntialiasing: " + data.antialiasing +
                         "\nCursor Trail: " + data.cursorTrail +
-                        "\nVisualizers: {" + data.allVisualizers + "," + data.lineVisualizer + "," + data.logoVisualizer + "," + data.bgVisualizer + "}" +
                         "\nNo focus volume: " + data.noFocusVolume +
                         "\nLowpass value: " + data.lowpassValue +
                         "\nMouse particle count: " + data.mouseParticles +
@@ -112,7 +112,14 @@ namespace JammerDash.Tech
                         "\nParallax: " + data.parallax +
                         "\nRandom hit sounds: " + data.randomSFX +
                         "\nConfined mouse: " + data.confinedMouse +
-                        "\nBackground Time: " + bg;
+                        "\nBackground Time: " + bg +
+                        "\nMouse wheel volume: " + data.wheelShortcut +
+                        "\nIncreased game volume: " + data.volumeIncrease +
+                        "\nSnow: " + data.snow +
+                        "\nGameplay Canvas: " + v +
+                        "\nBass: " + data.bass +
+                        "\nBass Gain: " + data.bassgain + "Hz";
+
 
         }
 

@@ -49,10 +49,6 @@ namespace JammerDash
         public int playerType = 0;
         public int antialiasing = 0;
         public bool cursorTrail = false;
-        public bool allVisualizers = true;
-        public bool lineVisualizer = true;
-        public bool logoVisualizer = true;
-        public bool bgVisualizer = true;
         public float noFocusVolume = -20f;
         public float lowpassValue = 500;
         public float mouseParticles = 1000;
@@ -70,7 +66,6 @@ namespace JammerDash
         public bool canvasOff = false;
         public bool bass = false;
         public float bassgain = 2.5f;
-        public bool visualizerColor = false;
         public float dim = 1;
         public string gameVersion = Application.version;
         public string saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();

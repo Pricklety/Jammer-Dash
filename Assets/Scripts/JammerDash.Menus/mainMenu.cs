@@ -52,7 +52,6 @@ namespace JammerDash.Menus
         public GameObject community;
         public GameObject musicPanel;
         public GameObject changelogs;
-        public GameObject funMode;
         public GameObject overPanel;
         public GameObject accPanel;
 
@@ -81,11 +80,7 @@ namespace JammerDash.Menus
         private List<string> videoUrls;
         private int currentVideoIndex = 0;
 
-        [Header("Idle")]
-        public Animator animator;
-        private float idleTimer = 0f;
-        public float idleTimeThreshold = 10f;
-
+       
         [Header("Music")]
         public AudioMixer audioMixer;
         AudioSource source;
@@ -99,14 +94,8 @@ namespace JammerDash.Menus
         public Text levelText;
         public RawImage[] discordpfp;
         public Text discordName;
-        public Text[] usernames;
+        public Text[] usernames; 
 
-        [Header("Fun Mode")]
-        public GameObject vis2;
-
-        [Header("Visualizer V2")]
-        public Text musicText;
-        public Slider musicSlider;
 
         [Header("Parallax")]
         public Transform logo;
@@ -773,7 +762,7 @@ namespace JammerDash.Menus
         private void ToggleMenuPanel(GameObject panel)
         {
             // Toggle the specified panel directly if it's changelogs or creditsPanel
-            if (panel == changelogs || panel == creditsPanel || panel == funMode || panel == community)
+            if (panel == changelogs || panel == creditsPanel || panel == community)
             {
                 panel.SetActive(!panel.activeSelf);
 
@@ -789,8 +778,7 @@ namespace JammerDash.Menus
                     community.SetActive(false);
                     changelogs.SetActive(false);
                     additionalPanel.SetActive(false);
-                    funMode.SetActive(false);
-                    vis2.SetActive(false);
+                   
                 }
                 if (!panel.active)
                 {
@@ -814,8 +802,7 @@ namespace JammerDash.Menus
                 community.SetActive(false);
                 changelogs.SetActive(false);
                 additionalPanel.SetActive(false);
-                funMode.SetActive(false);
-                vis2.SetActive(false);
+                
 
                 // Enable the specified panel if it's not null
                 if (panel != null)
@@ -900,17 +887,6 @@ namespace JammerDash.Menus
             additionalPanel.SetActive(false);
         }
 
-        public void FunMode()
-        {
-            ToggleMenuPanel(funMode);
-        }
-
-        // Fun mode buttons
-
-        public void VisualizerToggle()
-        {
-            vis2.SetActive(true);
-        }
         public void Quit()
         {
             StartCoroutine(QuitGame());
@@ -1246,9 +1222,7 @@ namespace JammerDash.Menus
                 background.position = Vector3.zero;
                 logo.position = new Vector3(0, 0, 0);
             }  
-            musicText.text = $"{AudioManager.Instance.GetComponent<AudioSource>().clip.name}: {AudioManager.Instance.GetComponent<AudioSource>().time:0.00}/{AudioManager.Instance.GetComponent<AudioSource>().clip.length:0.00}";
-            musicSlider.value = AudioManager.Instance.GetComponent<AudioSource>().time / AudioManager.Instance.GetComponent<AudioSource>().clip.length;
-
+           
             if (Input.GetKey(KeyCode.Escape))
             {
 
@@ -1310,24 +1284,7 @@ namespace JammerDash.Menus
             {
                 ToggleMenuPanel(mainPanel);
             }
-            bool hasInput = Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space);
-            idleTimer += Time.fixedDeltaTime;
-            if (!hasInput)
-            {
-                // Player is idle, start the idle animation immediately if it's not already playing
-                if (idleTimer > idleTimeThreshold || Input.GetKeyDown(KeyCode.F1))
-                {
-                    animator.SetTrigger("StartIdle");
-                    animator.ResetTrigger("StopIdle");
-                }
-
-            }
-            else if (hasInput && !IsPointerOverUIButNotButton())
-            {
-                idleTimer = 0;  // Resetting idleTimer when there is input
-                animator.SetTrigger("StopIdle");
-                animator.ResetTrigger("StartIdle");
-            }
+            
             if (Input.GetKeyDown(KeyCode.F5))
             {
                 LoadLevelFromLevels();
@@ -1342,10 +1299,7 @@ namespace JammerDash.Menus
                 additionalPanel.SetActive(!additionalPanel.active);
             }
 
-            if (Input.GetKeyDown(KeyCode.F3))
-            {
-                FunMode();
-            }
+            
         }
 
         public void OnPointerClick(PointerEventData eventData)

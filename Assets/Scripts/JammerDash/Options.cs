@@ -48,9 +48,6 @@ namespace JammerDash
         public Dropdown playerType;
         public Toggle vidBG;
         public Toggle cursorTrail;
-        public Toggle allVis;
-        public Toggle lineVis;
-        public Toggle logoVis;
         public Dropdown antiAliasing;
         public Slider lowpass;
         public Dropdown backgrounds;
@@ -70,7 +67,6 @@ namespace JammerDash
         public Dropdown bgTime;
         public Toggle bass;
         public Slider bassGain;
-        public Toggle visualizerColor;
         private static readonly HttpClient client = new();
         public Text version;
         public Slider dim;
@@ -279,7 +275,6 @@ namespace JammerDash
             vsync.isOn = settingsData.vsync;
             playerType.value = settingsData.playerType;
             cursorTrail.isOn = settingsData.cursorTrail;
-            allVis.isOn = settingsData.allVisualizers;
             antiAliasing.value = settingsData.antialiasing;
             lowpass.value = settingsData.lowpassValue;
             trailParticleCount.value = settingsData.mouseParticles;
@@ -295,7 +290,6 @@ namespace JammerDash
             increaseVol.isOn = settingsData.volumeIncrease;
             bass.isOn = settingsData.bass;
             bassGain.value = settingsData.bassgain;
-            visualizerColor.isOn = settingsData.visualizerColor;
             dim.value = settingsData.dim;
         }
 
@@ -321,9 +315,6 @@ namespace JammerDash
             settingsData.vsync = vsync.isOn;
             settingsData.playerType = playerType.value;
             settingsData.cursorTrail = cursorTrail.isOn;
-            settingsData.allVisualizers = allVis.isOn;
-            settingsData.lineVisualizer = lineVis.isOn;
-            settingsData.logoVisualizer = logoVis.isOn;
             settingsData.antialiasing = antiAliasing.value;
             settingsData.lowpassValue = lowpass.value;
             settingsData.hitType = hitType.value;
@@ -338,7 +329,6 @@ namespace JammerDash
             settingsData.volumeIncrease = increaseVol.isOn;
             settingsData.bass = bass.isOn;
             settingsData.bassgain = bassGain.value;
-            settingsData.visualizerColor = visualizerColor.isOn;
             settingsData.dim = dim.value;
             ApplyQualitySettings(settingsData.qualitySettingsLevel);
             ApplyMasterVolume(settingsData.volume);
@@ -349,7 +339,6 @@ namespace JammerDash
             Focus(settingsData.focusVol);
             Vsync(settingsData.vsync);
             Cursor(settingsData.cursorTrail);
-            Visualizers(settingsData.allVisualizers);
             AA(settingsData.antialiasing);
         }
 
@@ -376,11 +365,6 @@ namespace JammerDash
             }
         }
 
-
-        public void Visualizers(bool enabled)
-        {
-            allVis.isOn = enabled;
-        }
         public void HitNotes(bool enabled)
         {
             audio.hits = enabled;
@@ -483,9 +467,6 @@ namespace JammerDash
                 hitNotes = hitSounds.isOn,
                 playerType = playerType.value,
                 cursorTrail = cursorTrail.isOn,
-                allVisualizers = allVis.isOn,
-                lineVisualizer = lineVis.isOn,
-                logoVisualizer = logoVis.isOn,
                 antialiasing = antiAliasing.value,
                 lowpassValue = lowpass.value,
                 mouseParticles = trailParticleCount.value,
@@ -501,7 +482,6 @@ namespace JammerDash
                 snow = snow.isOn,
                 bass = bass.isOn,
                 bassgain = bassGain.value,
-                visualizerColor = visualizerColor.isOn,
                 dim = dim.value,
                 saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                 gameVersion = Application.version
@@ -772,18 +752,7 @@ namespace JammerDash
                 audio.masterS.gameObject.SetActive(false);
             }
 
-            if (allVis.isOn)
-            {
-                logoVis.isOn = true;
-                lineVis.isOn = true;
-            }
-            else if (!logoVis.isOn || !lineVis.isOn)
-                allVis.isOn = false;
-            else if (!allVis.isOn)
-            {
-                logoVis.isOn = false;
-                lineVis.isOn = false;
-            }
+          
 
             if (artBG.isOn)
             {
