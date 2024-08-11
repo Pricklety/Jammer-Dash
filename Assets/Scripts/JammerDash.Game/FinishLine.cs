@@ -126,10 +126,7 @@ namespace JammerDash.Game
         void SaveLevelDataForLevelDefault(float actualdest, float destruction)
         {
             // Construct the path based on conditions
-            string levelsPath = Path.Combine(Application.persistentDataPath,
-                string.IsNullOrEmpty(CustomLevelDataManager.Instance.levelName)
-                    ? Path.Combine("scenes", LevelDataManager.Instance.levelName)
-                    : Path.Combine("levels", "extracted", CustomLevelDataManager.Instance.levelName));
+            string levelsPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", CustomLevelDataManager.Instance.levelName);
 
             string[] levelFiles = Directory.GetFiles(levelsPath, "*.json", SearchOption.AllDirectories);
             string levelName = "";

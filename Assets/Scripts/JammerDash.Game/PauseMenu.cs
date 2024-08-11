@@ -69,14 +69,7 @@ namespace JammerDash.Game
             else if (SceneManager.GetActiveScene().name == "LevelDefault")
             {
                 string levelName = CustomLevelDataManager.Instance.levelName;
-                CheckSceneDataExists(levelName, "levels\\extracted");
                 string creator = $"by {CustomLevelDataManager.Instance.creator}";
-                if (levelName == null)
-                {
-                    creator = $"by {LevelDataManager.Instance.creator}";
-                    levelName = LevelDataManager.Instance.levelName;
-                    CheckSceneDataExists(levelName, "scenes");
-                }
                 this.creator.text = creator;
                 song.text = levelName;
             }
@@ -135,10 +128,6 @@ namespace JammerDash.Game
                 Notifications.Notifications.instance.Notify("Playfield UI is off.\nClick Shift+F1 to turn it back on.", null);
                 yield return null;
             }
-        }
-        private void CheckSceneDataExists(string levelName, string folder)
-        {
-
         }
 
         // Function to load SceneData for a specific level
@@ -302,7 +291,6 @@ namespace JammerDash.Game
         {
             Time.timeScale = 1;
             SceneManager.LoadSceneAsync(1);
-            LevelDataManager.Instance.enabled = false;
             CustomLevelDataManager.Instance.enabled = false;
         }
 

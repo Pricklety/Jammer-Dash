@@ -303,10 +303,7 @@ namespace JammerDash.Menus.Play
                     }
                 }
 
-                if (GetComponent<CustomLevelScript>().sceneData.picLocation != null && GetComponent<CustomLevelScript>() != null)
-                {
                     yield return StartCoroutine(LoadImage(GetComponent<CustomLevelScript>().sceneData.picLocation));
-                }
 
             }
 
@@ -326,13 +323,13 @@ namespace JammerDash.Menus.Play
                     Texture2D texture = DownloadHandlerTexture.GetContent(www);
                     Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
                     UnityEngine.Debug.Log(bg);
-                    yield return new WaitForSecondsRealtime(0.2f);
                     bg.sprite = sprite;
                     levelImage.sprite = sprite;
                 }
                 else
                 {
-                    levelImage.sprite = Resources.Load<Sprite>("backgrounds/basic/basic.png");
+                    bg.sprite = FindAnyObjectByType<mainMenu>().sprite[UnityEngine.Random.Range(0, FindAnyObjectByType<mainMenu>().sprite.Length)];
+                    levelImage.sprite = null;
                     StartCoroutine(AudioManager.Instance.ChangeSprite());
                 }
             }

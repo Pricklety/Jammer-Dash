@@ -33,12 +33,12 @@ namespace JammerDash.Editor
 
             bool pointerOverUI = EventSystem.current.IsPointerOverGameObject();
             bool isMovingWithMouse = false;
-            if (!Input.GetKey(KeyCode.LeftShift) && Input.GetMouseButton(0) && !pointerOverUI)
+            if (!Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeybindingManager.moveCam) && !pointerOverUI)
             {
                 isMovingWithMouse = true;
             }
 
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetKeyUp(KeybindingManager.moveCam))
             {
                 isMovingWithMouse = false;
             }

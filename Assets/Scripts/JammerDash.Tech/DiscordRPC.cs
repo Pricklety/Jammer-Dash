@@ -30,12 +30,12 @@ namespace JammerDash.Tech
             }
             else if (SceneManager.GetActiveScene().name == "LevelDefault")
             {
-                DiscordManager.current.UpdateDetails($"{CustomLevelDataManager.Instance.levelName}{LevelDataManager.Instance.levelName} by {LevelDataManager.Instance.creator}{CustomLevelDataManager.Instance.creator}");
+                DiscordManager.current.UpdateDetails($"{CustomLevelDataManager.Instance.levelName} by {CustomLevelDataManager.Instance.creator}");
                 DiscordManager.current.UpdateState("Clicking boxes and evading saws");
             }
             else if (SceneManager.GetActiveScene().name == "SampleScene")
             {
-                DiscordManager.current.UpdateDetails($"{LevelDataManager.Instance.levelName} - {FindObjectOfType<EditorManager>().objectCount.text}");
+                DiscordManager.current.UpdateDetails($"{CustomLevelDataManager.Instance.levelName} - {FindObjectOfType<EditorManager>().objectCount.text}");
                 DiscordManager.current.UpdateState("Editing a level");
             }
             else if (SceneManager.GetActiveScene().name == "MainMenu")

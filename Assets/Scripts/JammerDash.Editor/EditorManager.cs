@@ -19,6 +19,7 @@ using System.IO.Compression;
 using Random = UnityEngine.Random;
 using Debug = UnityEngine.Debug;
 using JammerDash.Tech;
+using JammerDash.Notifications;
 
 namespace JammerDash.Editor
 {
@@ -36,7 +37,6 @@ namespace JammerDash.Editor
         [Header("UI and Stuff")]
         public GameObject[] editorPages;
         public GameObject optionsMenu;
-        public GameObject mainMenu;
         public GameObject colorPickerMenuBG;
         public Text objectCount;
 #pragma warning disable CS0108 // Member hides inherited member; missing new keyword
@@ -70,7 +70,6 @@ namespace JammerDash.Editor
         public InputField customSongName;
         public InputField songArtist;
         public Text levelID;
-        public Text difficulty;
         public InputField offsetmarker;
 
         public Slider hp;
@@ -127,7 +126,6 @@ namespace JammerDash.Editor
         private string selectedImagePath;
         public float delay;
         public float delayLimit = 0.25f;
-        public float timer = 0f;
 
         [Header("Long Cube")]
         public float minWidth = 1f;
@@ -137,7 +135,8 @@ namespace JammerDash.Editor
         private Vector3 initialMousePosition;
         private Vector3 initialScale;
         private bool isCursorOnRightSide;
-
+        private GameObject[] beatObjects;
+        private int lastBeatObjectCount = 0;
 
         // Start is called before the first frame update
         void Start()
@@ -216,8 +215,8 @@ namespace JammerDash.Editor
         }
         private void MeasureTimeToReachDistance()
         {
-            GameObject[] objectsWithTag = FindObjectsWithTags(targetTags);
-            Transform targetObject = FindFarthestObjectInX(objectsWithTag);
+            GameObject[] objectsWithTag = Object.FindObjectsWithTags(targetTags);
+            Transform targetObject = Difficulty.FindFarthestObjectInX(objectsWithTag);
             if (targetObject != null)
             {
                 float distance = targetObject.position.x + additionalDistance;
@@ -245,35 +244,7 @@ namespace JammerDash.Editor
             }
         }
 
-        private GameObject[] FindObjectsWithTags(string[] tags)
-        {
-            GameObject[] objects = new GameObject[0];
-
-            foreach (string tag in tags)
-            {
-                objects = objects.Concat(GameObject.FindGameObjectsWithTag(tag)).ToArray();
-            }
-
-            return objects;
-        }
-
-        private Transform FindFarthestObjectInX(GameObject[] objects)
-        {
-            Transform farthestObject = null;
-            float maxX = float.MinValue;
-
-            foreach (GameObject obj in objects)
-            {
-                float x = obj.transform.position.x;
-                if (x > maxX)
-                {
-                    maxX = x;
-                    farthestObject = obj.transform;
-                }
-            }
-
-            return farthestObject;
-        }
+      
 
         public IEnumerator LoadAudioClip(string filePath)
         {
@@ -453,8 +424,6 @@ namespace JammerDash.Editor
                 // Create a new SceneData instance and populate it with current objects' positions
                 SceneData sceneData = CreateLevelSceneData();
 
-                Text text = GameObject.Find("errorText").GetComponent<Text>();
-
                 // Get the directory path based on the scene name
                 string directoryPath = GetLevelDataPath(sceneData.sceneName);
                 UnityEngine.Debug.Log(directoryPath);
@@ -486,41 +455,18 @@ namespace JammerDash.Editor
                 // Delete the directory
                 Directory.Delete(directoryPath, true);
                 UnityEngine.Debug.Log(directoryPath);
-                text.text = $"{sceneData.levelName} exported successfully.";
+                Notifications.Notifications.instance.Notify($"{sceneData.levelName} exported successfully.", null);
                 File.Delete(zipFilePath);
                 UnityEngine.Debug.Log($"Level data for {sceneData.levelName} saved in folder: {directoryPath}");
             }
             catch (Exception e)
             {
-                Text text = GameObject.Find("errorText").GetComponent<Text>();
                 UnityEngine.Debug.LogError("Error saving scene: " + e);
-                text.text = $"Couldn't save scene: {e.Message}.\nTry again later.\nError happened on {DateTime.Now}\n\nFull error: {e}";
+                Notifications.Notifications.instance.Notify($"Couldn't save scene: {e.Message}.\nTry again later.", null);
             }
         }
 
-        // Function to encrypt a string using AES encryption
-        private string Encrypt(string plainText, string key)
-        {
-            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
-            byte[] iv = new byte[16];
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = keyBytes;
-                aesAlg.IV = iv;
-
-                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-
-                using MemoryStream msEncrypt = new();
-                using (CryptoStream csEncrypt = new(msEncrypt, encryptor, CryptoStreamMode.Write))
-                {
-                    using (StreamWriter swEncrypt = new(csEncrypt))
-                    {
-                        swEncrypt.Write(plainText);
-                    }
-                }
-                return Convert.ToBase64String(msEncrypt.ToArray());
-            }
-        }
+      
         private string GetLevelDataPath(string sceneName)
         {
             // Combine the application's persistent data path with "levels" folder and the scene name
@@ -575,7 +521,6 @@ namespace JammerDash.Editor
                 // Create a new SceneData instance and populate it with current objects' positions
                 SceneData sceneData = CreateSceneData();
 
-                Text text = GameObject.Find("errorText").GetComponent<Text>();
                 // Serialize the SceneData instance to formatted JSON
                 string json = JsonUtility.ToJson(sceneData, true);
 
@@ -585,89 +530,17 @@ namespace JammerDash.Editor
                 // Write the JSON data to the file
                 File.WriteAllText(filePath, json);
 
-                text.text = $"{sceneData.sceneName} successfully saved." +
+                Notifications.Notifications.instance.Notify($"{ sceneData.sceneName} successfully saved." +
                 $"\nDifficulty: {sceneData.calculatedDifficulty}sn" +
-                $"\nSong: {sceneData.artist} - {sceneData.songName}" +
-                $"\nLength: {sceneData.levelLength} seconds" +
-                $"\nLast saved on: {DateTime.Now}" +
-                $"\nObjects: {cubes.Count + saws.Count + longCubes.Count} ({cubes.Count}c, {saws.Count}s, {longCubes.Count}l)" +
-                $"\nBPM: {sceneData.bpm}" +
-                $"\nOffset: {sceneData.offset}" +
-                $"\nVersion: {Application.version}" +
-                $"\nID: {sceneData.ID:0000000000}" +
-                $"\nHP: {sceneData.playerHP}" +
-                $"\nCS: {sceneData.boxSize}";
+                $"\nLength: {sceneData.levelLength} seconds", null);
             }
             catch (Exception e)
             {
-                Text text = GameObject.Find("errorText").GetComponent<Text>();
-                UnityEngine.Debug.LogError("Error saving scene: " + e);
-                text.text = $"Oops, something wrong happened!\n\nCouldn't save scene: {e.Message}.\nTry again later.\nError happened on {DateTime.Now}\n\nFull error: {e}";
+                Notifications.Notifications.instance.Notify($"Oops, something wrong happened!\nTry again later.", null);
             }
         }
 
-        public float CalculateAverageCubeDistance(List<GameObject> cubes)
-        {
-            if (cubes.Count < 2)
-            {
-                UnityEngine.Debug.Log("Not enough cubes in the list.");
-                return 0;
-            }
-
-            float totalDistance = 0f;
-            int numDistances = 0;
-
-            for (int i = 0; i < cubes.Count; i++)
-            {
-                for (int j = i + 1; j < cubes.Count; j++)
-                {
-                    Vector3 positionA = cubes[i].transform.position;
-                    Vector3 positionB = cubes[j].transform.position;
-
-                    // Calculate distance between cubes
-                    float distance = Vector3.Distance(positionA, positionB);
-                    totalDistance += distance;
-                    numDistances++;
-                }
-            }
-
-            // Calculate average distance
-            float averageDistance = totalDistance / numDistances;
-
-            return averageDistance;
-        }
-        public void LoadSceneData()
-        {
-            try
-            {
-                string sceneName = sceneNameInput.text.Trim();
-
-                if (string.IsNullOrEmpty(sceneName))
-                {
-                    UnityEngine.Debug.LogError("Scene name is empty. Please enter a valid scene name.");
-                    return;
-                }
-
-                string filePath = GetSceneDataPath(sceneName);
-                if (File.Exists(filePath))
-                {
-                    string json = File.ReadAllText(filePath);
-                    SceneData sceneData = JsonUtility.FromJson<SceneData>(json);
-
-                    LoadSceneWithData(sceneData);
-
-                    UnityEngine.Debug.Log("Scene loaded successfully: " + sceneName);
-                }
-                else
-                {
-                    UnityEngine.Debug.LogError("Scene file not found: " + filePath);
-                }
-            }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogError("Error loading scene: " + e.Message);
-            }
-        }
+      
         public void InstantiateLines()
         {
             // Check if the audio clip is assigned
@@ -838,9 +711,9 @@ namespace JammerDash.Editor
             if (cubes.Count > 0 || saws.Count > 0 || longCubes.Count > 0)
             {
 
-                FindFarthestObjectInX(cubes.ToArray());
-                FindFarthestObjectInX(saws.ToArray());
-                FindFarthestObjectInX(longCubes.ToArray());
+                Difficulty.FindFarthestObjectInX(cubes.ToArray());
+                Difficulty.FindFarthestObjectInX(saws.ToArray());
+                Difficulty.FindFarthestObjectInX(longCubes.ToArray());
                 MeasureTimeToReachDistance();
             }
             bgColorSel.color = cam.backgroundColor;
@@ -875,42 +748,11 @@ namespace JammerDash.Editor
 
            
 
-            if (Input.GetMouseButton(0))
-            {
-                timer += Time.unscaledDeltaTime;
-               
-            }
-            if (Input.GetMouseButtonUp(0))
-            {
-
-                // Find the farthest object in X direction
-                Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));
-
-                // Calculate the distance based on the position of the farthest object and additional distance
-                if (targetObject != null)
-                { 
-                    float distance = targetObject.position.x + additionalDistance;
-                List<Vector2> cubePositions = new List<Vector2>(); // Declare cubePositions as a List<Vector2>
-
-                foreach (GameObject cube in cubes)
-                {
-                    Vector2 cubePos = cube.transform.position;
-                    cubePositions.Add(cubePos); // Add cube position to the list
-                }
-                // Calculate the number of cubes per Y level
-                int[] cubesPerY = CalculateCubesPerY(cubePositions.ToArray());
-
-                // Calculate the difficulty based on cubes per Y level and other parameters
-                float calculatedDifficulty = CalculateDifficulty(cubesPerY, cubePositions.ToArray(), distance / 7);
-                    difficulty.text = "Level Difficulty: " + calculatedDifficulty.ToString("f2");
-                }
-            }
-
-            if (Input.GetMouseButtonUp(0) && timer < 0.125f && delay >= delayLimit && itemButtons[currentButtonPressed].clicked && !pointerOverUI && !player.enabled)
+          
+            if (Input.GetKeyDown(KeybindingManager.place) && delay >= delayLimit && itemButtons[currentButtonPressed].clicked && !pointerOverUI && !player.enabled)
             {
                 if (cubes.Count > 0)
                 {
-
                     List<Vector2> cubePositions = new List<Vector2>();
 
                     for (int i = 0; i < cubes.Count && i < longCubes.Count; i++)
@@ -923,36 +765,39 @@ namespace JammerDash.Editor
                         Vector2 longCubePos = longCubes[i].transform.position;
                         cubePositions.Add(longCubePos);
                     }
-
-
-                    
                 }
-                timer = 0f;
                 delay = 0;
-                UnityEngine.Debug.Log(itemButtons[currentButtonPressed]);
+
                 if (worldPos.y < 4.5f && worldPos.x > 1 && worldPos.y > -1.5f)
                 {
+                    // Cache beat objects and their positions
                     GameObject[] beatObjects = GameObject.FindGameObjectsWithTag("Beat");
+                    Vector3[] beatPositions = new Vector3[beatObjects.Length];
+                    for (int i = 0; i < beatObjects.Length; i++)
+                    {
+                        beatPositions[i] = beatObjects[i].transform.position;
+                    }
+
                     GameObject previousBeatObject = null;
                     GameObject nextBeatObject = null;
                     float shortestPreviousDistance = Mathf.Infinity;
                     float shortestNextDistance = Mathf.Infinity;
                     Vector3 clickPosition = new(Mathf.RoundToInt(worldPos.x * 2) / 2, Mathf.Round(worldPos.y), 0);
 
-                    foreach (GameObject beatObject in beatObjects)
+                    for (int i = 0; i < beatPositions.Length; i++)
                     {
-                        float distance = Vector3.Distance(beatObject.transform.position, clickPosition);
+                        float distance = Vector3.Distance(beatPositions[i], clickPosition);
 
                         // Check if the object is closer to the click position than the previously found objects
-                        if (beatObject.transform.position.x < clickPosition.x && distance < shortestPreviousDistance)
+                        if (beatPositions[i].x < clickPosition.x && distance < shortestPreviousDistance)
                         {
                             shortestPreviousDistance = distance;
-                            previousBeatObject = beatObject;
+                            previousBeatObject = beatObjects[i];
                         }
-                        else if (beatObject.transform.position.x >= clickPosition.x && distance < shortestNextDistance)
+                        else if (beatPositions[i].x >= clickPosition.x && distance < shortestNextDistance)
                         {
                             shortestNextDistance = distance;
-                            nextBeatObject = beatObject;
+                            nextBeatObject = beatObjects[i];
                         }
                     }
 
@@ -960,73 +805,33 @@ namespace JammerDash.Editor
                     float sqrDistanceToNext = (nextBeatObject != null) ? (Input.mousePosition - Camera.main.WorldToScreenPoint(nextBeatObject.transform.position)).sqrMagnitude : float.MaxValue;
 
                     // Determine the nearest beat object
-                    GameObject nearestBeatObject = null;
-                    if (sqrDistanceToPrevious < sqrDistanceToNext)
+                    GameObject nearestBeatObject = (sqrDistanceToPrevious < sqrDistanceToNext) ? previousBeatObject : nextBeatObject;
+
+                    // Instantiate the item at the nearest beat object position
+                    Vector2 instantiatePosition = (nearestBeatObject != null)
+                        ? new Vector2(nearestBeatObject.transform.position.x, Mathf.Round(worldPos.y))
+                        : new Vector3(worldPos.x, Mathf.Round(worldPos.y), 0);
+
+                    GameObject item = Instantiate(objects[currentButtonPressed], instantiatePosition, Quaternion.identity);
+                    if (item.CompareTag("Cubes"))
                     {
-                        nearestBeatObject = previousBeatObject;
+                        cubes.Add(item);
+                        SelectObject(item.transform);
                     }
-                    else
+                    else if (item.CompareTag("Saw"))
                     {
-                        nearestBeatObject = nextBeatObject;
+                        saws.Add(item);
+                        SelectObject(item.transform);
                     }
-
-
-                    if (nearestBeatObject != null)
+                    else if (item.CompareTag("LongCube"))
                     {
-                        GameObject item = Instantiate(objects[currentButtonPressed], new Vector2(nearestBeatObject.transform.position.x, Mathf.Round(worldPos.y)), Quaternion.identity);
-
-                        if (item.CompareTag("Cubes"))
-                        {
-                            cubes.Add(item);
-                            SelectObject(item.transform);
-                        }
-
-                        if (item.CompareTag("Saw"))
-                        {
-                            saws.Add(item);
-
-                            // Select the newly instantiated saw
-                            SelectObject(item.transform);
-                        }
-
-                        if (item.CompareTag("LongCube"))
-                        {
-                            longCubes.Add(item);
-
-                            SelectObject(item.transform);
-                        }
-
+                        longCubes.Add(item);
+                        SelectObject(item.transform);
                     }
-                    else
-                    {
-                        GameObject item = Instantiate(objects[currentButtonPressed], new Vector3(worldPos.x, Mathf.Round(worldPos.y), 0), Quaternion.identity);
-                        if (item.CompareTag("Cubes"))
-                        {
-                            cubes.Add(item);
-                            SelectObject(item.transform);
-                        }
-
-                        if (item.CompareTag("Saw"))
-                        {
-                            saws.Add(item);
-
-                            // Select the newly instantiated saw
-                            SelectObject(item.transform);
-                        }
-                        if (item.CompareTag("LongCube"))
-                        {
-                            longCubes.Add(item);
-                            SelectObject(item.transform);
-                        }
-                    }
-
                 }
             }
-            if (Input.GetMouseButtonUp(0))
-            {
-                timer = 0f;
-            }
-            if (Input.GetMouseButtonDown(1))
+
+            if (Input.GetKeyDown(KeybindingManager.selectObject))
             {
                 Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
@@ -1173,7 +978,6 @@ namespace JammerDash.Editor
             }
 
         }
-
         void SelectObject(Transform objTransform)
         {
             if (selectedObject != null)
@@ -1289,15 +1093,7 @@ namespace JammerDash.Editor
             colorPickerMenuBG.SetActive(false);
         }
 
-        public void OpenMenu()
-        {
-            mainMenu.SetActive(true);
-        }
-
-        public void CloseMenu()
-        {
-            mainMenu.SetActive(false);
-        }
+      
 
         public void OpenBG()
         {
@@ -1323,37 +1119,7 @@ namespace JammerDash.Editor
             Time.timeScale = 1f;
         }
 
-        private void LoadSceneWithData(SceneData sceneData)
-        {
-            LoadSceneAddressable("Assets/LevelDefault.unity", () =>
-            {
-
-                SceneManager.UnloadSceneAsync("SampleScene");
-
-                LevelDataManager.Instance.LoadLevelData(sceneData.levelName);
-
-
-            });
-        }
-
-        private void LoadSceneAddressable(string sceneKey, System.Action onComplete)
-        {
-            AsyncOperationHandle<SceneInstance> loadOperation = Addressables.LoadSceneAsync(sceneKey, LoadSceneMode.Additive);
-            loadOperation.Completed += operation =>
-            {
-
-                if (operation.Status == AsyncOperationStatus.Succeeded)
-                {
-                    onComplete?.Invoke();
-
-                }
-                else
-                {
-                    UnityEngine.Debug.LogError($"Failed to load scene '{sceneKey}': {operation.OperationException}");
-                }
-            };
-        }
-
+      
         public void SaveScene()
         {
             // Create a new SceneData instance and populate it with current objects' positions
@@ -1417,31 +1183,7 @@ namespace JammerDash.Editor
             Destroy(bgTexture2D);
         }
 
-        public void LoadScene()
-        {
-            string sceneName = sceneNameInput.text.Trim();
-
-            if (string.IsNullOrEmpty(sceneName))
-            {
-                UnityEngine.Debug.LogError("Scene name is empty. Please enter a valid scene name.");
-                return;
-            }
-
-            string filePath = GetSceneDataPath(sceneName);
-            if (File.Exists(filePath))
-            {
-                string json = File.ReadAllText(filePath);
-                SceneData sceneData = JsonUtility.FromJson<SceneData>(json);
-
-                LoadSceneWithData(sceneData);
-
-                UnityEngine.Debug.Log("Scene loaded successfully: " + sceneName);
-            }
-            else
-            {
-                UnityEngine.Debug.LogError("Scene file not found: " + filePath);
-            }
-        }
+       
 
         private string GetSceneDataPath(string sceneName)
         {
@@ -1456,7 +1198,7 @@ namespace JammerDash.Editor
         private SceneData CreateSceneData()
         {
             // Find the farthest object in X direction
-            Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));
+            Transform targetObject = Difficulty.FindFarthestObjectInX(Object.FindObjectsWithTags(targetTags));
 
             // Calculate the distance based on the position of the farthest object and additional distance
             float distance = targetObject.position.x + additionalDistance;
@@ -1468,10 +1210,10 @@ namespace JammerDash.Editor
                 cubePositions.Add(cubePos); // Add cube position to the list
             }
             // Calculate the number of cubes per Y level
-            int[] cubesPerY = CalculateCubesPerY(cubePositions.ToArray());
+            int[] cubesPerY = Difficulty.CalculateCubesPerY(cubePositions.ToArray());
 
             // Calculate the difficulty based on cubes per Y level and other parameters
-            float calculatedDifficulty = CalculateDifficulty(cubesPerY, cubePositions.ToArray(), distance / 7);
+            float calculatedDifficulty = Difficulty.CalculateDifficulty(cubes, saws, longCubes, hp, size, cubesPerY, cubePositions.ToArray(), distance / 7);
             string json = File.ReadAllText(Path.Combine(Application.persistentDataPath, "scenes", sceneNameInput.text, sceneNameInput.text + ".json"));
             SceneData data = SceneData.FromJson(json);
             // Create a SceneData object and populate its properties
@@ -1569,7 +1311,7 @@ namespace JammerDash.Editor
         private SceneData CreateLevelSceneData()
         {
             SaveSceneData();
-            Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));
+            Transform targetObject = Difficulty.FindFarthestObjectInX(Object.FindObjectsWithTags(targetTags));
 
             // Calculate the distance based on the position of the farthest object and additional distance
             float distance = targetObject.position.x + additionalDistance;
@@ -1581,10 +1323,10 @@ namespace JammerDash.Editor
                 cubePositions.Add(cubePos); // Add cube position to the list
             }
             // Calculate the number of cubes per Y level
-            int[] cubesPerY = CalculateCubesPerY(cubePositions.ToArray());
+            int[] cubesPerY = Difficulty.CalculateCubesPerY(cubePositions.ToArray());
 
             // Calculate the difficulty based on cubes per Y level and other parameters
-            float calculatedDifficulty = CalculateDifficulty(cubesPerY, cubePositions.ToArray(), distance / 7);
+            float calculatedDifficulty = Difficulty.CalculateDifficulty(cubes, saws, longCubes, hp, size, cubesPerY, cubePositions.ToArray(), distance / 7);
 
             // Create a SceneData object and populate its properties
             SceneData sceneData = new SceneData()
@@ -1643,87 +1385,7 @@ namespace JammerDash.Editor
             return sceneData;
         }
 
-        public float CalculateDifficulty(int[] cubeCountsPerY, Vector2[] cubePositions, float clickTimingWindow)
-        {
-            float difficulty = 0f;
-            Transform targetObject = FindFarthestObjectInX(FindObjectsWithTags(targetTags));
-
-            // Calculate the distance based on the position of the farthest object and additional distance
-            float distance = targetObject.position.x + additionalDistance;
-
-            // Iterate over each Y level
-            for (int y = -1; y <= 4; y++)
-            {
-                // Get the number of cubes on this Y level
-                int cubeCount = cubeCountsPerY[y + 1];
-
-                // If there are no cubes on this level, continue
-                if (cubeCount == 0)
-                    continue;
-
-                // Iterate over each pair of consecutive cubes on this Y level
-                for (int i = 0; i < cubeCount - 1; i++)
-                {
-                    // Calculate timing window based on Y level difference and player movement speed
-                    float timingWindow = CalculateTimingWindow(cubePositions[i], cubePositions[i + 1], y);
-
-                    // Consider X position variation for precision calculation
-                    float xPositionVariation = Mathf.Abs(cubePositions[i].x - cubePositions[i + 1].x);
-
-                    // Factor in precision required for clicking correctly
-                    float precisionFactor = CalculatePrecisionFactor(xPositionVariation);
-
-                    // Avoid division by zero by ensuring clickTimingWindow + distance is not zero
-                    float divisor = clickTimingWindow + distance != 0 ? clickTimingWindow + distance : float.Epsilon;
-                    float contribution = (timingWindow / 0.64f
-                     + cubeCount / 200f
-                     * (cubes.Count / 120f)
-                     * (saws.Count / 20f)
-                     * (longCubes.Count / 100f)
-                     * (precisionFactor / divisor)
-                     * 1 / (hp.value + 1) * 500f
-                     + Mathf.Exp(0.1f * (0.5f - size.value) * 70f)) / 10f;
-
-                    difficulty += contribution;
-                }
-            }
-            return difficulty;
-        }
-        private float CalculateTimingWindow(Vector2 position1, Vector2 position2, int yLevelDifference)
-        {
-            // Calculate the Y-axis distance between the cubes
-            float yDistance = Mathf.Abs(position2.y - position1.y);
-
-            // Calculate timing window based on Y-axis distance and player movement speed
-            float timeWindow = yDistance * 0.1f;
-
-            return timeWindow;
-        }
-
-
-        private float CalculatePrecisionFactor(float xPositionVariation)
-        {
-            float precisionFactor = 1 - xPositionVariation / 20f;
-
-            return Mathf.Clamp01(precisionFactor);
-        }
-        public int[] CalculateCubesPerY(Vector2[] cubePositions)
-        {
-            // Initialize an array to store the number of cubes per Y level
-            int[] cubesPerY = new int[6]; // Y levels range from -1 to 4, so 6 elements are needed
-
-            // Iterate over each cube position and count the number of cubes per Y level
-            foreach (Vector2 position in cubePositions)
-            {
-                int yLevel = Mathf.RoundToInt(position.y); // Round Y position to the nearest integer
-                yLevel = Mathf.Clamp(yLevel, -1, 4); // Ensure Y level is within valid range
-
-                // Increment the count for the corresponding Y level
-                cubesPerY[yLevel + 1]++;
-            }
-
-            return cubesPerY;
-        }
+       
 
 
         public void OpenBGSel()

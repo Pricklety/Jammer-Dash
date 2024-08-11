@@ -1,3 +1,4 @@
+using JammerDash.Editor;
 using JammerDash.Editor.Basics;
 using System;
 using System.Collections;
@@ -73,7 +74,54 @@ namespace JammerDash.Tech
 
             return null;
         }
+        public SceneData LoadEditLevelData(string sceneName)
+        {
+            string filePath = Path.Combine(Application.persistentDataPath, "scenes", sceneName, $"{sceneName}.json");
 
+            if (File.Exists(filePath))
+            {
+                string json = File.ReadAllText(filePath);
+                SceneData sceneData = SceneData.FromJson(json);
+
+                // Load the audio clip
+                string audioFilePath = Path.Combine(Application.persistentDataPath, "scenes", sceneName, $"{sceneData.songName}");
+
+                if (SceneManager.GetActiveScene().name == "SampleScene")
+                {
+                    OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
+                    EditorManager manager = FindObjectOfType<EditorManager>();
+                    using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(sceneData.picLocation))
+                    {
+                        if (www.isDone)
+                        {
+                            FindObjectOfType<RawImage>().gameObject.SetActive(true);
+                            manager.bgImage.isOn = true;
+                            manager.bgPreview.texture = DownloadHandlerTexture.GetContent(www);
+                        }
+                    }
+                    manager.sceneNameInput.text = sceneData.sceneName;
+                    manager.songArtist.text = sceneData.artist;
+                    manager.customSongName.text = sceneData.songName;
+                    manager.ground.SetActive(sceneData.ground);
+                    manager.groundToggle.isOn = sceneData.ground;
+                    manager.lineController.audioClip = sceneData.clip;
+                    manager.LoadSceneData(sceneData);
+                    levelName = sceneData.sceneName;
+                    creator = sceneData.creator;
+                    diff = (int)sceneData.calculatedDifficulty;
+                    ID = sceneData.ID;
+                    SceneManager.sceneLoaded += OnSceneLoaded;
+                    return sceneData;
+                }
+
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning("Scene data file not found: " + filePath);
+            }
+
+            return null;
+        }
         IEnumerator LoadImage(string url)
         {
             using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))

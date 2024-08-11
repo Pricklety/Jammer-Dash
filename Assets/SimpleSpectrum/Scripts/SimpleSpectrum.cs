@@ -10,6 +10,7 @@ SimpleSpectrum.cs - Part of Simple Spectrum V2.1 by Sam Boyer.
 #define WEB_MODE //different to UNITY_WEBGL, as we still want functionality in the Editor!
 #endif
 
+using JammerDash.Audio;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
@@ -189,12 +190,13 @@ public class SimpleSpectrum : MonoBehaviour {
     [Range(0, 1)]
     [Tooltip("The amount of dampening used when the new color value is lower than the existing color value.")]
     public float colorDecayDamp = 1;
-#endregion
+    #endregion
 
     /// <summary>
     /// The raw audio spectrum data. Can be set to custom values if the sourceType is set to Custom.
     /// (For a 1:1 data to bar mapping, set barAmount equal to numSamples, disable useLogarithmicFrequency and set linearSampleStretch to 1)
     /// </summary>
+    [System.Obsolete]
     public float[] spectrumInputData
     {
         get
@@ -204,7 +206,11 @@ public class SimpleSpectrum : MonoBehaviour {
         set
         {
             if (sourceType == SourceType.Custom)
+            {
+                spectrumInputData = AudioManager.Instance.GetComponent<AudioSource>().GetSpectrumData(numSamples, 0, FFTWindow.Rectangular);
                 spectrum = value;
+            }
+                
             else
                 Debug.LogError("Error from SimpleSpectrum: spectrumInputData cannot be set while sourceType is not Custom.");
         }
@@ -242,7 +248,6 @@ public class SimpleSpectrum : MonoBehaviour {
     void Start () {
         if(audioSource==null && sourceType == SourceType.AudioSource)
             Debug.LogError("An audio source has not been assigned. Please assign a reference to a source, or set useAudioListener instead.");
-
         RebuildSpectrum();
 	}
 

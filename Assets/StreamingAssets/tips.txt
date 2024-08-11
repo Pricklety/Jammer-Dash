@@ -63,3 +63,4 @@ Play screen is laggy? Delete the levels you don't play. Your scores will still b
 <FUN>: The editor really is a weird thing.
 <FUN>: KAMEHAMEHA!
 <FUN>: Every time i fail in Jammer Dash, I'll eat a kilogram of expired cheese.
+<FUN>: "berets are the best and the cutest" -adasko on Tuesday, August 6 2024 at 8.31 PM

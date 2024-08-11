@@ -39,7 +39,6 @@ namespace JammerDash
         public int selectedFPS = 60;
         public bool vsync = true;
         public float volume = 1;
-        public int qualitySettingsLevel = 2;
         public bool artBG = false;
         public bool customBG = false;
         public bool vidBG = false;
@@ -47,7 +46,6 @@ namespace JammerDash
         public bool hitNotes = true;
         public bool focusVol = true;
         public int playerType = 0;
-        public int antialiasing = 0;
         public bool cursorTrail = false;
         public float noFocusVolume = -20f;
         public float lowpassValue = 500;

@@ -1,54 +1,25 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
-
+using JammerDash;
 public class KeybindingUI : MonoBehaviour
 {
     public KeybindingManager keybindingManager;
-
-    public Text upBindingText;
-    public Text downBindingText;
-    public Text groundBindingText;
-    public Text boostBindingText;
-    public Text key1BindingText;
-    public Text key2BindingText;
+    public string keyName;
 
     private void Start()
     {
         KeybindingManager.instance.LoadKeybindingsFromJson();
-        UpdateUI();
-
+        UpdateUI(this.GetComponent<Text>(), keyName);
+        GetComponentInParent<Button>().onClick.RemoveAllListeners();
+        GetComponentInParent<Button>().onClick.AddListener(Rebind);
     }
 
-    public void RebindUp()
+    public void Rebind()
     {
-        StartCoroutine(WaitForKeyPress("up"));
+        StartCoroutine(WaitForKeyPress(keyName));
     }
 
-    public void RebindDown()
-    {
-        StartCoroutine(WaitForKeyPress("down"));
-    }
-
-    public void RebindGround()
-    {
-        StartCoroutine(WaitForKeyPress("ground"));
-    }
-
-    public void RebindBoost()
-    {
-        StartCoroutine(WaitForKeyPress("boost"));
-    }
-
-    public void RebindKey1()
-    {
-        StartCoroutine(WaitForKeyPress("key1"));
-    }
-
-    public void RebindKey2()
-    {
-        StartCoroutine(WaitForKeyPress("key2"));
-    }
 
     private System.Collections.IEnumerator WaitForKeyPress(string actionName)
     {
@@ -61,17 +32,20 @@ public class KeybindingUI : MonoBehaviour
                 break;
             }
         }
-        UpdateUI();
+        UpdateUI(this.GetComponent<Text>(), keyName);
+    }
+    private void Update()
+    {
+        if (keybindingManager == null)
+        {
+            keybindingManager = KeybindingManager.instance;
+            KeybindingManager.instance.LoadKeybindingsFromJson();
+        }
     }
 
-    public void UpdateUI()
+    public void UpdateUI(Text text, string name)
     {
-        upBindingText.text = KeybindingManager.GetBindingName("up");
-        downBindingText.text = KeybindingManager.GetBindingName("down");
-        groundBindingText.text = KeybindingManager.GetBindingName("ground");
-        boostBindingText.text = KeybindingManager.GetBindingName("boost");
-        key1BindingText.text = KeybindingManager.GetBindingName("key1");
-        key2BindingText.text = KeybindingManager.GetBindingName("key2");
+        text.text = KeybindingManager.GetBindingName(name);
         Debug.Log("Updated UI with current bindings");
     }
 

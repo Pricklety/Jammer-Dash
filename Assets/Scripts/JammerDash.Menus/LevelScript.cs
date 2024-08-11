@@ -1,5 +1,6 @@
 ﻿using JammerDash.Tech;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -7,6 +8,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.Networking;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
@@ -20,17 +22,37 @@ namespace JammerDash.Menus.Play
         public Text levelNameText;
         public Text songNameText;
         public Text difficultyText;
-        public UnityEvent onPlay;
+        public Text info;
+        public Image bg;
         public UnityEvent onEdit;
         public GameObject cubePrefab;
         public GameObject sawPrefab;
         public SceneData sceneData;
         private List<GameObject> cubes = new List<GameObject>();
         private List<GameObject> saws = new List<GameObject>();
+
         // Set the level data for this script
         public void SetSceneData(SceneData data)
         {
             sceneData = data;
+            info.text = $"Data: ID - {data.ID}; HP - {data.playerHP}; CS - {data.boxSize}; BPM - {data.bpm};";
+            bg.color = data.defBGColor;
+            LoadImage(data.picLocation);
+        }
+        private void LoadImage(string url)
+        {
+            using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))
+            {
+                var operation = www.SendWebRequest();
+
+                if (operation.isDone)
+                {
+                    // Create a Sprite from the downloaded texture and set it to the Image component
+                    Texture2D texture = DownloadHandlerTexture.GetContent(www);
+                    Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
+                    bg.sprite = sprite;
+                }
+            }
         }
 
         public void SetLevelName(string levelName)
@@ -138,24 +160,7 @@ namespace JammerDash.Menus.Play
         }
 
 
-        public void PlayLevel()
-        {
-            CustomLevelDataManager.Instance.levelName = null;
-            CustomLevelDataManager.Instance.creator = null;
-            CustomLevelDataManager.Instance.diff = 0;
-            CustomLevelDataManager.Instance.ID = 0;
-            string json = File.ReadAllText(Application.persistentDataPath + $"/scenes/{levelNameText.text}/" + $"{levelNameText.text}.json");
-            SceneData sceneData = SceneData.FromJson(json);
-            LevelDataManager data = LevelDataManager.Instance;
-            data.levelName = levelNameText.text;
-            LoadSceneAddressable("Assets/LevelDefault.unity", () =>
-            {
-                LevelDataManager data = LevelDataManager.Instance;
-                data.levelName = levelNameText.text;
-                LevelDataManager.Instance.LoadLevelData(levelNameText.text);
-            });
-        }
-
+       
 
         public void EditLevel()
         {
@@ -166,9 +171,9 @@ namespace JammerDash.Menus.Play
 
                 SceneManager.LoadSceneAsync("SampleScene").completed += operation =>
                 {
-                    LevelDataManager data = LevelDataManager.Instance;
+                    CustomLevelDataManager data = CustomLevelDataManager.Instance;
                     data.levelName = levelNameText.text;
-                    LevelDataManager.Instance.LoadLevelData(levelNameText.text);
+                    CustomLevelDataManager.Instance.LoadEditLevelData(levelNameText.text);
                 };
 
 

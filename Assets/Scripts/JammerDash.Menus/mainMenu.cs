@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 using Lachee.Discord.Control;
+using JammerDash.Tech;
 
 namespace JammerDash.Menus
 {
@@ -41,6 +42,12 @@ namespace JammerDash.Menus
         public GameObject accessibilityButton;
         public Text nolevelerror;
         public GameObject[] disableAccess;
+        string oldSeconds;
+        [Header("Clock")]
+        public GameObject hour;
+        public GameObject min;
+        public GameObject sec;
+
         [Header("Panels")]
         public GameObject mainPanel;
         public GameObject playPanel;
@@ -75,6 +82,7 @@ namespace JammerDash.Menus
       
         [Header("Video Background")]
         public GameObject videoPlayerObject;
+        public GameObject videoImage;
         public VideoPlayer videoPlayer;
         public VideoClip[] videoClips;
         private List<string> videoUrls;
@@ -109,6 +117,8 @@ namespace JammerDash.Menus
 
         private Camera mainCamera;
         private RectTransform canvasRect;
+
+        public Text clock;
 
         void Start()
         {
@@ -262,7 +272,6 @@ namespace JammerDash.Menus
                     File.Move(jsonFilePath, jsonDestinationPath);
                     ExtractMP3FromJDL(filePath, extractedPath);
                     GameObject levelInfoPanel = Instantiate(playPrefab, playlevelInfoParent);
-
                     // Display level information on UI
                     DisplayCustomLevelInfo(sceneData, levelInfoPanel.GetComponent<CustomLevelScript>());
                     levelInfoPanel.GetComponent<CustomLevelScript>().SetSceneData(sceneData);
@@ -381,19 +390,28 @@ namespace JammerDash.Menus
             {
                 sprite = Resources.LoadAll<Sprite>("backgrounds/christmas");
                 if (videoPlayerObject != null)
+                {
                     videoPlayerObject.SetActive(false);
+                    videoImage.SetActive(false);
+                }
             }
             else if (DateTime.Now.Month == 2 && DateTime.Now.Day == 14 && data.artBG)
             {
                 sprite = Resources.LoadAll<Sprite>("backgrounds/valentine");
                 if (videoPlayerObject != null)
+                {
                     videoPlayerObject.SetActive(false);
+                    videoImage.SetActive(false);
+                }
             }
             if (data.artBG)
             {
                 sprite = Resources.LoadAll<Sprite>("backgrounds/default");
                 if (videoPlayerObject != null)
+                {
                     videoPlayerObject.SetActive(false);
+                    videoImage.SetActive(false);
+                }
             }
             if (data.customBG)
             {
@@ -427,7 +445,11 @@ namespace JammerDash.Menus
             {
                 sprite = Resources.LoadAll<Sprite>("backgrounds/basic");
                 if (videoPlayerObject != null)
+                {
                     videoPlayerObject.SetActive(false);
+                    videoImage.SetActive(false);
+                }
+                    
             }
 
             if (sprite.Length > 0 && data.artBG || sprite.Length > 0 && data.customBG)
@@ -436,15 +458,16 @@ namespace JammerDash.Menus
                 int randomIndex = Random.Range(0, sprite.Length);
                 bg.sprite = sprite[randomIndex];
             }
-            else
+            else if (!data.artBG || !data.customBG || !data.vidBG)
             {
-                ChangeBasicCol();
+                sprite = Resources.LoadAll<Sprite>("backgrounds/basic");
+                bg.sprite = sprite[0];
             }
         }
         private async Task LoadCustomBackgroundAsync()
         {
             string path = Application.persistentDataPath + "/backgrounds";
-            string[] files = Directory.GetFiles(path, "*.png");
+            string[] files = Directory.GetFiles(path, "*.png", SearchOption.AllDirectories);
 
             if (files.Length == 0)
             {
@@ -481,6 +504,7 @@ namespace JammerDash.Menus
             if (videoPlayerObject != null)
             {
                 videoPlayerObject.SetActive(false);
+                videoImage.SetActive(false);
             }
 
             this.sprite = new Sprite[1];
@@ -530,38 +554,11 @@ namespace JammerDash.Menus
             // Video preparation is complete, start playing the video
             vp.Play();
         }
-        public void ChangeBasicCol()
-        {
-            StartCoroutine(SmoothColorChange());
-        }
+        
 
         public float elapsedTime;
 
-        private IEnumerator SmoothColorChange()
-        {
-            if (sprite != null && sprite.Length > 0)
-            {
-                bg.sprite = sprite[0];
-                Color targetColor = new Color(Random.Range(0.5f, 1f), Random.Range(0.5f, 1f), Random.Range(0.5f, 1f), 1f);
-
-                float duration = 0.5f;  // Adjust the duration as needed
-
-                while (elapsedTime < duration)
-                {
-                    bg.color = Color.Lerp(bg.color, targetColor, elapsedTime / duration);
-                    elapsedTime += Time.deltaTime;
-                    yield return null;
-                }
-                elapsedTime = 0f;
-
-                // Ensure the final color is exactly the target color
-                bg.color = targetColor;
-            }
-            else
-            {
-                bg.color = Color.white;
-            }
-        }
+     
 
 
        
@@ -811,7 +808,7 @@ namespace JammerDash.Menus
                     panel.SetActive(true);
                 }
                 // Enable mainPanel if none of the specific panels are active
-                else if (!playPanel.activeSelf && !creditsPanel.activeSelf && !settingsPanel.activeSelf)
+                else if (!playPanel.activeSelf || !creditsPanel.activeSelf || !settingsPanel.activeSelf)
                 {
                     mainPanel.SetActive(true);
                     LoadRandomBackground();
@@ -1140,9 +1137,19 @@ namespace JammerDash.Menus
             }
             return false;
         }
+        string FormatElapsedTime(float elapsedTime)
+        {
+            TimeSpan timeSpan = TimeSpan.FromSeconds(elapsedTime);
+            return string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
+        }
         public void FixedUpdate()
         {
-        
+            string timeInfo = DateTime.Now.ToString("hh:mm:ss tt") + "\n";
+            if (FindObjectOfType<GameTimer>() != null)
+            {
+                timeInfo += "running " + FormatElapsedTime(GameTimer.GetRunningTime());
+            }
+            clock.text = timeInfo;
             foreach (RawImage pfp in discordpfp)
             {
                  
@@ -1214,13 +1221,15 @@ namespace JammerDash.Menus
                 float newPositionY = layerMouseDelta.y / 10;
 
                 // Set the new position
-                logo.position = new Vector3(newPositionX, newPositionY, mouseDelta.z);
+                logo.position = new Vector3(newPositionX - 4.2f, newPositionY, mouseDelta.z);
+
+               
             }
             else
             {
                 background.localScale = Vector3.one;
                 background.position = Vector3.zero;
-                logo.position = new Vector3(0, 0, 0);
+                logo.position = new Vector3(-4.2f, 0, 0);
             }  
            
             if (Input.GetKey(KeyCode.Escape))
@@ -1276,10 +1285,16 @@ namespace JammerDash.Menus
             }
         }
 
-
         void Update()
         {
+            string seconds = System.DateTime.Now.ToLocalTime().ToString("ss");
 
+
+            if (seconds != oldSeconds)
+            {
+                UpdateTimer();
+                oldSeconds = seconds;
+            } 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 ToggleMenuPanel(mainPanel);
@@ -1300,6 +1315,18 @@ namespace JammerDash.Menus
             }
 
             
+        }
+
+        void UpdateTimer()
+        {
+            int secInt = int.Parse(DateTime.UtcNow.ToLocalTime().ToString("ss"));
+            int minInt = int.Parse(DateTime.UtcNow.ToLocalTime().ToString("mm"));
+            int hourInt = int.Parse(DateTime.UtcNow.ToLocalTime().ToString("hh"));
+            Debug.Log($"{secInt}, {minInt}, {hourInt}");
+
+            sec.transform.localRotation = Quaternion.Euler(0, 0, -secInt * 6);
+            min.transform.localRotation = Quaternion.Euler(0, 0, -minInt * 6);
+            hour.transform.localRotation = Quaternion.Euler(0, 0, -hourInt * 30);
         }
 
         public void OnPointerClick(PointerEventData eventData)

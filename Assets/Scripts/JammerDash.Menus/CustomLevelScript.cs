@@ -103,10 +103,6 @@ namespace JammerDash.Menus.Play
                 return;
             }
 
-            LevelDataManager.Instance.levelName = null;
-            LevelDataManager.Instance.creator = null;
-            LevelDataManager.Instance.diff = 0;
-            LevelDataManager.Instance.ID = 0;
             CustomLevelDataManager.Instance.LoadLevelData(sceneData.sceneName, sceneData.ID);
            
         }

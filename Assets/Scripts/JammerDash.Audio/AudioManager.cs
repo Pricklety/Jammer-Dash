@@ -305,7 +305,7 @@ namespace JammerDash.Audio
                 songPlayed = false;
             }
 
-            if (Input.GetMouseButtonDown(2) && !data.loadedLogoSFX)
+            if (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButtonDown(2) && !data.loadedLogoSFX)
             {
                 counter++;
                 if (counter == 3)
@@ -320,7 +320,7 @@ namespace JammerDash.Audio
 
                 }
             }
-            else if (data.loadedLogoSFX && Input.GetMouseButtonDown(2))
+            else if (data.loadedLogoSFX && Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButtonDown(2))
             {
                 counter++;
                 if (counter == 3)
@@ -642,10 +642,6 @@ namespace JammerDash.Audio
                 targetColor = Color.white;
                 imageComponent.color = Color.Lerp(startColor, targetColor, 1f);
                 menu.LoadRandomBackground();
-            }
-            else if (menu.sprite.Length > 0 && !menu.data.customBG || menu.sprite.Length > 0 && !menu.data.customBG)
-            {
-                menu.ChangeBasicCol();
             }
 
         }

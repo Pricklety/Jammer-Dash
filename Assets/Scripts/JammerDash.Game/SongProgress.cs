@@ -22,11 +22,8 @@ namespace JammerDash.Game
         {
             if (SceneManager.GetActiveScene().name == "LevelDefault")
             {
-                string levelName = LevelDataManager.Instance.levelName;
-                if (string.IsNullOrEmpty(levelName))
-                {
-                    levelName = CustomLevelDataManager.Instance.levelName;
-                }
+                string levelName = CustomLevelDataManager.Instance.levelName;
+               
 
                 string levelsFolderPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", levelName);
                 string levelJsonFilePath = Path.Combine(levelsFolderPath, $"{levelName}.json");

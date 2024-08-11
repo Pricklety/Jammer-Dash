@@ -112,12 +112,7 @@ namespace JammerDash.Game.Player
             volume.profile.TryGetSettings(out vignette);
             initialIntensity = vignette.intensity.value;
             vignette.color.value = startColor;
-            if (LevelDataManager.Instance.playerhp != 0)
-            {
-                maxHealth = LevelDataManager.Instance.playerhp;
-                hpSlider.maxValue = LevelDataManager.Instance.playerhp;
-            }
-            else if (CustomLevelDataManager.Instance.playerhp != 0)
+           if (CustomLevelDataManager.Instance.playerhp != 0)
             {
                 maxHealth = CustomLevelDataManager.Instance.playerhp;
                 hpSlider.maxValue = CustomLevelDataManager.Instance.playerhp;
@@ -413,7 +408,7 @@ namespace JammerDash.Game.Player
 
             // Calculate skill performance point
             float distanceInPercent = Mathf.Abs(cam.transform.position.x / FindObjectOfType<FinishLine>().transform.position.x);
-            GameScoreCalculator calc = new GameScoreCalculator(five, three, one, misses, combo, highestCombo, CustomLevelDataManager.Instance.diff + LevelDataManager.Instance.diff, distanceInPercent);
+            GameScoreCalculator calc = new GameScoreCalculator(five, three, one, misses, combo, highestCombo, CustomLevelDataManager.Instance.diff, distanceInPercent);
             float skillPerformancePoint = calc.PerformanceScore;
             SPInt = Mathf.RoundToInt(skillPerformancePoint);
             if (Total > 0)
@@ -638,7 +633,7 @@ namespace JammerDash.Game.Player
             counter.destroyedCubes += 50;
 
 
-            float formula = Mathf.RoundToInt(((LevelDataManager.Instance.diff + CustomLevelDataManager.Instance.diff) * 10) + health / 100 + ((int)counter.accCount / Total * 100) + combo * 3 * factor * 2) * 3;
+            float formula = factor * 100 + Mathf.RoundToInt((CustomLevelDataManager.Instance.diff / 10) + health / 100 + ((int)counter.accCount / Total * 100) + combo * 6) * 3;
             float newDestroyedCubes = counter.score + formula;
             newDestroyedCubes = Mathf.RoundToInt(newDestroyedCubes);
             float elapsedTime = 0f;
