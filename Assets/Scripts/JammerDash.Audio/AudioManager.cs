@@ -314,7 +314,7 @@ namespace JammerDash.Audio
                     GetComponent<AudioSource>().PlayOneShot(sfxLong, 1);
                     data.loadedLogoSFX = true;
                     SettingsFileHandler.SaveSettingsToFile(data);
-                    Notifications.Notifications.instance.Notify("Jammer Dash :)", null);
+                    Notifications.instance.Notify("Jammer Dash :)", null);
                     new WaitForSecondsRealtime(8f);
                         GetComponent<AudioSource>().volume = 1;
 
@@ -328,7 +328,7 @@ namespace JammerDash.Audio
                     GetComponent<AudioSource>().volume *= 0.8f;
                     GetComponent<AudioSource>().PlayOneShot(sfxLong, 1);
                     data.loadedLogoSFX = false;
-                    Notifications.Notifications.instance.Notify("oh :(", null);
+                    Notifications.instance.Notify("oh :(", null);
                     SettingsFileHandler.SaveSettingsToFile(data);
 
                     new WaitForSecondsRealtime(8f);
@@ -505,11 +505,11 @@ namespace JammerDash.Audio
             if (newFilesAdded)
             {
                 ShuffleSongPathsList();
-                Notifications.Notifications.instance.Notify($"Playlist loaded. \n{copiedFiles.Length} songs found.", null); // Display notification
+                Notifications.instance.Notify($"Playlist loaded. \n{copiedFiles.Length} songs found.", null); // Display notification
             }
             else
             {
-                Notifications.Notifications.instance.Notify($"No new songs found. \n{songPathsList.Count} songs in the playlist.", null); // Display notification
+                Notifications.instance.Notify($"No new songs found. \n{songPathsList.Count} songs in the playlist.", null); // Display notification
             }
         }
         public void PlaySource()

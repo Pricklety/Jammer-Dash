@@ -5,8 +5,6 @@ using System.Collections.Generic;
 
 namespace JammerDash
 {
-
-
 public class KeybindingManager : MonoBehaviour
 {
     [Header("Gameplay")]

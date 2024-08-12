@@ -125,7 +125,7 @@ namespace JammerDash.Game
             if (sd.canvasOff)
             {
                 canvas.SetActive(false);
-                Notifications.Notifications.instance.Notify("Playfield UI is off.\nClick Shift+F1 to turn it back on.", null);
+                Notifications.instance.Notify("Playfield UI is off.\nClick Shift+F1 to turn it back on.", null);
                 yield return null;
             }
         }
@@ -203,7 +203,7 @@ namespace JammerDash.Game
             }
             else if (!canvas.activeSelf)
             {
-                Notifications.Notifications.instance.Notify("Playfield UI is off\nClick Shift+F1 to re-enable it.", null);
+                Notifications.instance.Notify("Playfield UI is off\nClick Shift+F1 to re-enable it.", null);
             }
             bool focus = Application.isFocused;
             if (!focus)

@@ -1,30 +1,36 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class LogoScaler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+namespace JammerDash.Menus.Main
 {
-    private Vector3 targetScale;
-    private Vector3 originalScale;
-    private float lerpSpeed = 5f;
-
-    void Start()
+    public class LogoScaler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        originalScale = transform.localScale;
-        targetScale = originalScale;
-    }
+        private Vector3 targetScale;
+        private Vector3 originalScale;
+        private float lerpSpeed = 5f;
+        public bool isOverLogo;
 
-    void Update()
-    {
-        transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * lerpSpeed);
-    }
+        void Start()
+        {
+            originalScale = transform.localScale;
+            targetScale = originalScale;
+        }
 
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        targetScale = originalScale * 1.2f;
-    }
+        void Update()
+        {
+            transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * lerpSpeed);
+        }
 
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        targetScale = originalScale;
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            isOverLogo = true;
+            targetScale = originalScale * 1.2f;
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            isOverLogo = false;
+            targetScale = originalScale;
+        }
     }
 }

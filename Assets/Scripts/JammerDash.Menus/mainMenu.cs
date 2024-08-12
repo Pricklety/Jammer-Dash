@@ -24,6 +24,7 @@ using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 using Lachee.Discord.Control;
 using JammerDash.Tech;
+using JammerDash.Menus.Main;
 
 namespace JammerDash.Menus
 {
@@ -39,10 +40,15 @@ namespace JammerDash.Menus
         public Image quitPanel2;
         PlayerData playerData;
         public GameObject accessoverPanel;
-        public GameObject accessibilityButton;
         public Text nolevelerror;
         public GameObject[] disableAccess;
         string oldSeconds;
+
+        public Animator idle;
+        public Animator notIdle;
+        float afkTime;
+        bool hasPlayedIdle;
+
         [Header("Clock")]
         public GameObject hour;
         public GameObject min;
@@ -125,9 +131,6 @@ namespace JammerDash.Menus
             Time.timeScale = 1f;
             playerData = Account.Instance.LoadData();
             data = SettingsFileHandler.LoadSettingsFromFile();
-            LoadRandomBackground();
-            LoadLevelsFromFiles();
-            LoadLevelFromLevels();
             levelSlider.maxValue = Account.Instance.xpRequiredPerLevel[0];
             levelSlider.value = Account.Instance.currentXP;
             Debug.unityLogger.logEnabled = true;
@@ -138,9 +141,11 @@ namespace JammerDash.Menus
                 {
                     go.SetActive(true);
                 }
-                accessibilityButton.SetActive(false);
-            
-            
+
+            LoadRandomBackground();
+            LoadLevelsFromFiles();
+            LoadLevelFromLevels();
+
         }
         public string FormatTime(float time)
         {
@@ -317,7 +322,21 @@ namespace JammerDash.Menus
         {
             try
             {
-                // Create a temporary folder
+                if (!File.Exists(jdlFilePath))
+                {
+                    UnityEngine.Debug.LogError("File does not exist: " + jdlFilePath);
+                    return null;
+                }
+
+                UnityEngine.Debug.Log("Attempting to open JDL file: " + jdlFilePath);
+                UnityEngine.Debug.Log("File size: " + new FileInfo(jdlFilePath).Length + " bytes");
+
+                if (!IsZipFile(jdlFilePath))
+                {
+                    UnityEngine.Debug.LogError("The file is not a valid ZIP archive: " + jdlFilePath);
+                    return null;
+                }
+
                 string tempFolder = Path.Combine(Application.temporaryCachePath, "tempExtractedJson");
                 Directory.CreateDirectory(tempFolder);
 
@@ -327,16 +346,11 @@ namespace JammerDash.Menus
                     {
                         if (!entry.FullName.EndsWith(".json"))
                         {
-                            continue; // Skip non-JSON files
+                            continue;
                         }
 
-                        // Generate a unique filename for the extracted JSON file
                         string extractedFilePath = Path.Combine(tempFolder, Path.GetFileName(entry.FullName));
-
-                        // Extract the JSON file to the temporary folder
-                        entry.ExtractToFile(extractedFilePath, true); // Overwrite if file exists
-
-                        // Return the path of the extracted JSON file
+                        entry.ExtractToFile(extractedFilePath, true);
                         return extractedFilePath;
                     }
                 }
@@ -348,6 +362,25 @@ namespace JammerDash.Menus
 
             return null;
         }
+
+        private static bool IsZipFile(string filePath)
+        {
+            try
+            {
+                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                {
+                    using (var zipStream = new ZipArchive(fileStream, ZipArchiveMode.Read))
+                    {
+                        return zipStream.Entries.Count > 0;
+                    }
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
 
         public static void ExtractMP3FromJDL(string jdlFilePath, string destinationFilePath)
         {
@@ -589,8 +622,7 @@ namespace JammerDash.Menus
                 calculatedDifficulty = newDifficulty,
                 songName = songName,
                 artist = artist,
-                creator = mapper,
-                clipPath = Path.Combine(Application.persistentDataPath, "scenes", newLevelName, $"{artist} - {songName}.mp3")
+                creator = mapper
             };
 
             // Save the new level data to a JSON file
@@ -1185,6 +1217,7 @@ namespace JammerDash.Menus
 
             }
 
+           
 
             if (quitPanel.activeSelf)
             {
@@ -1284,13 +1317,37 @@ namespace JammerDash.Menus
 
             }
         }
-
+      
         void Update()
         {
             string seconds = System.DateTime.Now.ToLocalTime().ToString("ss");
+            
+
+            if ((Input.GetAxis("Mouse X") == 0 || Input.GetAxis("Mouse Y") == 0) && mainPanel.activeSelf)
+            {
+                afkTime += Time.fixedDeltaTime;
+
+                if (afkTime > 5f)
+                {
+                    if (!hasPlayedIdle)
+                    {
+                        idle.PlayInFixedTime("Idle");
+                        hasPlayedIdle = true;
+                    }
+                }
+            }
+            else
+            {
+               
+                        notIdle.PlayInFixedTime("notIdle");
+                        hasPlayedIdle = false;
+                    
+                    afkTime = 0f;
+                
+            }
 
 
-            if (seconds != oldSeconds)
+                if (seconds != oldSeconds)
             {
                 UpdateTimer();
                 oldSeconds = seconds;
@@ -1307,7 +1364,7 @@ namespace JammerDash.Menus
                 Account.Instance.CalculateXPRequirements();
                 Account.Instance.GainXP(0);
                 Account.Instance.LoadData();
-                Notifications.Notifications.instance.Notify($"Level list, levels and xp are reloaded. \n{levelInfoParent.childCount} levels total, {Account.Instance.totalXP} xp", null);
+                Notifications.instance.Notify($"Level list, levels and xp are reloaded. \n{levelInfoParent.childCount} levels total, {Account.Instance.totalXP} xp", null);
             }
             if (Input.GetKeyDown(KeyCode.F2))
             {

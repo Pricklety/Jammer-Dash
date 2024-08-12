@@ -15,10 +15,10 @@ using File = System.IO.File;
 using Directory = System.IO.Directory;
 using System.Net.Http;
 using System.Threading.Tasks;
-using JammerDash.Notifications;
 using UnityEngine.Events;
 using Debug = UnityEngine.Debug;
 using TMPro;
+
 namespace JammerDash
 {
     public class Options : MonoBehaviour
@@ -543,7 +543,7 @@ namespace JammerDash
                     this.update.onClick.AddListener(update);
                     changelogs.text = releaseNotes;
                     updateName.text = $"{latestVersion}\n<size=6>{uploadDate}</size>";
-                    Notifications.Notifications.instance.Notify($"There's a new update available! ({latestVersion}).\nClick to open changelogs and update.", updateAction);
+                    Notifications.instance.Notify($"There's a new update available! ({latestVersion}).\nClick to open changelogs and update.", updateAction);
                 }
             }
             catch (HttpRequestException e)

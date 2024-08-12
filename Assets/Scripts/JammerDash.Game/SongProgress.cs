@@ -34,7 +34,7 @@ namespace JammerDash.Game
                     // Load level data from "levels" folder
                     string json = File.ReadAllText(levelJsonFilePath);
                     SceneData sceneData = SceneData.FromJson(json);
-                    StartCoroutine(LoadAudioClip(sceneData.clipPath));
+                    StartCoroutine(LoadAudioClip(Path.Combine(Application.persistentDataPath, "levels", "extracted", sceneData.sceneName, sceneData.artist + " - " + sceneData.songName + ".mp3")));
                 }
                 else if (File.Exists(sceneJsonFilePath) && string.IsNullOrEmpty(CustomLevelDataManager.Instance.levelName))
                 {

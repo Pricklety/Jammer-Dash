@@ -250,7 +250,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 10, y: 0}
   m_SizeDelta: {x: 800, y: 90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7639366849960705820
@@ -281,16 +281,16 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 7482667652216324306, guid: 48e93eef0688c4a259cb0eddcd8661f7, type: 3}
-  m_Type: 3
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 2
-  m_FillAmount: 0.963
+  m_FillAmount: 1
   m_FillClockwise: 0
   m_FillOrigin: 2
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 0.75
 --- !u!114 &7639366849960705822
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -383,7 +383,6 @@ MonoBehaviour:
     gameVersion: 
     saveTime: 1.7114893e+9
     clip: {fileID: 0}
-    clipPath: 
     creator: 
     ground: 1
     defBGColor: {r: 0, g: 0, b: 0, a: 0}
@@ -394,7 +393,7 @@ MonoBehaviour:
     playerHP: 300
     boxSize: 1
     rank: 
-    picLocation: 
+    offset: 0
 --- !u!114 &7916049887309445861
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -434,6 +433,8 @@ MonoBehaviour:
   levelBPM: {fileID: 0}
   diff: {fileID: 0}
   levelObj: {fileID: 0}
+  hp: {fileID: 0}
+  size: {fileID: 0}
   bonus: {fileID: 0}
   lb: {fileID: 0}
   sfx: {fileID: 0}

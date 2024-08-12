@@ -63,7 +63,7 @@ namespace JammerDash
         public bool loadedLogoSFX = false;
         public bool canvasOff = false;
         public bool bass = false;
-        public float bassgain = 2.5f;
+        public float bassgain = 1.5f;
         public float dim = 1;
         public string gameVersion = Application.version;
         public string saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();

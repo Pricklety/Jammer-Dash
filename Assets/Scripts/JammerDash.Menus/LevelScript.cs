@@ -37,23 +37,8 @@ namespace JammerDash.Menus.Play
             sceneData = data;
             info.text = $"Data: ID - {data.ID}; HP - {data.playerHP}; CS - {data.boxSize}; BPM - {data.bpm};";
             bg.color = data.defBGColor;
-            LoadImage(data.picLocation);
         }
-        private void LoadImage(string url)
-        {
-            using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))
-            {
-                var operation = www.SendWebRequest();
-
-                if (operation.isDone)
-                {
-                    // Create a Sprite from the downloaded texture and set it to the Image component
-                    Texture2D texture = DownloadHandlerTexture.GetContent(www);
-                    Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
-                    bg.sprite = sprite;
-                }
-            }
-        }
+        
 
         public void SetLevelName(string levelName)
         {
@@ -180,7 +165,7 @@ namespace JammerDash.Menus.Play
             }
             else
             {
-                Notifications.Notifications.instance.Notify("Error (ID: J1)\nThis level does not exist.", null);
+                Notifications.instance.Notify("Error (ID: J1)\nThis level does not exist.", null);
             }
         }
 

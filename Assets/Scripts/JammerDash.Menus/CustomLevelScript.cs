@@ -28,7 +28,6 @@ namespace JammerDash.Menus.Play
         public void SetSceneData(SceneData data)
         {
             sceneData = data;
-            sceneData.clipPath = sceneData.clipPath.Replace("scenes", "levels/extracted");
         }
 
         public void SetLevelName(string levelName)

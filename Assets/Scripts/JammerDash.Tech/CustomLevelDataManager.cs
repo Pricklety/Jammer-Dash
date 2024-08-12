@@ -1,5 +1,6 @@
 using JammerDash.Editor;
 using JammerDash.Editor.Basics;
+using JammerDash.Menus.Play;
 using System;
 using System.Collections;
 using System.IO;
@@ -90,7 +91,7 @@ namespace JammerDash.Tech
                 {
                     OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
                     EditorManager manager = FindObjectOfType<EditorManager>();
-                    using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(sceneData.picLocation))
+                    using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(Path.Combine(Application.persistentDataPath, "scenes", sceneName, "bgImage.png")))
                     {
                         if (www.isDone)
                         {
@@ -208,10 +209,8 @@ namespace JammerDash.Tech
                 Debug.Log("Instantiated long cube");
             }
 
-            if (sceneData.picLocation != null)
-            {
-                StartCoroutine(LoadImage(sceneData.picLocation));
-            }
+                StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "scenes", levelName, "bgImage.png")));
+            
 
             Camera[] cams = FindObjectsOfType<Camera>();
             foreach (Camera cam in cams)

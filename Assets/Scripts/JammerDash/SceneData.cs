@@ -24,7 +24,6 @@ namespace JammerDash
         public string gameVersion;
         public float saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         public AudioClip clip;
-        public string clipPath;
         public string creator;
         public bool ground = true;
         public Color defBGColor;
@@ -35,7 +34,6 @@ namespace JammerDash
         public int playerHP = 300;
         public float boxSize = 1;
         public string rank;
-        public string picLocation;
         public float offset = 0;
 
         public string ToJson()

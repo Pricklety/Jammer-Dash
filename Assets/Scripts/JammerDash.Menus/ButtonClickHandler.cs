@@ -158,9 +158,9 @@ namespace JammerDash.Menus.Play
 
         public void Change()
         {
-            if (GetComponent<CustomLevelScript>().sceneData.picLocation != null && isSelected)
+            if (GetComponent<CustomLevelScript>().sceneData != null && isSelected)
             {
-                StartCoroutine(LoadImage(GetComponent<CustomLevelScript>().sceneData.picLocation));
+                StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "scenes", GetComponent<CustomLevelScript>().sceneData.sceneName, "bgImage.png")));
             }
         }
         IEnumerator Move(float lerpSpeed)
@@ -261,9 +261,9 @@ namespace JammerDash.Menus.Play
             button.onClick.RemoveAllListeners();
             if (GetComponent<CustomLevelScript>() != null)
             {
-                if (GetComponent<CustomLevelScript>().sceneData.clipPath != null)
+                if (GetComponent<CustomLevelScript>().sceneData != null)
                 {
-                    string clipPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", GetComponent<CustomLevelScript>().sceneData.sceneName, Path.GetFileName(GetComponent<CustomLevelScript>().sceneData.clipPath));
+                    string clipPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", GetComponent<CustomLevelScript>().sceneData.sceneName, GetComponent<CustomLevelScript>().sceneData.artist + " - " + GetComponent<CustomLevelScript>().sceneData.songName + ".mp3");
                     int audioClipIndex = -1; // Initialize to a value that indicates no match found
                     // Normalize the clipPath
                     clipPath.Replace("/", "\\");
@@ -303,7 +303,7 @@ namespace JammerDash.Menus.Play
                     }
                 }
 
-                    yield return StartCoroutine(LoadImage(GetComponent<CustomLevelScript>().sceneData.picLocation));
+                    yield return StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "scenes", GetComponent<CustomLevelScript>().sceneData.sceneName, "bgImage.png")));
 
             }
 
