@@ -18,7 +18,7 @@ QualitySettings:
     shadowCascade2Split: 0.32601038
     shadowCascade4Split: {x: 0.06666667, y: 0.2, z: 0.46666667}
     shadowmaskMode: 1
-    skinWeights: 255
+    skinWeights: 2
     globalTextureMipmapLimit: 0
     textureMipmapLimitSettings: []
     anisotropicTextures: 2
@@ -38,10 +38,10 @@ QualitySettings:
     enableLODCrossFade: 1
     streamingMipmapsActive: 1
     streamingMipmapsAddAllCameras: 1
-    streamingMipmapsMemoryBudget: 1024
-    streamingMipmapsRenderersPerFrame: 1024
+    streamingMipmapsMemoryBudget: 512
+    streamingMipmapsRenderersPerFrame: 64
     streamingMipmapsMaxLevelReduction: 1
-    streamingMipmapsMaxFileIORequests: 2048
+    streamingMipmapsMaxFileIORequests: 64
     particleRaycastBudget: 256
     asyncUploadTimeSlice: 6
     asyncUploadBufferSize: 48

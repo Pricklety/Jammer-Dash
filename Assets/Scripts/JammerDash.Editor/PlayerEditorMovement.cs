@@ -64,19 +64,19 @@ namespace JammerDash.Editor
         }
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.tag == "Cubes")
+            if (collision.CompareTag("Cubes"))
             {
-                new WaitForSeconds(0.14f);
+                new WaitForSeconds(0.07f);
                 Debug.Log("hit");
                 AudioClip hitSound = Resources.Load<AudioClip>("Audio/SFX/hit0");
                 GameObject.Find("sfx").GetComponent<AudioSource>().PlayOneShot(hitSound, 1);
 
             }
-            if (collision.tag == "Beat")
+            if (collision.CompareTag("Beat"))
             {
                 Debug.Log("hit");
-                AudioClip hitSound = Resources.Load<AudioClip>("Audio/SFX/hit0");
-                GameObject.Find("sfx").GetComponent<AudioSource>().PlayOneShot(hitSound, 1);
+                AudioClip hitSound = Resources.Load<AudioClip>("Audio/SFX/metronome");
+                GameObject.Find("sfx").GetComponent<AudioSource>().PlayOneShot(hitSound, 2);
 
             }
         }

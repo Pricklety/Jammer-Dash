@@ -28,7 +28,6 @@ namespace JammerDash.Menus.Play
         public void SetSceneData(SceneData data)
         {
             sceneData = data;
-            sceneData.clipPath = sceneData.clipPath.Replace("scenes", "levels/extracted");
         }
 
         public void SetLevelName(string levelName)
@@ -103,10 +102,6 @@ namespace JammerDash.Menus.Play
                 return;
             }
 
-            LevelDataManager.Instance.levelName = null;
-            LevelDataManager.Instance.creator = null;
-            LevelDataManager.Instance.diff = 0;
-            LevelDataManager.Instance.ID = 0;
             CustomLevelDataManager.Instance.LoadLevelData(sceneData.sceneName, sceneData.ID);
            
         }

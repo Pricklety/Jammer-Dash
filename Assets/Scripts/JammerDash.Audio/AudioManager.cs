@@ -67,7 +67,7 @@ namespace JammerDash.Audio
 
             QualitySettings.maxQueuedFrames = 0;
         }
-
+        
         public void Start()
         {
             masterS.onValueChanged.AddListener(OnMasterVolumeChanged);
@@ -121,9 +121,10 @@ namespace JammerDash.Audio
 
             return 0f;
         }
-
+       
         public void Update()
         {
+            
             if (Input.GetKeyDown(KeyCode.F9) && SceneManager.GetActiveScene().buildIndex == 1)
             {
                 StartCoroutine(LoadAudioClipsAsync());
@@ -305,7 +306,7 @@ namespace JammerDash.Audio
                 songPlayed = false;
             }
 
-            if (Input.GetMouseButtonDown(2) && !data.loadedLogoSFX)
+            if (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButtonDown(2) && !data.loadedLogoSFX)
             {
                 counter++;
                 if (counter == 3)
@@ -314,13 +315,13 @@ namespace JammerDash.Audio
                     GetComponent<AudioSource>().PlayOneShot(sfxLong, 1);
                     data.loadedLogoSFX = true;
                     SettingsFileHandler.SaveSettingsToFile(data);
-                    Notifications.Notifications.instance.Notify("Jammer Dash :)", null);
+                    Notifications.instance.Notify("Jammer Dash :)", null);
                     new WaitForSecondsRealtime(8f);
                         GetComponent<AudioSource>().volume = 1;
 
                 }
             }
-            else if (data.loadedLogoSFX && Input.GetMouseButtonDown(2))
+            else if (data.loadedLogoSFX && Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButtonDown(2))
             {
                 counter++;
                 if (counter == 3)
@@ -328,7 +329,7 @@ namespace JammerDash.Audio
                     GetComponent<AudioSource>().volume *= 0.8f;
                     GetComponent<AudioSource>().PlayOneShot(sfxLong, 1);
                     data.loadedLogoSFX = false;
-                    Notifications.Notifications.instance.Notify("oh :(", null);
+                    Notifications.instance.Notify("oh :(", null);
                     SettingsFileHandler.SaveSettingsToFile(data);
 
                     new WaitForSecondsRealtime(8f);
@@ -491,11 +492,6 @@ namespace JammerDash.Audio
                 {
                     songPathsList.Add(copiedFile);
                     newFilesAdded = true;
-                    Debug.Log($"Added new file to songPathsList: {copiedFile}");
-                }
-                else
-                {
-                    Debug.Log($"File already in songPathsList: {copiedFile}");
                 }
             }
 
@@ -505,11 +501,11 @@ namespace JammerDash.Audio
             if (newFilesAdded)
             {
                 ShuffleSongPathsList();
-                Notifications.Notifications.instance.Notify($"Playlist loaded. \n{copiedFiles.Length} songs found.", null); // Display notification
+                Notifications.instance.Notify($"Playlist loaded. \n{copiedFiles.Length} songs found.", null); // Display notification
             }
             else
             {
-                Notifications.Notifications.instance.Notify($"No new songs found. \n{songPathsList.Count} songs in the playlist.", null); // Display notification
+                Notifications.instance.Notify($"No new songs found. \n{songPathsList.Count} songs in the playlist.", null); // Display notification
             }
         }
         public void PlaySource()
@@ -620,7 +616,7 @@ namespace JammerDash.Audio
             mainMenu menu = options.GetComponent<mainMenu>();
 
             // Ensure there are sprites available
-            if (menu.sprite.Length > 0 && menu.data.artBG || menu.sprite.Length > 0 && menu.data.customBG)
+            if (menu.sprite.Length > 0 && (menu.data.backgroundType >= 1 || menu.data.backgroundType <= 3))
             {
 
                 // Set the new sprite gradually over a specified duration
@@ -642,10 +638,6 @@ namespace JammerDash.Audio
                 targetColor = Color.white;
                 imageComponent.color = Color.Lerp(startColor, targetColor, 1f);
                 menu.LoadRandomBackground();
-            }
-            else if (menu.sprite.Length > 0 && !menu.data.customBG || menu.sprite.Length > 0 && !menu.data.customBG)
-            {
-                menu.ChangeBasicCol();
             }
 
         }

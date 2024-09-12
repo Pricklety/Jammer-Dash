@@ -64,7 +64,7 @@ namespace JammerDash
 
            
                 UnityAction action = () => OpenScreenshotFolder();
-                Notifications.Notifications.instance.Notify("Screenshot taken. \nClick to open folder.", action);
+                Notifications.instance.Notify("Screenshot taken. \nClick to open folder.", action);
             
 
             Debug.Log("Screenshot captured: " + screenshotPath);

@@ -82,7 +82,11 @@ namespace JammerDash.Game
 
         private void Update()
         {
-            duration = 60 / CustomLevelDataManager.Instance.data.bpm;
+            if (CustomLevelDataManager.Instance.data.bpm != 0)
+            {
+                duration = 60 / CustomLevelDataManager.Instance.data.bpm;
+
+            }
             infotext.text = $"{CustomLevelDataManager.Instance.levelName} by {CustomLevelDataManager.Instance.creator}\n" +
                 $"? {CustomLevelDataManager.Instance.data.artist} - {CustomLevelDataManager.Instance.data.songName}";
            

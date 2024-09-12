@@ -8,7 +8,7 @@ namespace JammerDash.Menus.Play
 
     public class RankDisplay : MonoBehaviour
     {
-        public Text rankText;
+        public Image rankText;
         public int sceneIndex;
         public string keyName;
 
@@ -86,7 +86,7 @@ namespace JammerDash.Menus.Play
             {
                 // Displaying the highest rank data in the UI
                 string[] highestRankDataArray = highestRankData.Split(',');
-                rankText.text = highestRankDataArray[1]; // Assuming the rank tier is in the second position
+                rankText.sprite = Resources.Load<Sprite>($"ranking/{highestRankDataArray[1]}"); // Assuming the rank tier is in the second position
             }
             else
             {

@@ -30,20 +30,16 @@ namespace JammerDash.Editor.Basics
             if (SceneManager.GetActiveScene().name == "LevelDefault")
             {
 
-                if (gameObject.name.Contains("hitter") && LevelDataManager.Instance.cubesize != 0)
+                if (gameObject.name.Contains("hitter") && CustomLevelDataManager.Instance.cubesize != 0)
                 {
-                    transform.localScale = new Vector2(LevelDataManager.Instance.cubesize, LevelDataManager.Instance.cubesize);
+                    transform.localScale = new Vector2(CustomLevelDataManager.Instance.data.boxSize, CustomLevelDataManager.Instance.data.boxSize);
                 }
-                else if (LevelDataManager.Instance.cubesize == 0)
+                else if (CustomLevelDataManager.Instance.cubesize == 0)
                 {
-                    transform.localScale = new Vector2(CustomLevelDataManager.Instance.cubesize, CustomLevelDataManager.Instance.cubesize);
+                    transform.localScale = new Vector2(CustomLevelDataManager.Instance.data.boxSize, CustomLevelDataManager.Instance.data.boxSize);
                 }
             }
-            else if (SceneManager.GetActiveScene().name == "SampleScene" && Input.GetMouseButtonUp(0) )
-            {
-                if (transform.localScale != new Vector3(FindObjectOfType<EditorManager>().size.value, FindObjectOfType<EditorManager>().size.value, 0))
-                transform.localScale = new Vector3(FindObjectOfType<EditorManager>().size.value, FindObjectOfType<EditorManager>().size.value, 0);
-            }
+            
         }
     }
 

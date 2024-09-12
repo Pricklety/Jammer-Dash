@@ -5,6 +5,10 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 using System.Data;
+using UnityEngine.Networking;
+using System.Collections;
+using System;
+using System.Xml.Serialization;
 
 namespace JammerDash
 {
@@ -13,15 +17,16 @@ namespace JammerDash
     {
         [Header("Username")]
         public string username;
+        public string password;
+        public string email;
+        public string cc;
+        public string url;
         [Header("Level")]
         public int level = 0;
         public long currentXP = 0;
         public long[] xpRequiredPerLevel;
         public long totalXP = 0;
 
-        [Header("UI")]
-        public InputField usernameInput;
-        public GameObject buttonCreate;
 
         [Header("Internet Check")]
         public GameObject checkInternet;
@@ -73,9 +78,12 @@ namespace JammerDash
             }
             Debug.Log("Level Up! You are now level " + level);
         }
-        public void Apply()
+        public void Apply(string username, string password, string email, string cc)
         {
-            username = usernameInput.text;
+            this.username = username;
+            this.password = password;
+            this.cc = cc;
+            this.email = email;
             SavePlayerData();
         }
         public void CalculateXPRequirements()
@@ -91,12 +99,6 @@ namespace JammerDash
                 xpRequiredPerLevel[i] = (long)(xpRequiredPerLevel[i - 1] * growthRate);
             }
 
-            // Debug logs to check the array
-            Debug.Log("XP Required Per Level:");
-            for (int i = 0; i < xpRequiredPerLevel.Length; i++)
-            {
-                Debug.Log("Level " + i + ": " + xpRequiredPerLevel[i]);
-            }
         }
 
         // Method to save player data
@@ -112,13 +114,46 @@ namespace JammerDash
                 isLocal = true,
                 isOnline = false
             };
-
-            BinaryFormatter formatter = new BinaryFormatter();
+            PlayerData accountPost = new PlayerData
+            {
+                username = username,
+                password = password,
+                email = email,
+                country = cc
+            };
+            Debug.Log(accountPost.country);
+            StartCoroutine(Post(url, accountPost));
+            XmlSerializer formatter = new XmlSerializer(typeof(PlayerData));
             string path = Application.persistentDataPath + "/playerData.dat";
             FileStream stream = new FileStream(path, FileMode.Create);
-
             formatter.Serialize(stream, data);
             stream.Close();
+        }
+
+        public IEnumerator Post(string url, PlayerData bodyJsonObject)
+        {
+            string bodyJsonString = JsonUtility.ToJson(bodyJsonObject);
+
+            UnityWebRequest request = new UnityWebRequest(url, "POST");
+
+            request.SetRequestHeader("Content-Type", "application/json");
+            request.SetRequestHeader("accept-encoding", "application/json");
+
+            byte[] bodyRaw = new System.Text.UTF8Encoding().GetBytes(bodyJsonString);
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError("Error: " + request.error);
+            }
+            else
+            {
+                Debug.Log("Status Code: " + request.responseCode);
+                Debug.Log("Response Body: " + request.downloadHandler.text);
+            }
         }
         public PlayerData LoadData()
         {
@@ -126,7 +161,7 @@ namespace JammerDash
 
             if (File.Exists(path))
             {
-                BinaryFormatter formatter = new BinaryFormatter();
+                XmlSerializer formatter = new XmlSerializer(typeof(PlayerData));
                 FileStream stream = new FileStream(path, FileMode.Open);
 
                 PlayerData data = formatter.Deserialize(stream) as PlayerData;
@@ -146,12 +181,7 @@ namespace JammerDash
         }
         void Update()
         {
-            if (usernameInput == null && SceneManager.GetActiveScene().buildIndex == 1 && username == "Guest")
-            {
-                usernameInput = GameObject.Find("usernameField").GetComponent<InputField>();
-                usernameInput.text = username;
-                buttonCreate = GameObject.Find("create account");
-            }
+            
 
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {
@@ -175,6 +205,9 @@ public class PlayerData
     public long[] xpRequiredPerLevel;
     public long totalXP;
     public string username;
+    public string password;
+    public string email;
+    public string country;
     public bool isLocal;
     public bool isOnline;
 }

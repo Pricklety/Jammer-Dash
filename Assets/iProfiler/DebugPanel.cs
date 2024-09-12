@@ -17,7 +17,7 @@ using JammerDash.Audio;
 
 namespace JammerDash.Tech
 {
-    public class StatsMan : MonoBehaviour
+    public class DebugPanel : MonoBehaviour
     {
         public Text gui;
 
@@ -29,7 +29,7 @@ namespace JammerDash.Tech
         // Update is called once per frame
         void FixedUpdate()
         {
-            gui.text = $"Debug v11 - Jammer Dash {Application.version} ({Application.unityVersion})\n\n";
+            gui.text = $"Debug v12 - Jammer Dash {Application.version} ({Application.unityVersion})\n\n";
 
             DisplayAudioInfo();
             DisplayInputInfo();
@@ -57,7 +57,8 @@ namespace JammerDash.Tech
             gui.text += "\n\n" + "GPU: " + SystemInfo.graphicsDeviceName +
                         "\nGPU Type: " + SystemInfo.graphicsDeviceType +
                         "\nGPU Version: " + SystemInfo.graphicsDeviceVersion +
-                        "\nGPU Memory: " + SystemInfo.graphicsMemorySize + "MB";
+                        "\nGPU Memory: " + SystemInfo.graphicsMemorySize + "MB" +
+                        "\nMultithreading: " + SystemInfo.graphicsMultiThreaded;
         }
 
         void DisplayAudioInfo()
@@ -96,14 +97,10 @@ namespace JammerDash.Tech
             string v = data.canvasOff ? "Off" : "On";
 
             gui.text += "\n\nResolution value: " + data.resolutionValue + $" ({Screen.width}x{Screen.height})" +
-                        "\nQuality Level: " + data.qualitySettingsLevel + $" ({GetQualityLevelName()})" +
-                        "\nArtistic Backgrounds: " + data.artBG + $" ({Resources.LoadAll<Sprite>("backgrounds").Length} bgs)" +
-                        "\nCustom Backgrounds: " + data.customBG + $" ({Directory.GetFiles(Application.persistentDataPath + "/backgrounds", "*.png").Length} bgs)" +
-                        "\nVideo Backgrounds: " + data.vidBG + $" ({Directory.GetFiles(Application.persistentDataPath + "/backgrounds", "*.mp4").Length} bgs)" +
+                        "\nBackgrounds Type: " + data.backgroundType +
                         "\nSFX: " + data.sfx +
                         "\nHit Notes: " + data.hitNotes +
                         "\nPlayer Type: " + data.playerType +
-                        "\nAntialiasing: " + data.antialiasing +
                         "\nCursor Trail: " + data.cursorTrail +
                         "\nNo focus volume: " + data.noFocusVolume +
                         "\nLowpass value: " + data.lowpassValue +
@@ -133,7 +130,7 @@ namespace JammerDash.Tech
         void DisplayInputInfo()
         {
             gui.text += "\n\nTouch Support: " + Input.touchSupported +
-                        "\nInput count: " + Input.touchCount + "\n\n" +
+                        "\nTouch count: " + Input.touchCount + "\n\n" +
                         "\nPolling frequency: " + InputSystem.pollingFrequency + "Hz" +
                         "\nButton press point: " + InputSystem.settings.defaultButtonPressPoint +
                         "\nInput update mode: " + InputSystem.settings.updateMode +
@@ -141,22 +138,7 @@ namespace JammerDash.Tech
         }
 
 
-        private string[] qualityLevelNames = new string[]
-        {
-       "Low", "Medium", "High"
-        };
-        public string GetQualityLevelName()
-        {
-            int qualityLevelIndex = QualitySettings.GetQualityLevel();
-            if (qualityLevelIndex >= 0 && qualityLevelIndex <= qualityLevelNames.Length)
-            {
-                return qualityLevelNames[qualityLevelIndex];
-            }
-            else
-            {
-                return "Unknown";
-            }
-        }
+        
 
     }
 }

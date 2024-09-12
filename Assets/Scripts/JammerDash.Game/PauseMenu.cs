@@ -31,99 +31,13 @@ namespace JammerDash.Game
             SettingsData sd = SettingsFileHandler.LoadSettingsFromFile();
             dim.value = sd.dim;
             GameObject animA = GameObject.Find("Main Camera");
-            if (SceneManager.GetActiveScene().name != "LevelDefault")
-            {
-                song.text = SceneManager.GetActiveScene().name;
-                Transform canvasTransform = GameObject.Find("Canvas").transform;
-                if (canvasTransform != null)
-                {
-                    Transform pauseTransform = canvasTransform.Find("Pause").transform;
-                    if (pauseTransform != null)
-                    {
-                        Transform textTransform = pauseTransform.Find("Text (Legacy) (1)").transform;
-                        if (textTransform != null)
-                        {
-                            Text creatorText = textTransform.GetComponent<Text>();
-                            if (creatorText != null)
-                            {
-                                creator = creatorText;
-                            }
-                        }
-                        else
-                        {
-                            Debug.LogWarning("Text (Legacy) (1) not found under Pause");
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Pause not found under Canvas");
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("Canvas not found in the scene");
-                }
-
-                creator.text = "by Pricklety";
-            }
-            else if (SceneManager.GetActiveScene().name == "LevelDefault")
-            {
+           
                 string levelName = CustomLevelDataManager.Instance.levelName;
-                CheckSceneDataExists(levelName, "levels\\extracted");
                 string creator = $"by {CustomLevelDataManager.Instance.creator}";
-                if (levelName == null)
-                {
-                    creator = $"by {LevelDataManager.Instance.creator}";
-                    levelName = LevelDataManager.Instance.levelName;
-                    CheckSceneDataExists(levelName, "scenes");
-                }
                 this.creator.text = creator;
                 song.text = levelName;
-            }
-            else
-            {
-                Transform canvasTransform = GameObject.Find("Canvas").transform;
-                if (canvasTransform != null)
-                {
-                    Transform pauseTransform = canvasTransform.Find("Pause");
-                    if (pauseTransform != null)
-                    {
-                        Transform textTransform = pauseTransform.Find("Text (Legacy) (1)");
-                        if (textTransform != null)
-                        {
-                            Text creatorText = textTransform.GetComponent<Text>();
-                            if (creatorText != null)
-                            {
-                                creator = creatorText;
-                            }
-                        }
-                        else
-                        {
-                            Debug.LogWarning("Text (Legacy) (1) not found under Pause");
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning("Pause not found under Canvas");
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("Canvas not found in the scene");
-                }
-
-                song.text = SceneManager.GetActiveScene().name;
-                creator.text = "by Pricklety";
-            }
-            if (PlayerPrefs.HasKey("attempts"))
-            {
-                attint = PlayerPrefs.GetInt("attempts", 0); // Set attint from PlayerPrefs
-                if (attint < 1)
-                {
-                    attint = 1;
-                }
-            }
-            ;
+            
+           
         }
 
         public IEnumerator CheckUI()
@@ -132,44 +46,12 @@ namespace JammerDash.Game
             if (sd.canvasOff)
             {
                 canvas.SetActive(false);
-                Notifications.Notifications.instance.Notify("Playfield UI is off.\nClick Shift+F1 to turn it back on.", null);
+                Notifications.instance.Notify($"Playfield UI is off.\nClick Shift+{KeybindingManager.toggleUI.ToString()} to turn it back on.", null);
                 yield return null;
             }
         }
-        private void CheckSceneDataExists(string levelName, string folder)
-        {
 
-        }
-
-        // Function to load SceneData for a specific level
-        private SceneData LoadSceneData(string levelName)
-        {
-            SceneData loadedData = new SceneData();
-
-            // Construct the path to the level data file
-            string filePath = Path.Combine(Application.persistentDataPath, "scenes", levelName, levelName + ".json");
-
-            // Check if the file exists
-            if (File.Exists(filePath))
-            {
-                // Read the JSON file
-                string json = File.ReadAllText(filePath);
-
-                // Deserialize the JSON string to SceneData
-                loadedData = SceneData.FromJson(json);
-            }
-            song.text = loadedData.levelName;
-            if (info != null)
-            {
-
-                info.text = $"Difficulty: {(int)loadedData.calculatedDifficulty}sn\nLevel-Specific BPM: {loadedData.bpm}\nLength: {FormatTime(loadedData.levelLength)}";
-            }
-            else
-            {
-
-            }
-            return loadedData;
-        }
+      
         string FormatTime(float time)
         {
             TimeSpan timeSpan = TimeSpan.FromSeconds(time);
@@ -182,6 +64,13 @@ namespace JammerDash.Game
             if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>() != null)
                 music = GameObject.Find("Music").GetComponent<AudioSource>();
 
+            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeybindingManager.toggleUI))
+            {
+                SettingsData sd = SettingsFileHandler.LoadSettingsFromFile();
+                sd.canvasOff = true;
+                SettingsFileHandler.SaveSettingsToFile(sd);
+                CheckUI();
+            }
             image.color = new(image.color.r, image.color.g, image.color.b, dim.value);
             if (Input.GetKeyDown(KeyCode.Escape) && canvas.activeSelf && GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindObjectOfType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
             {
@@ -212,10 +101,7 @@ namespace JammerDash.Game
                 }
 
             }
-            else if (!canvas.activeSelf)
-            {
-                Notifications.Notifications.instance.Notify("Playfield UI is off\nClick Shift+F1 to re-enable it.", null);
-            }
+           
             bool focus = Application.isFocused;
             if (!focus)
             {
@@ -302,7 +188,6 @@ namespace JammerDash.Game
         {
             Time.timeScale = 1;
             SceneManager.LoadSceneAsync(1);
-            LevelDataManager.Instance.enabled = false;
             CustomLevelDataManager.Instance.enabled = false;
         }
 

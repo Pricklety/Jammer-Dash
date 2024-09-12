@@ -1,83 +1,63 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using JammerDash;
 
-public class KeybindingUI : MonoBehaviour
+namespace JammerDash.Menus.Options
 {
-    public KeybindingManager keybindingManager;
 
-    public Text upBindingText;
-    public Text downBindingText;
-    public Text groundBindingText;
-    public Text boostBindingText;
-    public Text key1BindingText;
-    public Text key2BindingText;
-
-    private void Start()
+    public class KeybindingUI : MonoBehaviour
     {
-        KeybindingManager.instance.LoadKeybindingsFromJson();
-        UpdateUI();
+        public KeybindingManager keybindingManager;
+        public string keyName;
 
-    }
-
-    public void RebindUp()
-    {
-        StartCoroutine(WaitForKeyPress("up"));
-    }
-
-    public void RebindDown()
-    {
-        StartCoroutine(WaitForKeyPress("down"));
-    }
-
-    public void RebindGround()
-    {
-        StartCoroutine(WaitForKeyPress("ground"));
-    }
-
-    public void RebindBoost()
-    {
-        StartCoroutine(WaitForKeyPress("boost"));
-    }
-
-    public void RebindKey1()
-    {
-        StartCoroutine(WaitForKeyPress("key1"));
-    }
-
-    public void RebindKey2()
-    {
-        StartCoroutine(WaitForKeyPress("key2"));
-    }
-
-    private System.Collections.IEnumerator WaitForKeyPress(string actionName)
-    {
-        yield return new WaitUntil(() => Input.anyKeyDown);
-        foreach (KeyCode keycode in Enum.GetValues(typeof(KeyCode)))
+        private void Start()
         {
-            if (Input.GetKeyDown(keycode))
+            KeybindingManager.instance.LoadKeybindingsFromJson();
+            UpdateUI(this.GetComponent<Text>(), keyName);
+            GetComponentInParent<Button>().onClick.RemoveAllListeners();
+            GetComponentInParent<Button>().onClick.AddListener(Rebind);
+        }
+
+        public void Rebind()
+        {
+            StartCoroutine(WaitForKeyPress(keyName));
+        }
+
+
+        private System.Collections.IEnumerator WaitForKeyPress(string actionName)
+        {
+            yield return new WaitUntil(() => Input.anyKeyDown);
+            foreach (KeyCode keycode in Enum.GetValues(typeof(KeyCode)))
             {
-                KeybindingManager.RebindKey(actionName, keycode);
-                break;
+                if (Input.GetKeyDown(keycode))
+                {
+                    KeybindingManager.RebindKey(actionName, keycode);
+                    break;
+                }
+            }
+            UpdateUI(this.GetComponent<Text>(), keyName);
+        }
+        private void Update()
+        {
+            if (keybindingManager == null)
+            {
+                keybindingManager = KeybindingManager.instance;
+                KeybindingManager.instance.LoadKeybindingsFromJson();
             }
         }
-        UpdateUI();
+
+        public void UpdateUI(Text text, string name)
+        {
+            text.text = KeybindingManager.GetBindingName(name);
+            Debug.Log("Updated UI with current bindings");
+        }
+
+        public void Save()
+        {
+
+            KeybindingManager.instance.SaveKeybindingsToJson();
+        }
     }
 
-    public void UpdateUI()
-    {
-        upBindingText.text = KeybindingManager.GetBindingName("up");
-        downBindingText.text = KeybindingManager.GetBindingName("down");
-        groundBindingText.text = KeybindingManager.GetBindingName("ground");
-        boostBindingText.text = KeybindingManager.GetBindingName("boost");
-        key1BindingText.text = KeybindingManager.GetBindingName("key1");
-        key2BindingText.text = KeybindingManager.GetBindingName("key2");
-        Debug.Log("Updated UI with current bindings");
-    }
-
-    public void Save()
-    {
-
-        KeybindingManager.instance.SaveKeybindingsToJson();
-    }
 }

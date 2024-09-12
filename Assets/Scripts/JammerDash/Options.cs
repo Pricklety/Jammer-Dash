@@ -15,10 +15,10 @@ using File = System.IO.File;
 using Directory = System.IO.Directory;
 using System.Net.Http;
 using System.Threading.Tasks;
-using JammerDash.Notifications;
 using UnityEngine.Events;
 using Debug = UnityEngine.Debug;
 using TMPro;
+
 namespace JammerDash
 {
     public class Options : MonoBehaviour
@@ -27,7 +27,6 @@ namespace JammerDash
         public Dropdown resolutionDropdown;
         public GameObject keybind;
         public InputField fpsInputField;
-        public Dropdown qualitySettingsDropdown;
         public GameObject confirm;
         public Text confirnText;
         public Button confirmation;
@@ -41,14 +40,10 @@ namespace JammerDash
         public Slider masterVolumeSlider;
         public Dropdown playlist;
         public Toggle hitSounds;
-        public Toggle artBG;
-        public Toggle customBG;
         public Toggle sfx;
         public Toggle vsync;
         public Dropdown playerType;
-        public Toggle vidBG;
         public Toggle cursorTrail;
-        public Dropdown antiAliasing;
         public Slider lowpass;
         public Dropdown backgrounds;
         public Slider trailParticleCount;
@@ -71,6 +66,10 @@ namespace JammerDash
         public Text version;
         public Slider dim;
 
+        bool artBG = false;
+        bool customBG = false;
+        bool seasonBG = false;
+        bool vidBG = false;
         [Header("Next Update")]
         public GameObject nextChangelogs;
         public TMP_Text changelogs;
@@ -129,12 +128,6 @@ namespace JammerDash
 
         void PopulateDropdowns()
         {
-            // Populate window mode dropdown
-           
-            // Populate quality dropdown
-            qualitySettingsDropdown.ClearOptions();
-            List<string> qualityLevels = new List<string>(QualitySettings.names);
-            qualitySettingsDropdown.AddOptions(qualityLevels);
 
             // Populate resolution dropdown
             resolutionDropdown.ClearOptions();
@@ -149,38 +142,9 @@ namespace JammerDash
             // Add the resolution options to the dropdown
             resolutionDropdown.AddOptions(resolutionOptions);
 
-            // Populate anti-aliasing dropdown
-            antiAliasing.ClearOptions();
-            List<string> aaOptions = new List<string> { "None", "2x", "4x", "8x" };
-            antiAliasing.AddOptions(aaOptions);
-
-            backgrounds.ClearOptions();
-
-            List<Sprite> images = GetImagesFromFolder("backgrounds");
-
-            // Add the images to the dropdown options
-            foreach (Sprite sprite in images)
-            {
-                backgrounds.options.Add(new Dropdown.OptionData(sprite.name));
-            }
-            backgrounds.RefreshShownValue();
+            
         }
-        List<Sprite> GetImagesFromFolder(string folderPath)
-        {
-            List<Sprite> images = new List<Sprite>();
-            Sprite[] sprites = Resources.LoadAll<Sprite>(folderPath);
-            images.AddRange(sprites);
-
-            // Get subfolders
-            string[] subfolders = GetSubfolders(folderPath);
-            foreach (string subfolder in subfolders)
-            {
-                // Load images recursively from subfolders
-                images.AddRange(GetImagesFromFolder(folderPath + "/" + subfolder));
-            }
-
-            return images;
-        }
+        
 
         string[] GetSubfolders(string folderPath)
         {
@@ -195,24 +159,14 @@ namespace JammerDash
             }
             return subfolders.ToArray();
         }
-        public void SetBackgroundImage(string imageName)
+        public void SetBackgroundImage()
         {
-            // Get the currently selected dropdown option (image name)
-            imageName = backgrounds.captionText.text;
-            // Iterate through all loaded images
-            foreach (Sprite image in GetImagesFromFolder("backgrounds"))
-            {
-                // Check if the image name matches the requested image
-                if (image.name == imageName)
-                {
-                    // Set the found image as the background image
-                    backgroundImage.sprite = image;
-                    return;
-                }
-            }
+            string text = backgrounds.captionText.text;
+            artBG = text == "Community";
+            seasonBG = text == "Seasonal";
+            vidBG = text == "Custom video";
+            customBG = text == "Custom image";
 
-            // If the image is not found in any subfolder, log a warning
-            UnityEngine.Debug.LogWarning("Background image not found: " + imageName);
         }
         public void LoadMasterVolume()
         {
@@ -264,18 +218,14 @@ namespace JammerDash
         {
             Application.targetFrameRate = settingsData.selectedFPS;
             fpsInputField.text = settingsData.selectedFPS.ToString();
-            qualitySettingsDropdown.value = settingsData.qualitySettingsLevel;
             resolutionDropdown.value = settingsData.resolutionValue;
             masterVolumeSlider.value = settingsData.volume;
-            artBG.isOn = settingsData.artBG;
-            customBG.isOn = settingsData.customBG;
-            vidBG.isOn = settingsData.vidBG;
+            backgrounds.value = settingsData.backgroundType;
             sfx.isOn = settingsData.sfx;
             hitSounds.isOn = settingsData.hitNotes;
             vsync.isOn = settingsData.vsync;
             playerType.value = settingsData.playerType;
             cursorTrail.isOn = settingsData.cursorTrail;
-            antiAliasing.value = settingsData.antialiasing;
             lowpass.value = settingsData.lowpassValue;
             trailParticleCount.value = settingsData.mouseParticles;
             showFPS.isOn = settingsData.isShowingFPS;
@@ -305,17 +255,13 @@ namespace JammerDash
         public void ApplySettings()
         {
             settingsData.selectedFPS = int.TryParse(fpsInputField.text, out int fpsCap) ? Mathf.Clamp(fpsCap, 1, 9999) : 60;
-            settingsData.qualitySettingsLevel = qualitySettingsDropdown.value;
             settingsData.volume = masterVolumeSlider.value;
-            settingsData.artBG = artBG.isOn;
-            settingsData.customBG = customBG.isOn;
-            settingsData.vidBG = vidBG.isOn;
+            settingsData.backgroundType = backgrounds.value;
             settingsData.hitNotes = hitSounds.isOn;
             settingsData.sfx = sfx.isOn;
             settingsData.vsync = vsync.isOn;
             settingsData.playerType = playerType.value;
             settingsData.cursorTrail = cursorTrail.isOn;
-            settingsData.antialiasing = antiAliasing.value;
             settingsData.lowpassValue = lowpass.value;
             settingsData.hitType = hitType.value;
             settingsData.isShowingFPS = showFPS.isOn;
@@ -330,7 +276,6 @@ namespace JammerDash
             settingsData.bass = bass.isOn;
             settingsData.bassgain = bassGain.value;
             settingsData.dim = dim.value;
-            ApplyQualitySettings(settingsData.qualitySettingsLevel);
             ApplyMasterVolume(settingsData.volume);
             ApplyFPSCap(settingsData.selectedFPS);
             ApplyResolution();
@@ -339,32 +284,9 @@ namespace JammerDash
             Focus(settingsData.focusVol);
             Vsync(settingsData.vsync);
             Cursor(settingsData.cursorTrail);
-            AA(settingsData.antialiasing);
         }
 
-        public void AA(int value)
-        {
-            // Apply anti-aliasing level based on the selected value
-            switch (value)
-            {
-                case 0: // None
-                    QualitySettings.antiAliasing = 0;
-                    break;
-                case 1: // 2x
-                    QualitySettings.antiAliasing = 2;
-                    break;
-                case 2: // 4x
-                    QualitySettings.antiAliasing = 4;
-                    break;
-                case 3: // 8x
-                    QualitySettings.antiAliasing = 8;
-                    break;
-                default:
-                    antiAliasing.captionText.text = "Invalid anti-aliasing value";
-                    break;
-            }
-        }
-
+       
         public void HitNotes(bool enabled)
         {
             audio.hits = enabled;
@@ -429,13 +351,6 @@ namespace JammerDash
 
         }
 
-        private void ApplyQualitySettings(int level)
-        {
-            // Add logic to set quality settings
-            QualitySettings.SetQualityLevel(level);
-            settingsData.qualitySettingsLevel = level;
-        }
-
         private void ApplyMasterVolume(float volume)
         {
             masterVolumeSlider.value = volume;
@@ -457,17 +372,13 @@ namespace JammerDash
             {
                 selectedFPS = int.TryParse(fpsInputField.text, out int fpsCap) ? Mathf.Clamp(fpsCap, 1, 9999) : 60,
                 vsync = vsync.isOn,
-                qualitySettingsLevel = qualitySettingsDropdown.value,
                 volume = masterVolumeSlider.value,
                 resolutionValue = resolutionDropdown.value,
-                artBG = artBG.isOn,
-                customBG = customBG.isOn,
-                vidBG = vidBG.isOn,
+                backgroundType = backgrounds.value,
                 sfx = sfx.isOn,
                 hitNotes = hitSounds.isOn,
                 playerType = playerType.value,
                 cursorTrail = cursorTrail.isOn,
-                antialiasing = antiAliasing.value,
                 lowpassValue = lowpass.value,
                 mouseParticles = trailParticleCount.value,
                 isShowingFPS = showFPS.isOn,
@@ -503,11 +414,7 @@ namespace JammerDash
 
         public void ResetToDefaults()
         {
-            // Reset all settings to default values
-
-
            
-
             int fpsCap;
             if (int.TryParse(fpsInputField.text, out fpsCap))
             {
@@ -519,11 +426,7 @@ namespace JammerDash
                 // Update the input field with the clamped value
                 fpsInputField.text = fpsCap.ToString();
             }
-
-
-            // Quality Settings
-            qualitySettingsDropdown.value = 2; // Set to default quality level index
-
+            
             // Master Volume
             masterVolumeSlider.value = 1.0f;
             OnMasterVolumeChanged(1.0f);
@@ -601,7 +504,7 @@ namespace JammerDash
                     this.update.onClick.AddListener(update);
                     changelogs.text = releaseNotes;
                     updateName.text = $"{latestVersion}\n<size=6>{uploadDate}</size>";
-                    Notifications.Notifications.instance.Notify($"There's a new update available! ({latestVersion}).\nClick to open changelogs and update.", updateAction);
+                    Notifications.instance.Notify($"There's a new update available! ({latestVersion}).\nClick to open changelogs and update.", updateAction);
                 }
             }
             catch (HttpRequestException e)
@@ -733,14 +636,30 @@ namespace JammerDash
                 playlist.value = audio.currentClipIndex;
 
 
-                if (Input.GetKeyDown(KeyCode.F6))
+                if (EventSystem.current.currentSelectedGameObject != null && EventSystem.current.currentSelectedGameObject.GetComponent<InputField>() == null)
                 {
-                    PlayPreviousSong();
+                    if (Input.GetKeyDown(KeybindingManager.prevSong))
+                    {
+                        PlayPreviousSong();
+                    }
+                    else if (Input.GetKeyDown(KeybindingManager.play))
+                    {
+                        Play();
+                    }
+                    else if (Input.GetKeyDown(KeybindingManager.pause))
+                    {
+                        Pause();
+                    }
+                    else if (Input.GetKeyDown(KeybindingManager.nextSong))
+                    {
+                        PlayNextSong();
+                    }
                 }
-                else if (Input.GetKeyDown(KeyCode.F7))
+                else
                 {
-                    PlayNextSong();  
+                    // do nothing
                 }
+
 
             }
             if (EventSystem.current.currentSelectedGameObject == masterVolumeSlider.gameObject)
@@ -754,49 +673,7 @@ namespace JammerDash
 
           
 
-            if (artBG.isOn)
-            {
-                settingsData.customBG = false;
-                settingsData.vidBG = false;
-                customBG.interactable = false;
-                vidBG.interactable = false;
-                customBG.isOn = false;
-                vidBG.isOn = false;
-            }
-            else if (!artBG.isOn)
-            {
-                customBG.interactable = true;
-                vidBG.interactable = true;
-            }
-            if (customBG.isOn)
-            {
-                settingsData.artBG = false;
-                settingsData.vidBG = false;
-                artBG.interactable = false;
-                vidBG.interactable = false;
-                artBG.isOn = false;
-                vidBG.isOn = false;
-
-            }
-            else if (!customBG.isOn)
-            {
-                artBG.interactable = true;
-                vidBG.interactable = true;
-            }
-            if (vidBG.isOn)
-            {
-                settingsData.artBG = false;
-                settingsData.customBG = false;
-                artBG.interactable = false;
-                customBG.interactable = false;
-                artBG.isOn = false;
-                customBG.isOn = false;
-            }
-            else if (!vidBG.isOn)
-            {
-                artBG.interactable = true;
-                customBG.interactable = true;
-            }
+            
             snowObj.SetActive(snow.isOn);
 
             if (increaseVol.isOn)

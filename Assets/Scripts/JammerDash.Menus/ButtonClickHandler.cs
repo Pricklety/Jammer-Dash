@@ -79,16 +79,19 @@ namespace JammerDash.Menus.Play
                     string level = data[0];
                     if (level == levelName)
                     {
-                        string[] scoreData = new string[8];
+                        string[] scoreData = new string[10];
                         scoreData[0] = data[1]; // Ranking
-                        scoreData[1] = data[4]; // Score
+                        scoreData[8] = data[2]; // Shine performance
                         scoreData[2] = data[3]; // Accuracy
+                        scoreData[1] = data[4]; // Score
                         scoreData[3] = data[5]; // Five
                         scoreData[4] = data[6]; // Three
                         scoreData[5] = data[7]; // One
                         scoreData[6] = data[8]; // Miss
-                        scoreData[7] = data[9]; // Username
+                        scoreData[9] = data[9]; // Combo
+                        scoreData[7] = data[10]; // Username
 
+                        
                         scoresList.Add(scoreData);
                     }
                 }
@@ -98,8 +101,10 @@ namespace JammerDash.Menus.Play
                 }
             }
 
-            // Sort scores by score value (element at index 1)
-            scoresList = scoresList.OrderByDescending(scoreData => float.Parse(scoreData[1])).ToList();
+        
+
+        // Sort scores by score value (element at index 1)
+        scoresList = scoresList.OrderByDescending(scoreData => float.Parse(scoreData[1])).ToList();
 
             // Instantiate a panel for the selected level
             foreach (string[] scoreData in scoresList)
@@ -107,14 +112,22 @@ namespace JammerDash.Menus.Play
                 GameObject panel = Instantiate(GetComponent<leaderboard>().panelPrefab, GetComponent<leaderboard>().panelContainer);
                 ScorePanel scorePanel = panel.GetComponent<ScorePanel>();
 
-                // Display each ranking, score, and accuracy
-                string displayText = string.Format("Score: {0:N0}, Accuracy: {1:F2}%", Convert.ToInt64(scoreData[1]), Convert.ToSingle(scoreData[2]));
-                string acc = string.Format("5: {0}\n3: {1}\n1: {2}\n0: {3}", scoreData[3], scoreData[4], scoreData[5], scoreData[6]);
+                // Display the ranking, score, accuracy, and other data
+                string displayText = string.Format("{0:N0} ({2}x)\n{1}%", scoreData[1], scoreData[2], scoreData[9]); // Score, Accuracy, Combo
+                string rankText = string.Format("{0}", scoreData[0]); // Ranking
+                string acc = string.Format("5: {0}\n3: {1}\n1: {2}\n0: {3}", scoreData[3], scoreData[4], scoreData[5], scoreData[6]); // Accuracy breakdown (Five, Three, One, Miss)
+                string user = scoreData[7]; // Username
 
+                // Debug logs to ensure data is correct
+                Debug.Log("Rank: " + rankText);
+                Debug.Log("Score: " + displayText);
+                Debug.Log("Accuracy breakdown: " + acc);
+                Debug.Log("Username: " + user);
+
+                scorePanel.rankText.sprite = Resources.Load<Sprite>($"ranking/{rankText}");
                 scorePanel.scoreText.text = displayText;
-                scorePanel.rankText.text = scoreData[0];
                 scorePanel.accuracyText.text = acc;
-                scorePanel.username.text = scoreData[7];
+                scorePanel.username.text = user;
             }
         }
         
@@ -158,9 +171,9 @@ namespace JammerDash.Menus.Play
 
         public void Change()
         {
-            if (GetComponent<CustomLevelScript>().sceneData.picLocation != null && isSelected)
+            if (GetComponent<CustomLevelScript>().sceneData != null && isSelected)
             {
-                StartCoroutine(LoadImage(GetComponent<CustomLevelScript>().sceneData.picLocation));
+                StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "scenes", GetComponent<CustomLevelScript>().sceneData.sceneName, "bgImage.png")));
             }
         }
         IEnumerator Move(float lerpSpeed)
@@ -261,9 +274,9 @@ namespace JammerDash.Menus.Play
             button.onClick.RemoveAllListeners();
             if (GetComponent<CustomLevelScript>() != null)
             {
-                if (GetComponent<CustomLevelScript>().sceneData.clipPath != null)
+                if (GetComponent<CustomLevelScript>().sceneData != null)
                 {
-                    string clipPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", GetComponent<CustomLevelScript>().sceneData.sceneName, Path.GetFileName(GetComponent<CustomLevelScript>().sceneData.clipPath));
+                    string clipPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", GetComponent<CustomLevelScript>().sceneData.sceneName, GetComponent<CustomLevelScript>().sceneData.artist + " - " + GetComponent<CustomLevelScript>().sceneData.songName + ".mp3");
                     int audioClipIndex = -1; // Initialize to a value that indicates no match found
                     // Normalize the clipPath
                     clipPath.Replace("/", "\\");
@@ -303,10 +316,7 @@ namespace JammerDash.Menus.Play
                     }
                 }
 
-                if (GetComponent<CustomLevelScript>().sceneData.picLocation != null && GetComponent<CustomLevelScript>() != null)
-                {
-                    yield return StartCoroutine(LoadImage(GetComponent<CustomLevelScript>().sceneData.picLocation));
-                }
+                    yield return StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "scenes", GetComponent<CustomLevelScript>().sceneData.sceneName, "bgImage.png")));
 
             }
 
@@ -326,13 +336,13 @@ namespace JammerDash.Menus.Play
                     Texture2D texture = DownloadHandlerTexture.GetContent(www);
                     Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
                     UnityEngine.Debug.Log(bg);
-                    yield return new WaitForSecondsRealtime(0.2f);
                     bg.sprite = sprite;
                     levelImage.sprite = sprite;
                 }
                 else
                 {
-                    levelImage.sprite = Resources.Load<Sprite>("backgrounds/basic/basic.png");
+                    bg.sprite = FindAnyObjectByType<mainMenu>().sprite[UnityEngine.Random.Range(0, FindAnyObjectByType<mainMenu>().sprite.Length + 1)];
+                    levelImage.sprite = null;
                     StartCoroutine(AudioManager.Instance.ChangeSprite());
                 }
             }

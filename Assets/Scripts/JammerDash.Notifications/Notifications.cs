@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace JammerDash.Notifications
+namespace JammerDash
 {
     public class Notifications : MonoBehaviour
     {

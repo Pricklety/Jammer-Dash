@@ -23,11 +23,14 @@ using System.Threading.Tasks;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 using Lachee.Discord.Control;
+using JammerDash.Tech;
+using JammerDash.Menus.Main;
 
 namespace JammerDash.Menus
 {
     public class mainMenu : MonoBehaviour, IPointerClickHandler
     {
+        
         public GameObject musicAsset;
         public Image bg;
         public Sprite[] sprite;
@@ -38,9 +41,25 @@ namespace JammerDash.Menus
         public Image quitPanel2;
         PlayerData playerData;
         public GameObject accessoverPanel;
-        public GameObject accessibilityButton;
         public Text nolevelerror;
         public GameObject[] disableAccess;
+        string oldSeconds;
+
+        public Animator idle;
+        public Animator notIdle;
+        float afkTime;
+        bool hasPlayedIdle;
+        [Header("Account System")]
+        public InputField usernameInput;
+        public InputField password;
+        public InputField email;
+        public Image countryIMG;
+        string cc;
+        [Header("Clock")]
+        public GameObject hour;
+        public GameObject min;
+        public GameObject sec;
+
         [Header("Panels")]
         public GameObject mainPanel;
         public GameObject playPanel;
@@ -75,6 +94,7 @@ namespace JammerDash.Menus
       
         [Header("Video Background")]
         public GameObject videoPlayerObject;
+        public GameObject videoImage;
         public VideoPlayer videoPlayer;
         public VideoClip[] videoClips;
         private List<string> videoUrls;
@@ -110,14 +130,13 @@ namespace JammerDash.Menus
         private Camera mainCamera;
         private RectTransform canvasRect;
 
+        public Text clock;
+
         void Start()
         {
             Time.timeScale = 1f;
             playerData = Account.Instance.LoadData();
             data = SettingsFileHandler.LoadSettingsFromFile();
-            LoadRandomBackground();
-            LoadLevelsFromFiles();
-            LoadLevelFromLevels();
             levelSlider.maxValue = Account.Instance.xpRequiredPerLevel[0];
             levelSlider.value = Account.Instance.currentXP;
             Debug.unityLogger.logEnabled = true;
@@ -128,9 +147,22 @@ namespace JammerDash.Menus
                 {
                     go.SetActive(true);
                 }
-                accessibilityButton.SetActive(false);
-            
-            
+
+            LoadLevelsFromFiles();
+            LoadLevelFromLevels();
+            StartCoroutine(SetCountry());
+            SetSpectrum();
+            LoadRandomBackground();
+
+        }
+        public void SetSpectrum()
+        {
+            SimpleSpectrum[] spectrums = FindObjectsByType<SimpleSpectrum>(FindObjectsSortMode.None);
+
+            foreach (SimpleSpectrum spectrum in spectrums)
+            {
+                spectrum.audioSource = AudioManager.Instance.GetComponent<AudioSource>();
+            }
         }
         public string FormatTime(float time)
         {
@@ -262,7 +294,6 @@ namespace JammerDash.Menus
                     File.Move(jsonFilePath, jsonDestinationPath);
                     ExtractMP3FromJDL(filePath, extractedPath);
                     GameObject levelInfoPanel = Instantiate(playPrefab, playlevelInfoParent);
-
                     // Display level information on UI
                     DisplayCustomLevelInfo(sceneData, levelInfoPanel.GetComponent<CustomLevelScript>());
                     levelInfoPanel.GetComponent<CustomLevelScript>().SetSceneData(sceneData);
@@ -301,14 +332,27 @@ namespace JammerDash.Menus
 
         public void SaveAcc()
         {
-            Account.Instance.username = Account.Instance.usernameInput.text;
-            Account.Instance.SavePlayerData();
+            Account.Instance.Apply(usernameInput.text, password.text, email.text, cc);
         }
         public static string ExtractJSONFromJDL(string jdlFilePath)
         {
             try
             {
-                // Create a temporary folder
+                if (!File.Exists(jdlFilePath))
+                {
+                    UnityEngine.Debug.LogError("File does not exist: " + jdlFilePath);
+                    return null;
+                }
+
+                UnityEngine.Debug.Log("Attempting to open JDL file: " + jdlFilePath);
+                UnityEngine.Debug.Log("File size: " + new FileInfo(jdlFilePath).Length + " bytes");
+
+                if (!IsZipFile(jdlFilePath))
+                {
+                    UnityEngine.Debug.LogError("The file is not a valid ZIP archive: " + jdlFilePath);
+                    return null;
+                }
+
                 string tempFolder = Path.Combine(Application.temporaryCachePath, "tempExtractedJson");
                 Directory.CreateDirectory(tempFolder);
 
@@ -318,16 +362,11 @@ namespace JammerDash.Menus
                     {
                         if (!entry.FullName.EndsWith(".json"))
                         {
-                            continue; // Skip non-JSON files
+                            continue;
                         }
 
-                        // Generate a unique filename for the extracted JSON file
                         string extractedFilePath = Path.Combine(tempFolder, Path.GetFileName(entry.FullName));
-
-                        // Extract the JSON file to the temporary folder
-                        entry.ExtractToFile(extractedFilePath, true); // Overwrite if file exists
-
-                        // Return the path of the extracted JSON file
+                        entry.ExtractToFile(extractedFilePath, true);
                         return extractedFilePath;
                     }
                 }
@@ -339,6 +378,25 @@ namespace JammerDash.Menus
 
             return null;
         }
+
+        private static bool IsZipFile(string filePath)
+        {
+            try
+            {
+                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                {
+                    using (var zipStream = new ZipArchive(fileStream, ZipArchiveMode.Read))
+                    {
+                        return zipStream.Entries.Count > 0;
+                    }
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
 
         public static void ExtractMP3FromJDL(string jdlFilePath, string destinationFilePath)
         {
@@ -377,74 +435,89 @@ namespace JammerDash.Menus
         public void LoadRandomBackground()
         {
             UnityEngine.Debug.Log(data);
-            if (DateTime.Now.Month == 12 && data.artBG)
-            {
-                sprite = Resources.LoadAll<Sprite>("backgrounds/christmas");
-                if (videoPlayerObject != null)
-                    videoPlayerObject.SetActive(false);
-            }
-            else if (DateTime.Now.Month == 2 && DateTime.Now.Day == 14 && data.artBG)
-            {
-                sprite = Resources.LoadAll<Sprite>("backgrounds/valentine");
-                if (videoPlayerObject != null)
-                    videoPlayerObject.SetActive(false);
-            }
-            if (data.artBG)
-            {
-                sprite = Resources.LoadAll<Sprite>("backgrounds/default");
-                if (videoPlayerObject != null)
-                    videoPlayerObject.SetActive(false);
-            }
-            if (data.customBG)
-            {
-                _ = LoadCustomBackgroundAsync();
-            }
-            else if (data.vidBG)
-            {
-                string[] files = Directory.GetFiles(Application.persistentDataPath + "/backgrounds", "*.mp4");
-                List<VideoClip> clips = new List<VideoClip>();
 
-                foreach (string file in files)
-                {
-                    // Check the size of each file before adding it to the list
-                    FileInfo fileInfo = new FileInfo(file);
-                    if (fileInfo.Length <= 5 * 1024 * 1024) // 5MB in bytes
+            switch (data.backgroundType)
+            {
+                case 1:
+                    sprite = Resources.LoadAll<Sprite>("backgrounds/default");
+                    if (videoPlayerObject != null)
                     {
-                        // Create a video clip from the file path
-                        LoadVideoClipFromFile(file);
-
+                        videoPlayerObject.SetActive(false);
+                        videoImage.SetActive(false);
                     }
-                    else
+                    if (DateTime.Now.Month == 12)
                     {
-                        UnityEngine.Debug.LogError("Video file size exceeds the limit (5MB): " + file);
+                        sprite = Resources.LoadAll<Sprite>("backgrounds/christmas");
+                        if (videoPlayerObject != null)
+                        {
+                            videoPlayerObject.SetActive(false);
+                            videoImage.SetActive(false);
+                        }
                     }
-                }
-                videoPlayer.loopPointReached += OnVideoLoopPointReached;
-                // Assign the video clips array
-                videoClips = clips.ToArray();
-            }
-            else if (!data.artBG && !data.vidBG && !data.customBG)
-            {
-                sprite = Resources.LoadAll<Sprite>("backgrounds/basic");
-                if (videoPlayerObject != null)
-                    videoPlayerObject.SetActive(false);
-            }
+                    else if (DateTime.Now.Month == 2 && DateTime.Now.Day == 14)
+                    {
+                        sprite = Resources.LoadAll<Sprite>("backgrounds/valentine");
+                        if (videoPlayerObject != null)
+                        {
+                            videoPlayerObject.SetActive(false);
+                            videoImage.SetActive(false);
+                        }
+                    }
+                    break;
+                case 2:
+                    // Implement server-side seasonal backgrounds
 
-            if (sprite.Length > 0 && data.artBG || sprite.Length > 0 && data.customBG)
-            {
+                    break;
+                case 3:
+                    _ = LoadCustomBackgroundAsync();
+                    break;
+                case 4:
+                    string[] files = Directory.GetFiles(Application.persistentDataPath + "/backgrounds", "*.mp4");
+                    List<VideoClip> clips = new List<VideoClip>();
+
+                    foreach (string file in files)
+                    {
+                        // Check the size of each file before adding it to the list
+                        FileInfo fileInfo = new FileInfo(file);
+                        if (fileInfo.Length <= 5 * 1024 * 1024) // 5MB in bytes
+                        {
+                            // Create a video clip from the file path
+                            LoadVideoClipFromFile(file);
+
+                        }
+                        else
+                        {
+                            UnityEngine.Debug.LogError("Video file size exceeds the limit (5MB): " + file);
+                        }
+                    }
+                    videoPlayer.loopPointReached += OnVideoLoopPointReached;
+                    // Assign the video clips array
+                    videoClips = clips.ToArray();
+                    break;
+                default:
+                    sprite = Resources.LoadAll<Sprite>("backgrounds/basic");
+                    if (videoPlayerObject != null)
+                    {
+                        videoPlayerObject.SetActive(false);
+                        videoImage.SetActive(false);
+                    }
+                    break;
+            }
+           
                 bg.color = Color.white;
-                int randomIndex = Random.Range(0, sprite.Length);
+            if (sprite.Length > 0)
+            {
+                int randomIndex = (sprite.Length == 1) ? 0 : Random.Range(0, sprite.Length);
                 bg.sprite = sprite[randomIndex];
             }
-            else
-            {
-                ChangeBasicCol();
-            }
+           
+
+
         }
         private async Task LoadCustomBackgroundAsync()
         {
             string path = Application.persistentDataPath + "/backgrounds";
-            string[] files = Directory.GetFiles(path, "*.png");
+            string[] files = Directory.GetFiles(path, "*.png", SearchOption.AllDirectories);
 
             if (files.Length == 0)
             {
@@ -475,12 +548,33 @@ namespace JammerDash.Menus
                 SetBackgroundSprite(sprite);
             }
         }
+       
+        public IEnumerator SetCountry()
+        {
+            string ip = new System.Net.WebClient().DownloadString("https://api.ipify.org");
+            string uri = $"https://ipapi.co/{ip}/json/";
 
+
+            using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
+            {
+                yield return webRequest.SendWebRequest();
+
+                string[] pages = uri.Split('/');
+                int page = pages.Length - 1;
+
+                IpApiData ipApiData = IpApiData.CreateFromJSON(webRequest.downloadHandler.text);
+
+                cc = ipApiData.country.ToLower();
+                countryIMG.sprite = Resources.Load<Sprite>("icons/countries/" + cc);
+
+            }
+        }
         private void SetBackgroundSprite(Sprite sprite)
         {
             if (videoPlayerObject != null)
             {
                 videoPlayerObject.SetActive(false);
+                videoImage.SetActive(false);
             }
 
             this.sprite = new Sprite[1];
@@ -530,38 +624,11 @@ namespace JammerDash.Menus
             // Video preparation is complete, start playing the video
             vp.Play();
         }
-        public void ChangeBasicCol()
-        {
-            StartCoroutine(SmoothColorChange());
-        }
+        
 
         public float elapsedTime;
 
-        private IEnumerator SmoothColorChange()
-        {
-            if (sprite != null && sprite.Length > 0)
-            {
-                bg.sprite = sprite[0];
-                Color targetColor = new Color(Random.Range(0.5f, 1f), Random.Range(0.5f, 1f), Random.Range(0.5f, 1f), 1f);
-
-                float duration = 0.5f;  // Adjust the duration as needed
-
-                while (elapsedTime < duration)
-                {
-                    bg.color = Color.Lerp(bg.color, targetColor, elapsedTime / duration);
-                    elapsedTime += Time.deltaTime;
-                    yield return null;
-                }
-                elapsedTime = 0f;
-
-                // Ensure the final color is exactly the target color
-                bg.color = targetColor;
-            }
-            else
-            {
-                bg.color = Color.white;
-            }
-        }
+     
 
 
        
@@ -592,8 +659,7 @@ namespace JammerDash.Menus
                 calculatedDifficulty = newDifficulty,
                 songName = songName,
                 artist = artist,
-                creator = mapper,
-                clipPath = Path.Combine(Application.persistentDataPath, "scenes", newLevelName, $"{artist} - {songName}.mp3")
+                creator = mapper
             };
 
             // Save the new level data to a JSON file
@@ -604,12 +670,6 @@ namespace JammerDash.Menus
             LoadLevelsFromFiles();
         }
 
-        [System.Serializable]
-        public class CountryInfo
-        {
-            public string country;
-            // Add other fields from the ipinfo.io response if needed
-        }
 
         void SaveLevelToFile(SceneData sceneData)
         {
@@ -811,7 +871,7 @@ namespace JammerDash.Menus
                     panel.SetActive(true);
                 }
                 // Enable mainPanel if none of the specific panels are active
-                else if (!playPanel.activeSelf && !creditsPanel.activeSelf && !settingsPanel.activeSelf)
+                else if (!playPanel.activeSelf || !creditsPanel.activeSelf || !settingsPanel.activeSelf)
                 {
                     mainPanel.SetActive(true);
                     LoadRandomBackground();
@@ -1079,7 +1139,7 @@ namespace JammerDash.Menus
 
         public void YouTube()
         {
-            Application.OpenURL("https://youtube.com/@JammerDashOfficial");
+            Application.OpenURL("https://www.youtube.com/@Jammer_Dash");
         }
 
         public void Newgrounds()
@@ -1140,9 +1200,19 @@ namespace JammerDash.Menus
             }
             return false;
         }
+        string FormatElapsedTime(float elapsedTime)
+        {
+            TimeSpan timeSpan = TimeSpan.FromSeconds(elapsedTime);
+            return string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
+        }
         public void FixedUpdate()
         {
-        
+            string timeInfo = DateTime.Now.ToString("hh:mm:ss tt") + "\n";
+            if (FindObjectOfType<GameTimer>() != null)
+            {
+                timeInfo += "running " + FormatElapsedTime(GameTimer.GetRunningTime());
+            }
+            clock.text = timeInfo;
             foreach (RawImage pfp in discordpfp)
             {
                  
@@ -1178,6 +1248,7 @@ namespace JammerDash.Menus
 
             }
 
+           
 
             if (quitPanel.activeSelf)
             {
@@ -1214,13 +1285,15 @@ namespace JammerDash.Menus
                 float newPositionY = layerMouseDelta.y / 10;
 
                 // Set the new position
-                logo.position = new Vector3(newPositionX, newPositionY, mouseDelta.z);
+                logo.position = new Vector3(newPositionX - 4.2f, newPositionY, mouseDelta.z);
+
+               
             }
             else
             {
                 background.localScale = Vector3.one;
                 background.position = Vector3.zero;
-                logo.position = new Vector3(0, 0, 0);
+                logo.position = new Vector3(-4.2f, 0, 0);
             }  
            
             if (Input.GetKey(KeyCode.Escape))
@@ -1275,11 +1348,50 @@ namespace JammerDash.Menus
 
             }
         }
-
-
+      
         void Update()
         {
+            string seconds = System.DateTime.Now.ToLocalTime().ToString("ss");
+            SimpleSpectrum[] spectrums = FindObjectsByType<SimpleSpectrum>(FindObjectsSortMode.None);
 
+            foreach (SimpleSpectrum spectrum in spectrums)
+            {
+                if (spectrum.audioSource == null)
+                {
+                    SetSpectrum();
+                }
+            }
+           
+
+            if ((Input.GetAxis("Mouse X") == 0 || Input.GetAxis("Mouse Y") == 0) && mainPanel.activeSelf)
+            {
+                afkTime += Time.fixedDeltaTime;
+
+                if (afkTime > 5f)
+                {
+                    if (!hasPlayedIdle)
+                    {
+                        idle.PlayInFixedTime("Idle");
+                        hasPlayedIdle = true;
+                    }
+                }
+            }
+            else
+            {
+               
+                        notIdle.PlayInFixedTime("notIdle");
+                        hasPlayedIdle = false;
+                    
+                    afkTime = 0f;
+                
+            }
+
+
+                if (seconds != oldSeconds)
+            {
+                UpdateTimer();
+                oldSeconds = seconds;
+            } 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 ToggleMenuPanel(mainPanel);
@@ -1292,7 +1404,7 @@ namespace JammerDash.Menus
                 Account.Instance.CalculateXPRequirements();
                 Account.Instance.GainXP(0);
                 Account.Instance.LoadData();
-                Notifications.Notifications.instance.Notify($"Level list, levels and xp are reloaded. \n{levelInfoParent.childCount} levels total, {Account.Instance.totalXP} xp", null);
+                Notifications.instance.Notify($"Level list, levels and xp are reloaded. \n{levelInfoParent.childCount} levels total, {Account.Instance.totalXP} xp", null);
             }
             if (Input.GetKeyDown(KeyCode.F2))
             {
@@ -1300,6 +1412,18 @@ namespace JammerDash.Menus
             }
 
             
+        }
+
+        void UpdateTimer()
+        {
+            int secInt = int.Parse(DateTime.UtcNow.ToLocalTime().ToString("ss"));
+            int minInt = int.Parse(DateTime.UtcNow.ToLocalTime().ToString("mm"));
+            int hourInt = int.Parse(DateTime.UtcNow.ToLocalTime().ToString("hh"));
+            Debug.Log($"{secInt}, {minInt}, {hourInt}");
+
+            sec.transform.localRotation = Quaternion.Euler(0, 0, -secInt * 6);
+            min.transform.localRotation = Quaternion.Euler(0, 0, -minInt * 6);
+            hour.transform.localRotation = Quaternion.Euler(0, 0, -hourInt * 30);
         }
 
         public void OnPointerClick(PointerEventData eventData)
@@ -1313,4 +1437,17 @@ namespace JammerDash.Menus
             }
         }
     }
+
+    [Serializable]
+    public class IpApiData
+    {
+        public string country;
+
+        public static IpApiData CreateFromJSON(string jsonString)
+        {
+            return JsonUtility.FromJson<IpApiData>(jsonString);
+        }
+    }
+
+
 }

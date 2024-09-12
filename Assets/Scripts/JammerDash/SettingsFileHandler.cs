@@ -39,15 +39,11 @@ namespace JammerDash
         public int selectedFPS = 60;
         public bool vsync = true;
         public float volume = 1;
-        public int qualitySettingsLevel = 2;
-        public bool artBG = false;
-        public bool customBG = false;
-        public bool vidBG = false;
+        public int backgroundType = 0;
         public bool sfx = true;
         public bool hitNotes = true;
         public bool focusVol = true;
         public int playerType = 0;
-        public int antialiasing = 0;
         public bool cursorTrail = false;
         public float noFocusVolume = -20f;
         public float lowpassValue = 500;
@@ -65,7 +61,7 @@ namespace JammerDash
         public bool loadedLogoSFX = false;
         public bool canvasOff = false;
         public bool bass = false;
-        public float bassgain = 2.5f;
+        public float bassgain = 1.5f;
         public float dim = 1;
         public string gameVersion = Application.version;
         public string saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
