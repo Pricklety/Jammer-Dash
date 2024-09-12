@@ -39,9 +39,7 @@ namespace JammerDash
         public int selectedFPS = 60;
         public bool vsync = true;
         public float volume = 1;
-        public bool artBG = false;
-        public bool customBG = false;
-        public bool vidBG = false;
+        public int backgroundType = 0;
         public bool sfx = true;
         public bool hitNotes = true;
         public bool focusVol = true;

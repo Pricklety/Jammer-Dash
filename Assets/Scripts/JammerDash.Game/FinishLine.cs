@@ -21,10 +21,14 @@ namespace JammerDash.Game
         public GameObject player;
         public AudioSource finishSound;
         public GameObject finishMenu;
-        public Text scoreText;
+        public Image scoreRank;
         public Animation anim;
         public SceneData data;
         public float maxPos;
+
+        public Text total;
+        public Text combo;
+        public Text acc;
         [Header("Scores")]
         public Text five;
         public Text three;
@@ -118,10 +122,7 @@ namespace JammerDash.Game
             {
                 SaveLevelDataForLevelDefault(actualdest, destruction);
             }
-            else
-            {
-                SaveLevelDataDef(SceneManager.GetActiveScene().buildIndex, scores.GetTier(actualdest), "dest" + sceneName, actualdest, "scores", destruction, player0.five, player0.three, player0.one, player0.misses, Account.Instance.username);
-            }
+           
         }
         void SaveLevelDataForLevelDefault(float actualdest, float destruction)
         {
@@ -147,7 +148,7 @@ namespace JammerDash.Game
                 SceneData sceneData = SceneData.FromJson(json);
                 Debug.Log(sceneData.levelName);
                 data = sceneData;
-                SaveLevelDataDef(sceneData.ID, scores.GetTier(actualdest), "dest" + sceneData.levelName, actualdest, "scores", destruction, player0.five, player0.three, player0.one, player0.misses, Account.Instance.username);
+                SaveLevelDataDef(sceneData.ID, scores.GetTier(actualdest), player0._performanceScore, actualdest, "scores", destruction, player0.five, player0.three, player0.one, player0.misses, Account.Instance.username, player0.highestCombo);
             }
             else
             {
@@ -155,7 +156,7 @@ namespace JammerDash.Game
             }
         }
 
-        void SaveLevelDataDef(int levelID, string tierName, string destName, float actualdest, string fileName, float destruction, int five, int three, int one, int miss, string username)
+        void SaveLevelDataDef(int levelID, string tierName, float sp, float actualdest, string fileName, float destruction, int five, int three, int one, int miss, string username, int combo)
         {
             string filePath = Path.Combine(Application.persistentDataPath, fileName + ".dat");
             using (StreamWriter writer = File.AppendText(filePath))
@@ -163,7 +164,7 @@ namespace JammerDash.Game
                 string formattedActualDest = actualdest.ToString("0.#################");
                 string formattedDestruction = destruction.ToString("0.#################");
 
-                writer.WriteLine($"{levelID},{tierName},{destName},{formattedActualDest},{formattedDestruction},{five},{three},{one},{miss},{username}");
+                writer.WriteLine($"{levelID},{tierName}, {sp},{formattedActualDest},{formattedDestruction},{five},{three},{one},{miss},{combo},{username}");
             }
         }
 
@@ -214,9 +215,12 @@ namespace JammerDash.Game
             long destruction = objectOfType.counter.score;
             float actualdest = (float)player0.counter.destructionPercentage;
             Account.Instance.GainXP(destruction); 
-            score.text = $"{player0.SPInt:N0} sp\nAccuracy: {player0.counter.accCount / player0.Total * 100}%\nScore: {player0.counter.score:N0}\nLevel XP: {Account.Instance.totalXP:N0} <color=lime>(+{player0.counter.score})</color>\nCombo: {player0.highestCombo}x\n";
-           if (scoreText != null)
-            scoreText.text = $"{player0.counter.GetTier(player0.counter.accCount / player0.Total * 100)}";
+            score.text = $"{player0.SPInt:N0} sp\nLevel XP: {Account.Instance.totalXP:N0} <color=lime>(+{player0.counter.score})</color>";
+            acc.text = $"{player0.counter.accCount / player0.Total * 100}%";
+            total.text = $"{player0.counter.score}";
+            combo.text = $"{player0.highestCombo}x";
+           if (scoreRank != null)
+            scoreRank.sprite = Resources.Load<Sprite>($"ranking/{player0.counter.GetNoColorTier(player0.counter.accCount / player0.Total * 100)}");
             player.transform.localScale = Vector3.zero;
             objectOfType.enabled = false;
 
@@ -224,7 +228,6 @@ namespace JammerDash.Game
             SaveLevelData(actualdest, destruction);
 
 
-            yield return new WaitForSecondsRealtime(2f);
             AudioSource[] audios = FindObjectsOfType<AudioSource>();
             Debug.Log(audios);
             finishMenu.SetActive(true);
@@ -240,12 +243,9 @@ namespace JammerDash.Game
             level.value = Account.Instance.currentXP / Account.Instance.xpRequiredPerLevel[Account.Instance.level];
             lvl.text = $"lv{Account.Instance.level}";
 
-
-
-            yield return new WaitForSecondsRealtime(0.75f);
             FindObjectOfType<AudioSource>().PlayOneShot(Resources.Load<AudioClip>($"Audio/SFX/ranking/{player0.counter.GetNoColorTier(player0.counter.accCount / player0.Total * 100)} Rank"));
-               
 
+            yield return null;
         }
 
     }

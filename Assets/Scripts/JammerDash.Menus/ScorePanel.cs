@@ -5,7 +5,7 @@ namespace JammerDash.Menus.Play.Score
 {
     public class ScorePanel : MonoBehaviour
     {
-        public Text rankText;
+        public Image rankText;
         public Text scoreText;
         public Text accuracyText;
         public Text username;

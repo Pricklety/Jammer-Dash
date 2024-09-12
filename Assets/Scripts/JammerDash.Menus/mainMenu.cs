@@ -30,6 +30,7 @@ namespace JammerDash.Menus
 {
     public class mainMenu : MonoBehaviour, IPointerClickHandler
     {
+        
         public GameObject musicAsset;
         public Image bg;
         public Sprite[] sprite;
@@ -48,7 +49,12 @@ namespace JammerDash.Menus
         public Animator notIdle;
         float afkTime;
         bool hasPlayedIdle;
-
+        [Header("Account System")]
+        public InputField usernameInput;
+        public InputField password;
+        public InputField email;
+        public Image countryIMG;
+        string cc;
         [Header("Clock")]
         public GameObject hour;
         public GameObject min;
@@ -142,10 +148,21 @@ namespace JammerDash.Menus
                     go.SetActive(true);
                 }
 
-            LoadRandomBackground();
             LoadLevelsFromFiles();
             LoadLevelFromLevels();
+            StartCoroutine(SetCountry());
+            SetSpectrum();
+            LoadRandomBackground();
 
+        }
+        public void SetSpectrum()
+        {
+            SimpleSpectrum[] spectrums = FindObjectsByType<SimpleSpectrum>(FindObjectsSortMode.None);
+
+            foreach (SimpleSpectrum spectrum in spectrums)
+            {
+                spectrum.audioSource = AudioManager.Instance.GetComponent<AudioSource>();
+            }
         }
         public string FormatTime(float time)
         {
@@ -315,8 +332,7 @@ namespace JammerDash.Menus
 
         public void SaveAcc()
         {
-            Account.Instance.username = Account.Instance.usernameInput.text;
-            Account.Instance.SavePlayerData();
+            Account.Instance.Apply(usernameInput.text, password.text, email.text, cc);
         }
         public static string ExtractJSONFromJDL(string jdlFilePath)
         {
@@ -419,83 +435,84 @@ namespace JammerDash.Menus
         public void LoadRandomBackground()
         {
             UnityEngine.Debug.Log(data);
-            if (DateTime.Now.Month == 12 && data.artBG)
-            {
-                sprite = Resources.LoadAll<Sprite>("backgrounds/christmas");
-                if (videoPlayerObject != null)
-                {
-                    videoPlayerObject.SetActive(false);
-                    videoImage.SetActive(false);
-                }
-            }
-            else if (DateTime.Now.Month == 2 && DateTime.Now.Day == 14 && data.artBG)
-            {
-                sprite = Resources.LoadAll<Sprite>("backgrounds/valentine");
-                if (videoPlayerObject != null)
-                {
-                    videoPlayerObject.SetActive(false);
-                    videoImage.SetActive(false);
-                }
-            }
-            if (data.artBG)
-            {
-                sprite = Resources.LoadAll<Sprite>("backgrounds/default");
-                if (videoPlayerObject != null)
-                {
-                    videoPlayerObject.SetActive(false);
-                    videoImage.SetActive(false);
-                }
-            }
-            if (data.customBG)
-            {
-                _ = LoadCustomBackgroundAsync();
-            }
-            else if (data.vidBG)
-            {
-                string[] files = Directory.GetFiles(Application.persistentDataPath + "/backgrounds", "*.mp4");
-                List<VideoClip> clips = new List<VideoClip>();
 
-                foreach (string file in files)
-                {
-                    // Check the size of each file before adding it to the list
-                    FileInfo fileInfo = new FileInfo(file);
-                    if (fileInfo.Length <= 5 * 1024 * 1024) // 5MB in bytes
+            switch (data.backgroundType)
+            {
+                case 1:
+                    sprite = Resources.LoadAll<Sprite>("backgrounds/default");
+                    if (videoPlayerObject != null)
                     {
-                        // Create a video clip from the file path
-                        LoadVideoClipFromFile(file);
-
+                        videoPlayerObject.SetActive(false);
+                        videoImage.SetActive(false);
                     }
-                    else
+                    if (DateTime.Now.Month == 12)
                     {
-                        UnityEngine.Debug.LogError("Video file size exceeds the limit (5MB): " + file);
+                        sprite = Resources.LoadAll<Sprite>("backgrounds/christmas");
+                        if (videoPlayerObject != null)
+                        {
+                            videoPlayerObject.SetActive(false);
+                            videoImage.SetActive(false);
+                        }
                     }
-                }
-                videoPlayer.loopPointReached += OnVideoLoopPointReached;
-                // Assign the video clips array
-                videoClips = clips.ToArray();
-            }
-            else if (!data.artBG && !data.vidBG && !data.customBG)
-            {
-                sprite = Resources.LoadAll<Sprite>("backgrounds/basic");
-                if (videoPlayerObject != null)
-                {
-                    videoPlayerObject.SetActive(false);
-                    videoImage.SetActive(false);
-                }
-                    
-            }
+                    else if (DateTime.Now.Month == 2 && DateTime.Now.Day == 14)
+                    {
+                        sprite = Resources.LoadAll<Sprite>("backgrounds/valentine");
+                        if (videoPlayerObject != null)
+                        {
+                            videoPlayerObject.SetActive(false);
+                            videoImage.SetActive(false);
+                        }
+                    }
+                    break;
+                case 2:
+                    // Implement server-side seasonal backgrounds
 
-            if (sprite.Length > 0 && data.artBG || sprite.Length > 0 && data.customBG)
-            {
+                    break;
+                case 3:
+                    _ = LoadCustomBackgroundAsync();
+                    break;
+                case 4:
+                    string[] files = Directory.GetFiles(Application.persistentDataPath + "/backgrounds", "*.mp4");
+                    List<VideoClip> clips = new List<VideoClip>();
+
+                    foreach (string file in files)
+                    {
+                        // Check the size of each file before adding it to the list
+                        FileInfo fileInfo = new FileInfo(file);
+                        if (fileInfo.Length <= 5 * 1024 * 1024) // 5MB in bytes
+                        {
+                            // Create a video clip from the file path
+                            LoadVideoClipFromFile(file);
+
+                        }
+                        else
+                        {
+                            UnityEngine.Debug.LogError("Video file size exceeds the limit (5MB): " + file);
+                        }
+                    }
+                    videoPlayer.loopPointReached += OnVideoLoopPointReached;
+                    // Assign the video clips array
+                    videoClips = clips.ToArray();
+                    break;
+                default:
+                    sprite = Resources.LoadAll<Sprite>("backgrounds/basic");
+                    if (videoPlayerObject != null)
+                    {
+                        videoPlayerObject.SetActive(false);
+                        videoImage.SetActive(false);
+                    }
+                    break;
+            }
+           
                 bg.color = Color.white;
-                int randomIndex = Random.Range(0, sprite.Length);
+            if (sprite.Length > 0)
+            {
+                int randomIndex = (sprite.Length == 1) ? 0 : Random.Range(0, sprite.Length);
                 bg.sprite = sprite[randomIndex];
             }
-            else if (!data.artBG || !data.customBG || !data.vidBG)
-            {
-                sprite = Resources.LoadAll<Sprite>("backgrounds/basic");
-                bg.sprite = sprite[0];
-            }
+           
+
+
         }
         private async Task LoadCustomBackgroundAsync()
         {
@@ -531,7 +548,27 @@ namespace JammerDash.Menus
                 SetBackgroundSprite(sprite);
             }
         }
+       
+        public IEnumerator SetCountry()
+        {
+            string ip = new System.Net.WebClient().DownloadString("https://api.ipify.org");
+            string uri = $"https://ipapi.co/{ip}/json/";
 
+
+            using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
+            {
+                yield return webRequest.SendWebRequest();
+
+                string[] pages = uri.Split('/');
+                int page = pages.Length - 1;
+
+                IpApiData ipApiData = IpApiData.CreateFromJSON(webRequest.downloadHandler.text);
+
+                cc = ipApiData.country.ToLower();
+                countryIMG.sprite = Resources.Load<Sprite>("icons/countries/" + cc);
+
+            }
+        }
         private void SetBackgroundSprite(Sprite sprite)
         {
             if (videoPlayerObject != null)
@@ -633,12 +670,6 @@ namespace JammerDash.Menus
             LoadLevelsFromFiles();
         }
 
-        [System.Serializable]
-        public class CountryInfo
-        {
-            public string country;
-            // Add other fields from the ipinfo.io response if needed
-        }
 
         void SaveLevelToFile(SceneData sceneData)
         {
@@ -1108,7 +1139,7 @@ namespace JammerDash.Menus
 
         public void YouTube()
         {
-            Application.OpenURL("https://youtube.com/@JammerDashOfficial");
+            Application.OpenURL("https://www.youtube.com/@Jammer_Dash");
         }
 
         public void Newgrounds()
@@ -1321,7 +1352,16 @@ namespace JammerDash.Menus
         void Update()
         {
             string seconds = System.DateTime.Now.ToLocalTime().ToString("ss");
-            
+            SimpleSpectrum[] spectrums = FindObjectsByType<SimpleSpectrum>(FindObjectsSortMode.None);
+
+            foreach (SimpleSpectrum spectrum in spectrums)
+            {
+                if (spectrum.audioSource == null)
+                {
+                    SetSpectrum();
+                }
+            }
+           
 
             if ((Input.GetAxis("Mouse X") == 0 || Input.GetAxis("Mouse Y") == 0) && mainPanel.activeSelf)
             {
@@ -1397,4 +1437,17 @@ namespace JammerDash.Menus
             }
         }
     }
+
+    [Serializable]
+    public class IpApiData
+    {
+        public string country;
+
+        public static IpApiData CreateFromJSON(string jsonString)
+        {
+            return JsonUtility.FromJson<IpApiData>(jsonString);
+        }
+    }
+
+
 }

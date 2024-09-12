@@ -67,7 +67,7 @@ namespace JammerDash.Audio
 
             QualitySettings.maxQueuedFrames = 0;
         }
-
+        
         public void Start()
         {
             masterS.onValueChanged.AddListener(OnMasterVolumeChanged);
@@ -121,9 +121,10 @@ namespace JammerDash.Audio
 
             return 0f;
         }
-
+       
         public void Update()
         {
+            
             if (Input.GetKeyDown(KeyCode.F9) && SceneManager.GetActiveScene().buildIndex == 1)
             {
                 StartCoroutine(LoadAudioClipsAsync());
@@ -491,11 +492,6 @@ namespace JammerDash.Audio
                 {
                     songPathsList.Add(copiedFile);
                     newFilesAdded = true;
-                    Debug.Log($"Added new file to songPathsList: {copiedFile}");
-                }
-                else
-                {
-                    Debug.Log($"File already in songPathsList: {copiedFile}");
                 }
             }
 
@@ -620,7 +616,7 @@ namespace JammerDash.Audio
             mainMenu menu = options.GetComponent<mainMenu>();
 
             // Ensure there are sprites available
-            if (menu.sprite.Length > 0 && menu.data.artBG || menu.sprite.Length > 0 && menu.data.customBG)
+            if (menu.sprite.Length > 0 && (menu.data.backgroundType >= 1 || menu.data.backgroundType <= 3))
             {
 
                 // Set the new sprite gradually over a specified duration

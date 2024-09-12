@@ -201,7 +201,7 @@ namespace JammerDash.Editor
             for (int i = 0; i < numLines; i++)
             {
                 float x = i * spacing;
-                Vector3 position = new(x, 0f, 0f);
+                Vector3 position = new(x, -1f, 0f);
                 GameObject newLine = Instantiate(linePrefab, position, Quaternion.identity);
 
                 // Set original position if newLine has "Beat" tag
@@ -233,10 +233,11 @@ namespace JammerDash.Editor
 
                 // Convert time to minutes:seconds format
                 int minutes = Mathf.FloorToInt(timeToReachDistance / 60);
-                int seconds = Mathf.FloorToInt(timeToReachDistance % 60);
+                float seconds = timeToReachDistance % 60;
+                
 
                 // Display the result on the Text component
-                levelLength.text = $"Length: {minutes:D2}:{seconds:D2}";
+                levelLength.text = $"Length: {minutes:D2}:{seconds:00.000}";
             }
             else
             {
@@ -576,7 +577,7 @@ namespace JammerDash.Editor
             for (int i = 0; i < numLines; i++)
             {
                 float x = i * spacing;
-                Vector3 position = new(x, 0f, 0f);
+                Vector3 position = new(x, -1f, 0f);
                 GameObject newLine = Instantiate(linePrefab, position, Quaternion.identity);
 
                 // Set original position if newLine has "Beat" tag
@@ -610,11 +611,12 @@ namespace JammerDash.Editor
 
             for (int i = 0; i < beats.Length; i++)
             {
-                beats[i].transform.position = new Vector3(originalPositions[i].x + (value / 700), 0, 0);
+                beats[i].transform.position = new Vector3(originalPositions[i].x + (value / 700), -1.5f, 5);
             }
             size.gameObject.GetComponentInChildren<Text>().text = $"Cube size: {size.value}x";
             hp.gameObject.GetComponentInChildren<Text>().text = $"Player health: {hp.value}";
-            if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift))
+
+            if (Input.GetKeyDown(KeybindingManager.changeLongCubeSize) && Input.GetKey(KeybindingManager.place) && selectedObject != null && selectedObject.gameObject.name.Contains("hitter02"))
             {
                 RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -627,15 +629,11 @@ namespace JammerDash.Editor
                         isCursorOnRightSide = IsCursorOnRightSide();
                     }
                 }
-            }
-
-            if (Input.GetMouseButton(1) && Input.GetKey(KeyCode.LeftShift) && selectedObject != null && selectedObject.gameObject.name.Contains("hitter02"))
-            {
                 float mouseSpeed = Input.GetAxis("Mouse X");
                 // Calculate the change in size based on the mouse movement direction
-                float newSizeX = selectedObject.GetComponent<SpriteRenderer>().size.x + (mouseSpeed * Time.unscaledDeltaTime * (isCursorOnRightSide ? 1 : -1));
+                float newSizeX = selectedObject.GetComponent<SpriteRenderer>().size.x + (mouseSpeed * Time.unscaledDeltaTime * (isCursorOnRightSide ? 1 : -1) + 0.5f);
                 // Clamp the size within the specified limits
-                newSizeX = Mathf.Clamp(newSizeX, 1f, 100);
+                newSizeX = Mathf.Clamp(newSizeX, 1f, Mathf.Infinity);
 
                 // Update the size of the SpriteRenderer
                 SpriteRenderer spriteRenderer = selectedObject.GetComponent<SpriteRenderer>();
@@ -646,7 +644,7 @@ namespace JammerDash.Editor
             }
             else if (selectedObject != null && DateTime.Now.Day == 1 && DateTime.Now.Month == 4)
             { // Capture initial mouse position only once
-                if (Input.GetMouseButtonDown(0))
+                if (Input.GetKeyDown(KeybindingManager.place))
                 {
                     initialMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 }
@@ -748,7 +746,7 @@ namespace JammerDash.Editor
            
 
           
-            if (Input.GetKeyDown(KeybindingManager.place) && delay >= delayLimit && itemButtons[currentButtonPressed].clicked && !pointerOverUI && !player.enabled)
+            if (!Input.GetKey(KeybindingManager.changeLongCubeSize) && Input.GetKeyDown(KeybindingManager.place) && delay >= delayLimit && itemButtons[currentButtonPressed].clicked && !pointerOverUI && !player.enabled)
             {
                 if (cubes.Count > 0)
                 {

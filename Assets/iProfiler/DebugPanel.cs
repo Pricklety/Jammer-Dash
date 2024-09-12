@@ -97,9 +97,7 @@ namespace JammerDash.Tech
             string v = data.canvasOff ? "Off" : "On";
 
             gui.text += "\n\nResolution value: " + data.resolutionValue + $" ({Screen.width}x{Screen.height})" +
-                        "\nArtistic Backgrounds: " + data.artBG + $" ({Resources.LoadAll<Sprite>("backgrounds").Length} bgs)" +
-                        "\nCustom Backgrounds: " + data.customBG + $" ({Directory.GetFiles(Application.persistentDataPath + "/backgrounds", "*.png").Length} bgs)" +
-                        "\nVideo Backgrounds: " + data.vidBG + $" ({Directory.GetFiles(Application.persistentDataPath + "/backgrounds", "*.mp4").Length} bgs)" +
+                        "\nBackgrounds Type: " + data.backgroundType +
                         "\nSFX: " + data.sfx +
                         "\nHit Notes: " + data.hitNotes +
                         "\nPlayer Type: " + data.playerType +

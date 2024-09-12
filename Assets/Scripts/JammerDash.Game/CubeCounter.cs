@@ -35,17 +35,17 @@ namespace JammerDash.Game
             }
             if (destructionPercentage == maxScore)
             {
-                return "<color=#FFC300>SS+</color>";
+                return "SS+";
             }
-            else if (destructionPercentage >= maxScore * 0.99f && FindObjectOfType<PlayerMovement>().misses != 1)
+            else if (destructionPercentage >= maxScore * 0.99f)
             {
-                return "<color=#B5CE00>SS</color>";
+                return "SS";
             }
-            else if (destructionPercentage >= maxScore * 0.95f && FindObjectOfType<PlayerMovement>().misses != 1)
+            else if (destructionPercentage >= maxScore * 0.95f)
             {
                 return "S";
             }
-            else if ((destructionPercentage <= maxScore && destructionPercentage >= maxScore * 0.92f && FindObjectOfType<PlayerMovement>().misses >= 1) || (destructionPercentage <= 0.95f && FindObjectOfType<PlayerMovement>().misses == 0))
+            else if (destructionPercentage <= maxScore && destructionPercentage >= maxScore * 0.92f)
             {
                 return "A";
             }

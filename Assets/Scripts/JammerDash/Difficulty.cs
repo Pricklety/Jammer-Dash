@@ -44,17 +44,20 @@ namespace JammerDash.Difficulty
                     float averageDistance = CalculateAverageCubeDistance(cubes);
                     // Avoid division by zero by ensuring clickTimingWindow + distance is not zero
                     float divisor = clickTimingWindow + distance != 0 ? clickTimingWindow + distance : float.Epsilon;
-                    float contribution = (timingWindow / 0.64f
-                     + cubeCount / 200f
-                     * (cubes.Count / 120f)
-                     * (saws.Count / 20f)
-                     * (longCubes.Count / 100f)
-                     * (precisionFactor / divisor)
-                     * 1 / (hp.value + 1) * 500f
-                     + Mathf.Exp(0.1f * (0.5f - size.value) * 70f)
-                     * averageDistance / 15) / 10f;
+                    float contribution = (
+    (timingWindow / 0.98f) +
+    (cubeCount / 300f) *  
+    (cubes.Count / 160f) * 
+    (saws.Count / 30f) *  
+    (longCubes.Count / 60f) * 
+    (precisionFactor / divisor) *  // Increase divisor impact
+    (1 / (hp.value + 1)) * 30f +  // Reduce multiplier
+    Mathf.Exp(0.02f * (0.5f - size.value) * 20f) *  // Significantly reduce exponential growth
+    (averageDistance / 5f))  // Lower distance multiplier
+    / 6000f;  // Further increase the final division to lower overall score
 
-                    difficulty += contribution;
+
+            difficulty += contribution;
                 }
             }
             return difficulty;

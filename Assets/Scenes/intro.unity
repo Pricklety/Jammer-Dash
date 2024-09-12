@@ -5822,7 +5822,6 @@ MonoBehaviour:
     gameVersion: 
     saveTime: 1.7192411e+9
     clip: {fileID: 0}
-    clipPath: 
     creator: 
     ground: 1
     defBGColor: {r: 0, g: 0, b: 0, a: 0}
@@ -5833,7 +5832,6 @@ MonoBehaviour:
     playerHP: 300
     boxSize: 1
     rank: 
-    picLocation: 
     offset: 0
 --- !u!114 &1177968662
 MonoBehaviour:
@@ -5848,12 +5846,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   username: 
+  password: 
+  email: 
+  cc: 
+  url: http://149.28.160.232:9234/api/register
   level: 0
   currentXP: 0
   xpRequiredPerLevel: 
   totalXP: 0
-  usernameInput: {fileID: 0}
-  buttonCreate: {fileID: 0}
   checkInternet: {fileID: 1574443850}
 --- !u!114 &1177968663
 MonoBehaviour:

@@ -49,18 +49,19 @@ Play screen is laggy? Delete the levels you don't play. Your scores will still b
 <FUN>: Who needs <color=cyan>Subway Surfers</color> when you've got this?
 <FUN>: Last time I played this, I wanted to punch the crate, but then I hit my computer.
 <FUN>: MOM I FINALLY BEAT IT!!!
-<FUN>: Wanna <color=red>smash</color>? wanna smash boxes, bruh why are you so dirty minded?
-<FUN>: Guys, my father came back when i beat <color=green>Challenger</color>. 5 stars recommend
-<FUN>: I hired the idle mode screen joker. He probably <color=red>escaped</color>.
 <FUN>: I told <color=red>ChatGPT</color> to generate me 10 lines of the texts.txt file. It did not work out.
-<FUN>: I accidentally clicked the <color=green>right mouse button</color>. I FAILED CAUSE OF YOUR STUPID KEYBINDS!
 <FUN>: game.SetGravity(0f); <b><color=red>now fly b***h</color></b>
 <FUN>: Rhythm game made by a guy that doesn't know S**T about Rhythm.
 <FUN>: Why am I wasting time of my life writing these texts? I should be <color=red>productive</color>.
 <FUN>: Is this your IP: 127.0.0.1:0? Got ya.
 <FUN>: intro.unity failed to load. touch grass kid.
 <FUN>: <color=red>C</color><color=orange>o</color><color=yellow>l</color><color=green>o</color><color=cyan>r</color><color=cyan>s</color><color=purple>!</color>
-<FUN>: The editor really is a weird thing.
 <FUN>: KAMEHAMEHA!
 <FUN>: Every time i fail in Jammer Dash, I'll eat a kilogram of expired cheese.
-<FUN>: "berets are the best and the cutest" -adasko on Tuesday, August 6 2024 at 8.31 PM
+<FUN>: "berets are the best and the cutest" -adasko
+<FUN>: "i eat people yum yum" -monte
+<FUN>: Fumos are cool.
+<FUN>: "all my n****s jam to the dash" -monte
+<FUN>: "PRICKLETY CAN I HAVE A F*****G QUOTE MAN" -konro
+<FUN>: "why florida? don't y'all got alligators and shit" -konro
+<FUN>: "im gladnkynkom died brook" -konro
