@@ -20,6 +20,8 @@ using Random = UnityEngine.Random;
 using Debug = UnityEngine.Debug;
 using JammerDash.Tech;
 using JammerDash.Difficulty;
+using UnityEngine.UI.Extensions.Tweens;
+using JammerDash.Audio;
 
 namespace JammerDash.Editor
 {
@@ -58,7 +60,6 @@ namespace JammerDash.Editor
         public GameObject musicPanel;
         public string musicFolderPath;
         public Dropdown defMusic;
-        public LineController lineControllerPrefab;
         public Text artistText;
         public Text nameText;
         public Slider playback;
@@ -71,6 +72,8 @@ namespace JammerDash.Editor
         public InputField songArtist;
         public Text levelID;
         public InputField offsetmarker;
+        public Slider lengthSlider;
+        public Text lengthText;
 
         public Slider hp;
         public Slider size;
@@ -141,6 +144,8 @@ namespace JammerDash.Editor
         // Start is called before the first frame update
         void Start()
         {
+
+            audio = AudioManager.Instance.source;
             cubes = new List<GameObject>();
             saws = new List<GameObject>();
             if (vol != null && vol.profile != null)
@@ -161,6 +166,7 @@ namespace JammerDash.Editor
             cubes.AddRange(GameObject.FindGameObjectsWithTag("Cubes"));
             saws.AddRange(GameObject.FindGameObjectsWithTag("Saw"));
 
+            
         }
 
         public void OnMultiplierChange()
@@ -238,6 +244,7 @@ namespace JammerDash.Editor
 
                 // Display the result on the Text component
                 levelLength.text = $"Length: {minutes:D2}:{seconds:00.000}";
+                
             }
             else
             {
@@ -281,6 +288,8 @@ namespace JammerDash.Editor
                         audio.clip = audioClip;
                         lineController.audioClip = audioClip;
                         musicFolderPath = filePath;
+
+                        lengthSlider.maxValue = audio.clip.length * 7;
                     }
                     else
                     {
@@ -601,11 +610,27 @@ namespace JammerDash.Editor
             Vector3 objectPosition = selectedObject.transform.position;
             return mousePosition.x >= objectPosition.x;
         }
+        public string FormatTime(float time)
+        {
+            int minutes = Mathf.FloorToInt(time / 60);
+            int seconds = Mathf.FloorToInt(time % 60);
+            int ms = Mathf.FloorToInt((time - Mathf.Floor(time)) * 1000);
+            // Ensure seconds don't go beyond 59
+            seconds = Mathf.Clamp(seconds, 0, 59);
+
+            return string.Format("{0:00}:{1:00}.{2:000}", minutes, seconds, ms);
+        }
+        public void LengthPos()
+        {
+
+            cam.transform.position = new Vector3(lengthSlider.value, 1, -10);
+        }
 
         // Update is called once per frame
         void Update()
         {
-            
+            lengthText.text = FormatTime(lengthSlider.value / 7);
+            lengthSlider.value = cam.transform.position.x;
             float value = float.Parse(offsetmarker.text);
             GameObject[] beats = GameObject.FindGameObjectsWithTag("Beat");
 
@@ -616,10 +641,11 @@ namespace JammerDash.Editor
             size.gameObject.GetComponentInChildren<Text>().text = $"Cube size: {size.value}x";
             hp.gameObject.GetComponentInChildren<Text>().text = $"Player health: {hp.value}";
 
-            if (Input.GetKeyDown(KeybindingManager.changeLongCubeSize) && Input.GetKey(KeybindingManager.place) && selectedObject != null && selectedObject.gameObject.name.Contains("hitter02"))
+            if (Input.GetKey(KeybindingManager.changeLongCubeSize) && Input.GetKey(KeybindingManager.place) && selectedObject != null && selectedObject.gameObject.name.Contains("hitter02"))
             {
-                RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+
                 if (Physics.Raycast(ray, out hit))
                 {
                     if (hit.collider.gameObject.name.Contains("hitter02"))
@@ -629,42 +655,28 @@ namespace JammerDash.Editor
                         isCursorOnRightSide = IsCursorOnRightSide();
                     }
                 }
-                float mouseSpeed = Input.GetAxis("Mouse X");
-                // Calculate the change in size based on the mouse movement direction
-                float newSizeX = selectedObject.GetComponent<SpriteRenderer>().size.x + (mouseSpeed * Time.unscaledDeltaTime * (isCursorOnRightSide ? 1 : -1) + 0.5f);
-                // Clamp the size within the specified limits
-                newSizeX = Mathf.Clamp(newSizeX, 1f, Mathf.Infinity);
 
-                // Update the size of the SpriteRenderer
-                SpriteRenderer spriteRenderer = selectedObject.GetComponent<SpriteRenderer>();
-                if (spriteRenderer != null)
+                Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
+
+                Vector3 objectPosition = selectedObject.position;
+
+                float mouseToObjectDistanceX = mouseWorldPosition.x - objectPosition.x;
+
+                if (mouseToObjectDistanceX > 0) 
                 {
-                    spriteRenderer.size = new Vector2(newSizeX, spriteRenderer.size.y);
+                    float newSizeX = Mathf.Abs(mouseToObjectDistanceX);
+
+                    newSizeX = Mathf.Clamp(newSizeX, 1f, Mathf.Infinity);
+
+                    SpriteRenderer spriteRenderer = selectedObject.GetComponent<SpriteRenderer>();
+                    if (spriteRenderer != null)
+                    {
+                        spriteRenderer.size = new Vector2(newSizeX, spriteRenderer.size.y);
+                    }
                 }
             }
-            else if (selectedObject != null && DateTime.Now.Day == 1 && DateTime.Now.Month == 4)
-            { // Capture initial mouse position only once
-                if (Input.GetKeyDown(KeybindingManager.place))
-                {
-                    initialMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                }
-                UnityEngine.Debug.Log("IT'S " + DateTime.Now.Day + "/" + DateTime.Now.Month);
 
-                Vector3 currentMousePosition = Input.mousePosition;
-                float delta = currentMousePosition.x - initialMousePosition.x;
 
-                // Calculate new width and position
-                float newWidth = Mathf.Clamp(initialScale.x + delta * expansionSpeed, 1, 100);
-                float widthChange = newWidth - initialScale.x;
-                Vector3 newPosition = selectedObject.transform.position + selectedObject.transform.right * (widthChange / 2f);
-
-                // Update scale and position
-                selectedObject.transform.localScale = new Vector3(newWidth, selectedObject.transform.localScale.y, selectedObject.transform.localScale.z);
-                selectedObject.transform.position = newPosition;
-
-                UnityEngine.Debug.Log("fools");
-            }
-           
             if (!Input.GetKey(KeyCode.R))
             {
 
@@ -700,7 +712,7 @@ namespace JammerDash.Editor
                 }
             }
             playbackText.text = $"Playback ({Time.timeScale:0.00}x)";
-            audio = GameObject.Find("Music").GetComponent<AudioSource>();
+            audio = AudioManager.Instance.source;
             audio.pitch = Time.timeScale;
             PlayerEditorMovement player = GameObject.FindObjectOfType<PlayerEditorMovement>();
 

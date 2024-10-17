@@ -1826,164 +1826,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 247714431}
   m_CullTransparentMesh: 1
---- !u!1 &253565401
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 253565403}
-  - component: {fileID: 253565402}
-  - component: {fileID: 253565404}
-  m_Layer: 0
-  m_Name: Music
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
---- !u!82 &253565402
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 253565401}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: d8d59fca6ad9fd248ae64a3243529cf1, type: 3}
-  m_PlayOnAwake: 0
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.63516194
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
---- !u!4 &253565403
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 253565401}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1674237366}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &253565404
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 253565401}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb9e1c60e9604444bb14cd47f7787551, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  linePrefab: {fileID: 343633266324371392, guid: d4abaae092d5b8049af5926ba2623b0c, type: 3}
-  bpmLine: {fileID: 343633266324371392, guid: 67bb764dfc35e414fb1e09806d4cf3ca, type: 3}
-  audioClip: {fileID: 8300000, guid: 6f796869b13a0484580fc0a3f5e22526, type: 3}
-  audioPitch: 1
-  artistText: {fileID: 0}
-  nameText: {fileID: 1568051496}
-  audioSource: {fileID: 253565402}
 --- !u!1 &257141883
 GameObject:
   m_ObjectHideFlags: 0
@@ -2472,6 +2314,7 @@ GameObject:
   - component: {fileID: 401841158}
   - component: {fileID: 401841157}
   - component: {fileID: 401841161}
+  - component: {fileID: 401841162}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: EditorManager
@@ -2591,7 +2434,7 @@ MonoBehaviour:
   optionsMenu: {fileID: 1872510612}
   colorPickerMenuBG: {fileID: 1600610262}
   objectCount: {fileID: 892631982}
-  audio: {fileID: 253565402}
+  audio: {fileID: 0}
   bg: {fileID: 0}
   bgColorSel: {fileID: 968386822}
   grSelector: {fileID: 1027969230}
@@ -2608,7 +2451,6 @@ MonoBehaviour:
   musicPanel: {fileID: 0}
   musicFolderPath: Application.streamingAssetsPath
   defMusic: {fileID: 0}
-  lineControllerPrefab: {fileID: 253565404}
   artistText: {fileID: 0}
   nameText: {fileID: 1568051496}
   playback: {fileID: 9840536}
@@ -2621,6 +2463,8 @@ MonoBehaviour:
   songArtist: {fileID: 1053016674}
   levelID: {fileID: 1971725023}
   offsetmarker: {fileID: 1063665568}
+  lengthSlider: {fileID: 1652663436}
+  lengthText: {fileID: 85654094}
   hp: {fileID: 1951290267}
   size: {fileID: 794496495}
   vol: {fileID: 519420034}
@@ -2633,7 +2477,7 @@ MonoBehaviour:
   cam: {fileID: 519420031}
   planBPreview: {fileID: 0}
   color1: {fileID: 1943897491}
-  lineController: {fileID: 253565404}
+  lineController: {fileID: 401841162}
   selectedObject: {fileID: 0}
   selectionHighlight: {fileID: 0}
   ground: {fileID: 1323739757}
@@ -2667,6 +2511,25 @@ MonoBehaviour:
   minWidth: 1
   maxWidth: 999
   expansionSpeed: 2
+--- !u!114 &401841162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 401841156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb9e1c60e9604444bb14cd47f7787551, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  linePrefab: {fileID: 343633266324371392, guid: d4abaae092d5b8049af5926ba2623b0c, type: 3}
+  bpmLine: {fileID: 343633266324371392, guid: 67bb764dfc35e414fb1e09806d4cf3ca, type: 3}
+  audioClip: {fileID: 0}
+  audioPitch: 1
+  artistText: {fileID: 1460389898}
+  nameText: {fileID: 1568051496}
+  audioSource: {fileID: 0}
 --- !u!1 &406826485
 GameObject:
   m_ObjectHideFlags: 0
@@ -10056,7 +9919,19 @@ MonoBehaviour:
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 401841161}
+        m_TargetAssemblyTypeName: JammerDash.Editor.EditorManager, Assembly-CSharp
+        m_MethodName: LengthPos
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1673097313
 GameObject:
   m_ObjectHideFlags: 0
@@ -10263,7 +10138,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 818954664}
-  - {fileID: 253565403}
   - {fileID: 1944401547}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10315,7 +10189,7 @@ BoxCollider2D:
   m_EdgeRadius: 0
 --- !u!50 &1674237372
 Rigidbody2D:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -10326,8 +10200,8 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 1
   m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -10354,7 +10228,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 7
   cam: {fileID: 519420032}
-  music: {fileID: 253565402}
+  music: {fileID: 0}
   sfxS: {fileID: 818954663}
   jump: {fileID: 8300000, guid: f9abde361f355a946a6aa316e42e67fe, type: 3}
   impact: {fileID: 8300000, guid: 29b7f5d749adb6c4db0ecb298ef17983, type: 3}
@@ -13433,7 +13307,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 253565404}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: LineController, Assembly-CSharp
         m_MethodName: ToggleLine
         m_Mode: 1

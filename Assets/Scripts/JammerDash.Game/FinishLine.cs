@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using JammerDash.Game.Player;
 using JammerDash.Tech;
 using JammerDash.Editor.Basics;
+using JammerDash.Audio;
 
 namespace JammerDash.Game
 {
@@ -220,7 +221,7 @@ namespace JammerDash.Game
             total.text = $"{player0.counter.score}";
             combo.text = $"{player0.highestCombo}x";
            if (scoreRank != null)
-            scoreRank.sprite = Resources.Load<Sprite>($"ranking/{player0.counter.GetNoColorTier(player0.counter.accCount / player0.Total * 100)}");
+            scoreRank.sprite = Resources.Load<Sprite>($"ranking/{player0.counter.GetTier(player0.counter.accCount / player0.Total * 100)}");
             player.transform.localScale = Vector3.zero;
             objectOfType.enabled = false;
 
@@ -228,8 +229,7 @@ namespace JammerDash.Game
             SaveLevelData(actualdest, destruction);
 
 
-            AudioSource[] audios = FindObjectsOfType<AudioSource>();
-            Debug.Log(audios);
+            
             finishMenu.SetActive(true);
             if (anim != null)
             anim.Play();
@@ -243,7 +243,7 @@ namespace JammerDash.Game
             level.value = Account.Instance.currentXP / Account.Instance.xpRequiredPerLevel[Account.Instance.level];
             lvl.text = $"lv{Account.Instance.level}";
 
-            FindObjectOfType<AudioSource>().PlayOneShot(Resources.Load<AudioClip>($"Audio/SFX/ranking/{player0.counter.GetNoColorTier(player0.counter.accCount / player0.Total * 100)} Rank"));
+            AudioManager.Instance.source.PlayOneShot(Resources.Load<AudioClip>($"Audio/SFX/ranking/{player0.counter.GetTier(player0.counter.accCount / player0.Total * 100)} Rank"));
 
             yield return null;
         }

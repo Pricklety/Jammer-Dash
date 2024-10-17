@@ -6259,6 +6259,7 @@ MonoBehaviour:
   timer: 0
   songLoaded: 0
   devText: {fileID: 828858576}
+  source: {fileID: 0}
 --- !u!114 &1287563243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6703,7 +6704,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1612322276}
   - component: {fileID: 1612322275}
-  - component: {fileID: 1612322274}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -6711,14 +6711,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &1612322274
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1612322273}
-  m_Enabled: 1
 --- !u!20 &1612322275
 Camera:
   m_ObjectHideFlags: 0
@@ -7465,7 +7457,8 @@ PrefabInstance:
       propertyPath: reverbZoneMixCustomCurve.m_Curve.Array.data[0].value
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 0}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 2810003822230129092, guid: 3b85ea57d6ecc9144b964fb6ef498752, type: 3}
@@ -7499,6 +7492,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2810003822230129094, guid: 3b85ea57d6ecc9144b964fb6ef498752, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2810003823231954473}
+    - targetCorrespondingSourceObject: {fileID: 2810003822230129094, guid: 3b85ea57d6ecc9144b964fb6ef498752, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2810003823231954474}
   m_SourcePrefab: {fileID: 100100000, guid: 3b85ea57d6ecc9144b964fb6ef498752, type: 3}
 --- !u!4 &2810003823231954467 stripped
 Transform:
@@ -7665,6 +7661,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shutter: {fileID: 8300000, guid: 0072c353ad01a7948bd8af9d0a4dd80f, type: 3}
+--- !u!114 &2810003823231954474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 156647891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CollisionTag: 
+  EventReference:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  Event: 
+  EventPlayTrigger: 0
+  EventStopTrigger: 0
+  AllowFadeout: 1
+  TriggerOnce: 0
+  Preload: 0
+  NonRigidbodyVelocity: 0
+  Params: []
+  OverrideAttenuation: 0
+  OverrideMinDistance: -1
+  OverrideMaxDistance: -1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

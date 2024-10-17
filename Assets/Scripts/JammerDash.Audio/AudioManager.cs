@@ -50,6 +50,7 @@ namespace JammerDash.Audio
         bool paused = false;
         public bool songLoaded;
         public Text devText;
+        public AudioSource source;
 
         private void Awake()
         {
@@ -71,7 +72,7 @@ namespace JammerDash.Audio
         public void Start()
         {
             masterS.onValueChanged.AddListener(OnMasterVolumeChanged);
-
+            source = GetComponent<AudioSource>();
             if (Debug.isDebugBuild)
             devText.gameObject.SetActive(true);
             else
@@ -125,7 +126,7 @@ namespace JammerDash.Audio
         public void Update()
         {
             
-            if (Input.GetKeyDown(KeyCode.F9) && SceneManager.GetActiveScene().buildIndex == 1)
+            if (Input.GetKeyDown(KeyCode.F9))
             {
                 StartCoroutine(LoadAudioClipsAsync());
             }
@@ -180,9 +181,6 @@ namespace JammerDash.Audio
                 audio.outputAudioMixerGroup = master;
                 audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", Mathf.Clamp(masterS.value, -80f, 20f));
             }
-            if (SceneManager.GetActiveScene().buildIndex == 1)
-            {
-
                 if (!options.increaseVol.isOn)
                 {
                     masterS.maxValue = 0;
@@ -192,7 +190,7 @@ namespace JammerDash.Audio
                 {
                     masterS.maxValue = 20;
                 }
-            }
+            
                 if (Input.GetKey(KeyCode.LeftShift) && value1 != 0 && data.wheelShortcut)
             {
                 timer = 0f; // Increment timer each frame
@@ -294,7 +292,7 @@ namespace JammerDash.Audio
                 if (SceneManager.GetActiveScene().buildIndex == 1)
                     options.masterVolumeSlider.value = masterS.value;
             }
-            if (!songPlayed && !paused && !audioSource.isPlaying || (audioSource.time >= audioSource.clip.length && SceneManager.GetActiveScene().buildIndex == 1 || !audioSource.isPlaying && !paused))
+            if (SceneManager.GetActiveScene().buildIndex == 1 && (!songPlayed && !paused && !audioSource.isPlaying || (audioSource.time >= audioSource.clip.length || !audioSource.isPlaying && !paused)))
             {
                 PlayNextSong(songPlayed);
                 songPlayed = true;
