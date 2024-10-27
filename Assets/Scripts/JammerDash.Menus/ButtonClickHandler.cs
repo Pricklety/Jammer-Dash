@@ -304,8 +304,8 @@ namespace JammerDash.Menus.Play
                         yield return new WaitUntil(() => AudioManager.Instance.songLoaded);
                         yield return new WaitForEndOfFrame();
                         UnityEngine.Debug.LogWarning("hi2");
-                        AudioManager.Instance.source.loop = true;
-                        AudioManager.Instance.source.time = UnityEngine.Random.Range(AudioManager.Instance.source.clip.length * 0f, AudioManager.Instance.source.clip.length * 0.5f);
+                        AudioManager.Instance.GetComponent<AudioSource>().loop = true;
+                        AudioManager.Instance.GetComponent<AudioSource>().time = UnityEngine.Random.Range(AudioManager.Instance.GetComponent<AudioSource>().clip.length * 0f, AudioManager.Instance.GetComponent<AudioSource>().clip.length * 0.5f);
 
                     }
                     else

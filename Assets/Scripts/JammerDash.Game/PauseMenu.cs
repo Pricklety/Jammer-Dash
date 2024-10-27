@@ -9,7 +9,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using JammerDash.Tech;
 using JammerDash.Game.Player;
-using JammerDash.Audio;
 
 namespace JammerDash.Game
 {
@@ -28,7 +27,7 @@ namespace JammerDash.Game
         // Start is called before the first frame update
         void Start()
         {
-            music = AudioManager.Instance.source;
+
             SettingsData sd = SettingsFileHandler.LoadSettingsFromFile();
             dim.value = sd.dim;
             GameObject animA = GameObject.Find("Main Camera");
@@ -63,7 +62,7 @@ namespace JammerDash.Game
         void Update()
         {
             if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>() != null)
-                music = AudioManager.Instance.source;
+                music = GameObject.Find("Music").GetComponent<AudioSource>();
 
             if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeybindingManager.toggleUI))
             {
@@ -135,8 +134,8 @@ namespace JammerDash.Game
 
         public void Resume()
         {
-            
-            AudioSource music = AudioManager.Instance.source;
+            GameObject obj01 = GameObject.Find("Music");
+            AudioSource music = obj01.GetComponent<AudioSource>();
 
             panel.SetActive(false);
             GameObject.Find("loadingText").GetComponent<Text>().text = "Click anything to continue";

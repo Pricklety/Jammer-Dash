@@ -1,4 +1,3 @@
-using JammerDash.Audio;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -24,10 +23,6 @@ namespace JammerDash.Editor
         public AudioClip impact;
         public Text text;
 
-        private void Start()
-        {
-            music = AudioManager.Instance.source;
-        }
         private void Update()
         {
             // Move player right

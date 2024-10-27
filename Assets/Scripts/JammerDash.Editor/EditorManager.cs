@@ -20,14 +20,6 @@ using Random = UnityEngine.Random;
 using Debug = UnityEngine.Debug;
 using JammerDash.Tech;
 using JammerDash.Difficulty;
-<<<<<<< HEAD
-using UnityEngine.UI.Extensions.Tweens;
-using JammerDash.Audio;
-using System.Threading.Tasks;
-using Lachee.IO.Exceptions;
-using JammerDash.Editor.Screens;
-=======
->>>>>>> master
 
 namespace JammerDash.Editor
 {
@@ -43,7 +35,6 @@ namespace JammerDash.Editor
         public int finishCount = 1;
 
         [Header("UI and Stuff")]
-        public LoadingScreen loadingPanel;
         public GameObject[] editorPages;
         public GameObject optionsMenu;
         public GameObject colorPickerMenuBG;
@@ -67,6 +58,7 @@ namespace JammerDash.Editor
         public GameObject musicPanel;
         public string musicFolderPath;
         public Dropdown defMusic;
+        public LineController lineControllerPrefab;
         public Text artistText;
         public Text nameText;
         public Slider playback;
@@ -79,10 +71,6 @@ namespace JammerDash.Editor
         public InputField songArtist;
         public Text levelID;
         public InputField offsetmarker;
-        public Slider lengthSlider;
-        public Text lengthText;
-        public InputField romaji;
-        public InputField romajiArtist;
 
         public Slider hp;
         public Slider size;
@@ -144,20 +132,15 @@ namespace JammerDash.Editor
         public float maxWidth = 999f; 
         public float expansionSpeed = 1f; 
 
-<<<<<<< HEAD
-=======
         private Vector3 initialMousePosition;
         private Vector3 initialScale;
         private bool isCursorOnRightSide;
         private GameObject[] beatObjects;
         private int lastBeatObjectCount = 0;
->>>>>>> master
 
         // Start is called before the first frame update
         void Start()
         {
-
-            audio = AudioManager.Instance.source;
             cubes = new List<GameObject>();
             saws = new List<GameObject>();
             if (vol != null && vol.profile != null)
@@ -178,7 +161,6 @@ namespace JammerDash.Editor
             cubes.AddRange(GameObject.FindGameObjectsWithTag("Cubes"));
             saws.AddRange(GameObject.FindGameObjectsWithTag("Saw"));
 
-            
         }
 
         public void OnMultiplierChange()
@@ -231,13 +213,9 @@ namespace JammerDash.Editor
 
 
         }
-        private async void MeasureTimeToReachDistance()
+        private void MeasureTimeToReachDistance()
         {
-<<<<<<< HEAD
-            GameObject[] objectsWithTag = await Difficulty.Object.FindObjectsWithTags(targetTags);
-=======
             GameObject[] objectsWithTag = Difficulty.Object.FindObjectsWithTags(targetTags);
->>>>>>> master
             Transform targetObject = Calculator.FindFarthestObjectInX(objectsWithTag);
             if (targetObject != null)
             {
@@ -256,30 +234,18 @@ namespace JammerDash.Editor
                 // Convert time to minutes:seconds format
                 int minutes = Mathf.FloorToInt(timeToReachDistance / 60);
                 float seconds = timeToReachDistance % 60;
-<<<<<<< HEAD
-
-
-                // Display the result on the Text component
-                levelLength.text = $"";
-
-=======
                 
 
                 // Display the result on the Text component
                 levelLength.text = $"Length: {minutes:D2}:{seconds:00.000}";
->>>>>>> master
             }
             else
             {
-                levelLength.text = "";
+                levelLength.text = "Length: 00:00";
             }
         }
 
-<<<<<<< HEAD
-
-=======
       
->>>>>>> master
 
         public IEnumerator LoadAudioClip(string filePath)
         {
@@ -315,8 +281,6 @@ namespace JammerDash.Editor
                         audio.clip = audioClip;
                         lineController.audioClip = audioClip;
                         musicFolderPath = filePath;
-
-                        lengthSlider.maxValue = audio.clip.length * 7;
                     }
                     else
                     {
@@ -358,7 +322,7 @@ namespace JammerDash.Editor
             cubes = new List<GameObject>();
             saws = new List<GameObject>();
             longCubes = new();
-            string sceneName = customSongName.text;
+            string sceneName = sceneNameInput.text.Trim();
             string filePath = GetSceneDataPath(sceneName);
 
             if (File.Exists(filePath))
@@ -416,13 +380,7 @@ namespace JammerDash.Editor
                 bpm.text = sceneData.bpm.ToString();
                 color1.startingColor = sceneData.defBGColor;
                 StartCoroutine(LoadAudioClip(Path.Combine(Application.persistentDataPath, "scenes", sceneName, sceneData.artist + " - " + sceneData.songName + ".mp3")));
-<<<<<<< HEAD
-                creator.text = sceneData.creator;
-                romaji.text = sceneData.romanizedName;
-                romajiArtist.text = sceneData.romanizedArtist;
-=======
                 creator.text = sceneData.creator; 
->>>>>>> master
                 hp.value = sceneData.playerHP;
                 size.value = sceneData.boxSize;
                 offsetmarker.text = sceneData.offset.ToString();
@@ -459,22 +417,16 @@ namespace JammerDash.Editor
             }
         }
 
-        public async Task SaveLevelData()
+        public void SaveLevelData()
         {
             try
             {
                 // Create a new SceneData instance and populate it with current objects' positions
-<<<<<<< HEAD
-                SceneData sceneData = await CreateLevelSceneData(loadingPanel);
-=======
                 SceneData sceneData = CreateLevelSceneData();
->>>>>>> master
 
                 // Get the directory path based on the scene name
                 string directoryPath = GetLevelDataPath(sceneData.sceneName);
                 UnityEngine.Debug.Log(directoryPath);
-<<<<<<< HEAD
-=======
 
                 // Check if the directory exists before proceeding
                 if (!Directory.Exists(directoryPath))
@@ -506,7 +458,6 @@ namespace JammerDash.Editor
                 Notifications.instance.Notify($"{sceneData.levelName} exported successfully.", null);
                 File.Delete(zipFilePath);
                 UnityEngine.Debug.Log($"Level data for {sceneData.levelName} saved in folder: {directoryPath}");
->>>>>>> master
             }
             catch (Exception e)
             {
@@ -515,41 +466,39 @@ namespace JammerDash.Editor
             }
         }
 
-<<<<<<< HEAD
-
-
-=======
       
->>>>>>> master
         private string GetLevelDataPath(string sceneName)
         {
-
-            // Combine the application's persistent data path with "levels" folder and the sanitized scene name
+            // Combine the application's persistent data path with "levels" folder and the scene name
             string directoryPath = Path.Combine(Application.persistentDataPath, "levels", sceneName);
 
-            try
-            {
-                // Create the directory if it doesn't exist
-                Directory.CreateDirectory(directoryPath);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Failed to create directory: {ex.Message}");
-                return null; // or throw; handle accordingly
-            }
+            // Create the directory if it doesn't exist
+            Directory.CreateDirectory(directoryPath);
 
-            // Combine the directory path with the sanitized scene name and ".jdl" extension for the file
+            // Combine the directory path with the scene name and ".jdl" extension for the file
             string jdlFilePath = Path.Combine(directoryPath, $"{sceneName}.jdl");
 
-           
-            return directoryPath; // Return the directory path or jdlFilePath as needed
+            // Convert the folder to a .jdl file if it's not already converted
+            if (!File.Exists(jdlFilePath))
+            {
+                ConvertFolderToJDL(directoryPath);
+            }
+
+            return directoryPath;
         }
 
-      
+        private void ConvertFolderToJDL(string folderPath)
+        {
+            try
+            {
+                // Check if the .jdl file already exists
+                string jdlFilePath = $"{folderPath}.jdl";
+                if (File.Exists(jdlFilePath))
+                {
+                    UnityEngine.Debug.LogWarning($"Folder '{folderPath}' is already converted to .jdl file: '{jdlFilePath}'");
+                    return;
+                }
 
-<<<<<<< HEAD
-       
-=======
                 // Create a zip archive of the folder
                 string zipFilePath = $"{folderPath}.zip";
                 ZipFile.CreateFromDirectory(folderPath, zipFilePath);
@@ -591,7 +540,6 @@ namespace JammerDash.Editor
             }
         }
 
->>>>>>> master
       
         public void InstantiateLines()
         {
@@ -653,40 +601,14 @@ namespace JammerDash.Editor
             Vector3 objectPosition = selectedObject.transform.position;
             return mousePosition.x >= objectPosition.x;
         }
-        public string FormatTime(float time)
-        {
-            int minutes = Mathf.FloorToInt(time / 60);
-            int seconds = Mathf.FloorToInt(time % 60);
-            int ms = Mathf.FloorToInt((time - Mathf.Floor(time)) * 1000);
-            // Ensure seconds don't go beyond 59
-            seconds = Mathf.Clamp(seconds, 0, 59);
-
-            return string.Format("{0:00}:{1:00}.{2:000}", minutes, seconds, ms);
-        }
-        public void LengthPos()
-        {
-
-            cam.transform.position = new Vector3(lengthSlider.value, 1, -10);
-        }
 
         // Update is called once per frame
         void Update()
         {
-            lengthText.text = FormatTime(lengthSlider.value / 7);
-            if (Camera.main.transform.position.x > lengthSlider.value / 7)
-            {
-                lengthText.text = FormatTime(Camera.main.transform.position.x / 7);
-            }
-            lengthSlider.value = cam.transform.position.x;
+            
+            float value = float.Parse(offsetmarker.text);
             GameObject[] beats = GameObject.FindGameObjectsWithTag("Beat");
 
-<<<<<<< HEAD
-            
-            size.gameObject.GetComponentInChildren<Text>().text = $"Cube size: {size.value}x";
-            hp.gameObject.GetComponentInChildren<Text>().text = $"Player health: {hp.value}";
-
-            if (Input.GetKey(KeybindingManager.changeLongCubeSize) && Input.GetKey(KeybindingManager.place) && selectedObject != null && selectedObject.gameObject.name.Contains("hitter02"))
-=======
             for (int i = 0; i < beats.Length; i++)
             {
                 beats[i].transform.position = new Vector3(originalPositions[i].x + (value / 700), -1.5f, 5);
@@ -695,33 +617,18 @@ namespace JammerDash.Editor
             hp.gameObject.GetComponentInChildren<Text>().text = $"Player health: {hp.value}";
 
             if (Input.GetKeyDown(KeybindingManager.changeLongCubeSize) && Input.GetKey(KeybindingManager.place) && selectedObject != null && selectedObject.gameObject.name.Contains("hitter02"))
->>>>>>> master
             {
-                Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
-
-                Vector3 objectPosition = selectedObject.position;
-
-                float mouseToObjectDistanceX = mouseWorldPosition.x - objectPosition.x;
-
-                if (mouseToObjectDistanceX > 0) 
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit))
                 {
-                    float newSizeX = Mathf.Abs(mouseToObjectDistanceX);
-
-                    newSizeX = Mathf.Clamp(newSizeX, 1f, Mathf.Infinity);
-
-                    SpriteRenderer spriteRenderer = selectedObject.GetComponent<SpriteRenderer>();
-                    if (spriteRenderer != null)
+                    if (hit.collider.gameObject.name.Contains("hitter02"))
                     {
-                        spriteRenderer.size = new Vector2(newSizeX, spriteRenderer.size.y);
+                        selectedObject = hit.collider.transform;
+                        initialMousePosition = Input.mousePosition;
+                        isCursorOnRightSide = IsCursorOnRightSide();
                     }
                 }
-<<<<<<< HEAD
-            }
-            if (offsetmarker.text.Length > 0)
-            {
-                float value = float.Parse(offsetmarker.text);
-                for (int i = 0; i < beats.Length; i++)
-=======
                 float mouseSpeed = Input.GetAxis("Mouse X");
                 // Calculate the change in size based on the mouse movement direction
                 float newSizeX = selectedObject.GetComponent<SpriteRenderer>().size.x + (mouseSpeed * Time.unscaledDeltaTime * (isCursorOnRightSide ? 1 : -1) + 0.5f);
@@ -731,27 +638,33 @@ namespace JammerDash.Editor
                 // Update the size of the SpriteRenderer
                 SpriteRenderer spriteRenderer = selectedObject.GetComponent<SpriteRenderer>();
                 if (spriteRenderer != null)
->>>>>>> master
                 {
-                    beats[i].transform.position = new Vector3(originalPositions[i].x + (value / 700), -1.5f, 5);
+                    spriteRenderer.size = new Vector2(newSizeX, spriteRenderer.size.y);
                 }
             }
-<<<<<<< HEAD
-            else
-            {
-                float value = 0;
-                for (int i = 0; i < beats.Length; i++)
-=======
             else if (selectedObject != null && DateTime.Now.Day == 1 && DateTime.Now.Month == 4)
             { // Capture initial mouse position only once
                 if (Input.GetKeyDown(KeybindingManager.place))
->>>>>>> master
                 {
-                    beats[i].transform.position = new Vector3(originalPositions[i].x + (value / 700), -1.5f, 5);
+                    initialMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 }
+                UnityEngine.Debug.Log("IT'S " + DateTime.Now.Day + "/" + DateTime.Now.Month);
+
+                Vector3 currentMousePosition = Input.mousePosition;
+                float delta = currentMousePosition.x - initialMousePosition.x;
+
+                // Calculate new width and position
+                float newWidth = Mathf.Clamp(initialScale.x + delta * expansionSpeed, 1, 100);
+                float widthChange = newWidth - initialScale.x;
+                Vector3 newPosition = selectedObject.transform.position + selectedObject.transform.right * (widthChange / 2f);
+
+                // Update scale and position
+                selectedObject.transform.localScale = new Vector3(newWidth, selectedObject.transform.localScale.y, selectedObject.transform.localScale.z);
+                selectedObject.transform.position = newPosition;
+
+                UnityEngine.Debug.Log("fools");
             }
-
-
+           
             if (!Input.GetKey(KeyCode.R))
             {
 
@@ -787,14 +700,11 @@ namespace JammerDash.Editor
                 }
             }
             playbackText.text = $"Playback ({Time.timeScale:0.00}x)";
-            audio = AudioManager.Instance.source;
+            audio = GameObject.Find("Music").GetComponent<AudioSource>();
             audio.pitch = Time.timeScale;
             PlayerEditorMovement player = GameObject.FindObjectOfType<PlayerEditorMovement>();
 
 
-<<<<<<< HEAD
-            
-=======
             if (cubes.Count > 0 || saws.Count > 0 || longCubes.Count > 0)
             {
 
@@ -803,7 +713,6 @@ namespace JammerDash.Editor
                 Calculator.FindFarthestObjectInX(longCubes.ToArray());
                 MeasureTimeToReachDistance();
             }
->>>>>>> master
             bgColorSel.color = cam.backgroundColor;
             float xPosNormalized = transform.position.x / 1;
             audio.panStereo = Mathf.Lerp(-1f, 1f, xPosNormalized);
@@ -828,7 +737,7 @@ namespace JammerDash.Editor
 
             int accurateCount = cubes.Count + saws.Count + longCubes.Count;
 
-            objectCount.text = "Objects: " + accurateCount.ToString() + "/100000";
+            objectCount.text = "Objects: " + accurateCount.ToString() + "/6000";
             string file = Path.Combine(Application.persistentDataPath, "scenes", sceneNameInput.text, sceneNameInput.text + ".json");
             string json = File.ReadAllText(file);
             SceneData data = SceneData.FromJson(json);
@@ -839,11 +748,7 @@ namespace JammerDash.Editor
           
             if (!Input.GetKey(KeybindingManager.changeLongCubeSize) && Input.GetKeyDown(KeybindingManager.place) && delay >= delayLimit && itemButtons[currentButtonPressed].clicked && !pointerOverUI && !player.enabled)
             {
-<<<<<<< HEAD
-                if (cubes.Count > 0 && accurateCount <= 100000)
-=======
                 if (cubes.Count > 0)
->>>>>>> master
                 {
                     List<Vector2> cubePositions = new List<Vector2>();
 
@@ -974,7 +879,7 @@ namespace JammerDash.Editor
                 PlayAudio();
             }
 
-            if (selectedObject != null && !player.enabled && selectedObject.transform.position.x >= 1)
+            if (selectedObject != null && !player.enabled && selectedObject.transform.position.x >= 1 && selectedObject.transform.position.x <= 20000)
             {
                 float moveX = 0f;
                 float moveY = 0f;
@@ -1024,7 +929,10 @@ namespace JammerDash.Editor
                     selectedObject.transform.position = new Vector3(1, selectedObject.transform.position.y, selectedObject.transform.position.z);
                 }
 
-                
+                if (selectedObject.transform.position.x > 20000)
+                {
+                    selectedObject.transform.position = new Vector3(20000, selectedObject.transform.position.y, selectedObject.transform.position.z);
+                }
             }
 
             if (Camera.main.transform.position.x < 7)
@@ -1208,10 +1116,6 @@ namespace JammerDash.Editor
             Time.timeScale = 1f;
         }
 
-<<<<<<< HEAD
-
-
-=======
       
         public void SaveScene()
         {
@@ -1230,7 +1134,6 @@ namespace JammerDash.Editor
 
             UnityEngine.Debug.Log("Scene saved successfully: " + sceneNameInput.text.Trim());
         }
->>>>>>> master
         private void CopyFileDirectly(string sourcePath, string destinationPath)
         {
             try
@@ -1288,15 +1191,9 @@ namespace JammerDash.Editor
             return filePath;
         }
 
-        IEnumerator AddObjectPositions<T>(IEnumerable<GameObject> objects, List<Vector2> positions, string type)
-        {
-<<<<<<< HEAD
-            foreach (GameObject obj in objects)
-            {
-                positions.Add(obj.transform.position);
 
-                if (positions.Count % 50 == 0) // Yield every 50 objects for smoother performance
-=======
+        private SceneData CreateSceneData()
+        {
             // Find the farthest object in X direction
             Transform targetObject = Calculator.FindFarthestObjectInX(Difficulty.Object.FindObjectsWithTags(targetTags));
 
@@ -1369,16 +1266,43 @@ namespace JammerDash.Editor
                 sceneData.cubePositions = new List<Vector3>();
 
                 foreach (GameObject cube in cubes)
->>>>>>> master
                 {
-                    yield return null; // Wait for the next frame
+                    Vector3 cubePos = cube.transform.position;
+                    sceneData.cubePositions.Add(cubePos);
+                    UnityEngine.Debug.Log($"Added cube position: {cubePos}");
                 }
             }
-            UnityEngine.Debug.Log($"{type} positions added successfully.");
+
+            if (saws != null)
+            {
+                sceneData.sawPositions = new List<Vector3>();
+
+                foreach (GameObject saw in saws)
+                {
+                    Vector3 sawPos = saw.transform.position;
+                    sceneData.sawPositions.Add(sawPos);
+                    UnityEngine.Debug.Log($"Added saw position: {sawPos}");
+                }
+            }
+            if (longCubes != null)
+            {
+                sceneData.longCubePositions = new List<Vector3>();
+                sceneData.longCubeWidth = new();
+
+                foreach (GameObject cube in longCubes)
+                {
+                    Vector3 cubePos = cube.transform.position;
+                    sceneData.longCubePositions.Add(cubePos);
+                    float width = cube.GetComponent<SpriteRenderer>().size.x;
+                    sceneData.longCubeWidth.Add(width);
+                    UnityEngine.Debug.Log($"Added long cube position: {cubePos}");
+                    UnityEngine.Debug.Log($"Added long cube width: {width}");
+                }
+
+            }
+            return sceneData;
         }
 
-<<<<<<< HEAD
-=======
         private SceneData CreateLevelSceneData()
         {
             SaveSceneData();
@@ -1458,7 +1382,6 @@ namespace JammerDash.Editor
        
 
 
->>>>>>> master
         public void OpenBGSel()
         {
             bgSel.SetActive(true);
@@ -1517,412 +1440,6 @@ namespace JammerDash.Editor
                 UnityEngine.Debug.LogError("File does not exist: " + path);
             }
         }
-        public void SaveSceneButton()
-        {
-            // Call the async method without awaiting it; logs the exception if it fails
-            _ = SaveSceneData().ContinueWith(task =>
-            {
-                if (task.IsFaulted)
-                {
-                    UnityEngine.Debug.LogError($"Error saving scene: {task.Exception?.Flatten().Message}");
-                }
-            }, TaskContinuationOptions.OnlyOnFaulted);
-        }
 
-        public void SaveLevel()
-        {
-            // Similar to SaveSceneButton, call SaveLevelData asynchronously and log errors
-            _ = SaveLevelData().ContinueWith(task =>
-            {
-                if (task.IsFaulted)
-                {
-                    UnityEngine.Debug.LogError($"Error saving level: {task.Exception?.Flatten().Message}");
-                }
-            }, TaskContinuationOptions.OnlyOnFaulted);
-        }
-
-        public async Task SaveSceneData()
-        {
-            try
-            {
-                // Create a new SceneData instance and populate it with current objects' positions
-                SceneData sceneData = await CreateSceneData(loadingPanel);
-
-                // Serialize the SceneData instance to formatted JSON
-                string json = JsonUtility.ToJson(sceneData, true);
-
-                // Get the file path based on the scene name
-                string filePath = GetSceneDataPath(sceneData.sceneName);
-
-                // Write the JSON data to the file
-                File.WriteAllText(filePath, json);
-
-                Notifications.instance.Notify($"{sceneData.sceneName} successfully saved." +
-                $"\nDifficulty: {sceneData.calculatedDifficulty}sn" +
-                $"\nLength: {sceneData.levelLength} seconds", null);
-            }
-            catch (Exception e)
-            {
-                Notifications.instance.Notify($"Oops, something wrong happened!\nTry again later.", null);
-            }
-        }
-
-
-        public async void SaveScene()
-        {
-            try
-            {
-               // Create a new SceneData instance and populate it with current objects' positions
-            SceneData sceneData = await CreateSceneData(loadingPanel);
-
-            // Serialize the SceneData instance to formatted JSON
-            string json = JsonUtility.ToJson(sceneData, true);
-
-            // Get the file path based on the scene name
-            string filePath = GetSceneDataPath(sceneNameInput.text.Trim());
-
-            // Write the JSON data to the file
-            File.WriteAllText(filePath, json);
-
-
-            UnityEngine.Debug.Log("Scene saved successfully: " + sceneNameInput.text.Trim());
-            }
-            catch (Exception e)
-            {
-                // Log errors that occur during saving
-                UnityEngine.Debug.LogError($"Failed to save scene: {e.Message}");
-            }
-        }
-
-        private async Task<GameObject[]> GetCubesOnMainThread(LoadingScreen loadingScreen)
-        {
-            string[] tags = { "Cubes", "Saw", "LongCube" };
-            List<GameObject> foundCubes = new List<GameObject>();
-
-            // Total tags to search
-            int totalTags = tags.Length;
-
-            for (int i = 0; i < totalTags; i++)
-            {
-                string tag = tags[i];
-
-                // Find objects with the current tag
-                GameObject[] objectsWithTag = GameObject.FindGameObjectsWithTag(tag);
-                foundCubes.AddRange(objectsWithTag);
-
-                // Update the loading screen with the current count
-                loadingScreen.UpdateLoading($"Retrieving cubes... Found {foundCubes.Count} so far.", (i + 1) / (float)totalTags);
-
-                // Simulate delay for demonstration purposes (Remove this in production)
-                await Task.Delay(100); // Optional: simulate processing time
-            }
-
-            return foundCubes.ToArray();
-        }
-
-
-
-
-        private async Task<SceneData> LoadSceneDataFromFile()
-        {
-            string path = Path.Combine(Application.persistentDataPath, "scenes", sceneNameInput.text, sceneNameInput.text + ".json");
-            SceneData data = null;
-
-            if (File.Exists(path))
-            {
-                try
-                {
-                    string json = await File.ReadAllTextAsync(path);
-                    data = SceneData.FromJson(json);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError($"Error reading JSON file: {e.Message}");
-                    data = new SceneData(); // Create a default instance if needed
-                }
-            }
-            else
-            {
-                Debug.LogWarning("Scene file not found. Creating new SceneData.");
-                data = new SceneData();
-            }
-
-            return data;
-        }
-        private void UpdateLoadingText(string message)
-        {
-            loadingPanel.loadingText.text = message; // Assuming loadingTextUI is a reference to your UI Text component
-        }
-        private async Task<SceneData> CreateSceneData(LoadingScreen loadingScreen)
-        {
-           
-            loadingScreen.ShowLoadingScreen(); // Show loading screen
-
-            loadingScreen.UpdateLoading("Retrieving cubes...", 0f);
-            GameObject[] cubes = await GetCubesOnMainThread(loadingPanel);
-            if (cubes == null)
-            {
-                Debug.LogError("Cubes array is null.");
-                loadingScreen.HideLoadingScreen(); // Hide loading screen
-                return null;
-            }
-
-            // Update loading screen with the count of cubes retrieved
-            int cubeCount = cubes.Length;
-            loadingScreen.UpdateLoading($"Gathering cube positions... Retrieved {cubeCount} cubes", 0.1f);
-            List<Vector2> cubePositions = cubes.Select(cube => (Vector2)cube.transform.position).ToList();
-
-            loadingScreen.UpdateLoading("Calculating farthest object...", 0.2f);
-            float distance1 = 0f;
-            GetFarthestObjectOnMainThread(cubes, (targetObject) =>
-            {
-                // This block will run once the farthest object has been found
-                float distance = targetObject != null ? targetObject.position.x + additionalDistance : 0;
-                distance1 = distance;
-                // Continue processing with the obtained distance
-                Debug.Log($"Calculated distance: {distance}");
-            });
-            
-
-                loadingScreen.UpdateLoading("Calculating cubes per Y level...", 0.3f);
-            int[] cubesPerY = await Task.Run(() => Calculator.CalculateCubesPerY(cubePositions.ToArray()));
-
-            loadingScreen.UpdateLoading("Calculating difficulty...", 0.4f);
-            float calculateDifficulty = Calculator.CalculateDifficulty(
-     this.cubes,
-     saws,
-     longCubes,
-     hp,
-     size,
-     cubesPerY,
-     cubePositions.ToArray(),
-     distance1 / 7, updateLoadingText =>
-     {
-         loadingPanel.loadingText.text = updateLoadingText;
-     });
-
-            
-
-            // Load existing scene data if available, with fallback
-            SceneData data = await LoadSceneDataFromFile() ?? new SceneData();
-
-            loadingScreen.UpdateLoading("Creating Scene Data object...", 0.5f);
-            SceneData sceneData = new SceneData
-            {
-                sceneName = customSongName.text,
-                bpm = int.TryParse(bpmInput.text, out int bpmValue) ? bpmValue : 0,
-                calculatedDifficulty = calculateDifficulty % 150,
-                gameVersion = Application.version,
-                saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                songLength = audio.clip != null ? audio.clip.length : 0,
-                ground = groundToggle != null && groundToggle.isOn,
-                levelLength = (int)(distance1 / 7),
-                creator = creator != null ? creator.text : "Unknown",
-                romanizedName = romaji != null ? romaji.text : "Unknown",
-                romanizedArtist = romajiArtist != null ? romajiArtist.text : "Unknown",
-                playerHP = hp != null ? (int)hp.value : 300,
-                boxSize = size != null ? size.value : 1,
-                artist = songArtist != null ? songArtist.text : "Unknown",
-                songName = customSongName.text,
-                offset = float.TryParse(offsetmarker != null ? offsetmarker.text : "0", out float offsetValue) ? offsetValue : 0,
-                ID = (data.ID == 0) ? Random.Range(int.MinValue, int.MaxValue) : data.ID,
-                defBGColor = Camera.main != null ? Camera.main.backgroundColor : Color.black
-            };
-
-            loadingScreen.UpdateLoading("Saving background image if enabled...", 0.6f);
-            // Save background image if enabled
-            if (bgPreview != null && bgPreview.texture != null && bgImage != null && bgImage.isOn)
-            {
-                SaveBackgroundImageTexture(Path.Combine(Application.persistentDataPath, "scenes", sceneData.sceneName, "bgImage.png"));
-            }
-
-            loadingScreen.UpdateLoading("Processing positions for cubes, saws, and long cubes...", 0.7f);
-            sceneData.cubePositions = this.cubes?.Select(cube => cube.transform.position).ToList() ?? new List<Vector3>();
-            sceneData.sawPositions = saws?.Select(saw => saw.transform.position).ToList() ?? new List<Vector3>();
-            if (longCubes != null)
-            {
-                sceneData.longCubePositions = longCubes.Select(cube => cube.transform.position).ToList();
-                sceneData.longCubeWidth = longCubes.Select(cube => cube.GetComponent<SpriteRenderer>()?.size.x ?? 0).ToList();
-            }
-
-            loadingScreen.UpdateLoading("Scene data created successfully.", 1f);
-            loadingScreen.HideLoadingScreen(); // Hide loading screen
-            return sceneData;
-        }
-
-        private async Task<SceneData> CreateLevelSceneData(LoadingScreen loadingScreen)
-        {
-            loadingScreen.ShowLoadingScreen(); // Show loading screen
-
-            loadingScreen.UpdateLoading("Saving Scene Data...", 0f);
-            await SaveSceneData(); // Ensure SaveSceneData is completed before proceeding
-
-            loadingScreen.UpdateLoading("Retrieving cubes...", 0.1f);
-            GameObject[] cubes = await GetCubesOnMainThread(loadingPanel);
-            if (cubes == null || cubes.Length == 0)
-            {
-                Debug.LogError("No cubes found on the main thread.");
-                loadingScreen.HideLoadingScreen(); // Hide loading screen
-                return null;
-            }
-
-            // Update loading screen with the count of cubes retrieved
-            int cubeCount = cubes.Length;
-            loadingScreen.UpdateLoading($"Gathering cube positions... Retrieved {cubeCount} cubes", 0.2f);
-            List<Vector2> cubePositions = cubes.Select(cube => (Vector2)cube.transform.position).ToList();
-
-
-            loadingScreen.UpdateLoading("Calculating farthest object...", 0.2f);
-            float distance1 = 0f;
-            GetFarthestObjectOnMainThread(cubes, (targetObject) =>
-            {
-                // This block will run once the farthest object has been found
-                float distance = targetObject != null ? targetObject.position.x + additionalDistance : 0;
-                distance1 = distance;
-                // Continue processing with the obtained distance
-                Debug.Log($"Calculated distance: {distance}");
-            });
-
-
-            loadingScreen.UpdateLoading("Calculating cubes per Y level...", 0.4f);
-            int[] cubesPerY = await Task.Run(() => Calculator.CalculateCubesPerY(cubePositions.ToArray()));
-
-            loadingScreen.UpdateLoading("Calculating difficulty...", 0.5f);
-            float calculateDifficulty = Calculator.CalculateDifficulty(
-     this.cubes,
-     saws,
-     longCubes,
-     hp,
-     size,
-     cubesPerY,
-     cubePositions.ToArray(),
-     distance1 / 7, updateLoadingText =>
-     {
-         loadingPanel.loadingText.text = updateLoadingText;
-     });
-            loadingScreen.UpdateLoading("Creating Scene Data object...", 0.6f);
-            SceneData sceneData = new SceneData
-            {
-                levelName = customSongName.text,
-                sceneName = customSongName.text,
-                calculatedDifficulty = calculateDifficulty,
-                gameVersion = Application.version,
-                saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                songLength = audio.clip != null ? audio.clip.length : 0,
-                artist = songArtist != null ? songArtist.text : "Unknown",
-                songName = customSongName.text,
-                ground = groundToggle != null && groundToggle.isOn,
-                levelLength = (int)(distance1 / 7),
-                creator = creator != null ? creator.text : "Unknown",
-                romanizedName = romaji != null ? romaji.text : "Unknown",
-                romanizedArtist = romajiArtist != null ? romajiArtist.text : "Unknown",
-                offset = float.TryParse(offsetmarker?.text, out float offsetValue) ? offsetValue : 0,
-                ID = UnityEngine.Random.Range(int.MinValue, int.MaxValue)
-            };
-
-            loadingScreen.UpdateLoading("Processing positions for cubes, saws, and long cubes...", 0.65f);
-            sceneData.cubePositions = this.cubes?.Select(cube => cube.transform.position).ToList() ?? new List<Vector3>();
-            sceneData.sawPositions = saws?.Select(saw => saw.transform.position).ToList() ?? new List<Vector3>();
-            if (longCubes != null)
-            {
-                sceneData.longCubePositions = longCubes.Select(cube => cube.transform.position).ToList();
-                sceneData.longCubeWidth = longCubes.Select(cube => cube.GetComponent<SpriteRenderer>()?.size.x ?? 0).ToList();
-            }
-
-            // Set source and destination paths for the scene
-            string sourceFolderPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
-            string destinationFolderPath = Path.Combine(Application.persistentDataPath, "levels", sceneData.levelName);
-
-            loadingScreen.UpdateLoading("Copying files...", 0.7f);
-            try
-            {
-                await CopyFilesAsync(sourceFolderPath, destinationFolderPath);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Error copying files: {ex.Message}");
-                loadingScreen.HideLoadingScreen(); // Hide loading screen
-                return null;
-            }
-
-            loadingScreen.UpdateLoading("Creating ZIP file...", 0.8f);
-            string zipFilePath = Path.Combine(Application.persistentDataPath, "levels", $"{sceneData.levelName}.jdl");
-           
-
-            try
-            {
-                if (File.Exists(zipFilePath))
-                {
-                    File.Delete(zipFilePath);
-                }
-                ZipFile.CreateFromDirectory(destinationFolderPath, zipFilePath, System.IO.Compression.CompressionLevel.NoCompression, false, null);
-                // Delete the original copied folder
-                Directory.Delete(destinationFolderPath, true);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Error creating ZIP file: {ex.Message}");
-                loadingScreen.HideLoadingScreen(); // Hide loading screen
-                return null;
-            }
-
-
-            loadingScreen.UpdateLoading("Level scene data created successfully.", 1f);
-            loadingScreen.HideLoadingScreen(); // Hide loading screen
-            return sceneData;
-        }
-        private void GetFarthestObjectOnMainThread(GameObject[] cubes, Action<Transform> callback)
-        {
-            // Check if cubes is null or empty
-            if (cubes == null || cubes.Length == 0)
-            {
-                Debug.LogError("Cubes array is null or empty.");
-                callback(null); // Call the callback with null
-                return; // Early return if no cubes are provided
-            }
-
-            // Enqueue the action to run on the main thread
-            MainThreadDispatcher.Enqueue(() =>
-            {
-                // Run the FindFarthestObjectInX method on the main thread
-                Transform result = Calculator.FindFarthestObjectInX(cubes);
-
-                // Check if result is null
-                if (result == null)
-                {
-                    Debug.LogError("No farthest object found.");
-                }
-                else
-                {
-                    Debug.Log($"Farthest object found: {result.name} at position {result.position}");
-                }
-
-                // Call the callback with the result
-                callback(result);
-            });
-        }
-
-
-
-        private Task CopyFilesAsync(string sourceFolderPath, string destinationFolderPath)
-        {
-            
-            return Task.Run(() =>
-            {
-                foreach (string sourcePath in Directory.GetFiles(sourceFolderPath, "*", SearchOption.AllDirectories))
-                {
-                    string relativePath = sourcePath.Substring(sourceFolderPath.Length + 1);
-                    string destinationPath = Path.Combine(destinationFolderPath, relativePath);
-
-                    string destinationDirectory = Path.GetDirectoryName(destinationPath);
-                    if (!Directory.Exists(destinationDirectory))
-                    {
-                        Directory.CreateDirectory(destinationDirectory);
-                    }
-
-                    File.Copy(sourcePath, destinationPath, true);
-                }
-            });
-        }
     }
 }

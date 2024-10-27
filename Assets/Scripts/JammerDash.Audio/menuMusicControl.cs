@@ -86,6 +86,45 @@ namespace JammerDash.Audio
 
 
 
+        private void Update()
+        {
+            if (SceneManager.GetActiveScene().buildIndex > 1 || SceneManager.GetActiveScene().name == "LevelDefault")
+            {
+                fadingOut = true;
+            }
+            else
+            {
+                fadingOut = false;
+                audioSource.volume = 1;
+                audioSource.pitch = 1;
+            }
 
+            if (fadingOut)
+            {
+                // Continue the fade-out process
+                StartCoroutine(FadeOutAndPause());
+            }
+        }
+
+        private IEnumerator FadeOutAndPause()
+        {
+            float startVolume = audioSource.volume;
+            float elapsedTime = 0.0f;
+
+            while (elapsedTime < fadeDuration)
+            {
+                elapsedTime += Time.deltaTime;
+                float t = elapsedTime / fadeDuration;
+
+                audioSource.volume = Mathf.Lerp(startVolume, 0.0f, t);
+
+                yield return null;
+            }
+
+            // Lower the pitch after the fade out
+            audioSource.pitch = 0f;
+
+            fadingOut = false;
+        }
     }
 }

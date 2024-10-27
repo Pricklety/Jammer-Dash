@@ -1,7 +1,5 @@
 using UnityEngine;
 using JammerDash.Game.Player;
-using NUnit.Framework;
-using System.Collections.Generic;
 namespace JammerDash.Game
 {
     public class CubeCounter : MonoBehaviour
@@ -11,23 +9,16 @@ namespace JammerDash.Game
         public int score;
         public float accCount;
         public double destructionPercentage;
-        public List<GameObject> cubes = new();
+        public GameObject[] cubes;
 
         void Start()
         {
-            
-            maxScore = cubes.Count * 50;
+            cubes = GameObject.FindGameObjectsWithTag("Cubes");
+            maxScore = cubes.Length * 50;
         }
 
         void FixedUpdate()
         {
-            if (cubes.Count == 0)
-            {
-                foreach (GameObject cube in GameObject.FindGameObjectsWithTag("Cubes"))
-                    cubes.Add(cube);
-                foreach (GameObject longCube in GameObject.FindGameObjectsWithTag("LongCube"))
-                    cubes.Add(longCube);
-            }
             float destruction = ((float)accCount / FindObjectOfType<PlayerMovement>().Total) * 100;
             // Call GetTier and print the returned tier
             GetTier(destruction);
@@ -54,11 +45,7 @@ namespace JammerDash.Game
             {
                 return "S";
             }
-<<<<<<< HEAD
-            else if (destructionPercentage >= maxScore * 0.92f)
-=======
             else if (destructionPercentage <= maxScore && destructionPercentage >= maxScore * 0.92f)
->>>>>>> master
             {
                 return "A";
             }
@@ -84,6 +71,49 @@ namespace JammerDash.Game
             }
         }
 
-       
+        public string GetNoColorTier(float destructionPercentage)
+        {
+            float maxScore = 100;
+            if (destructionPercentage > maxScore)
+            {
+                return "Invalid";
+            }
+            if (destructionPercentage == maxScore)
+            {
+                return "SS+";
+            }
+            else if (destructionPercentage >= maxScore * 0.99f && FindObjectOfType<PlayerMovement>().misses != 1)
+            {
+                return "SS";
+            }
+            else if (destructionPercentage >= maxScore * 0.95f && FindObjectOfType<PlayerMovement>().misses != 1)
+            {
+                return "S";
+            }
+            else if ((destructionPercentage <= maxScore && destructionPercentage >= maxScore * 0.92f && FindObjectOfType<PlayerMovement>().misses >= 1) || (destructionPercentage <= 0.95f && FindObjectOfType<PlayerMovement>().misses >= 0))
+            {
+                return "A";
+            }
+            else if (destructionPercentage >= maxScore * 0.86f)
+            {
+                return "B";
+            }
+            else if (destructionPercentage >= maxScore * 0.75f)
+            {
+                return "C";
+            }
+            else if (destructionPercentage >= maxScore * 0.50f)
+            {
+                return "D";
+            }
+            else if (destructionPercentage >= maxScore * 0.25f)
+            {
+                return "F";
+            }
+            else
+            {
+                return "F-";
+            }
+        }
     }
 }
