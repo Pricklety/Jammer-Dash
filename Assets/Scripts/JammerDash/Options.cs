@@ -275,7 +275,11 @@ namespace JammerDash
             settingsData.volumeIncrease = increaseVol.isOn;
             settingsData.bass = bass.isOn;
             settingsData.bassgain = bassGain.value;
+<<<<<<< HEAD
             settingsData.dim = dim.value / 100;
+=======
+            settingsData.dim = dim.value;
+>>>>>>> master
             ApplyMasterVolume(settingsData.volume);
             ApplyFPSCap(settingsData.selectedFPS);
             ApplyResolution();

@@ -69,6 +69,13 @@ namespace JammerDash.Game.Player
         [Header("UI")]
         public GameObject deathPanel;
 
+<<<<<<< HEAD
+=======
+        [Header("Maximum scoring")]
+        int maxScore;
+        int maxCombo;
+        float maxHP;
+>>>>>>> master
         [Header("SP Calculator")]
         public float accuracyWeight = 0.56f;
         public float comboWeight = 0.25f;
@@ -76,6 +83,13 @@ namespace JammerDash.Game.Player
         public float strategicDecisionMakingWeight = 0.13f;
         public float adaptabilityWeight = 0.15f;
         public float levelCompletionTimeWeight = 0.1f;
+<<<<<<< HEAD
+=======
+        private float _precision;
+        private float _sequenceEfficiency;
+        private float _versatility;
+        private float _completionSpeed;
+>>>>>>> master
         public float _performanceScore;
 
         private float _gameDifficulty;
@@ -261,7 +275,11 @@ namespace JammerDash.Game.Player
 
             // Debug text area
             {
+<<<<<<< HEAD
                
+=======
+                ShinePerformance sp = new ShinePerformance(five + three + one + misses, 0, 0, 0, maxCombo, maxCombo, _gameDifficulty, CalculateLevelCompletionTime());
+>>>>>>> master
                 
                 debug.text = $"<b>KEYS</b>\r" +
                     $"\nKey1: {k}\r\n" +
@@ -275,11 +293,19 @@ namespace JammerDash.Game.Player
                     $"three: {three}\r\n" +
                     $"one: {one}\r\n" +
                     $"miss: {misses}\r\n" +
+<<<<<<< HEAD
                     $"score: {counter.score}\r\n" +
                     $"combo: {combo}x\r\n" +
                     $"health: {hpint}\r\n" +
                     $"accuracy: {counter.accCount / Total * 100:000.00}% ({counter.accCount} / {Total})\r\n" +
                     $"sp: {_performanceScore:0.00}";
+=======
+                    $"score: {counter.score} ({maxScore})\r\n" +
+                    $"combo: {combo}x ({maxCombo})\r\n" +
+                    $"health: {hpint}\r\n" +
+                    $"accuracy: {counter.accCount / Total * 100:000.00}% ({counter.accCount} / {Total})\r\n" +
+                    $"sp: {_performanceScore} ({sp.PerformanceScore})";
+>>>>>>> master
             }
             if (health > maxHealth)
             {
@@ -413,6 +439,7 @@ namespace JammerDash.Game.Player
             {
                 
                 float acc = (float)counter.accCount / Total * 100;
+<<<<<<< HEAD
                 if (float.IsNaN(acc))
                 {
                     acc = 0;
@@ -422,6 +449,9 @@ namespace JammerDash.Game.Player
                     _performanceScore = 0;
                 }
                 this.acc.text = $"{acc:F2}% | {counter.GetTier(acc)} | {~~SPInt:F0} sp";
+=======
+                this.acc.text = $"{acc:F2}% | {counter.GetTier(acc)} | {SPInt:F2} sp";
+>>>>>>> master
             }
             else
             {
@@ -452,6 +482,7 @@ namespace JammerDash.Game.Player
                         highestCombo++;
                     }
                     combo++;
+                        maxCombo++;
 
                     StartCoroutine(ChangeScore(Vector3.Distance(hit.collider.transform.position, transform.position)));
 
@@ -537,6 +568,7 @@ namespace JammerDash.Game.Player
             sfxS.PlayOneShot(fail);
 
             combo = 0;
+                maxCombo++;
             StartCoroutine(ChangeTextCombo());
         }
 
@@ -592,6 +624,11 @@ namespace JammerDash.Game.Player
         }
         IEnumerator ChangeScore(float playerDistance)
         {
+<<<<<<< HEAD
+=======
+            ChangeMaxScore();
+            float factor;
+>>>>>>> master
             UnityEngine.Debug.Log(playerDistance);
             if (playerDistance <= 0.29f)
             {
@@ -639,7 +676,14 @@ namespace JammerDash.Game.Player
             }
 
             counter.destroyedCubes += 50;
+<<<<<<< HEAD
             float formula = (maxScore * factor) / counter.cubes.Count;
+=======
+
+
+            float formula = factor * 100 + Mathf.RoundToInt((CustomLevelDataManager.Instance.diff / 10) + health / 100 + ((int)counter.accCount / Total * 100) + combo * 6) * 3;
+           
+>>>>>>> master
             float newDestroyedCubes = counter.score + formula;
             newDestroyedCubes = Mathf.RoundToInt(newDestroyedCubes);
 
@@ -660,7 +704,59 @@ namespace JammerDash.Game.Player
             counter.score = Mathf.RoundToInt(newDestroyedCubes);
             yield return new WaitForSeconds(0.2f);
         }
+<<<<<<< HEAD
 
+=======
+
+        public void ChangeMaxScore()
+        {
+            float maxFormula = 100 + Mathf.RoundToInt((CustomLevelDataManager.Instance.diff / 10) + CustomLevelDataManager.Instance.data.playerHP / 100 + 100 + maxCombo * 6) * 3;
+            float maxNewScore = maxScore + maxFormula;
+            maxNewScore = Mathf.RoundToInt(maxNewScore);
+            maxScore = Mathf.RoundToInt(maxNewScore);
+        }
+
+        public void ChangeMaxScoreLong()
+        {
+
+            int formula = Mathf.RoundToInt((float)counter.destructionPercentage) * ((int)counter.accCount / Total * 100 / 2) + combo * 20;
+            int newDestroyedCubes = maxScore + formula;
+            maxScore = Mathf.RoundToInt(newDestroyedCubes);
+        }
+        public IEnumerator ChangeScoreLong()
+        {
+            ChangeMaxScoreLong();
+            counter.destroyedCubes += 50;
+            five++;
+            int formula = Mathf.RoundToInt((float)counter.destructionPercentage) * ((int)counter.accCount / Total * 100 / 2) + combo * 20;
+            int newDestroyedCubes = counter.score + formula;
+            health += 30f;
+            if (AudioManager.Instance != null)
+            {
+                if (AudioManager.Instance.hits)
+                {
+                    Instantiate(goodTextPrefab, transform.position, Quaternion.identity);
+                }
+            }
+
+            float elapsedTime = 0f;
+            float duration = 0.1f;
+            counter.accCount += 1;
+
+            while (elapsedTime < duration)
+            {
+                SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+                    counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
+                    elapsedTime += Time.deltaTime;
+                    scoreText.text = $"{counter.score}\n<color=lime>(+{formula})</color>";
+                yield return null; // Wait for the next frame
+            }
+
+            // Ensure the score reaches the final value precisely
+            counter.score = Mathf.RoundToInt(newDestroyedCubes);
+            yield return new WaitForSeconds(0.2f);
+        }
+>>>>>>> master
 
 
         private void DestroyCube(GameObject cube)
@@ -754,6 +850,14 @@ namespace JammerDash.Game.Player
                     health -= 30;
                     Total += 5;
                     activeCubes.Remove(collision.gameObject);
+<<<<<<< HEAD
+=======
+                    health -= 35; // Lower health due to passing the cube
+                    combo = 0; // Reset combo
+                    maxCombo++;
+                    ChangeMaxScore();
+                    StartCoroutine(ChangeTextCombo());
+>>>>>>> master
                 }
 
 
@@ -765,17 +869,61 @@ namespace JammerDash.Game.Player
                     activeCubes.Remove(collision.gameObject);
 
 
+<<<<<<< HEAD
                     health -= 30;
                     bufferActive = false;
 
+=======
+                        Total += 1;
+                        activeCubes.Remove(collision.gameObject);
+                        health -= 75; // Lower health due to passing the cube
+                        combo = 0; // Reset combo
+                        maxScore++;
+                        ChangeMaxScoreLong();
+                        StartCoroutine(ChangeTextCombo());
+                    }
+>>>>>>> master
                 }
                 else if (bufferActive)
                 {
                     UnityEngine.Debug.Log("hit: " + bufferActive);
                     DestroyCube(collision.gameObject);
 
+<<<<<<< HEAD
                     bufferActive = false;
                     health += 30;
+=======
+                    Total += 1;
+
+                    Animation anim = combotext.GetComponent<Animation>();
+                    if (highestCombo <= combo)
+                    {
+                        highestCombo++;
+                    }
+                   
+
+                    if (collision.offset.x < 5)
+                    {
+                        combo += 1;
+                        maxCombo += 1;
+                    }
+                    else
+                    {
+
+                        combo += Mathf.RoundToInt(collision.offset.x / 5);
+                        maxCombo += Mathf.RoundToInt(collision.offset.x / 5);
+                    }
+
+                    SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+                  
+                        StartCoroutine(ChangeScoreLong());
+                    
+                       
+                    health += 20;
+                    anim.Stop("comboanim");
+                    anim.Play("comboanim");
+                    comboTime = 0;
+>>>>>>> master
                 }
             }
 
@@ -789,10 +937,15 @@ namespace JammerDash.Game.Player
             {
                 int formula = 1;
                 int newDestroyedCubes = counter.score + formula;
+                int newMaxScore = maxScore + formula;
                 scoreText.text = $"{counter.score}\n<color=lime>(+{formula})</color>";
                 // Ensure the score reaches the final value precisely
                 counter.score = newDestroyedCubes;
+<<<<<<< HEAD
                 
+=======
+                maxScore = newMaxScore;
+>>>>>>> master
                 health += 0.175f;
                 yield return null;
             }
@@ -880,6 +1033,10 @@ namespace JammerDash.Game.Player
                 {
                     bufferActive = false;
                 }
+<<<<<<< HEAD
+=======
+                maxScore += maxCombo + 1;
+>>>>>>> master
             }
 
 

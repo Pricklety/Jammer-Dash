@@ -30,9 +30,13 @@ namespace JammerDash.Menus
 {
     public class mainMenu : MonoBehaviour, IPointerClickHandler
     {
+<<<<<<< HEAD
         public bool areLevelsImported = false;
 
 
+=======
+        
+>>>>>>> master
         public GameObject musicAsset;
         public Image bg;
         public Sprite[] sprite;
@@ -155,6 +159,7 @@ namespace JammerDash.Menus
             StartCoroutine(SetCountry());
             SetSpectrum();
             LoadRandomBackground();
+<<<<<<< HEAD
             string path = Path.Combine(Application.persistentDataPath, "levels");
             if (Directory.GetFiles(path, "*.jdl").Length == 0)
             {
@@ -163,6 +168,9 @@ namespace JammerDash.Menus
                 FileBrowser.SetDefaultFilter("Levels");
                 FileBrowser.ShowLoadDialog(ImportLevel, null, FileBrowser.PickMode.Files, true, Path.Combine(Application.streamingAssetsPath, "levels"), null, "Import Level...", "Import");
             }
+=======
+
+>>>>>>> master
         }
         public void SetSpectrum()
         {
@@ -170,7 +178,11 @@ namespace JammerDash.Menus
 
             foreach (SimpleSpectrum spectrum in spectrums)
             {
+<<<<<<< HEAD
                 spectrum.audioSource = AudioManager.Instance.source;
+=======
+                spectrum.audioSource = AudioManager.Instance.GetComponent<AudioSource>();
+>>>>>>> master
             }
         }
         public string FormatTime(float time)
@@ -1215,10 +1227,13 @@ namespace JammerDash.Menus
         public void FixedUpdate()
         {
             string timeInfo = DateTime.Now.ToString("hh:mm:ss tt") + "\n";
+<<<<<<< HEAD
             if (SceneManager.GetActiveScene().buildIndex == 1 && AudioManager.Instance.source.loop)
             {
                 AudioManager.Instance.source.loop = false;
             }
+=======
+>>>>>>> master
             if (FindObjectOfType<GameTimer>() != null)
             {
                 timeInfo += "running " + FormatElapsedTime(GameTimer.GetRunningTime());

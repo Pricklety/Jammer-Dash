@@ -54,7 +54,11 @@ namespace JammerDash.Game
             {
                 return "S";
             }
+<<<<<<< HEAD
             else if (destructionPercentage >= maxScore * 0.92f)
+=======
+            else if (destructionPercentage <= maxScore && destructionPercentage >= maxScore * 0.92f)
+>>>>>>> master
             {
                 return "A";
             }

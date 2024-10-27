@@ -44,10 +44,22 @@ namespace JammerDash
         // Technical
         public string gameVersion;
         public float saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+<<<<<<< HEAD
+=======
+        public AudioClip clip;
+        public string creator;
+        public bool ground = true;
+        public Color defBGColor;
+        public Color defGColor;
+>>>>>>> master
         public bool isVerified;
         public bool isUploaded;
         public int playerScore;
         public string rank;
+<<<<<<< HEAD
+=======
+        public float offset = 0;
+>>>>>>> master
 
         public string ToJson()
         {

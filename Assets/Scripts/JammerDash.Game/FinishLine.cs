@@ -221,7 +221,11 @@ namespace JammerDash.Game
             total.text = $"{player0.counter.score}";
             combo.text = $"{player0.highestCombo}x";
            if (scoreRank != null)
+<<<<<<< HEAD
             scoreRank.sprite = Resources.Load<Sprite>($"ranking/{player0.counter.GetTier(player0.counter.accCount / player0.Total * 100)}");
+=======
+            scoreRank.sprite = Resources.Load<Sprite>($"ranking/{player0.counter.GetNoColorTier(player0.counter.accCount / player0.Total * 100)}");
+>>>>>>> master
             player.transform.localScale = Vector3.zero;
             objectOfType.enabled = false;
 
@@ -229,7 +233,12 @@ namespace JammerDash.Game
             SaveLevelData(actualdest, destruction);
 
 
+<<<<<<< HEAD
             
+=======
+            AudioSource[] audios = FindObjectsOfType<AudioSource>();
+            Debug.Log(audios);
+>>>>>>> master
             finishMenu.SetActive(true);
             if (anim != null)
             anim.Play();
@@ -243,7 +252,11 @@ namespace JammerDash.Game
             level.value = Account.Instance.currentXP / Account.Instance.xpRequiredPerLevel[Account.Instance.level];
             lvl.text = $"lv{Account.Instance.level}";
 
+<<<<<<< HEAD
             AudioManager.Instance.source.PlayOneShot(Resources.Load<AudioClip>($"Audio/SFX/ranking/{player0.counter.GetTier(player0.counter.accCount / player0.Total * 100)} Rank"));
+=======
+            FindObjectOfType<AudioSource>().PlayOneShot(Resources.Load<AudioClip>($"Audio/SFX/ranking/{player0.counter.GetNoColorTier(player0.counter.accCount / player0.Total * 100)} Rank"));
+>>>>>>> master
 
             yield return null;
         }

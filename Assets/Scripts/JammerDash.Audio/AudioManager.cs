@@ -126,7 +126,11 @@ namespace JammerDash.Audio
         public void Update()
         {
             
+<<<<<<< HEAD
             if (Input.GetKeyDown(KeyCode.F9))
+=======
+            if (Input.GetKeyDown(KeyCode.F9) && SceneManager.GetActiveScene().buildIndex == 1)
+>>>>>>> master
             {
                 StartCoroutine(LoadAudioClipsAsync());
             }
