@@ -30,7 +30,9 @@ namespace JammerDash.Menus
 {
     public class mainMenu : MonoBehaviour, IPointerClickHandler
     {
-        
+        public bool areLevelsImported = false;
+
+
         public GameObject musicAsset;
         public Image bg;
         public Sprite[] sprite;
@@ -78,7 +80,6 @@ namespace JammerDash.Menus
         public GameObject levelInfoPanelPrefab;
         public Transform levelInfoParent;
         public GameObject levelCreatePanel;
-        public InputField newLevelNameInput;
         public InputField song;
         public InputField artists;
         public InputField map;
@@ -135,6 +136,7 @@ namespace JammerDash.Menus
         void Start()
         {
             Time.timeScale = 1f;
+            AudioManager.Instance.source.pitch = 1f;
             playerData = Account.Instance.LoadData();
             data = SettingsFileHandler.LoadSettingsFromFile();
             levelSlider.maxValue = Account.Instance.xpRequiredPerLevel[0];
@@ -153,7 +155,14 @@ namespace JammerDash.Menus
             StartCoroutine(SetCountry());
             SetSpectrum();
             LoadRandomBackground();
-
+            string path = Path.Combine(Application.persistentDataPath, "levels");
+            if (Directory.GetFiles(path, "*.jdl").Length == 0)
+            {
+                FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserCanvas")).GetComponent<FileBrowser>();
+                FileBrowser.SetFilters(false, new FileBrowser.Filter("Jammer Dash Level", ".jdl"));
+                FileBrowser.SetDefaultFilter("Levels");
+                FileBrowser.ShowLoadDialog(ImportLevel, null, FileBrowser.PickMode.Files, true, Path.Combine(Application.streamingAssetsPath, "levels"), null, "Import Level...", "Import");
+            }
         }
         public void SetSpectrum()
         {
@@ -645,8 +654,6 @@ namespace JammerDash.Menus
         }
         public void CreateNewLevel()
         {
-            // Get input values for the new level
-            string newLevelName = newLevelNameInput.text;
             float newDifficulty = 0;
 
             songName = song.text;
@@ -654,8 +661,8 @@ namespace JammerDash.Menus
             mapper = map.text;
             SceneData newLevelData = new SceneData
             {
-                sceneName = newLevelName, // You may want to customize the scene name
-                levelName = newLevelName,
+                sceneName = songName, 
+                levelName = songName,
                 calculatedDifficulty = newDifficulty,
                 songName = songName,
                 artist = artist,

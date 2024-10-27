@@ -246,8 +246,6 @@ public class SimpleSpectrum : MonoBehaviour {
     float micRestartWait = 20;
 
     void Start () {
-        if(audioSource==null && sourceType == SourceType.AudioSource)
-            Debug.LogError("An audio source has not been assigned. Please assign a reference to a source, or set useAudioListener instead.");
         RebuildSpectrum();
 	}
 

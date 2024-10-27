@@ -129,6 +129,8 @@ namespace JammerDash.Game.Player
             else if (data.hitType == 1)
             {
                 goodTextPrefab = Resources.Load<GameObject>("RinHit");
+                okTextPrefab = Resources.Load<GameObject>("RinOK");
+                normalTextPrefab = Resources.Load<GameObject>("RinNormal");
                 badTextPrefab = Resources.Load<GameObject>("RinMiss");
             }
             GameObject[] deathObjects = FindObjectsOfType<GameObject>();
@@ -762,7 +764,6 @@ namespace JammerDash.Game.Player
                 {
                     activeCubes.Remove(collision.gameObject);
 
-                    Total += 5;
 
                     health -= 30;
                     bufferActive = false;
