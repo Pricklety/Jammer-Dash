@@ -5,6 +5,7 @@
     <type fullname="JammerDash.Game.cameraColor" preserve="all" />
     <type fullname="JammerDash.Game.CubeCounter" preserve="all" />
     <type fullname="JammerDash.Game.FinishLine" preserve="all" />
+    <type fullname="JammerDash.Game.Note.NoteBehaviour" preserve="all" />
     <type fullname="JammerDash.Game.PauseMenu" preserve="all" />
     <type fullname="JammerDash.Game.Player.PlayerMovement" preserve="all" />
     <type fullname="JammerDash.Game.RestartCustom" preserve="all" />
@@ -14,14 +15,8 @@
   <assembly fullname="Unity.Addressables, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" preserve="all">
     <type fullname="UnityEngine.AddressableAssets.Addressables" preserve="all" />
   </assembly>
-  <assembly fullname="Unity.InputSystem, Version=1.8.2.0, Culture=neutral, PublicKeyToken=null">
-    <type fullname="UnityEngine.InputSystem.InputActionAsset" preserve="all" />
+  <assembly fullname="Unity.InputSystem, Version=1.11.1.0, Culture=neutral, PublicKeyToken=null">
     <type fullname="UnityEngine.InputSystem.PlayerInput" preserve="all" />
-    <type fullname="UnityEngine.InputSystem.InputAction" preserve="nothing" serialized="true" />
-    <type fullname="UnityEngine.InputSystem.InputActionMap" preserve="nothing" serialized="true" />
-    <type fullname="UnityEngine.InputSystem.InputBinding" preserve="nothing" serialized="true" />
-    <type fullname="UnityEngine.InputSystem.InputControlScheme" preserve="nothing" serialized="true" />
-    <type fullname="UnityEngine.InputSystem.InputControlScheme/DeviceRequirement" preserve="nothing" serialized="true" />
     <type fullname="UnityEngine.InputSystem.PlayerInput/ControlsChangedEvent" preserve="nothing" serialized="true" />
     <type fullname="UnityEngine.InputSystem.PlayerInput/DeviceLostEvent" preserve="nothing" serialized="true" />
     <type fullname="UnityEngine.InputSystem.PlayerInput/DeviceRegainedEvent" preserve="nothing" serialized="true" />

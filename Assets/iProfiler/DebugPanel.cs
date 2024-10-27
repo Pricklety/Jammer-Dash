@@ -29,11 +29,10 @@ namespace JammerDash.Tech
         // Update is called once per frame
         void FixedUpdate()
         {
-            gui.text = $"Debug v12 - Jammer Dash {Application.version} ({Application.unityVersion})\n\n";
+            gui.text = $"Debug v13 - Jammer Dash {Application.version} (Unity {Application.unityVersion})\n\n";
 
             DisplayAudioInfo();
             DisplayInputInfo();
-            DisplayOptionsInfo();
             DisplaySystemInfo();
             DisplayGraphicsInfo();
             DisplayVideoInfo();
@@ -74,50 +73,6 @@ namespace JammerDash.Tech
             {
                 musicSource = GameObject.Find("mainmenu").GetComponent<AudioSource>();
             }
-        }
-
-        void DisplayOptionsInfo()
-        {
-            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-          
-
-            string bg = "";
-            switch (data.bgTime)
-            {
-                case 1:
-                    bg = "On song change";
-                    break;
-                case 2:
-                    bg = "Every 15s";
-                    break;
-                case 3:
-                    bg = "Every 30s";
-                    break;
-            }
-            string v = data.canvasOff ? "Off" : "On";
-
-            gui.text += "\n\nResolution value: " + data.resolutionValue + $" ({Screen.width}x{Screen.height})" +
-                        "\nBackgrounds Type: " + data.backgroundType +
-                        "\nSFX: " + data.sfx +
-                        "\nHit Notes: " + data.hitNotes +
-                        "\nPlayer Type: " + data.playerType +
-                        "\nCursor Trail: " + data.cursorTrail +
-                        "\nNo focus volume: " + data.noFocusVolume +
-                        "\nLowpass value: " + data.lowpassValue +
-                        "\nMouse particle count: " + data.mouseParticles +
-                        "\nShowing FPS: " + data.isShowingFPS +
-                        "\nParallax: " + data.parallax +
-                        "\nRandom hit sounds: " + data.randomSFX +
-                        "\nConfined mouse: " + data.confinedMouse +
-                        "\nBackground Time: " + bg +
-                        "\nMouse wheel volume: " + data.wheelShortcut +
-                        "\nIncreased game volume: " + data.volumeIncrease +
-                        "\nSnow: " + data.snow +
-                        "\nGameplay Canvas: " + v +
-                        "\nBass: " + data.bass +
-                        "\nBass Gain: " + data.bassgain + "Hz";
-
-
         }
 
         void DisplayVideoInfo()
