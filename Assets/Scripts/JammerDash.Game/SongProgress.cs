@@ -7,7 +7,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using JammerDash.Game.Player;
 using JammerDash.Tech;
-using JammerDash.Audio;
 
 namespace JammerDash.Game
 {
@@ -21,8 +20,6 @@ namespace JammerDash.Game
         public PlayerMovement player;
         private void Start()
         {
-
-            audioSource = AudioManager.Instance.source;
             if (SceneManager.GetActiveScene().name == "LevelDefault")
             {
                 string levelName = CustomLevelDataManager.Instance.levelName;

@@ -69,13 +69,10 @@ namespace JammerDash.Game.Player
         [Header("UI")]
         public GameObject deathPanel;
 
-<<<<<<< HEAD
-=======
         [Header("Maximum scoring")]
         int maxScore;
         int maxCombo;
         float maxHP;
->>>>>>> master
         [Header("SP Calculator")]
         public float accuracyWeight = 0.56f;
         public float comboWeight = 0.25f;
@@ -83,15 +80,15 @@ namespace JammerDash.Game.Player
         public float strategicDecisionMakingWeight = 0.13f;
         public float adaptabilityWeight = 0.15f;
         public float levelCompletionTimeWeight = 0.1f;
-<<<<<<< HEAD
-=======
         private float _precision;
         private float _sequenceEfficiency;
         private float _versatility;
         private float _completionSpeed;
->>>>>>> master
         public float _performanceScore;
 
+        private int _perfectHits, _greatHits, _goodHits, _missedHits;
+        private int _currentCombo, _bestCombo;
+        private int _totalActions;
         private float _gameDifficulty;
 
         [Header("Others")]
@@ -100,23 +97,18 @@ namespace JammerDash.Game.Player
         private float maxY = 4f;
         public int combo;
         public int highestCombo;
+        private float comboTime;
+        private float combominimize = .75f;
         bool isDying = false;
         bool invincible = false;
         public int Total = 0;
         private bool bufferActive = false;
-        public int maxScore = 1000000;
-        public float factor;
+        public float longcombo = 0;
         public int misses;
         public int five;
         public int three;
         public int one;
         public int SPInt;
-        private bool isBufferRunning = false;
-
-        private void Awake()
-        {
-            music = AudioManager.Instance.source;
-        }
         private void Start()
         {
             CustomLevelDataManager.Instance.sceneLoaded = false;
@@ -139,13 +131,13 @@ namespace JammerDash.Game.Player
                 okTextPrefab = Resources.Load<GameObject>("crap");
                 normalTextPrefab = Resources.Load<GameObject>("ok");
                 badTextPrefab = Resources.Load<GameObject>("bad");
+                UnityEngine.Debug.Log("asd");
             }
             else if (data.hitType == 1)
             {
                 goodTextPrefab = Resources.Load<GameObject>("RinHit");
-                okTextPrefab = Resources.Load<GameObject>("RinOK");
-                normalTextPrefab = Resources.Load<GameObject>("RinNormal");
                 badTextPrefab = Resources.Load<GameObject>("RinMiss");
+                UnityEngine.Debug.Log("asd");
             }
             GameObject[] deathObjects = FindObjectsOfType<GameObject>();
             FindObjectOfType<cameraColor>().enabled = true;
@@ -275,11 +267,7 @@ namespace JammerDash.Game.Player
 
             // Debug text area
             {
-<<<<<<< HEAD
-               
-=======
                 ShinePerformance sp = new ShinePerformance(five + three + one + misses, 0, 0, 0, maxCombo, maxCombo, _gameDifficulty, CalculateLevelCompletionTime());
->>>>>>> master
                 
                 debug.text = $"<b>KEYS</b>\r" +
                     $"\nKey1: {k}\r\n" +
@@ -293,19 +281,11 @@ namespace JammerDash.Game.Player
                     $"three: {three}\r\n" +
                     $"one: {one}\r\n" +
                     $"miss: {misses}\r\n" +
-<<<<<<< HEAD
-                    $"score: {counter.score}\r\n" +
-                    $"combo: {combo}x\r\n" +
-                    $"health: {hpint}\r\n" +
-                    $"accuracy: {counter.accCount / Total * 100:000.00}% ({counter.accCount} / {Total})\r\n" +
-                    $"sp: {_performanceScore:0.00}";
-=======
                     $"score: {counter.score} ({maxScore})\r\n" +
                     $"combo: {combo}x ({maxCombo})\r\n" +
                     $"health: {hpint}\r\n" +
                     $"accuracy: {counter.accCount / Total * 100:000.00}% ({counter.accCount} / {Total})\r\n" +
                     $"sp: {_performanceScore} ({sp.PerformanceScore})";
->>>>>>> master
             }
             if (health > maxHealth)
             {
@@ -318,6 +298,7 @@ namespace JammerDash.Game.Player
 
             combotext.text = combo.ToString() + "x";
 
+            comboTime += Time.deltaTime;
 
 
             SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
@@ -437,21 +418,8 @@ namespace JammerDash.Game.Player
             SPInt = Mathf.RoundToInt(_performanceScore);
             if (Total > 0)
             {
-                
                 float acc = (float)counter.accCount / Total * 100;
-<<<<<<< HEAD
-                if (float.IsNaN(acc))
-                {
-                    acc = 0;
-                }
-                else if (float.IsNaN(_performanceScore))
-                {
-                    _performanceScore = 0;
-                }
-                this.acc.text = $"{acc:F2}% | {counter.GetTier(acc)} | {~~SPInt:F0} sp";
-=======
                 this.acc.text = $"{acc:F2}% | {counter.GetTier(acc)} | {SPInt:F2} sp";
->>>>>>> master
             }
             else
             {
@@ -476,6 +444,8 @@ namespace JammerDash.Game.Player
                     passedCubes.Add(hit.collider.gameObject);
                     DestroyCube(hit.collider.gameObject);
 
+                    Total += 1;
+
                     Animation anim = combotext.GetComponent<Animation>();
                     if (highestCombo <= combo)
                     {
@@ -484,10 +454,12 @@ namespace JammerDash.Game.Player
                     combo++;
                         maxCombo++;
 
+                    SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
                     StartCoroutine(ChangeScore(Vector3.Distance(hit.collider.transform.position, transform.position)));
 
                     anim.Stop("comboanim");
                     anim.Play("comboanim");
+                    comboTime = 0;
                 }
             }
             else if (passedCubes.Count > 0 && FindNearestCubeDistance() < 2)
@@ -564,7 +536,9 @@ namespace JammerDash.Game.Player
                 ShowBadText();
             }
 
+            health -= 20;
             counter.destroyedCubes -= 100 - combo;
+            Total += 1;
             sfxS.PlayOneShot(fail);
 
             combo = 0;
@@ -584,8 +558,6 @@ namespace JammerDash.Game.Player
             float lerpSpeed = 1f;
             float lerpTimer = 0f;
             misses++;
-            health -= 30;
-            counter.score -= 350;
             while (lerpTimer < 1f)
             {
                 lerpTimer += Time.fixedDeltaTime * lerpSpeed;
@@ -624,18 +596,13 @@ namespace JammerDash.Game.Player
         }
         IEnumerator ChangeScore(float playerDistance)
         {
-<<<<<<< HEAD
-=======
             ChangeMaxScore();
             float factor;
->>>>>>> master
             UnityEngine.Debug.Log(playerDistance);
             if (playerDistance <= 0.29f)
             {
                 factor = 1f;
                 five++;
-                counter.accCount += 5;
-                Total += 5;
                 if (AudioManager.Instance != null)
                 {
                     if (AudioManager.Instance.hits)
@@ -649,8 +616,6 @@ namespace JammerDash.Game.Player
             {
                 factor = 1f / 3f;
                 three++;
-                counter.accCount += 3;
-                Total += 5;
                 if (AudioManager.Instance != null)
                 {
                     if (AudioManager.Instance.hits)
@@ -664,8 +629,6 @@ namespace JammerDash.Game.Player
             {
                 factor = 1f / 5f;
                 one++;
-                counter.accCount += 1;
-                Total += 5;
                 if (AudioManager.Instance != null)
                 {
                     if (AudioManager.Instance.hits)
@@ -676,37 +639,30 @@ namespace JammerDash.Game.Player
             }
 
             counter.destroyedCubes += 50;
-<<<<<<< HEAD
-            float formula = (maxScore * factor) / counter.cubes.Count;
-=======
 
 
             float formula = factor * 100 + Mathf.RoundToInt((CustomLevelDataManager.Instance.diff / 10) + health / 100 + ((int)counter.accCount / Total * 100) + combo * 6) * 3;
            
->>>>>>> master
             float newDestroyedCubes = counter.score + formula;
             newDestroyedCubes = Mathf.RoundToInt(newDestroyedCubes);
-
             float elapsedTime = 0f;
             float duration = 0.1f;
+            counter.accCount += 1 * factor;
 
-            health += maxHealth / (20f * factor); 
-
+            health += 20 * factor;
             while (elapsedTime < duration)
             {
-                counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
-                elapsedTime += Time.deltaTime;
-                scoreText.text = $"{counter.score}\n<color=lime>(+{formula:0})</color>";
-                yield return null;
+                SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+                    counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
+                    elapsedTime += Time.deltaTime;
+                    scoreText.text = $"{counter.score}\n<color=lime>(+{formula})</color>";
+                yield return null; // Wait for the next frame
             }
 
-            // Ensure final score is precisely updated
+            // Ensure the score reaches the final value precisely
             counter.score = Mathf.RoundToInt(newDestroyedCubes);
             yield return new WaitForSeconds(0.2f);
         }
-<<<<<<< HEAD
-
-=======
 
         public void ChangeMaxScore()
         {
@@ -756,7 +712,6 @@ namespace JammerDash.Game.Player
             counter.score = Mathf.RoundToInt(newDestroyedCubes);
             yield return new WaitForSeconds(0.2f);
         }
->>>>>>> master
 
 
         private void DestroyCube(GameObject cube)
@@ -775,13 +730,13 @@ namespace JammerDash.Game.Player
 
             }
         }
+
         private void ShowBadText()
         {
             if (Time.timeScale > 0)
             {
                 Instantiate(badTextPrefab, transform.position, Quaternion.identity);
 
-                Total += 5;
 
             }
 
@@ -847,17 +802,13 @@ namespace JammerDash.Game.Player
                         }
                     }
 
-                    health -= 30;
-                    Total += 5;
+                    Total += 1;
                     activeCubes.Remove(collision.gameObject);
-<<<<<<< HEAD
-=======
                     health -= 35; // Lower health due to passing the cube
                     combo = 0; // Reset combo
                     maxCombo++;
                     ChangeMaxScore();
                     StartCoroutine(ChangeTextCombo());
->>>>>>> master
                 }
 
 
@@ -866,14 +817,19 @@ namespace JammerDash.Game.Player
             {
                 if (!bufferActive)
                 {
+                    UnityEngine.Debug.Log("failed: " + bufferActive);
                     activeCubes.Remove(collision.gameObject);
 
+                    if (!passedCubes.Contains(collision.gameObject))
+                    {
+                        if (AudioManager.Instance != null)
+                        {
+                            if (AudioManager.Instance.hits)
+                            {
+                                ShowBadText();
+                            }
+                        }
 
-<<<<<<< HEAD
-                    health -= 30;
-                    bufferActive = false;
-
-=======
                         Total += 1;
                         activeCubes.Remove(collision.gameObject);
                         health -= 75; // Lower health due to passing the cube
@@ -882,17 +838,12 @@ namespace JammerDash.Game.Player
                         ChangeMaxScoreLong();
                         StartCoroutine(ChangeTextCombo());
                     }
->>>>>>> master
                 }
                 else if (bufferActive)
                 {
                     UnityEngine.Debug.Log("hit: " + bufferActive);
                     DestroyCube(collision.gameObject);
 
-<<<<<<< HEAD
-                    bufferActive = false;
-                    health += 30;
-=======
                     Total += 1;
 
                     Animation anim = combotext.GetComponent<Animation>();
@@ -923,10 +874,8 @@ namespace JammerDash.Game.Player
                     anim.Stop("comboanim");
                     anim.Play("comboanim");
                     comboTime = 0;
->>>>>>> master
                 }
             }
-
 
         }
 
@@ -935,17 +884,13 @@ namespace JammerDash.Game.Player
         {
             if (bufferActive)
             {
-                int formula = 1;
+                int formula = combo + 1;
                 int newDestroyedCubes = counter.score + formula;
                 int newMaxScore = maxScore + formula;
                 scoreText.text = $"{counter.score}\n<color=lime>(+{formula})</color>";
                 // Ensure the score reaches the final value precisely
                 counter.score = newDestroyedCubes;
-<<<<<<< HEAD
-                
-=======
                 maxScore = newMaxScore;
->>>>>>> master
                 health += 0.175f;
                 yield return null;
             }
@@ -960,101 +905,80 @@ namespace JammerDash.Game.Player
         {
             if (collision.gameObject.name.Contains("hitter02") && collision.transform.position.y == transform.position.y)
             {
-
+                UnityEngine.Debug.Log(bufferActive);
                 if ((Input.GetKeyDown(KeybindingManager.hit1) || Input.GetKeyDown(KeybindingManager.hit2)) && !isDying)
                 {
+                    if (highestCombo <= combo)
+                    {
+                        highestCombo++;
+                    }
                     if (!bufferActive)
                     {
 
                         sfxS.PlayOneShot(hit);
                     }
                     bufferActive = true;
-
-                    float distance = Vector2.Distance(collision.transform.position, transform.position);
-                    float middle = Mathf.Abs(collision.offset.x);
-                    Debug.Log(distance);
-                    if (distance < 1)
-                    {
-                        combo++;
-                        if (highestCombo < combo)
-                        {
-                            highestCombo++;
-                        }
-
-                        StartCoroutine(ChangeScore(0f));
-                        if (AudioManager.Instance != null && AudioManager.Instance.hits)
-                        {
-                            Instantiate(goodTextPrefab, transform.position, Quaternion.identity);
-                        }
-
-                        Animation anim = combotext.GetComponent<Animation>();
-
-                        anim.Stop("comboanim");
-                        anim.Play("comboanim");
-                    }
-                    else if (distance < middle && distance >= 1)
-                    {
-                        StartCoroutine(ChangeScore(0.30f));
-                        if (AudioManager.Instance != null && AudioManager.Instance.hits)
-                        {
-                            Instantiate(normalTextPrefab, transform.position, Quaternion.identity);
-                        }
-                    }
-                    else if (distance >= middle)
-                    {
-                        health -= 35;
-                        combo = 0;
-                        StartCoroutine(ChangeScore(0.48f));
-                        if (AudioManager.Instance != null && AudioManager.Instance.hits)
-                        {
-                            Instantiate(okTextPrefab, transform.position, Quaternion.identity);
-                        }
-                    }
+                }
+                else if ((Input.GetKey(KeybindingManager.hit1) || Input.GetKey(KeybindingManager.hit2)) && !isDying)
+                {
+                    StartCoroutine(OnTriggerEnter2DBuffer());
                     
-                }
-                if ((Input.GetKeyUp(KeybindingManager.hit1) || Input.GetKeyUp(KeybindingManager.hit2)) && !isDying && collision.transform.position.y == transform.position.y) 
-                {
-                    counter.score -= Mathf.RoundToInt((maxScore * factor) / counter.cubes.Count);
-                    bufferActive = false;
-                }
-                if ((Input.GetKey(KeybindingManager.hit1) || Input.GetKey(KeybindingManager.hit2)) && !isDying)
-                {
-                    if (!isBufferRunning && bufferActive)
-                    {
-                        StartCoroutine(OnTriggerEnter2DBufferLoop());
-                    }
-                    else
-                    {
-                        isBufferRunning = false;
-                    }
                 }
 
                 else if (!(Input.GetKey(KeybindingManager.hit1) || Input.GetKey(KeybindingManager.hit2)) && !isDying)
                 {
                     bufferActive = false;
                 }
-<<<<<<< HEAD
-=======
                 maxScore += maxCombo + 1;
->>>>>>> master
             }
+            if (collision.tag == "SloMoTutorial")
+            {
+                GameObject tutg = GameObject.Find("TutorialText");
+                Text tuttext = tutg.GetComponent<Text>();
+                health -= 0.05f;
 
+                if (transform.position.x < 25)
+                {
+                    tuttext.text = "Welcome to Jammer Dash!";
+                    health -= 0f;
+                }
+                if (transform.position.x > 25 && transform.position.x < 56)
+                {
+                    tuttext.text = "Click the left mouse button to destroy the cube and continue (Enter and right mouse button work too)";
+                }
+                if (transform.position.x > 78 && transform.position.x < 100)
+                {
+                    tuttext.text = "Click W to go upwards and destroy the cube";
+                }
+                if (transform.position.x > 120 && transform.position.x < 150)
+                {
+                    tuttext.text = "Click S to go downwards and destroy the cube";
+                }
+                if (transform.position.x > 165 && transform.position.x < 200)
+                {
+                    tuttext.text = "Click Space to dash upwards and destroy the cube";
+                }
+                if (transform.position.x > 210 && transform.position.x < 260)
+                {
+                    tuttext.text = "Click Space again";
+                }
+                if (transform.position.x > 270 && transform.position.x < 320)
+                {
+                    tuttext.text = "Click A to go back to the ground";
+                }
+                if (transform.position.x > 330 && transform.position.x < 360)
+                {
+                    tuttext.text = "Now try to do this level to the finish with what you learned.";
+                }
+
+
+
+            }
 
             if (collision.name == "finishline")
             {
                 health -= 0f;
             }
-        }
-
-        IEnumerator OnTriggerEnter2DBufferLoop()
-        {
-            isBufferRunning = true;
-            while ((Input.GetKey(KeybindingManager.hit1) || Input.GetKey(KeybindingManager.hit2)) && !isDying && bufferActive)
-            {
-                StartCoroutine(OnTriggerEnter2DBuffer());
-                yield return new WaitForSeconds(0.03f);    
-            }
-            isBufferRunning = false;
         }
     }
 

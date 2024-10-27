@@ -50,7 +50,6 @@ namespace JammerDash.Audio
         bool paused = false;
         public bool songLoaded;
         public Text devText;
-        public AudioSource source;
 
         private void Awake()
         {
@@ -72,7 +71,7 @@ namespace JammerDash.Audio
         public void Start()
         {
             masterS.onValueChanged.AddListener(OnMasterVolumeChanged);
-            source = GetComponent<AudioSource>();
+
             if (Debug.isDebugBuild)
             devText.gameObject.SetActive(true);
             else
@@ -126,11 +125,7 @@ namespace JammerDash.Audio
         public void Update()
         {
             
-<<<<<<< HEAD
-            if (Input.GetKeyDown(KeyCode.F9))
-=======
             if (Input.GetKeyDown(KeyCode.F9) && SceneManager.GetActiveScene().buildIndex == 1)
->>>>>>> master
             {
                 StartCoroutine(LoadAudioClipsAsync());
             }
@@ -185,7 +180,7 @@ namespace JammerDash.Audio
                 audio.outputAudioMixerGroup = master;
                 audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", Mathf.Clamp(masterS.value, -80f, 20f));
             }
-            if (SceneManager.GetActiveScene().buildIndex == 1 && options != null)
+            if (SceneManager.GetActiveScene().buildIndex == 1)
             {
 
                 if (!options.increaseVol.isOn)
@@ -197,91 +192,90 @@ namespace JammerDash.Audio
                 {
                     masterS.maxValue = 20;
                 }
-
-
+            }
                 if (Input.GetKey(KeyCode.LeftShift) && value1 != 0 && data.wheelShortcut)
+            {
+                timer = 0f; // Increment timer each frame
+                            // Activate masterS GameObject if it's not active
+                if (!masterS.gameObject.activeSelf)
                 {
-                    timer = 0f; // Increment timer each frame
-                                // Activate masterS GameObject if it's not active
-                    if (!masterS.gameObject.activeSelf)
+                    masterS.gameObject.SetActive(true);
+                }
+                // Calculate the new volume within the range of -80 to 0
+                if (!options.increaseVol.isOn)
+                {
+                    masterS.maxValue = 0;
+                    float newVolume = Mathf.Clamp(masterS.value + value1, -80f, 20f);
+                    audioSource.PlayOneShot(Resources.Load<AudioClip>("Audio/SFX/volClick"), 0.75f);
+                    float intVol = Mathf.InverseLerp(-80f, 0f, newVolume) * 100f;
+                    // Loop through each audio source
+                    foreach (AudioSource audio in audios)
                     {
-                        masterS.gameObject.SetActive(true);
-                    }
-                    // Calculate the new volume within the range of -80 to 0
-                    if (!options.increaseVol.isOn)
-                    {
-                        masterS.maxValue = 0;
-                        float newVolume = Mathf.Clamp(masterS.value + value1, -80f, 20f);
-                        audioSource.PlayOneShot(Resources.Load<AudioClip>("Audio/SFX/volClick"), 0.75f);
-                        float intVol = Mathf.InverseLerp(-80f, 0f, newVolume) * 100f;
-                        // Loop through each audio source
-                        foreach (AudioSource audio in audios)
-                        {
 
-                            // Apply the new volume to the audio source 
-                            audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", newVolume);
-                            if (SceneManager.GetActiveScene().buildIndex == 1)
-                            {
-                                options.masterVolumeSlider.value = newVolume;
-                            }
-                        }
-                        masterS.value = newVolume; // Update UI slider text
-                        masterS.GetComponentInChildren<Text>().text = "Master: " + (int)intVol;
-                    }
-                    else
-                    {
-                        masterS.maxValue = 20;
-                        float newVolume = Mathf.Clamp(masterS.value + value1, -80f, 20f);
-                        audioSource.PlayOneShot(Resources.Load<AudioClip>("Audio/SFX/volClick"), 0.75f);
-                        float intVol = Mathf.InverseLerp(-80f, 20f, newVolume) * 120f;
-                        // Loop through each audio source
-                        foreach (AudioSource audio in audios)
-                        {
-
-                            // Apply the new volume to the audio source 
-                            audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", newVolume);
-                            if (SceneManager.GetActiveScene().buildIndex == 1)
-                            {
-                                options.masterVolumeSlider.value = newVolume;
-                            }
-                        }
-                        masterS.value = newVolume; // Update UI slider text
-                        masterS.GetComponentInChildren<Text>().text = "Master: " + (int)intVol;
-
-                        options.ApplyOptions();
-                    }
-
-
-
-
-                    // Check if masterS is held and there's no input from Mouse ScrollWheel
-                    if (EventSystem.current.currentSelectedGameObject == masterS || Input.GetAxis("Mouse ScrollWheel") != 0)
-                    {
+                        // Apply the new volume to the audio source 
+                        audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", newVolume);
                         if (SceneManager.GetActiveScene().buildIndex == 1)
                         {
-                            options.masterVolumeSlider.value = masterS.value;
+                            options.masterVolumeSlider.value = newVolume;
                         }
-                        timer = 0f; // Reset the timer when masterS is held
                     }
+                    masterS.value = newVolume; // Update UI slider text
+                    masterS.GetComponentInChildren<Text>().text = "Master: " + (int)intVol;
                 }
                 else
                 {
-                    if (Input.GetMouseButton(0) && timer < 2)
+                    masterS.maxValue = 20;
+                    float newVolume = Mathf.Clamp(masterS.value + value1, -80f, 20f);
+                    audioSource.PlayOneShot(Resources.Load<AudioClip>("Audio/SFX/volClick"), 0.75f);
+                    float intVol = Mathf.InverseLerp(-80f, 20f, newVolume) * 120f;
+                    // Loop through each audio source
+                    foreach (AudioSource audio in audios)
                     {
+
+                        // Apply the new volume to the audio source 
+                        audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", newVolume);
                         if (SceneManager.GetActiveScene().buildIndex == 1)
                         {
-                            options.masterVolumeSlider.value = masterS.value;  // Calculate the new volume within the range of -80 to 0
-                            float newVolume = Mathf.Clamp(masterS.value, -80f, 0f);
-                            float intVol = Mathf.RoundToInt(Mathf.InverseLerp(-80f, 0f, newVolume) * 100f);
-                            // Update UI slider text
-                            masterS.GetComponentInChildren<Text>().text = "Master: " + intVol;
+                            options.masterVolumeSlider.value = newVolume;
                         }
-                        timer = 1.95f;
                     }
+                    masterS.value = newVolume; // Update UI slider text
+                    masterS.GetComponentInChildren<Text>().text = "Master: " + (int)intVol;
 
-                    timer += Time.fixedDeltaTime;
+                    options.ApplyOptions();
+                }
+               
+
+
+               
+                // Check if masterS is held and there's no input from Mouse ScrollWheel
+                if (EventSystem.current.currentSelectedGameObject == masterS || Input.GetAxis("Mouse ScrollWheel") != 0)
+                {
+                    if (SceneManager.GetActiveScene().buildIndex == 1)
+                    {
+                        options.masterVolumeSlider.value = masterS.value;
+                    }
+                    timer = 0f; // Reset the timer when masterS is held
                 }
             }
+            else
+            {
+                if (Input.GetMouseButton(0) && timer < 2)
+                {
+                    if (SceneManager.GetActiveScene().buildIndex == 1)
+                    {
+                        options.masterVolumeSlider.value = masterS.value;  // Calculate the new volume within the range of -80 to 0
+                        float newVolume = Mathf.Clamp(masterS.value, -80f, 0f);
+                        float intVol = Mathf.RoundToInt(Mathf.InverseLerp(-80f, 0f, newVolume) * 100f);
+                        // Update UI slider text
+                        masterS.GetComponentInChildren<Text>().text = "Master: " + intVol;
+                    }
+                    timer = 1.95f;
+                }
+
+                timer += Time.fixedDeltaTime;
+            }
+
           
             if (Mathf.Approximately(timer, 2f))
             {
@@ -300,7 +294,7 @@ namespace JammerDash.Audio
                 if (SceneManager.GetActiveScene().buildIndex == 1)
                     options.masterVolumeSlider.value = masterS.value;
             }
-            if (SceneManager.GetActiveScene().buildIndex == 1 && (!songPlayed && !paused && !audioSource.isPlaying || (audioSource.time >= audioSource.clip.length || !audioSource.isPlaying && !paused)))
+            if (!songPlayed && !paused && !audioSource.isPlaying || (audioSource.time >= audioSource.clip.length && SceneManager.GetActiveScene().buildIndex == 1 || !audioSource.isPlaying && !paused))
             {
                 PlayNextSong(songPlayed);
                 songPlayed = true;

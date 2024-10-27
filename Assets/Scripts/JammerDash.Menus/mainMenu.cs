@@ -30,13 +30,7 @@ namespace JammerDash.Menus
 {
     public class mainMenu : MonoBehaviour, IPointerClickHandler
     {
-<<<<<<< HEAD
-        public bool areLevelsImported = false;
-
-
-=======
         
->>>>>>> master
         public GameObject musicAsset;
         public Image bg;
         public Sprite[] sprite;
@@ -84,6 +78,7 @@ namespace JammerDash.Menus
         public GameObject levelInfoPanelPrefab;
         public Transform levelInfoParent;
         public GameObject levelCreatePanel;
+        public InputField newLevelNameInput;
         public InputField song;
         public InputField artists;
         public InputField map;
@@ -140,7 +135,6 @@ namespace JammerDash.Menus
         void Start()
         {
             Time.timeScale = 1f;
-            AudioManager.Instance.source.pitch = 1f;
             playerData = Account.Instance.LoadData();
             data = SettingsFileHandler.LoadSettingsFromFile();
             levelSlider.maxValue = Account.Instance.xpRequiredPerLevel[0];
@@ -159,18 +153,7 @@ namespace JammerDash.Menus
             StartCoroutine(SetCountry());
             SetSpectrum();
             LoadRandomBackground();
-<<<<<<< HEAD
-            string path = Path.Combine(Application.persistentDataPath, "levels");
-            if (Directory.GetFiles(path, "*.jdl").Length == 0)
-            {
-                FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserCanvas")).GetComponent<FileBrowser>();
-                FileBrowser.SetFilters(false, new FileBrowser.Filter("Jammer Dash Level", ".jdl"));
-                FileBrowser.SetDefaultFilter("Levels");
-                FileBrowser.ShowLoadDialog(ImportLevel, null, FileBrowser.PickMode.Files, true, Path.Combine(Application.streamingAssetsPath, "levels"), null, "Import Level...", "Import");
-            }
-=======
 
->>>>>>> master
         }
         public void SetSpectrum()
         {
@@ -178,11 +161,7 @@ namespace JammerDash.Menus
 
             foreach (SimpleSpectrum spectrum in spectrums)
             {
-<<<<<<< HEAD
-                spectrum.audioSource = AudioManager.Instance.source;
-=======
                 spectrum.audioSource = AudioManager.Instance.GetComponent<AudioSource>();
->>>>>>> master
             }
         }
         public string FormatTime(float time)
@@ -666,6 +645,8 @@ namespace JammerDash.Menus
         }
         public void CreateNewLevel()
         {
+            // Get input values for the new level
+            string newLevelName = newLevelNameInput.text;
             float newDifficulty = 0;
 
             songName = song.text;
@@ -673,8 +654,8 @@ namespace JammerDash.Menus
             mapper = map.text;
             SceneData newLevelData = new SceneData
             {
-                sceneName = songName, 
-                levelName = songName,
+                sceneName = newLevelName, // You may want to customize the scene name
+                levelName = newLevelName,
                 calculatedDifficulty = newDifficulty,
                 songName = songName,
                 artist = artist,
@@ -886,7 +867,7 @@ namespace JammerDash.Menus
                 // Enable the specified panel if it's not null
                 if (panel != null)
                 {
-                    AudioManager.Instance.source.loop = false;
+                    AudioManager.Instance.GetComponent<AudioSource>().loop = false;
                     panel.SetActive(true);
                 }
                 // Enable mainPanel if none of the specific panels are active
@@ -894,7 +875,7 @@ namespace JammerDash.Menus
                 {
                     mainPanel.SetActive(true);
                     LoadRandomBackground();
-                    AudioManager.Instance.source.loop = false;
+                    AudioManager.Instance.GetComponent<AudioSource>().loop = false;
                 }
 
                 if (playPanel.activeSelf)
@@ -906,7 +887,7 @@ namespace JammerDash.Menus
                         if (level.isSelected)
                         {
                             level.Change();
-                            AudioManager.Instance.source.loop = true;
+                            AudioManager.Instance.GetComponent<AudioSource>().loop = true;
                         }
                     }
                 }
@@ -920,7 +901,7 @@ namespace JammerDash.Menus
         }
         public void Play()
         {
-            AudioManager.Instance.source.loop = true;
+            AudioManager.Instance.GetComponent<AudioSource>().loop = true;
             ToggleMenuPanel(playPanel);
             InputSystem.pollingFrequency = 1000;
             InputSystem.settings.maxQueuedEventsPerUpdate = 1000;
@@ -1100,7 +1081,7 @@ namespace JammerDash.Menus
 
         public void Menu()
         {
-            AudioManager.Instance.source.loop = false;
+            AudioManager.Instance.GetComponent<AudioSource>().loop = false;
             StartCoroutine(AudioManager.Instance.ChangeSprite());
             settingsPanel.SetActive(false);
             creditsPanel.SetActive(false);
@@ -1227,13 +1208,6 @@ namespace JammerDash.Menus
         public void FixedUpdate()
         {
             string timeInfo = DateTime.Now.ToString("hh:mm:ss tt") + "\n";
-<<<<<<< HEAD
-            if (SceneManager.GetActiveScene().buildIndex == 1 && AudioManager.Instance.source.loop)
-            {
-                AudioManager.Instance.source.loop = false;
-            }
-=======
->>>>>>> master
             if (FindObjectOfType<GameTimer>() != null)
             {
                 timeInfo += "running " + FormatElapsedTime(GameTimer.GetRunningTime());
@@ -1359,9 +1333,9 @@ namespace JammerDash.Menus
                 audioMixer.SetFloat("Lowpass", data.lowpassValue);
             }
 
-            if (mainPanel.activeSelf && AudioManager.Instance.source.loop && SceneManager.GetActiveScene().buildIndex == 1)
+            if (mainPanel.activeSelf && AudioManager.Instance.GetComponent<AudioSource>().loop)
             {
-                AudioManager.Instance.source.loop = false;
+                AudioManager.Instance.GetComponent<AudioSource>().loop = false;
             }
             if (playlevelInfoParent.childCount == 0)
             {

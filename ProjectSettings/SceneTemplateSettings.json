@@ -44,7 +44,7 @@
         {
             "userAdded": false,
             "type": "UnityEngine.LightingSettings",
-            "defaultInstantiationMode": 1
+            "defaultInstantiationMode": 0
         },
         {
             "userAdded": false,
