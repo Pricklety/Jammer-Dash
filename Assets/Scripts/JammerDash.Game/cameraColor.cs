@@ -8,6 +8,7 @@ using JammerDash.Game.Player;
 using UnityEngine.UI;
 using JammerDash.Tech;
 using TMPro;
+using JammerDash.Audio;
 
 namespace JammerDash.Game
 {
@@ -27,7 +28,7 @@ namespace JammerDash.Game
 
         private void Start()
         {
-
+            song = AudioManager.Instance.source;
             song.pitch = 0;
             player.enabled = false;
             StartCoroutine(LateStart());
@@ -60,7 +61,7 @@ namespace JammerDash.Game
                     player.enabled = false;
                 }
                 player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>();
-                song = GameObject.Find("Music").GetComponent<AudioSource>();
+                song = AudioManager.Instance.source;
             }
             else
             {
@@ -91,12 +92,12 @@ namespace JammerDash.Game
                 $"? {CustomLevelDataManager.Instance.data.artist} - {CustomLevelDataManager.Instance.data.songName}";
            
             player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>();
-            song = GameObject.Find("Music").GetComponent<AudioSource>();
+            song = AudioManager.Instance.source;
 
             if (player.health > 0 || player == null)
             {
                 player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>();
-                song = GameObject.Find("Music").GetComponent<AudioSource>();
+                song = AudioManager.Instance.source;
 
             }
 

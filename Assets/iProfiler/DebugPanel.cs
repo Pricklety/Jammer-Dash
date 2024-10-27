@@ -29,11 +29,14 @@ namespace JammerDash.Tech
         // Update is called once per frame
         void FixedUpdate()
         {
+<<<<<<< HEAD
+            gui.text = $"Debug v13 - Jammer Dash {Application.version} (Unity {Application.unityVersion})\n\n";
+=======
             gui.text = $"Debug v12 - Jammer Dash {Application.version} ({Application.unityVersion})\n\n";
+>>>>>>> master
 
             DisplayAudioInfo();
             DisplayInputInfo();
-            DisplayOptionsInfo();
             DisplaySystemInfo();
             DisplayGraphicsInfo();
             DisplayVideoInfo();
@@ -76,6 +79,8 @@ namespace JammerDash.Tech
             }
         }
 
+<<<<<<< HEAD
+=======
         void DisplayOptionsInfo()
         {
             SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
@@ -120,6 +125,7 @@ namespace JammerDash.Tech
 
         }
 
+>>>>>>> master
         void DisplayVideoInfo()
         {
             gui.text += "\n\nScreen Full Screen: " + Screen.fullScreen +

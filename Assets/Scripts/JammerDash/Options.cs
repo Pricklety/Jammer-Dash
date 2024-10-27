@@ -240,7 +240,7 @@ namespace JammerDash
             increaseVol.isOn = settingsData.volumeIncrease;
             bass.isOn = settingsData.bass;
             bassGain.value = settingsData.bassgain;
-            dim.value = settingsData.dim;
+            dim.value = settingsData.dim * 100;
         }
 
         public void ApplyOptions()
@@ -275,7 +275,11 @@ namespace JammerDash
             settingsData.volumeIncrease = increaseVol.isOn;
             settingsData.bass = bass.isOn;
             settingsData.bassgain = bassGain.value;
+<<<<<<< HEAD
+            settingsData.dim = dim.value / 100;
+=======
             settingsData.dim = dim.value;
+>>>>>>> master
             ApplyMasterVolume(settingsData.volume);
             ApplyFPSCap(settingsData.selectedFPS);
             ApplyResolution();
@@ -393,7 +397,7 @@ namespace JammerDash
                 snow = snow.isOn,
                 bass = bass.isOn,
                 bassgain = bassGain.value,
-                dim = dim.value,
+                dim = dim.value / 100,
                 saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                 gameVersion = Application.version
             };
@@ -776,7 +780,7 @@ namespace JammerDash
         public void FixedUpdate()
         {
             trailFadeText.text = $"Trail fade ({trailFade.value:0.00}s)";
-            dim.GetComponentInChildren<Text>().text = $"Background visibility ({dim.value * 100}%)";
+            dim.GetComponentInChildren<Text>().text = $"Background visibility ({dim.value}%)";
         }
     }
 }

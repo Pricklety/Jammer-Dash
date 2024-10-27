@@ -5,7 +5,7 @@ using System.Net;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
-
+using JammerDash.Audio;
 namespace JammerDash.Editor
 {
 
@@ -29,7 +29,7 @@ namespace JammerDash.Editor
 
         private void Start()
         {
-            audioSource = GetComponent<AudioSource>();
+            audioSource = AudioManager.Instance.source;
             audioSource.clip = audioClip;
             audioSource.pitch = audioPitch; // Set the initial pitch
             audioStartTime = 0;
@@ -44,7 +44,7 @@ namespace JammerDash.Editor
                 Vector3 movement = Vector3.right * Time.deltaTime * 7f; // Adjust the speed as needed
                 if (currentLine != null)
                 {
-                    currentLine.transform.position = new Vector2(GameObject.Find("Music").GetComponent<AudioSource>().time * 7f, 0);
+                    currentLine.transform.position = new Vector2(AudioManager.Instance.source.time * 7f, 0);
                 }
 
 
