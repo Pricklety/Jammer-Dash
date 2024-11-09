@@ -26,7 +26,7 @@ namespace JammerDash.Audio
         int counter = 0;
         public AudioClip sfxShort;
         public AudioClip sfxLong;
-
+        public bool shuffle = false;
         bool songPlayed = false;
         private float masterVolume = 1.0f;
         public List<string> songPathsList;
@@ -80,7 +80,7 @@ namespace JammerDash.Audio
 
 
             if (isLogoSFX)
-                GetComponent<AudioSource>().PlayOneShot(sfxShort);
+                source.PlayOneShot(sfxShort);
 
         }
         public void OnMasterVolumeChanged(float volume)
@@ -112,7 +112,7 @@ namespace JammerDash.Audio
         {
             if (songPathsList != null && currentClipIndex >= 0 && currentClipIndex < songPathsList.Count)
             {
-                AudioSource audioSource = GetComponent<AudioSource>();
+                AudioSource audioSource = source;
 
                 if (audioSource.isPlaying)
                 {
@@ -170,7 +170,7 @@ namespace JammerDash.Audio
                     }
                 }
             }
-            AudioSource audioSource = GetComponent<AudioSource>();
+            AudioSource audioSource = source;
             float value1 = Input.GetAxisRaw("Mouse ScrollWheel");
             float volumeChangeSpeed = 1f;
 
@@ -181,7 +181,7 @@ namespace JammerDash.Audio
                 audio.outputAudioMixerGroup = master;
                 audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", Mathf.Clamp(masterS.value, -80f, 20f));
             }
-            if (SceneManager.GetActiveScene().buildIndex == 1 && options != null)
+            if (options != null)
             {
 
                 if (!options.increaseVol.isOn)
@@ -233,7 +233,6 @@ namespace JammerDash.Audio
                         // Loop through each audio source
                         foreach (AudioSource audio in audios)
                         {
-
                             // Apply the new volume to the audio source 
                             audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", newVolume);
                             if (SceneManager.GetActiveScene().buildIndex == 1)
@@ -308,37 +307,7 @@ namespace JammerDash.Audio
                 songPlayed = false;
             }
 
-            if (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButtonDown(2) && !data.loadedLogoSFX)
-            {
-                counter++;
-                if (counter == 3)
-                {
-                    GetComponent<AudioSource>().volume *= 0.8f;
-                    GetComponent<AudioSource>().PlayOneShot(sfxLong, 1);
-                    data.loadedLogoSFX = true;
-                    SettingsFileHandler.SaveSettingsToFile(data);
-                    Notifications.instance.Notify("Jammer Dash :)", null);
-                    new WaitForSecondsRealtime(8f);
-                        GetComponent<AudioSource>().volume = 1;
-
-                }
-            }
-            else if (data.loadedLogoSFX && Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButtonDown(2))
-            {
-                counter++;
-                if (counter == 3)
-                {
-                    GetComponent<AudioSource>().volume *= 0.8f;
-                    GetComponent<AudioSource>().PlayOneShot(sfxLong, 1);
-                    data.loadedLogoSFX = false;
-                    Notifications.instance.Notify("oh :(", null);
-                    SettingsFileHandler.SaveSettingsToFile(data);
-
-                    new WaitForSecondsRealtime(8f);
-                    GetComponent<AudioSource>().volume = 1;
-
-                }
-            }
+           
             master.audioMixer.SetFloat("Gain", data.bass ? data.bassgain : 1f);
 
 
@@ -513,23 +482,23 @@ namespace JammerDash.Audio
         public void PlaySource()
         {
 
-            GetComponent<AudioSource>().Play();
+            source.Play();
 
             paused = false;
         }
 
         public void Pause()
         {
-            GetComponent<AudioSource>().Pause();
+           source.Pause();
 
             paused = true;
         }
 
         public void Stop()
         {
-            GetComponent<AudioSource>().Pause();
+            source.Pause();
             paused = true;
-            GetComponent<AudioSource>().Stop();
+            source.Stop();
         }
         public void ShuffleSongPathsList()
         {
@@ -594,7 +563,7 @@ namespace JammerDash.Audio
             {
                 cooldown = 0f;
                 isLoading = true;
-                if (Input.GetKey(KeyCode.LeftShift))
+                if (Input.GetKey(KeyCode.LeftShift) || shuffle)
                     currentClipIndex = UnityEngine.Random.Range(0, songPathsList.Count);
                 else
                     currentClipIndex++;
@@ -684,11 +653,11 @@ namespace JammerDash.Audio
 
 
                         // Set the loaded audio clip to the AudioSource component
-                        GetComponent<AudioSource>().clip = audioClip;
+                        source.clip = audioClip;
                         options.musicSlider.maxValue = audioClip.length;
                         options.musicSlider.value = 0f;
                         options.musicText.text = "";
-                        GetComponent<AudioSource>().Play();
+                        source.Play();
                         songLoaded = true;
                     }
                     else
@@ -713,7 +682,7 @@ namespace JammerDash.Audio
 
         public void Play(int index)
         {
-            GetComponent<AudioSource>().clip.name = Path.GetFileNameWithoutExtension(songPathsList[index]);
+            source.clip.name = Path.GetFileNameWithoutExtension(songPathsList[index]);
             currentClipIndex = index;
             PlayCurrentSong();
             UnityEngine.Debug.Log(currentClipIndex);

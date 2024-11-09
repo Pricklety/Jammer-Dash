@@ -123,7 +123,7 @@ namespace JammerDash
         public void OnMusicSliderValueChanged()
         {
             if (Input.GetMouseButtonDown(0))
-                audio.GetComponent<AudioSource>().time = musicSlider.value;
+                audio.source.time = musicSlider.value;
         }
 
         void PopulateDropdowns()
@@ -457,7 +457,7 @@ namespace JammerDash
             if (audio != null && audio.AreAudioClipsLoaded())
             {
                 // Assuming you have some logic to get the current music clip and time
-                AudioClip currentClip = audio.GetComponent<AudioSource>().clip;
+                AudioClip currentClip = audio.source.clip;
                 float currentTime = audio.GetCurrentTime();
 
 
@@ -532,10 +532,10 @@ namespace JammerDash
             if (currentClip != null)
             {
                 // Get the current audio clip and time
-                AudioClip Clip = audio.GetComponent<AudioSource>().clip;
+                AudioClip Clip = audio.source.clip;
                 string clipName = Clip != null ? Clip.name : "Unknown song";
                 float Time = currentTime;
-                float length = audio.GetComponent<AudioSource>().clip.length;
+                float length = audio.source.clip.length;
                 // Format the text
                 string formattedText = $"♪ {clipName}\n{FormatTime (Time)}/{FormatTime(length)}";
 
@@ -600,7 +600,7 @@ namespace JammerDash
             if (audio != null)
             {
                 // Get the name of the currently playing audio clip
-                string currentClipName = audio.GetComponent<AudioSource>().clip.name;
+                string currentClipName = audio.source.clip.name;
 
                 // Find the index of the audio clip by name in the musicClips list
                 int currentIndex = -1;
@@ -630,8 +630,8 @@ namespace JammerDash
            
             if (audio != null)
             {
-                DisplayMusicInfo(audio.GetComponent<AudioSource>().clip, audio.GetComponent<AudioSource>().time);
-                musicSlider.maxValue = (int)audio.GetComponent<AudioSource>().clip.length;
+                DisplayMusicInfo(audio.source.clip, audio.source.time);
+                musicSlider.maxValue = (int)audio.source.clip.length;
                 UpdateDropdownSelection();
                 playlist.value = audio.currentClipIndex;
 

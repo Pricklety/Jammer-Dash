@@ -3,13 +3,13 @@ using UnityEngine.UI;
 using System.IO;
 using System;
 using System.Collections;
-
+using System.Linq;
 namespace JammerDash.EasterEggs
 {
     public class RandomTextDisplay : MonoBehaviour
     {
         public Text textComponent;
-        public string filePath = "texts.txt";
+        public string filePath = "tips.txt";
         float time;
 
         void Start()
@@ -36,9 +36,14 @@ namespace JammerDash.EasterEggs
             try
             {
                 string[] lines = File.ReadAllLines(fullPath);
-                if (lines.Length > 0)
+                string[] filteredLines = lines
+    .Where(line => !string.IsNullOrWhiteSpace(line)           
+                   && !line.Trim().StartsWith("//")    
+                   && !(line.Trim().StartsWith("[") && line.Trim().EndsWith("]")))
+    .ToArray();
+                if (filteredLines.Length > 0)
                 {
-                    string randomLine = lines[UnityEngine.Random.Range(0, lines.Length)];
+                    string randomLine = filteredLines[UnityEngine.Random.Range(0, filteredLines.Length)];
                     textComponent.text = randomLine;
 
                 }
@@ -77,7 +82,13 @@ namespace JammerDash.EasterEggs
                 fullPath = Path.Combine(Application.streamingAssetsPath, filePath);
             }
             string[] lines = File.ReadAllLines(fullPath);
-            string randomLine = lines[UnityEngine.Random.Range(0, lines.Length)];
+            string[] filteredLines = lines
+.Where(line => !string.IsNullOrWhiteSpace(line)
+               && !line.Trim().StartsWith("//")
+               && !(line.Trim().StartsWith("[") && line.Trim().EndsWith("]")))
+.ToArray();
+            string randomLine = filteredLines[UnityEngine.Random.Range(0, filteredLines.Length)];
+             
             yield return textComponent.text = randomLine;
         }
     }

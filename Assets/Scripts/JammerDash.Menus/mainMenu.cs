@@ -46,7 +46,7 @@ namespace JammerDash.Menus
         public Text nolevelerror;
         public GameObject[] disableAccess;
         string oldSeconds;
-
+        public Image shuffleImage;
         public Animator idle;
         public Animator notIdle;
         float afkTime;
@@ -170,7 +170,7 @@ namespace JammerDash.Menus
 
             foreach (SimpleSpectrum spectrum in spectrums)
             {
-                spectrum.audioSource = AudioManager.Instance.GetComponent<AudioSource>();
+                spectrum.audioSource = AudioManager.Instance.source;
             }
         }
         public string FormatTime(float time)
@@ -343,6 +343,7 @@ namespace JammerDash.Menus
         {
             Account.Instance.Apply(usernameInput.text, password.text, email.text, cc);
         }
+
         public static string ExtractJSONFromJDL(string jdlFilePath)
         {
             try
@@ -874,7 +875,7 @@ namespace JammerDash.Menus
                 // Enable the specified panel if it's not null
                 if (panel != null)
                 {
-                    AudioManager.Instance.GetComponent<AudioSource>().loop = false;
+                    AudioManager.Instance.source.loop = false;
                     panel.SetActive(true);
                 }
                 // Enable mainPanel if none of the specific panels are active
@@ -882,7 +883,7 @@ namespace JammerDash.Menus
                 {
                     mainPanel.SetActive(true);
                     LoadRandomBackground();
-                    AudioManager.Instance.GetComponent<AudioSource>().loop = false;
+                    AudioManager.Instance.source.loop = false;
                 }
 
                 if (playPanel.activeSelf)
@@ -894,7 +895,7 @@ namespace JammerDash.Menus
                         if (level.isSelected)
                         {
                             level.Change();
-                            AudioManager.Instance.GetComponent<AudioSource>().loop = true;
+                            AudioManager.Instance.source.loop = true;
                         }
                     }
                 }
@@ -908,7 +909,7 @@ namespace JammerDash.Menus
         }
         public void Play()
         {
-            AudioManager.Instance.GetComponent<AudioSource>().loop = true;
+            AudioManager.Instance.source.loop = true;
             ToggleMenuPanel(playPanel);
             InputSystem.pollingFrequency = 1000;
             InputSystem.settings.maxQueuedEventsPerUpdate = 1000;
@@ -1088,7 +1089,7 @@ namespace JammerDash.Menus
 
         public void Menu()
         {
-            AudioManager.Instance.GetComponent<AudioSource>().loop = false;
+            AudioManager.Instance.source.loop = false;
             StartCoroutine(AudioManager.Instance.ChangeSprite());
             settingsPanel.SetActive(false);
             creditsPanel.SetActive(false);
@@ -1212,8 +1213,21 @@ namespace JammerDash.Menus
             TimeSpan timeSpan = TimeSpan.FromSeconds(elapsedTime);
             return string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
         }
+
+        public void Shuffle()
+        {
+            AudioManager.Instance.shuffle = !AudioManager.Instance.shuffle;
+        }
         public void FixedUpdate()
         {
+            if (AudioManager.Instance.shuffle)
+            {
+                shuffleImage.color = Color.HSVToRGB(0.33f, 0.47f, 1);
+            }
+            else
+            {
+                shuffleImage.color = Color.white;
+            }
             string timeInfo = DateTime.Now.ToString("hh:mm:ss tt") + "\n";
             if (FindObjectOfType<GameTimer>() != null)
             {
@@ -1340,9 +1354,9 @@ namespace JammerDash.Menus
                 audioMixer.SetFloat("Lowpass", data.lowpassValue);
             }
 
-            if (mainPanel.activeSelf && AudioManager.Instance.GetComponent<AudioSource>().loop)
+            if (mainPanel.activeSelf && AudioManager.Instance.source.loop)
             {
-                AudioManager.Instance.GetComponent<AudioSource>().loop = false;
+                AudioManager.Instance.source.loop = false;
             }
             if (playlevelInfoParent.childCount == 0)
             {

@@ -71,7 +71,7 @@ namespace JammerDash.Tech
             }
             else
             {
-                musicSource = GameObject.Find("mainmenu").GetComponent<AudioSource>();
+                musicSource = AudioManager.Instance.source;
             }
         }
 

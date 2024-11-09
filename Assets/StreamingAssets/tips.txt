@@ -1,3 +1,4 @@
+[Tips]
 You can use WASD together with arrow keys as movement inputs (Space has no alt key)
 Disable hit notes in Settings!
 Being banned only lets you play the game offline. Your scores won't be uploaded online.
@@ -23,6 +24,8 @@ If you don't like the default game keybind layout, feel free to change it in the
 You think you're better than your friends? Challenge them to a head-to-head match using "Multiplayer Mode" (versions v0.5.1 and newer)
 If you ever get notified of a new update, download it. Something new just dropped :eyes:
 Play screen is laggy? Delete the levels you don't play. Your scores will still be saved online (This game can support up to 500 levels in one screen)!
+
+[old humor]
 <FUN>: Made in Austria!
 <FUN>: Also made in Croatia!
 <FUN>: Approved by chickens!!!
@@ -31,7 +34,6 @@ Play screen is laggy? Delete the levels you don't play. Your scores will still b
 <FUN>: Also try <color=cyan>Geometry Dash</color>!
 <FUN>: Also try <color=cyan>Just Shapes & Beats</color>!
 <FUN>: Also try <color=cyan>Minecraft</color>!
-<FUN>: Also try <color=cyan>osu!</color>!
 <FUN>: Also try <color=cyan>Cities: Skylines 2</color>!
 <FUN>: Also try <color=cyan>Fall'd</color>!
 <FUN>: You are not a <color=yellow>note</color>!
@@ -58,9 +60,72 @@ Play screen is laggy? Delete the levels you don't play. Your scores will still b
 <FUN>: <color=red>C</color><color=orange>o</color><color=yellow>l</color><color=green>o</color><color=cyan>r</color><color=cyan>s</color><color=purple>!</color>
 <FUN>: KAMEHAMEHA!
 <FUN>: Every time i fail in Jammer Dash, I'll eat a kilogram of expired cheese.
-<FUN>: "berets are the best and the cutest" -adasko
 <FUN>: Fumos are cool.
-<FUN>: "PRICKLETY CAN I HAVE A F*****G QUOTE MAN" -konro
-<FUN>: "why florida? don't y'all got alligators and shit" -konro
-<FUN>: "im gladnkynkom died brook" -konro
-<FUN>: "if you hit that subscribe button down below i will PERSONALLY send you 1000 TONS of COCAINE!!" -konro
+
+[b0.5 humor]
+<FUN>: Quality Approved by Grandma
+<FUN>: Made with 100% anime inspiration!
+<FUN>: じゃあね、またね！
+<FUN>: Play this or face the wrath of KANJI!
+<FUN>: Available in 1080p kawaii resolution.
+<FUN>: In case of failure, blame lag.
+<FUN>: Help, I'm stuck in a <i>non-existent tutorial</i>!
+<FUN>: Achievement Unlocked: Epic Failure
+<FUN>: MOM!! I’M GAMING!!!
+<FUN>: Will you gg or rage quit?
+<FUN>: Press X for doubt.
+<FUN>: I completely f****d up my ears blasting music here. S**t.
+<FUN>: Anime-approved...by exactly one character.
+<FUN>: Unlocked: 10% confidence boost. (Expires immediately)
+<FUN>: Mom’s probably judging you. Keep going anyway.
+<FUN>: New achievement: Tolerance for Mediocrity.
+<FUN>: This isn’t a bug; it’s a “feature.”
+<FUN>: Certified “Not a Waste of Time” (officially unproven).
+<FUN>: This is fine. Everything is fine. (probably)
+<FUN>: NVM IT'S NOT FINE HELP AHHHHHHHHH!!!
+<FUN>: Insert random success rate here.
+<FUN> Fact: Winners probably don’t play this game.
+<FUN>: Sometimes you win; other times... you open Jammer Dash.
+<FUN>: Zero chill. Maximum disappointment.
+<FUN>: Made possible by a grant from “Why Am I Doing This?”
+<FUN>: Quality seal? Nah, it’s a "slightly acceptable" stamp.
+<FUN>: We don't talk about the s**t code in this game. It works, that's all that matters.
+<FUN>: meow~
+
+[Undertale references]
+<REF>: Get dunked on.
+<REF>: Nyeh Heh Heh!
+<REF>: my child you are breaking my heart
+<REF>: SO hyped for the destruction of humanity.
+<REF>: Do not step on the leaves.
+<REF>: Hide behind that suspiciously shaped lamp.
+
+[Frieren: Beyond Journey’s End references]
+<REF>: 29 years after the death of Himmel the Hero...
+<REF>: She's like 1000 years old, yet acts like a small child (She cool tho -devs)
+<REF>: Aura, k**l yourself.
+<REF>: So small...
+<REF>: Zoltraak.
+
+[Bocchi the Rock! references]
+<REF>: "Abandoning your uniqueness is the equivalent of dying" -Ryou Yamada
+<REF>: mumumumumumumumumumumumumumumumumu
+<REF>: Dorito-shaped hair drummer...
+<REF>: 逃げたギター!!!!!
+<REF>: *eats grass* yum.
+
+[JoJo’s Bizarre Adventure references]
+<REF>: ZA WARUDO!!!
+<REF>: JOTARO... DIO.
+<REF>: ゴゴゴゴゴ 
+
+[Quotes from Pricklety's friends :3]
+<QUOTE>: "PRICKLETY CAN I HAVE A F*****G QUOTE MAN" -konro
+<QUOTE>: "why florida? don't y'all got alligators and shit" -konro
+<QUOTE>: "im gladnkynkom died brook" -konro
+<QUOTE>: "if you hit that subscribe button down below i will PERSONALLY send you 1000 TONS of COCAINE!!" -konro
+<QUOTE>: "berets are the best and the cutest" -adasko
+<QUOTE>: "Why fail once when you can fail spectacularly?" -ChatGPT
+<QUOTE>: "山田リョウ大好き" -Pricklety, not noticing he's a f*****g simp. (Wait, that means I noticed now, I wrote this myself...)
+<QUOTE>: "Someone help, how does one learn Kanji consistently" -Pricklety
+<QUOTE>: "cvxy cdfsf dsfverqwf vwr7wv10fas4dfv10 qě0č+č1 vdefv1ydxf v1yxcv1xc1v1dfh+dshd-fgh n14bcv52n1445a4ewvr10fdyfg4s f0g74fsh8t0z ěřčtz gdysfg sdfg sdfgb-§.ú)awer478" -mnux

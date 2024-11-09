@@ -19,6 +19,10 @@ namespace JammerDash.Game
 
         void FixedUpdate()
         {
+            if (cubes.Length == 0)
+            {
+                cubes = GameObject.FindGameObjectsWithTag("Cubes");
+            }
             float destruction = ((float)accCount / FindObjectOfType<PlayerMovement>().Total) * 100;
             // Call GetTier and print the returned tier
             GetTier(destruction);

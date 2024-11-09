@@ -11,7 +11,7 @@ namespace JammerDash.Audio
     {
         private AudioSource audioSource;
         private float fadeDuration = 0.5f; // Duration of the fade-out in seconds
-        private bool fadingOut = false;
+        public bool fadingOut = false;
         public AudioClip christmasClip;
         public AudioClip normalClip;
         public int normalClipIndex = 1; // Index of the normal music clip
@@ -82,49 +82,6 @@ namespace JammerDash.Audio
 
             UnityEngine.Debug.LogWarning("Desired song not found in the playlist. Playing the first song.");
             return desiredIndex;
-        }
-
-
-
-        private void Update()
-        {
-            if (SceneManager.GetActiveScene().buildIndex > 1 || SceneManager.GetActiveScene().name == "LevelDefault")
-            {
-                fadingOut = true;
-            }
-            else
-            {
-                fadingOut = false;
-                audioSource.volume = 1;
-                audioSource.pitch = 1;
-            }
-
-            if (fadingOut)
-            {
-                // Continue the fade-out process
-                StartCoroutine(FadeOutAndPause());
-            }
-        }
-
-        private IEnumerator FadeOutAndPause()
-        {
-            float startVolume = audioSource.volume;
-            float elapsedTime = 0.0f;
-
-            while (elapsedTime < fadeDuration)
-            {
-                elapsedTime += Time.deltaTime;
-                float t = elapsedTime / fadeDuration;
-
-                audioSource.volume = Mathf.Lerp(startVolume, 0.0f, t);
-
-                yield return null;
-            }
-
-            // Lower the pitch after the fade out
-            audioSource.pitch = 0f;
-
-            fadingOut = false;
         }
     }
 }

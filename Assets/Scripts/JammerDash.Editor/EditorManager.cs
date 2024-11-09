@@ -36,7 +36,7 @@ namespace JammerDash.Editor
         public Button loadMusicButton;
         public int currentButtonPressed;
         public Ray ray;
-        public RaycastHit hit; 
+        public RaycastHit hit;
         public int finishCount = 1;
 
         [Header("UI and Stuff")]
@@ -139,8 +139,8 @@ namespace JammerDash.Editor
 
         [Header("Long Cube")]
         public float minWidth = 1f;
-        public float maxWidth = 999f; 
-        public float expansionSpeed = 1f; 
+        public float maxWidth = 999f;
+        public float expansionSpeed = 1f;
 
 
         // Start is called before the first frame update
@@ -465,14 +465,14 @@ namespace JammerDash.Editor
             // Combine the directory path with the sanitized scene name and ".jdl" extension for the file
             string jdlFilePath = Path.Combine(directoryPath, $"{sceneName}.jdl");
 
-           
+
             return directoryPath; // Return the directory path or jdlFilePath as needed
         }
 
-      
 
-       
-      
+
+
+
         public void InstantiateLines()
         {
             // Check if the audio clip is assigned
@@ -522,16 +522,33 @@ namespace JammerDash.Editor
 
 
         }
-       
+
         private Vector3[] originalPositions;
-       
-       
+
+
         bool IsCursorOnRightSide()
         {
             UnityEngine.Debug.Log("test");
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3 objectPosition = selectedObject.transform.position;
             return mousePosition.x >= objectPosition.x;
+        }
+        public string FormatTime(float time)
+        {
+            int minutes = Mathf.FloorToInt(time / 60);
+            int seconds = Mathf.FloorToInt(time % 60);
+
+            // Calculate milliseconds from the fractional part of the original time
+            int ms = Mathf.FloorToInt((time - Mathf.Floor(time)) * 1000);
+
+            // Ensure seconds don't go beyond 59
+            seconds = Mathf.Clamp(seconds, 0, 59);
+
+            return string.Format("{0:00}:{1:00}.{2:000}", minutes, seconds, ms);
+        }
+        public void LengthPos()
+        {
+            cam.transform.position = new Vector3(lengthSlider.value * 7, 1, -10);
         }
 
         // Update is called once per frame
@@ -542,14 +559,14 @@ namespace JammerDash.Editor
             {
                 lengthText.text = FormatTime(Camera.main.transform.position.x / 7);
             }
-            lengthSlider.value = cam.transform.position.x;
+            lengthSlider.maxValue = AudioManager.Instance.source.clip.length;
             GameObject[] beats = GameObject.FindGameObjectsWithTag("Beat");
 
-            
+
             size.gameObject.GetComponentInChildren<Text>().text = $"Cube size: {size.value}x";
             hp.gameObject.GetComponentInChildren<Text>().text = $"Player health: {hp.value}";
 
-            if (Input.GetKeyDown(KeybindingManager.changeLongCubeSize) && Input.GetKey(KeybindingManager.place) && selectedObject != null && selectedObject.gameObject.name.Contains("hitter02"))
+            if (Input.GetKey(KeybindingManager.changeLongCubeSize) && Input.GetKeyDown(KeybindingManager.place) && selectedObject != null && selectedObject.gameObject.name.Contains("hitter02"))
             {
                 Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
 
@@ -557,7 +574,7 @@ namespace JammerDash.Editor
 
                 float mouseToObjectDistanceX = mouseWorldPosition.x - objectPosition.x;
 
-                if (mouseToObjectDistanceX > 0) 
+                if (mouseToObjectDistanceX > 0)
                 {
                     float newSizeX = Mathf.Abs(mouseToObjectDistanceX);
 
@@ -587,9 +604,9 @@ namespace JammerDash.Editor
                 }
             }
 
-                UnityEngine.Debug.Log("fools");
-            }
-           
+
+
+
             if (!Input.GetKey(KeyCode.R))
             {
 
@@ -625,12 +642,12 @@ namespace JammerDash.Editor
                 }
             }
             playbackText.text = $"Playback ({Time.timeScale:0.00}x)";
-            audio = GameObject.Find("Music").GetComponent<AudioSource>();
+            audio = AudioManager.Instance.source;
             audio.pitch = Time.timeScale;
             PlayerEditorMovement player = GameObject.FindObjectOfType<PlayerEditorMovement>();
 
 
-            
+
             bgColorSel.color = cam.backgroundColor;
             float xPosNormalized = transform.position.x / 1;
             audio.panStereo = Mathf.Lerp(-1f, 1f, xPosNormalized);
@@ -661,9 +678,9 @@ namespace JammerDash.Editor
             SceneData data = SceneData.FromJson(json);
             levelID.text = "Level ID: " + data.ID;
 
-           
 
-          
+
+
             if (!Input.GetKey(KeybindingManager.changeLongCubeSize) && Input.GetKeyDown(KeybindingManager.place) && delay >= delayLimit && itemButtons[currentButtonPressed].clicked && !pointerOverUI && !player.enabled)
             {
                 if (cubes.Count > 0 && accurateCount <= 100000)
@@ -847,7 +864,7 @@ namespace JammerDash.Editor
                     selectedObject.transform.position = new Vector3(1, selectedObject.transform.position.y, selectedObject.transform.position.z);
                 }
 
-                
+
             }
 
             if (Camera.main.transform.position.x < 7)
@@ -890,6 +907,7 @@ namespace JammerDash.Editor
             }
 
         }
+
         void SelectObject(Transform objTransform)
         {
             if (selectedObject != null)
@@ -1005,7 +1023,7 @@ namespace JammerDash.Editor
             colorPickerMenuBG.SetActive(false);
         }
 
-      
+
 
         public void OpenBG()
         {
@@ -1079,12 +1097,12 @@ namespace JammerDash.Editor
             Destroy(bgTexture2D);
         }
 
-       
+
 
         private string GetSceneDataPath(string sceneName)
         {
             string directoryPath = Path.Combine(Application.persistentDataPath, "scenes", sceneName);
-                 Directory.CreateDirectory(directoryPath);
+            Directory.CreateDirectory(directoryPath);
 
             string filePath = Path.Combine(directoryPath, sceneName + ".json");
             return filePath;
@@ -1217,20 +1235,20 @@ namespace JammerDash.Editor
         {
             try
             {
-               // Create a new SceneData instance and populate it with current objects' positions
-            SceneData sceneData = await CreateSceneData(loadingPanel);
+                // Create a new SceneData instance and populate it with current objects' positions
+                SceneData sceneData = await CreateSceneData(loadingPanel);
 
-            // Serialize the SceneData instance to formatted JSON
-            string json = JsonUtility.ToJson(sceneData, true);
+                // Serialize the SceneData instance to formatted JSON
+                string json = JsonUtility.ToJson(sceneData, true);
 
-            // Get the file path based on the scene name
-            string filePath = GetSceneDataPath(sceneNameInput.text.Trim());
+                // Get the file path based on the scene name
+                string filePath = GetSceneDataPath(sceneNameInput.text.Trim());
 
-            // Write the JSON data to the file
-            File.WriteAllText(filePath, json);
+                // Write the JSON data to the file
+                File.WriteAllText(filePath, json);
 
 
-            UnityEngine.Debug.Log("Scene saved successfully: " + sceneNameInput.text.Trim());
+                UnityEngine.Debug.Log("Scene saved successfully: " + sceneNameInput.text.Trim());
             }
             catch (Exception e)
             {
@@ -1300,7 +1318,7 @@ namespace JammerDash.Editor
         }
         private async Task<SceneData> CreateSceneData(LoadingScreen loadingScreen)
         {
-           
+
             loadingScreen.ShowLoadingScreen(); // Show loading screen
 
             loadingScreen.UpdateLoading("Retrieving cubes...", 0f);
@@ -1327,26 +1345,26 @@ namespace JammerDash.Editor
                 // Continue processing with the obtained distance
                 Debug.Log($"Calculated distance: {distance}");
             });
-            
 
-                loadingScreen.UpdateLoading("Calculating cubes per Y level...", 0.3f);
+
+            loadingScreen.UpdateLoading("Calculating cubes per Y level...", 0.3f);
             int[] cubesPerY = await Task.Run(() => Calculator.CalculateCubesPerY(cubePositions.ToArray()));
 
             loadingScreen.UpdateLoading("Calculating difficulty...", 0.4f);
             float calculateDifficulty = Calculator.CalculateDifficulty(
-     this.cubes,
-     saws,
-     longCubes,
-     hp,
-     size,
-     cubesPerY,
-     cubePositions.ToArray(),
-     distance1 / 7, updateLoadingText =>
-     {
-         loadingPanel.loadingText.text = updateLoadingText;
-     });
+        this.cubes,
+        saws,
+        longCubes,
+        hp,
+        size,
+        cubesPerY,
+        cubePositions.ToArray(),
+        distance1 / 7, updateLoadingText =>
+        {
+            loadingPanel.loadingText.text = updateLoadingText;
+        });
 
-            
+
 
             // Load existing scene data if available, with fallback
             SceneData data = await LoadSceneDataFromFile() ?? new SceneData();
@@ -1434,17 +1452,17 @@ namespace JammerDash.Editor
 
             loadingScreen.UpdateLoading("Calculating difficulty...", 0.5f);
             float calculateDifficulty = Calculator.CalculateDifficulty(
-     this.cubes,
-     saws,
-     longCubes,
-     hp,
-     size,
-     cubesPerY,
-     cubePositions.ToArray(),
-     distance1 / 7, updateLoadingText =>
-     {
-         loadingPanel.loadingText.text = updateLoadingText;
-     });
+        this.cubes,
+        saws,
+        longCubes,
+        hp,
+        size,
+        cubesPerY,
+        cubePositions.ToArray(),
+        distance1 / 7, updateLoadingText =>
+        {
+            loadingPanel.loadingText.text = updateLoadingText;
+        });
             loadingScreen.UpdateLoading("Creating Scene Data object...", 0.6f);
             SceneData sceneData = new SceneData
             {
@@ -1492,7 +1510,7 @@ namespace JammerDash.Editor
 
             loadingScreen.UpdateLoading("Creating ZIP file...", 0.8f);
             string zipFilePath = Path.Combine(Application.persistentDataPath, "levels", $"{sceneData.levelName}.jdl");
-           
+
 
             try
             {
@@ -1551,7 +1569,7 @@ namespace JammerDash.Editor
 
         private Task CopyFilesAsync(string sourceFolderPath, string destinationFolderPath)
         {
-            
+
             return Task.Run(() =>
             {
                 foreach (string sourcePath in Directory.GetFiles(sourceFolderPath, "*", SearchOption.AllDirectories))

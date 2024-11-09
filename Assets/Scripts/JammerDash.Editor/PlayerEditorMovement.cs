@@ -1,3 +1,4 @@
+using JammerDash.Audio;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -23,6 +24,10 @@ namespace JammerDash.Editor
         public AudioClip impact;
         public Text text;
 
+        private void Start()
+        {
+            music = AudioManager.Instance.source;
+        }
         private void Update()
         {
             // Move player right
@@ -66,7 +71,7 @@ namespace JammerDash.Editor
         {
             if (collision.CompareTag("Cubes"))
             {
-                new WaitForSeconds(0.07f);
+                new WaitForSecondsRealtime(0.07f);
                 Debug.Log("hit");
                 AudioClip hitSound = Resources.Load<AudioClip>("Audio/SFX/hit0");
                 GameObject.Find("sfx").GetComponent<AudioSource>().PlayOneShot(hitSound, 1);

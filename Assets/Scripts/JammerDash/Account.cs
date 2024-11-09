@@ -9,6 +9,8 @@ using UnityEngine.Networking;
 using System.Collections;
 using System;
 using System.Xml.Serialization;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace JammerDash
 {
@@ -17,7 +19,7 @@ namespace JammerDash
     {
         [Header("Username")]
         public string username;
-        public string password;
+        public string user;
         public string email;
         public string cc;
         public string url;
@@ -27,7 +29,8 @@ namespace JammerDash
         public long[] xpRequiredPerLevel;
         public long totalXP = 0;
 
-
+        [Header("Local data")]
+        public PlayerData p;
         [Header("Internet Check")]
         public GameObject checkInternet;
 
@@ -58,11 +61,11 @@ namespace JammerDash
             if (currentXP >= xpRequiredPerLevel[level])
             {
                 LevelUp();
-                SavePlayerData();
+                SavePlayerDataXP();
             }
             else
             {
-                SavePlayerData();
+                SavePlayerDataXP();
             }
         }
 
@@ -78,10 +81,10 @@ namespace JammerDash
             }
             Debug.Log("Level Up! You are now level " + level);
         }
-        public void Apply(string username, string password, string email, string cc)
+        public void Apply(string username, string user, string email, string cc)
         {
             this.username = username;
-            this.password = password;
+            this.user = user;
             this.cc = cc;
             this.email = email;
             SavePlayerData();
@@ -100,10 +103,25 @@ namespace JammerDash
             }
 
         }
+        public static String sha256_hash(String value)
+        {
+            StringBuilder Sb = new StringBuilder();
 
+            using (SHA256 hash = SHA256Managed.Create())
+            {
+                Encoding enc = Encoding.UTF8;
+                Byte[] result = hash.ComputeHash(enc.GetBytes(value));
+
+                foreach (Byte b in result)
+                    Sb.Append(b.ToString("x2"));
+            }
+
+            return Sb.ToString();
+        }
         // Method to save player data
         public void SavePlayerData()
         {
+            string save = sha256_hash(user);
             PlayerData data = new PlayerData
             {
                 level = level,
@@ -111,18 +129,49 @@ namespace JammerDash
                 xpRequiredPerLevel = xpRequiredPerLevel,
                 totalXP = totalXP,
                 username = username,
+                user = save,
                 isLocal = true,
                 isOnline = false
             };
+            if (data.user == null)
+            {
+                p = data;
+            }
+            else
+            {
+                data = p;
+            }
             PlayerData accountPost = new PlayerData
             {
                 username = username,
-                password = password,
+                user = user,
                 email = email,
-                country = cc
+                country = cc,
+                id = SystemInfo.deviceUniqueIdentifier
             };
             Debug.Log(accountPost.country);
-            StartCoroutine(Post(url, accountPost));
+            StartCoroutine(Register(url, accountPost));
+            XmlSerializer formatter = new XmlSerializer(typeof(PlayerData));
+            string path = Application.persistentDataPath + "/playerData.dat";
+            FileStream stream = new FileStream(path, FileMode.Create);
+            formatter.Serialize(stream, p);
+            stream.Close();
+        }
+
+        public void SavePlayerDataXP()
+        {
+            string save = sha256_hash(user);
+            PlayerData data = new PlayerData
+            {
+                level = level,
+                currentXP = currentXP,
+                xpRequiredPerLevel = xpRequiredPerLevel,
+                totalXP = totalXP,
+                username = username,
+                user = save,
+                isLocal = true,
+                isOnline = false
+            };
             XmlSerializer formatter = new XmlSerializer(typeof(PlayerData));
             string path = Application.persistentDataPath + "/playerData.dat";
             FileStream stream = new FileStream(path, FileMode.Create);
@@ -130,7 +179,7 @@ namespace JammerDash
             stream.Close();
         }
 
-        public IEnumerator Post(string url, PlayerData bodyJsonObject)
+        public IEnumerator Register(string url, PlayerData bodyJsonObject)
         {
             string bodyJsonString = JsonUtility.ToJson(bodyJsonObject);
 
@@ -148,12 +197,22 @@ namespace JammerDash
             if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.LogError("Error: " + request.error);
+                Debug.LogError("Response Body: " + request.downloadHandler.text);
+                Notifications.instance.Notify($"An error happened.\n{request.error}", null);
             }
             else
             {
                 Debug.Log("Status Code: " + request.responseCode);
                 Debug.Log("Response Body: " + request.downloadHandler.text);
+                Notifications.instance.Notify($"Successfully registered as {bodyJsonObject.username}", null);
+                StartCoroutine(Login(this.url, bodyJsonObject));
             }
+        }
+
+        public IEnumerator Login(string url, PlayerData loginData)
+        {
+            // Login to account, save data locally and call this every time if there is a loginData.txt saved (hashed);
+            return null;
         }
         public PlayerData LoadData()
         {
@@ -205,9 +264,10 @@ public class PlayerData
     public long[] xpRequiredPerLevel;
     public long totalXP;
     public string username;
-    public string password;
+    public string user;
     public string email;
     public string country;
     public bool isLocal;
     public bool isOnline;
+    public string id;
 }

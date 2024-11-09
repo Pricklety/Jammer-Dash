@@ -135,7 +135,7 @@ namespace JammerDash.Game.Player
             }
             GameObject[] deathObjects = FindObjectsOfType<GameObject>();
             FindObjectOfType<cameraColor>().enabled = true;
-
+            music.time = 0f;
             foreach (GameObject obj in deathObjects)
             {
                 if (obj.name == "death")
@@ -375,7 +375,7 @@ namespace JammerDash.Game.Player
 
             }
             if (music.isPlaying)
-                transform.position = Vector2.Lerp(transform.position, new Vector2(music.time * moveSpeed, transform.position.y), 1); 
+                transform.position = Vector2.Lerp(transform.position, new Vector2(music.time * 7, transform.position.y), 1); 
             else
                 transform.Translate(moveSpeed * Time.deltaTime * Vector2.right);
 
@@ -639,7 +639,7 @@ namespace JammerDash.Game.Player
             }
 
             counter.destroyedCubes += 50;
-            float formula = (maxScore * factor) / counter.cubes.Count;
+            float formula = (maxScore * factor) / counter.cubes.Length;
             float newDestroyedCubes = counter.score + formula;
             newDestroyedCubes = Mathf.RoundToInt(newDestroyedCubes);
 
@@ -861,7 +861,7 @@ namespace JammerDash.Game.Player
                 }
                 if ((Input.GetKeyUp(KeybindingManager.hit1) || Input.GetKeyUp(KeybindingManager.hit2)) && !isDying && collision.transform.position.y == transform.position.y) 
                 {
-                    counter.score -= Mathf.RoundToInt((maxScore * factor) / counter.cubes.Count);
+                    counter.score -= Mathf.RoundToInt((maxScore * factor) / counter.cubes.Length);
                     bufferActive = false;
                 }
                 if ((Input.GetKey(KeybindingManager.hit1) || Input.GetKey(KeybindingManager.hit2)) && !isDying)

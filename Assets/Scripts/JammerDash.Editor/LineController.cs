@@ -5,6 +5,7 @@ using System.Net;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using JammerDash.Audio;
 
 namespace JammerDash.Editor
 {
@@ -15,7 +16,6 @@ namespace JammerDash.Editor
         public GameObject linePrefab; // Prefab of the line to spawn
         public GameObject bpmLine; // Prefab of the BPM line
         public AudioClip audioClip; // The single audio clip to be played
-        public float audioPitch = 1.0f; // Adjust this value to slow down or speed up the audio
         public Text artistText;
         public Text nameText;
 
@@ -29,10 +29,7 @@ namespace JammerDash.Editor
 
         private void Start()
         {
-            audioSource = GetComponent<AudioSource>();
-            audioSource.clip = audioClip;
-            audioSource.pitch = audioPitch; // Set the initial pitch
-            audioStartTime = 0;
+            audioSource = AudioManager.Instance.source;
 
 
         }
@@ -41,16 +38,14 @@ namespace JammerDash.Editor
         {
             if (isMoving && !isPaused)
             {
-                Vector3 movement = Vector3.right * Time.deltaTime * 7f; // Adjust the speed as needed
                 if (currentLine != null)
                 {
-                    currentLine.transform.position = new Vector2(GameObject.Find("Music").GetComponent<AudioSource>().time * 7f, 0);
+                    currentLine.transform.position = new Vector2(audioSource.time * 7f, 0);
                 }
 
 
             }
 
-            // Check for 'G' key press
             if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.Y) || Input.GetKeyDown(KeyCode.Z))
             {
                 SaveLinePosition();
@@ -78,8 +73,7 @@ namespace JammerDash.Editor
                 initialXPosition = currentLine.transform.position.x;
 
                 audioSource.time = spawnPosition.x / 7;
-                audioSource.pitch = audioPitch; // Reset the pitch
-                audioSource.Play();
+                audioSource.pitch = 1f;
 
                 // Load saved position from PlayerPrefs
                 savedXPosition = PlayerPrefs.GetFloat("SavedXPosition", 0f);
@@ -88,51 +82,12 @@ namespace JammerDash.Editor
             {
                 StopLine();
                 isPaused = true;
-                audioSource.Stop();
                 audioSource.time = 0;
             }
         }
 
 
-        public IEnumerator LoadAudioClip(string songName)
-        {
-            string filePath = Path.Combine(Application.persistentDataPath, "music", songName);
-            using (UnityWebRequest www = UnityWebRequest.Get("file://" + filePath))
-            {
-                yield return www.SendWebRequest();
-
-                if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
-                {
-                    Debug.LogError("Failed to load audio clip: " + www.error);
-                    Debug.Log(filePath);
-                }
-                else
-                {
-                    AudioClip audioClip = AudioClip.Create(songName, ((int)www.downloadedBytes) / 2, 2, 44100, false);
-
-                    // Convert byte array to float array
-                    float[] floatData = new float[audioClip.samples * audioClip.channels];
-                    for (int i = 0; i < floatData.Length; i++)
-                    {
-                        floatData[i] = BitConverter.ToInt16(www.downloadHandler.data, i * 2) / 32768.0f;
-                    }
-
-                    audioClip.SetData(floatData, 0);
-
-                    if (audioClip != null)
-                    {
-                        this.audioClip = audioClip;
-                        audioSource.clip = audioClip;
-                        Debug.Log("Audio clip loaded successfully");
-                    }
-                    else
-                    {
-                        Debug.LogError("Failed to convert MP3 to AudioClip");
-                    }
-                }
-            }
-        }
-
+      
         public void UpdateArtistAndNameText(string songName)
         {
             // Extract artist and name information from the songName

@@ -1,4 +1,5 @@
 
+using JammerDash.Audio;
 using System;
 using System.Collections;
 using System.IO;
@@ -20,7 +21,7 @@ namespace JammerDash.Tech
         void Start()
         {
             // Try to find an AudioSource component on this GameObject
-            musicAudioSource = GetComponent<AudioSource>();
+            musicAudioSource = AudioManager.Instance.source;
 
             // If there isn't an AudioSource on this GameObject, try to find one in the scene
             if (musicAudioSource == null)

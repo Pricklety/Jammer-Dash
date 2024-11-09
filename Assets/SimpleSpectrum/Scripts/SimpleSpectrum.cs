@@ -207,7 +207,7 @@ public class SimpleSpectrum : MonoBehaviour {
         {
             if (sourceType == SourceType.Custom)
             {
-                spectrumInputData = AudioManager.Instance.GetComponent<AudioSource>().GetSpectrumData(numSamples, 0, FFTWindow.Rectangular);
+                spectrumInputData = AudioManager.Instance.source.GetSpectrumData(numSamples, 0, FFTWindow.Rectangular);
                 spectrum = value;
             }
                 
