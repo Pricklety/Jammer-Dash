@@ -28,7 +28,7 @@ namespace JammerDash.Game
         // Start is called before the first frame update
         void Start()
         {
-
+            music = AudioManager.Instance.source;
             SettingsData sd = SettingsFileHandler.LoadSettingsFromFile();
             dim.value = sd.dim;
             GameObject animA = GameObject.Find("Main Camera");
