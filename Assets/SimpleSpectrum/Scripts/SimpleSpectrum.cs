@@ -207,7 +207,7 @@ public class SimpleSpectrum : MonoBehaviour {
         {
             if (sourceType == SourceType.Custom)
             {
-                spectrumInputData = AudioManager.Instance.GetComponent<AudioSource>().GetSpectrumData(numSamples, 0, FFTWindow.Rectangular);
+                spectrumInputData = AudioManager.Instance.source.GetSpectrumData(numSamples, 0, FFTWindow.Rectangular);
                 spectrum = value;
             }
                 
@@ -246,11 +246,6 @@ public class SimpleSpectrum : MonoBehaviour {
     float micRestartWait = 20;
 
     void Start () {
-<<<<<<< HEAD
-=======
-        if(audioSource==null && sourceType == SourceType.AudioSource)
-            Debug.LogError("An audio source has not been assigned. Please assign a reference to a source, or set useAudioListener instead.");
->>>>>>> master
         RebuildSpectrum();
 	}
 

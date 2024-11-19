@@ -144,17 +144,7 @@ namespace JammerDash.Menus.Play
             {
                 StartCoroutine(Move(0));
             }
-            // Calculate the button's distance from the center of the scroll view
-            float distanceFromCenter = Mathf.Abs(-buttonRectTransform.localPosition.y - scrollRect.content.localPosition.y - 495);
-
-            // Calculate the ratio of distance from center to the total scroll view height
-            float ratio = distanceFromCenter / (scrollRect.content.rect.height - 2);
-
-            // Calculate the size of the button based on the ratio
-            float newSize = Mathf.Lerp(0, 820, 1 - ratio); // Buttons closer to the center will have larger sizes
-
-            // Set the size of the button
-            buttonRectTransform.sizeDelta = new Vector2(newSize, buttonRectTransform.sizeDelta.y);
+           
             if (isSelected && Input.GetKeyDown(KeyCode.Return))
             {
                 if (gameObject.GetComponent<CustomLevelScript>() == null)
@@ -173,10 +163,10 @@ namespace JammerDash.Menus.Play
         {
             if (GetComponent<CustomLevelScript>().sceneData != null && isSelected)
             {
-                StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "scenes", GetComponent<CustomLevelScript>().sceneData.sceneName, "bgImage.png")));
+                StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", GetComponent<CustomLevelScript>().sceneData.ID + " - " + GetComponent<CustomLevelScript>().sceneData.sceneName, "bgImage.png")));
             }
         }
-        IEnumerator Move(float lerpSpeed)
+        public IEnumerator Move(float lerpSpeed)
         {
             if (lerpSpeed != 0)
             {
@@ -214,12 +204,15 @@ namespace JammerDash.Menus.Play
                 Destroy(child.gameObject);
             }
         }
-        public IEnumerator HandleButtonClick()
+        int selectedLevelIndex = -1;
+
+        public IEnumerator PlayAudioOnlyMode()
         {
-            if (GetComponent<CustomLevelScript>() != null)
+            ButtonClickHandler[] levels = FindObjectsOfType<ButtonClickHandler>();
+            var customLevel = GetComponent<CustomLevelScript>();
+            if (customLevel != null)
             {
-                DestroyLeaderboard();
-                DisplayLB(GetComponent<CustomLevelScript>().sceneData.ID.ToString());
+
                 levelLength = GameObject.Find("info").GetComponent<Text>();
                 levelBPM = GameObject.Find("infoBPM").GetComponent<Text>();
                 diff = GameObject.Find("infodiff").GetComponent<Text>();
@@ -227,100 +220,248 @@ namespace JammerDash.Menus.Play
                 hp = GameObject.Find("health").GetComponent<Text>();
                 size = GameObject.Find("cubeSize").GetComponent<Text>();
                 bonus = GameObject.Find("levelbonusinfoi").GetComponent<Text>();
-                SceneData data = GetComponent<CustomLevelScript>().sceneData;
-                levelLength.text = $"{FormatTime(data.songLength):N0} ({FormatTime(data.levelLength):N0})"; 
-                levelBPM.text = $"{data.bpm}";
-                diff.text = $"{data.calculatedDifficulty:F2}";
-                levelObj.text = $"{(data.cubePositions.Count + data.sawPositions.Count + data.longCubePositions.Count):N0} ({data.cubePositions.Count}, {data.sawPositions.Count}, {data.longCubePositions.Count})";
-                hp.text = $"Player HP: {data.playerHP}";
-                size.text = $"Object size: {data.boxSize}";
-                long unixTime = Convert.ToInt64(data.saveTime);
-                DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(unixTime).ToUniversalTime();
 
-                TimeZoneInfo timeZone = TimeZoneInfo.Local;
-                DateTimeOffset EUTime = TimeZoneInfo.ConvertTime(dateTimeOffset, timeZone);
-                string formattedEUTime = EUTime.ToString("yyyy-MM-dd hh:MM:ss"); 
-                bonus.text = $"mapper: {data.creator}, ID: {data.ID}, last saved on {formattedEUTime}";
+                // Find the selected level's index
+               
+                new WaitUntil(() => GetComponent<leaderboard>().panelContainer != null);
+                DestroyLeaderboard();
+                DisplayLB(customLevel.sceneData.ID.ToString());
+
+                // Update UI elements
+                UpdateUIWithLevelData(customLevel.sceneData);
+
+                // Display formatted save time
+                bonus.text = GetFormattedBonusInfo(customLevel.sceneData);
             }
-            if (isSelected)
+
+            // Reset other buttons' selection
+            DeselectOtherButtons();
+
+            isSelected = true;
+            yield return StartCoroutine(Move(5));
+
+            button.onClick.RemoveAllListeners();
+
+            // Start Lerp for button scale
+            yield return StartCoroutine(LerpButtonSize(buttonRectTransform, new Vector3(850f, 120f, 0f)));
+
+            if (customLevel.sceneData != null)
             {
-                if (gameObject.GetComponent<CustomLevelScript>() == null)
+                string clipPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", customLevel.sceneData.ID + " - " + customLevel.sceneData.sceneName, customLevel.sceneData.artist + " - " + customLevel.sceneData.songName + ".mp3");
+                int audioClipIndex = -1; // Initialize to a value that indicates no match found
+                                         // Normalize the clipPath
+                clipPath.Replace("/", "\\");
+                // Iterate through the songPathsList
+                for (int i = 0; i < AudioManager.Instance.songPathsList.Count; i++)
                 {
-                    sfx.PlayOneShot(sfxclip);
-                    FindFirstObjectByType<mainMenu>().OpenLevel(GetComponent<RankDisplay>().sceneIndex);
-                    StopAllCoroutines();
+                    // Normalize the current path in songPathsList
+                    string normalizedSongPath = AudioManager.Instance.songPathsList[i];
+
+                    if (string.Equals(normalizedSongPath, clipPath, StringComparison.OrdinalIgnoreCase)) // Case-insensitive comparison
+                    {
+                        audioClipIndex = i; // Set the index if a match is found
+                        break; // No need to continue searching once a match is found
+                    }
+                }
+
+                // If a match was found, set the audioClipIndex and load the audio clip
+                if (audioClipIndex != -1)
+                {
+                    // Set the audioClipIndex on the AudioManager.Instance
+                    AudioManager.Instance.currentClipIndex = audioClipIndex;
+
+                    // Load the audio clip asynchronously
+                    yield return StartCoroutine(AudioManager.Instance.LoadAudioClip(clipPath));
+                    yield return new WaitUntil(() => AudioManager.Instance.songLoaded);
+                    yield return new WaitForEndOfFrame();
+                    UnityEngine.Debug.LogWarning("hi2");
+                    AudioManager.Instance.source.loop = true;
+                    AudioManager.Instance.source.time = UnityEngine.Random.Range(AudioManager.Instance.source.clip.length * 0f, AudioManager.Instance.source.clip.length * 0.5f);
+
                 }
                 else
                 {
-
-                    sfx.PlayOneShot(sfxclip);
-                    // Play custom level
-                    GetComponent<CustomLevelScript>().PlayLevel();
-                    StopAllCoroutines();
+                    // Handle case where no match was found
+                    UnityEngine.Debug.LogError("Clip path not found in songPathsList!");
+                    Debug.LogError(clipPath);
                 }
             }
+            int selectedLevelIndex = Array.FindIndex(levels, level => level.isSelected);
+            FindAnyObjectByType<mainMenu>().levelRow = selectedLevelIndex;
+            yield return StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", customLevel.sceneData.ID + " - " + customLevel.sceneData.sceneName, "bgImage.png")));
+        }
+        private IEnumerator LerpButtonSize(RectTransform rectTransform, Vector2 sizeChange, float duration = 0.1f)
+        {
+            Vector2 initialSize = rectTransform.sizeDelta;
+
+            float timeElapsed = 0;
+
+            while (timeElapsed < duration)
+            {
+                rectTransform.sizeDelta = Vector2.Lerp(initialSize, sizeChange, timeElapsed / duration);
+                timeElapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            rectTransform.sizeDelta = sizeChange;
+        }
+
+
+        public IEnumerator HandleButtonClick()
+        {
+            var customLevel = GetComponent<CustomLevelScript>();
+            ButtonClickHandler[] levels = FindObjectsOfType<ButtonClickHandler>();
+            if (customLevel != null)
+            {
+
+                levelLength = GameObject.Find("info").GetComponent<Text>();
+                levelBPM = GameObject.Find("infoBPM").GetComponent<Text>();
+                diff = GameObject.Find("infodiff").GetComponent<Text>();
+                levelObj = GameObject.Find("infoobj").GetComponent<Text>();
+                hp = GameObject.Find("health").GetComponent<Text>();
+                size = GameObject.Find("cubeSize").GetComponent<Text>();
+                bonus = GameObject.Find("levelbonusinfoi").GetComponent<Text>();
+                new WaitUntil(() => GetComponent<leaderboard>().panelContainer != null);
+                DestroyLeaderboard();
+                DisplayLB(customLevel.sceneData.ID.ToString());
+                // Update UI elements
+                UpdateUIWithLevelData(customLevel.sceneData);
+
+                // Display formatted save time
+                bonus.text = GetFormattedBonusInfo(customLevel.sceneData);
+            }
+
+            if (isSelected)
+            {
+                PlayLevelAudioOrSFX();
+            }
+
+            yield return StartCoroutine(LerpButtonSize(buttonRectTransform, new Vector3(850f, 120f, 0f)));
             // Reset other buttons' selection
+            DeselectOtherButtons();
+
+            isSelected = true;
+            yield return StartCoroutine(Move(0));
+
+            button.onClick.RemoveAllListeners();
+           
+            if (customLevel.sceneData != null)
+            {
+                string clipPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", customLevel.sceneData.ID + " - " + customLevel.sceneData.sceneName, customLevel.sceneData.artist + " - " + customLevel.sceneData.songName + ".mp3");
+                int audioClipIndex = -1; // Initialize to a value that indicates no match found
+                                         // Normalize the clipPath
+                clipPath.Replace("/", "\\");
+                // Iterate through the songPathsList
+                for (int i = 0; i < AudioManager.Instance.songPathsList.Count; i++)
+                {
+                    // Normalize the current path in songPathsList
+                    string normalizedSongPath = AudioManager.Instance.songPathsList[i];
+
+                    if (string.Equals(normalizedSongPath, clipPath, StringComparison.OrdinalIgnoreCase)) // Case-insensitive comparison
+                    {
+                        audioClipIndex = i; // Set the index if a match is found
+                        break; // No need to continue searching once a match is found
+                    }
+                }
+
+                // If a match was found, set the audioClipIndex and load the audio clip
+                if (audioClipIndex != -1)
+                {
+                    // Set the audioClipIndex on the AudioManager.Instance
+                    AudioManager.Instance.currentClipIndex = audioClipIndex;
+
+                    // Load the audio clip asynchronously
+                    yield return StartCoroutine(AudioManager.Instance.LoadAudioClip(clipPath));
+                    yield return new WaitUntil(() => AudioManager.Instance.songLoaded);
+                    yield return new WaitForEndOfFrame();
+                    UnityEngine.Debug.LogWarning("hi2");
+                    AudioManager.Instance.source.loop = true;
+                    AudioManager.Instance.source.time = UnityEngine.Random.Range(AudioManager.Instance.source.clip.length * 0f, AudioManager.Instance.source.clip.length * 0.5f);
+
+                }
+                else
+                {
+                    // Handle case where no match was found
+                    UnityEngine.Debug.LogError("Clip path not found in songPathsList!");
+                    Debug.LogError(clipPath);
+                }
+            }
+            int selectedLevelIndex = Array.FindIndex(levels, level => level.isSelected);
+            FindAnyObjectByType<mainMenu>().levelRow = selectedLevelIndex;
+            yield return StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", customLevel.sceneData.ID + " - " + customLevel.sceneData.sceneName, "bgImage.png")));
+
+
+
+        }
+
+        // Helper function to update UI with scene data
+        private void UpdateUIWithLevelData(SceneData data)
+        {
+            levelLength.text = $"{FormatTime(data.songLength):N0} ({FormatTime(data.levelLength):N0})";
+            levelBPM.text = $"{data.bpm}";
+            diff.text = $"{data.calculatedDifficulty:F2}";
+            levelObj.text = $"{(data.cubePositions.Count + data.sawPositions.Count + data.longCubePositions.Count):N0} ({data.cubePositions.Count}, {data.sawPositions.Count}, {data.longCubePositions.Count})";
+            hp.text = $"Player HP: {data.playerHP}";
+            size.text = $"Object size: {data.boxSize}";
+        }
+
+        // Format and return the bonus information as a string
+        private string GetFormattedBonusInfo(SceneData data)
+        {
+            long unixTime = Convert.ToInt64(data.saveTime);
+            DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(unixTime).ToUniversalTime();
+            DateTimeOffset EUTime = TimeZoneInfo.ConvertTime(dateTimeOffset, TimeZoneInfo.Local);
+            return $"mapper: {data.creator}, ID: {data.ID}, last saved on {EUTime:yyyy-MM-dd hh:MM:ss}";
+        }
+
+        // Handle playing the SFX or custom level audio
+        private void PlayLevelAudioOrSFX()
+        {
+            sfx.PlayOneShot(sfxclip);
+            if (GetComponent<CustomLevelScript>() == null)
+            {
+                FindFirstObjectByType<mainMenu>().OpenLevel(GetComponent<RankDisplay>().sceneIndex);
+            }
+            else
+            {
+                GetComponent<CustomLevelScript>().PlayLevel();
+            }
+            StopAllCoroutines();
+        }
+
+        // Deselect other buttons in the scroll rect content
+        private void DeselectOtherButtons()
+        {
             ButtonClickHandler[] buttons = scrollRect.content.GetComponentsInChildren<ButtonClickHandler>();
             foreach (ButtonClickHandler otherButton in buttons)
             {
                 if (otherButton != this)
                 {
+
+                    StartCoroutine(LerpButtonSize(otherButton.buttonRectTransform, new Vector3(800f, 90f, 0f)));
                     otherButton.isSelected = false;
+                    otherButton.selectedLevelIndex = -1;
                 }
             }
-            isSelected = true;
-            yield return StartCoroutine(Move(0));
+        }
 
-            button.onClick.RemoveAllListeners();
-            if (GetComponent<CustomLevelScript>() != null)
-            {
-                if (GetComponent<CustomLevelScript>().sceneData != null)
-                {
-                    string clipPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", GetComponent<CustomLevelScript>().sceneData.sceneName, GetComponent<CustomLevelScript>().sceneData.artist + " - " + GetComponent<CustomLevelScript>().sceneData.songName + ".mp3");
-                    int audioClipIndex = -1; // Initialize to a value that indicates no match found
-                    // Normalize the clipPath
-                    clipPath.Replace("/", "\\");
-                    // Iterate through the songPathsList
-                    for (int i = 0; i < AudioManager.Instance.songPathsList.Count; i++)
-                    {
-                        // Normalize the current path in songPathsList
-                        string normalizedSongPath = AudioManager.Instance.songPathsList[i];
+        // Helper function to generate clip path
+        private string GetClipPath(SceneData data)
+        {
+            return Path.Combine(Application.persistentDataPath, "levels", "extracted", data.sceneName, $"{data.artist} - {data.songName}.mp3").Replace("/", "\\");
+        }
 
-                        if (string.Equals(normalizedSongPath, clipPath, StringComparison.OrdinalIgnoreCase)) // Case-insensitive comparison
-                        {
-                            audioClipIndex = i; // Set the index if a match is found
-                            break; // No need to continue searching once a match is found
-                        }
-                    }
+        // Helper function to find index of clip path in songPathsList
+        private int GetAudioClipIndex(List<string> songPathsList, string clipPath)
+        {
+            return songPathsList.FindIndex(path => string.Equals(path, clipPath, StringComparison.OrdinalIgnoreCase));
+        }
 
-                    // If a match was found, set the audioClipIndex and load the audio clip
-                    if (audioClipIndex != -1)
-                    {
-                        // Set the audioClipIndex on the AudioManager.Instance
-                        AudioManager.Instance.currentClipIndex = audioClipIndex;
-
-                        // Load the audio clip asynchronously
-                        yield return StartCoroutine(AudioManager.Instance.LoadAudioClip(clipPath));
-                        yield return new WaitUntil(() => AudioManager.Instance.songLoaded);
-                        yield return new WaitForEndOfFrame();
-                        UnityEngine.Debug.LogWarning("hi2");
-                        AudioManager.Instance.source.loop = true;
-                        AudioManager.Instance.source.time = UnityEngine.Random.Range(AudioManager.Instance.source.clip.length * 0f, AudioManager.Instance.source.clip.length * 0.5f);
-
-                    }
-                    else
-                    {
-                        // Handle case where no match was found
-                        UnityEngine.Debug.LogError("Clip path not found in songPathsList!");
-                        Debug.LogError(clipPath);
-                    }
-                }
-
-                    yield return StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "scenes", GetComponent<CustomLevelScript>().sceneData.sceneName, "bgImage.png")));
-
-            }
-
-
+        // Configure audio source settings
+        private void ConfigureAudioSource()
+        {
+            AudioManager.Instance.source.loop = true;
+            AudioManager.Instance.source.time = UnityEngine.Random.Range(AudioManager.Instance.source.clip.length * 0f, AudioManager.Instance.source.clip.length * 0.5f);
         }
 
         // Coroutine to load image from URL
@@ -335,15 +476,13 @@ namespace JammerDash.Menus.Play
                     // Create a Sprite from the downloaded texture and set it to the Image component
                     Texture2D texture = DownloadHandlerTexture.GetContent(www);
                     Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
-                    UnityEngine.Debug.Log(bg);
+                    UnityEngine.Debug.Log(url);
                     bg.sprite = sprite;
                     levelImage.sprite = sprite;
                 }
                 else
                 {
-                    bg.sprite = FindAnyObjectByType<mainMenu>().sprite[UnityEngine.Random.Range(0, FindAnyObjectByType<mainMenu>().sprite.Length + 1)];
-                    levelImage.sprite = null;
-                    StartCoroutine(AudioManager.Instance.ChangeSprite());
+                    Debug.LogError(www.error);
                 }
             }
         }

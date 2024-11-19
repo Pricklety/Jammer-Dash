@@ -31,8 +31,9 @@ namespace JammerDash.Game
             if (SceneManager.GetActiveScene().name == "LevelDefault")
             {
                 string levelName = CustomLevelDataManager.Instance.levelName;
+                string fullName = CustomLevelDataManager.Instance.ID + " - " + CustomLevelDataManager.Instance.levelName;
                
-                    string path = Path.Combine(Application.persistentDataPath, "levels", "extracted", levelName, levelName + ".json");
+                    string path = Path.Combine(Application.persistentDataPath, "levels", "extracted", fullName, levelName + ".json");
                     string json = File.ReadAllText(path);
                     SceneData data = SceneData.FromJson(json);
                     CustomLevelDataManager.Instance.LoadLevelData(levelName, data.ID);

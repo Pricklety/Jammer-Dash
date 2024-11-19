@@ -11,7 +11,7 @@ namespace JammerDash.Audio
     {
         private AudioSource audioSource;
         private float fadeDuration = 0.5f; // Duration of the fade-out in seconds
-        private bool fadingOut = false;
+        public bool fadingOut = false;
         public AudioClip christmasClip;
         public AudioClip normalClip;
         public int normalClipIndex = 1; // Index of the normal music clip
@@ -83,9 +83,5 @@ namespace JammerDash.Audio
             UnityEngine.Debug.LogWarning("Desired song not found in the playlist. Playing the first song.");
             return desiredIndex;
         }
-
-
-
-
     }
 }

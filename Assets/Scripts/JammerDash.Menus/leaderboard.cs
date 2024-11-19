@@ -11,7 +11,7 @@ namespace JammerDash.Menus.Play
         public GameObject panelPrefab;
         public Transform panelContainer;
 
-        void Start()
+        void Awake()
         {
             panelContainer = GameObject.Find("lb content").transform;
         }

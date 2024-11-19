@@ -3,6 +3,7 @@ using System.IO;
 using System;
 using System.Collections;
 using UnityEngine.Events;
+using JammerDash.Audio;
 
 namespace JammerDash
 {
@@ -49,7 +50,7 @@ namespace JammerDash
 
             // Capture screenshot
             ScreenCapture.CaptureScreenshot(screenshotPath);
-            GetComponent<AudioSource>().PlayOneShot(shutter);
+            AudioManager.Instance.source.PlayOneShot(shutter);
 
             // Wait for a short period of time before checking if the file exists
             yield return new WaitForSeconds(1f);

@@ -16,17 +16,22 @@ using Debug = UnityEngine.Debug;
 using JammerDash.Menus;
 using UnityEditor;
 using UnityEditor.Experimental;
+using JammerDash.Audio;
 
 namespace JammerDash.Audio
 {
     public class AudioManager : MonoBehaviour
     {
+        // Keybind function part thingy (Game.FunctionPanel)
+        public Animator toggleAnim;
+        public Text functionName;
+        public Text functionKeybind;
 
         bool isLogoSFX = false;
         int counter = 0;
         public AudioClip sfxShort;
         public AudioClip sfxLong;
-
+        public bool shuffle = false;
         bool songPlayed = false;
         private float masterVolume = 1.0f;
         public List<string> songPathsList;
@@ -34,7 +39,7 @@ namespace JammerDash.Audio
         float bgtimer = 0f;
         float spriteChangeInterval = 15f;
         public static AudioManager Instance { get; private set; }
-
+        public int levelIndex = -1;
         public bool isMusicLoaded = false;
         private int loadedSongsCount;
         private float loadingProgress;
@@ -80,7 +85,7 @@ namespace JammerDash.Audio
 
 
             if (isLogoSFX)
-                GetComponent<AudioSource>().PlayOneShot(sfxShort);
+                source.PlayOneShot(sfxShort);
 
         }
         public void OnMasterVolumeChanged(float volume)
@@ -112,7 +117,7 @@ namespace JammerDash.Audio
         {
             if (songPathsList != null && currentClipIndex >= 0 && currentClipIndex < songPathsList.Count)
             {
-                AudioSource audioSource = GetComponent<AudioSource>();
+                AudioSource audioSource = source;
 
                 if (audioSource.isPlaying)
                 {
@@ -125,12 +130,38 @@ namespace JammerDash.Audio
        
         public void Update()
         {
-            
-<<<<<<< HEAD
+            #region Keybind Checks (The keybindpanel)
+            if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.Return))
+            {
+                KeybindPanel.ToggleFunction("Toggle fullscreen", "Alt + Enter");
+
+            }
+
+            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeybindingManager.toggleUI))
+            {
+                KeybindPanel.ToggleFunction("Toggle gameplay interface", $"Shift + {KeybindingManager.toggleUI}");
+            }
+
+            if (SceneManager.GetActiveScene().buildIndex == 1)
+            {
+
+                if (Input.GetKeyDown(KeybindingManager.nextSong))
+                    KeybindPanel.ToggleFunction("Next song", $"{KeybindingManager.nextSong}");
+                else if (Input.GetKeyDown(KeybindingManager.prevSong))
+                    KeybindPanel.ToggleFunction("Previous song", $"{KeybindingManager.prevSong}");
+                else if (Input.GetKeyDown(KeybindingManager.pause))
+                    KeybindPanel.ToggleFunction("Pause song", $"{KeybindingManager.pause}");
+                else if (Input.GetKeyDown(KeybindingManager.play))
+                    KeybindPanel.ToggleFunction("Play song", $"{KeybindingManager.play}");
+                else if (Input.GetKeyDown(KeyCode.B))
+                {
+                    KeybindPanel.ToggleFunction("Change background", "B");
+                }
+                if ((shuffle || Input.GetKey(KeyCode.LeftShift)) && Input.GetKeyDown(KeybindingManager.nextSong))
+                    KeybindPanel.ToggleFunction("Random song", $"Shift + {KeybindingManager.nextSong}");
+            }
+            #endregion
             if (Input.GetKeyDown(KeyCode.F9))
-=======
-            if (Input.GetKeyDown(KeyCode.F9) && SceneManager.GetActiveScene().buildIndex == 1)
->>>>>>> master
             {
                 StartCoroutine(LoadAudioClipsAsync());
             }
@@ -174,7 +205,7 @@ namespace JammerDash.Audio
                     }
                 }
             }
-            AudioSource audioSource = GetComponent<AudioSource>();
+            AudioSource audioSource = source;
             float value1 = Input.GetAxisRaw("Mouse ScrollWheel");
             float volumeChangeSpeed = 1f;
 
@@ -185,7 +216,7 @@ namespace JammerDash.Audio
                 audio.outputAudioMixerGroup = master;
                 audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", Mathf.Clamp(masterS.value, -80f, 20f));
             }
-            if (SceneManager.GetActiveScene().buildIndex == 1 && options != null)
+            if (options != null)
             {
 
                 if (!options.increaseVol.isOn)
@@ -237,7 +268,6 @@ namespace JammerDash.Audio
                         // Loop through each audio source
                         foreach (AudioSource audio in audios)
                         {
-
                             // Apply the new volume to the audio source 
                             audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", newVolume);
                             if (SceneManager.GetActiveScene().buildIndex == 1)
@@ -312,37 +342,7 @@ namespace JammerDash.Audio
                 songPlayed = false;
             }
 
-            if (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButtonDown(2) && !data.loadedLogoSFX)
-            {
-                counter++;
-                if (counter == 3)
-                {
-                    GetComponent<AudioSource>().volume *= 0.8f;
-                    GetComponent<AudioSource>().PlayOneShot(sfxLong, 1);
-                    data.loadedLogoSFX = true;
-                    SettingsFileHandler.SaveSettingsToFile(data);
-                    Notifications.instance.Notify("Jammer Dash :)", null);
-                    new WaitForSecondsRealtime(8f);
-                        GetComponent<AudioSource>().volume = 1;
-
-                }
-            }
-            else if (data.loadedLogoSFX && Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButtonDown(2))
-            {
-                counter++;
-                if (counter == 3)
-                {
-                    GetComponent<AudioSource>().volume *= 0.8f;
-                    GetComponent<AudioSource>().PlayOneShot(sfxLong, 1);
-                    data.loadedLogoSFX = false;
-                    Notifications.instance.Notify("oh :(", null);
-                    SettingsFileHandler.SaveSettingsToFile(data);
-
-                    new WaitForSecondsRealtime(8f);
-                    GetComponent<AudioSource>().volume = 1;
-
-                }
-            }
+           
             master.audioMixer.SetFloat("Gain", data.bass ? data.bassgain : 1f);
 
 
@@ -517,23 +517,23 @@ namespace JammerDash.Audio
         public void PlaySource()
         {
 
-            GetComponent<AudioSource>().Play();
+            source.Play();
 
             paused = false;
         }
 
         public void Pause()
         {
-            GetComponent<AudioSource>().Pause();
+           source.Pause();
 
             paused = true;
         }
 
         public void Stop()
         {
-            GetComponent<AudioSource>().Pause();
+            source.Pause();
             paused = true;
-            GetComponent<AudioSource>().Stop();
+            source.Stop();
         }
         public void ShuffleSongPathsList()
         {
@@ -598,7 +598,7 @@ namespace JammerDash.Audio
             {
                 cooldown = 0f;
                 isLoading = true;
-                if (Input.GetKey(KeyCode.LeftShift))
+                if (Input.GetKey(KeyCode.LeftShift) || shuffle)
                     currentClipIndex = UnityEngine.Random.Range(0, songPathsList.Count);
                 else
                     currentClipIndex++;
@@ -688,11 +688,11 @@ namespace JammerDash.Audio
 
 
                         // Set the loaded audio clip to the AudioSource component
-                        GetComponent<AudioSource>().clip = audioClip;
+                        source.clip = audioClip;
                         options.musicSlider.maxValue = audioClip.length;
                         options.musicSlider.value = 0f;
                         options.musicText.text = "";
-                        GetComponent<AudioSource>().Play();
+                        source.Play();
                         songLoaded = true;
                     }
                     else
@@ -717,7 +717,7 @@ namespace JammerDash.Audio
 
         public void Play(int index)
         {
-            GetComponent<AudioSource>().clip.name = Path.GetFileNameWithoutExtension(songPathsList[index]);
+            source.clip.name = Path.GetFileNameWithoutExtension(songPathsList[index]);
             currentClipIndex = index;
             PlayCurrentSong();
             UnityEngine.Debug.Log(currentClipIndex);
@@ -768,4 +768,22 @@ namespace JammerDash.Audio
             get { return !Task.WhenAll(tasks).IsCompleted; }
         }
     }
+
+   
 }
+
+namespace JammerDash.Menus
+{
+    public class KeybindPanel
+    {
+        public static void ToggleFunction(string func, string key)
+        {
+           
+            AudioManager.Instance.toggleAnim.Rebind();
+            AudioManager.Instance.toggleAnim.Play("keybindFunc", 0, 0);
+            AudioManager.Instance.functionName.text = func;
+            AudioManager.Instance.functionKeybind.text = key;
+        }
+    }
+}
+

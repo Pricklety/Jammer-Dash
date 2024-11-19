@@ -30,13 +30,9 @@ namespace JammerDash.Menus
 {
     public class mainMenu : MonoBehaviour, IPointerClickHandler
     {
-<<<<<<< HEAD
         public bool areLevelsImported = false;
 
 
-=======
-        
->>>>>>> master
         public GameObject musicAsset;
         public Image bg;
         public Sprite[] sprite;
@@ -50,7 +46,7 @@ namespace JammerDash.Menus
         public Text nolevelerror;
         public GameObject[] disableAccess;
         string oldSeconds;
-
+        public Image shuffleImage;
         public Animator idle;
         public Animator notIdle;
         float afkTime;
@@ -79,6 +75,7 @@ namespace JammerDash.Menus
         public GameObject changelogs;
         public GameObject overPanel;
         public GameObject accPanel;
+        public GameObject multiPanel;
 
         [Header("LevelInfo")]
         public GameObject levelInfoPanelPrefab;
@@ -96,6 +93,7 @@ namespace JammerDash.Menus
         public string artist;
         public string path;
         public Text songMP3Name;
+        public int levelRow = -1;
       
         [Header("Video Background")]
         public GameObject videoPlayerObject;
@@ -159,7 +157,6 @@ namespace JammerDash.Menus
             StartCoroutine(SetCountry());
             SetSpectrum();
             LoadRandomBackground();
-<<<<<<< HEAD
             string path = Path.Combine(Application.persistentDataPath, "levels");
             if (Directory.GetFiles(path, "*.jdl").Length == 0)
             {
@@ -168,9 +165,6 @@ namespace JammerDash.Menus
                 FileBrowser.SetDefaultFilter("Levels");
                 FileBrowser.ShowLoadDialog(ImportLevel, null, FileBrowser.PickMode.Files, true, Path.Combine(Application.streamingAssetsPath, "levels"), null, "Import Level...", "Import");
             }
-=======
-
->>>>>>> master
         }
         public void SetSpectrum()
         {
@@ -178,11 +172,7 @@ namespace JammerDash.Menus
 
             foreach (SimpleSpectrum spectrum in spectrums)
             {
-<<<<<<< HEAD
                 spectrum.audioSource = AudioManager.Instance.source;
-=======
-                spectrum.audioSource = AudioManager.Instance.GetComponent<AudioSource>();
->>>>>>> master
             }
         }
         public string FormatTime(float time)
@@ -300,10 +290,10 @@ namespace JammerDash.Menus
                     processedIDs.Add(sceneData.ID);
 
                     // Log the level name to verify if sceneData is successfully deserialized
-                    UnityEngine.Debug.LogWarning(sceneData.levelName);
+                    UnityEngine.Debug.LogWarning(sceneData.sceneName);
 
                     // Create a directory with the level name
-                    string extractedPath = Path.Combine(levelsPath, "extracted", sceneData.sceneName);
+                    string extractedPath = Path.Combine(levelsPath, "extracted", sceneData.ID + " - " + sceneData.sceneName);
                     Directory.CreateDirectory(extractedPath);
 
                     // Move the JSON file to the new directory
@@ -313,7 +303,7 @@ namespace JammerDash.Menus
                         File.Delete(jsonDestinationPath);
                     }
                     File.Move(jsonFilePath, jsonDestinationPath);
-                    ExtractMP3FromJDL(filePath, extractedPath);
+                    ExtractOtherFromJDL(filePath, extractedPath);
                     GameObject levelInfoPanel = Instantiate(playPrefab, playlevelInfoParent);
                     // Display level information on UI
                     DisplayCustomLevelInfo(sceneData, levelInfoPanel.GetComponent<CustomLevelScript>());
@@ -355,6 +345,7 @@ namespace JammerDash.Menus
         {
             Account.Instance.Apply(usernameInput.text, password.text, email.text, cc);
         }
+
         public static string ExtractJSONFromJDL(string jdlFilePath)
         {
             try
@@ -419,7 +410,7 @@ namespace JammerDash.Menus
         }
 
 
-        public static void ExtractMP3FromJDL(string jdlFilePath, string destinationFilePath)
+        public static void ExtractOtherFromJDL(string jdlFilePath, string destinationFilePath)
         {
             try
             {
@@ -429,7 +420,7 @@ namespace JammerDash.Menus
                     {
                         string entryFileName = entry.FullName;
 
-                        if (entryFileName.EndsWith(".mp3") || entryFileName.EndsWith(".wav") || entryFileName.EndsWith(".ogg"))
+                        if (entryFileName.EndsWith(".mp3") || entryFileName.EndsWith(".png"))
                         {
                             // Combine the destination directory path with the MP3 filename
                             string destinationFullPath = Path.Combine(destinationFilePath, Path.GetFileName(entryFileName));
@@ -447,8 +438,7 @@ namespace JammerDash.Menus
             }
         }
 
-
-
+      
         public void URL(string url)
         {
             Application.OpenURL(url);
@@ -538,17 +528,28 @@ namespace JammerDash.Menus
         private async Task LoadCustomBackgroundAsync()
         {
             string path = Application.persistentDataPath + "/backgrounds";
-            string[] files = Directory.GetFiles(path, "*.png", SearchOption.AllDirectories);
 
-            if (files.Length == 0)
+            // Supported image file types in Unity
+            string[] supportedExtensions = new string[] { "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.tga" };
+
+            // Gather all files with supported extensions
+            List<string> files = new List<string>();
+            foreach (var extension in supportedExtensions)
             {
-                Debug.LogWarning("No PNG files found in the directory: " + path);
+                files.AddRange(Directory.GetFiles(path, extension, SearchOption.AllDirectories));
+            }
+
+            if (files.Count == 0)
+            {
+                Debug.LogWarning("No image files found in the directory: " + path);
                 return;
             }
 
-            string randomFilePath = files[UnityEngine.Random.Range(0, files.Length)]; // Choose a random file path
+            // Choose a random file path
+            string randomFilePath = files[UnityEngine.Random.Range(0, files.Count)];
             await LoadSpriteAsync(randomFilePath);
         }
+
 
         private async Task LoadSpriteAsync(string filePath)
         {
@@ -600,6 +601,7 @@ namespace JammerDash.Menus
 
             this.sprite = new Sprite[1];
             this.sprite[0] = sprite;
+            Resources.UnloadUnusedAssets();
         }
             private void LoadVideoClipFromFile(string filePath)
         {
@@ -673,12 +675,13 @@ namespace JammerDash.Menus
             mapper = map.text;
             SceneData newLevelData = new SceneData
             {
-                sceneName = songName, 
+                sceneName = songName,
                 levelName = songName,
                 calculatedDifficulty = newDifficulty,
                 songName = songName,
                 artist = artist,
-                creator = mapper
+                creator = mapper,
+                ID = Random.RandomRange(int.MinValue, int.MaxValue)
             };
 
             // Save the new level data to a JSON file
@@ -696,7 +699,7 @@ namespace JammerDash.Menus
             string json = sceneData.ToJson();
 
             // Save JSON to a new file in the persistentDataPath + scenes & levels folder
-            string namepath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.levelName);
+            string namepath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneData.levelName);
             string filePath = Path.Combine(namepath, $"{sceneData.levelName}.json");
             string musicPath = Path.Combine(namepath, $"{sceneData.artist} - {sceneData.songName}.mp3");
             if (Directory.Exists(namepath))
@@ -707,7 +710,7 @@ namespace JammerDash.Menus
             {
                 Directory.CreateDirectory(namepath);
                 File.WriteAllText(filePath, json);
-                File.Copy(path, Path.Combine(Application.persistentDataPath, "scenes", sceneData.sceneName, $"{artist} - {songName}.mp3"));
+                File.Copy(path, Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneData.levelName, $"{artist} - {songName}.mp3"));
             }
 
         }
@@ -857,6 +860,7 @@ namespace JammerDash.Menus
                     community.SetActive(false);
                     changelogs.SetActive(false);
                     additionalPanel.SetActive(false);
+                    multiPanel.SetActive(false);
                    
                 }
                 if (!panel.active)
@@ -881,7 +885,8 @@ namespace JammerDash.Menus
                 community.SetActive(false);
                 changelogs.SetActive(false);
                 additionalPanel.SetActive(false);
-                
+                multiPanel.SetActive(false);
+
 
                 // Enable the specified panel if it's not null
                 if (panel != null)
@@ -905,10 +910,36 @@ namespace JammerDash.Menus
                     {
                         if (level.isSelected)
                         {
+                            levelRow = Array.IndexOf(levels, level);
                             level.Change();
                             AudioManager.Instance.source.loop = true;
                         }
+                        else
+                        {
+                            AudioManager.Instance.source.loop = true;
+                            if (levelRow == -1)
+                            {
+                                int randomIndex = Random.Range(0, levels.Length);
+                                levelRow = randomIndex;
+                                new WaitUntil(() => levels[randomIndex].GetComponent<leaderboard>().panelContainer != null);
+                                StartCoroutine(levels[randomIndex].PlayAudioOnlyMode());
+                                levels[randomIndex].Change();
+                                
+                            }
+                            else
+                            {
+                                new WaitUntil(() => levels[levelRow].GetComponent<leaderboard>().panelContainer != null);
+                                levels[levelRow].Change();
+                                StartCoroutine(levels[levelRow].Move(1));
+                                if (AudioManager.Instance.source.clip.name != $"{levels[levelRow].GetComponent<CustomLevelScript>().sceneData.artist} - {levels[levelRow].GetComponent<CustomLevelScript>().sceneData.songName}")
+                                    StartCoroutine(levels[levelRow].PlayAudioOnlyMode());
+                            }
+                        }
                     }
+                }
+                else
+                {
+
                 }
             }
         }
@@ -924,6 +955,11 @@ namespace JammerDash.Menus
             ToggleMenuPanel(playPanel);
             InputSystem.pollingFrequency = 1000;
             InputSystem.settings.maxQueuedEventsPerUpdate = 1000;
+        }
+
+        public void Multi()
+        {
+            ToggleMenuPanel(multiPanel);
         }
 
         public void PlayRandomSFX()
@@ -1107,6 +1143,7 @@ namespace JammerDash.Menus
             playPanel.SetActive(false);
             community.SetActive(false);
             mainPanel.SetActive(true);
+            multiPanel.SetActive(false);
         }
 
 
@@ -1224,16 +1261,22 @@ namespace JammerDash.Menus
             TimeSpan timeSpan = TimeSpan.FromSeconds(elapsedTime);
             return string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
         }
+
+        public void Shuffle()
+        {
+            AudioManager.Instance.shuffle = !AudioManager.Instance.shuffle;
+        }
         public void FixedUpdate()
         {
-            string timeInfo = DateTime.Now.ToString("hh:mm:ss tt") + "\n";
-<<<<<<< HEAD
-            if (SceneManager.GetActiveScene().buildIndex == 1 && AudioManager.Instance.source.loop)
+            if (AudioManager.Instance.shuffle)
             {
-                AudioManager.Instance.source.loop = false;
+                shuffleImage.color = Color.HSVToRGB(0.33f, 0.47f, 1);
             }
-=======
->>>>>>> master
+            else
+            {
+                shuffleImage.color = Color.white;
+            }
+            string timeInfo = DateTime.Now.ToString("hh:mm:ss tt") + "\n";
             if (FindObjectOfType<GameTimer>() != null)
             {
                 timeInfo += "running " + FormatElapsedTime(GameTimer.GetRunningTime());
@@ -1359,7 +1402,7 @@ namespace JammerDash.Menus
                 audioMixer.SetFloat("Lowpass", data.lowpassValue);
             }
 
-            if (mainPanel.activeSelf && AudioManager.Instance.source.loop && SceneManager.GetActiveScene().buildIndex == 1)
+            if (mainPanel.activeSelf && AudioManager.Instance.source.loop)
             {
                 AudioManager.Instance.source.loop = false;
             }
@@ -1379,7 +1422,7 @@ namespace JammerDash.Menus
         {
             string seconds = System.DateTime.Now.ToLocalTime().ToString("ss");
             SimpleSpectrum[] spectrums = FindObjectsByType<SimpleSpectrum>(FindObjectsSortMode.None);
-
+            AudioManager.Instance.levelIndex = levelRow;
             foreach (SimpleSpectrum spectrum in spectrums)
             {
                 if (spectrum.audioSource == null)
@@ -1388,27 +1431,43 @@ namespace JammerDash.Menus
                 }
             }
            
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                LoadRandomBackground();
+            }
 
             if ((Input.GetAxis("Mouse X") == 0 || Input.GetAxis("Mouse Y") == 0) && mainPanel.activeSelf)
             {
                 afkTime += Time.fixedDeltaTime;
 
-                if (afkTime > 5f)
+                if (afkTime > 25f && (!settingsPanel.activeSelf && !accPanel.activeSelf && !additionalPanel.activeSelf))
                 {
                     if (!hasPlayedIdle)
                     {
+                        ToggleMenuPanel(mainPanel);
+                        Cursor.visible = false;
                         idle.PlayInFixedTime("Idle");
                         hasPlayedIdle = true;
                     }
                 }
+                if (afkTime > 25f && (settingsPanel.activeSelf || accPanel.activeSelf || additionalPanel.activeSelf))
+                {
+                    Cursor.visible = true;
+                    notIdle.PlayInFixedTime("notIdle");
+                    hasPlayedIdle = false;
+                }
+                else if (afkTime < 25f)
+                {
+                    Cursor.visible = true;
+                }
             }
             else
             {
-               
-                        notIdle.PlayInFixedTime("notIdle");
-                        hasPlayedIdle = false;
-                    
-                    afkTime = 0f;
+
+                Cursor.visible = true;
+                notIdle.PlayInFixedTime("notIdle");
+                hasPlayedIdle = false;
+                afkTime = 0f;
                 
             }
 

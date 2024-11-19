@@ -71,7 +71,7 @@ namespace JammerDash.Editor
         {
             if (collision.CompareTag("Cubes"))
             {
-                new WaitForSeconds(0.07f);
+                new WaitForSecondsRealtime(0.07f);
                 Debug.Log("hit");
                 AudioClip hitSound = Resources.Load<AudioClip>("Audio/SFX/hit0");
                 GameObject.Find("sfx").GetComponent<AudioSource>().PlayOneShot(hitSound, 1);

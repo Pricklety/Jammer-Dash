@@ -28,6 +28,7 @@ namespace JammerDash.Menus.Play
         public GameObject cubePrefab;
         public GameObject sawPrefab;
         public SceneData sceneData;
+        int ID;
         private List<GameObject> cubes = new List<GameObject>();
         private List<GameObject> saws = new List<GameObject>();
 
@@ -37,6 +38,7 @@ namespace JammerDash.Menus.Play
             sceneData = data;
             info.text = $"Data: ID - {data.ID}; HP - {data.playerHP}; CS - {data.boxSize}; BPM - {data.bpm};";
             bg.color = data.defBGColor;
+            ID = data.ID;
         }
         
 
@@ -69,7 +71,7 @@ namespace JammerDash.Menus.Play
 
         public void DeleteLevel()
         {
-            string levelPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.sceneName);
+            string levelPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneData.levelName);
 
             // Check if the level path exists
             if (Directory.Exists(levelPath))
@@ -149,7 +151,7 @@ namespace JammerDash.Menus.Play
 
         public void EditLevel()
         {
-            string json = File.ReadAllText(Application.persistentDataPath + $"/scenes/{levelNameText.text}/" + $"{levelNameText.text}.json");
+            string json = File.ReadAllText(Application.persistentDataPath + $"/scenes/{ID} - {levelNameText.text}/" + $"{levelNameText.text}.json");
             SceneData sceneData = SceneData.FromJson(json);
             if (sceneData != null)
             {
@@ -158,7 +160,7 @@ namespace JammerDash.Menus.Play
                 {
                     CustomLevelDataManager data = CustomLevelDataManager.Instance;
                     data.levelName = levelNameText.text;
-                    CustomLevelDataManager.Instance.LoadEditLevelData(levelNameText.text);
+                    CustomLevelDataManager.Instance.LoadEditLevelData(ID, levelNameText.text);
                 };
 
 

@@ -28,11 +28,11 @@ namespace JammerDash.Game
 
         private void Start()
         {
+
             song = AudioManager.Instance.source;
             song.pitch = 0;
             player.enabled = false;
             StartCoroutine(LateStart());
-           
             Canvas[] canvases = FindObjectsOfType<Canvas>();
             foreach (Canvas canvas in canvases)
             {
@@ -50,14 +50,12 @@ namespace JammerDash.Game
                 {
                     Destroy(player1);
                     player0.SetActive(true);
-                    song.pitch = 0;
                     player.enabled = false;
                 }
                 else if (data.playerType == 1)
                 {
                     Destroy(player0);
                     player1.SetActive(true);
-                    song.pitch = 0;
                     player.enabled = false;
                 }
                 player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>();
@@ -67,7 +65,7 @@ namespace JammerDash.Game
             {
                 player0 = GameObject.FindGameObjectWithTag("Player");
             }
-            song.pitch = 0;
+            song.Stop();
             player.enabled = false;
             new WaitForSecondsRealtime(0.5f);
             
@@ -76,8 +74,8 @@ namespace JammerDash.Game
             started = true;
             player.enabled = true; // Enable the player movement after the delay
             GetComponent<Animator>().enabled = false;
-            song.volume = 1f;
             song.pitch = 1f;
+            song.volume = 1f;
             song.Play();
         }
 

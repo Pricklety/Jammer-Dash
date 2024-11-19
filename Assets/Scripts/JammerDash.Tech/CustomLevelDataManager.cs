@@ -50,11 +50,11 @@ namespace JammerDash.Tech
 
             levelName = sceneName;
             ID = id;
-            string filePath = Path.Combine(Application.persistentDataPath, "levels", sceneName + ".jdl");
+            string filePath = Path.Combine(Application.persistentDataPath, "levels", $"{id} - {levelName}.jdl");
 
             if (File.Exists(filePath))
             {
-                filePath = Path.Combine(Application.persistentDataPath, "levels", "extracted", levelName, $"{levelName}.json");
+                filePath = Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{id} - {levelName}", $"{levelName}.json");
                 string json = File.ReadAllText(filePath);
                 Debug.LogWarning(filePath);
                 SceneData sceneData = SceneData.FromJson(json);
@@ -75,9 +75,9 @@ namespace JammerDash.Tech
 
             return null;
         }
-        public SceneData LoadEditLevelData(string sceneName)
+        public SceneData LoadEditLevelData(int ID, string sceneName)
         {
-            string filePath = Path.Combine(Application.persistentDataPath, "scenes", sceneName, $"{sceneName}.json");
+            string filePath = Path.Combine(Application.persistentDataPath, "scenes", ID.ToString() + " - " + sceneName, $"{sceneName}.json");
 
             if (File.Exists(filePath))
             {
@@ -85,13 +85,13 @@ namespace JammerDash.Tech
                 SceneData sceneData = SceneData.FromJson(json);
 
                 // Load the audio clip
-                string audioFilePath = Path.Combine(Application.persistentDataPath, "scenes", sceneName, $"{sceneData.songName}");
+                string audioFilePath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneName, $"{sceneData.songName}");
 
                 if (SceneManager.GetActiveScene().name == "SampleScene")
                 {
                     OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
                     EditorManager manager = FindObjectOfType<EditorManager>();
-                    using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(Path.Combine(Application.persistentDataPath, "scenes", sceneName, "bgImage.png")))
+                    using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneName, "bgImage.png")))
                     {
                         if (www.isDone)
                         {
@@ -110,7 +110,7 @@ namespace JammerDash.Tech
                     levelName = sceneData.sceneName;
                     creator = sceneData.creator;
                     diff = (int)sceneData.calculatedDifficulty;
-                    ID = sceneData.ID;
+                    this.ID = sceneData.ID;
                     SceneManager.sceneLoaded += OnSceneLoaded;
                     return sceneData;
                 }
@@ -170,7 +170,7 @@ namespace JammerDash.Tech
         private IEnumerator ProcessAfterSceneLoaded()
         {
             yield return new WaitForEndOfFrame();
-            string filePath = Path.Combine(Application.persistentDataPath, "levels", "extracted", levelName, $"{levelName}.json");
+            string filePath = Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{ID} - {levelName}", $"{levelName}.json");
             Debug.Log(filePath);
             string json = File.ReadAllText(filePath);
             SceneData sceneData = SceneData.FromJson(json);
@@ -209,7 +209,7 @@ namespace JammerDash.Tech
                 Debug.Log("Instantiated long cube");
             }
 
-                StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "scenes", levelName, "bgImage.png")));
+                StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{ID} - {levelName}", "bgImage.png")));
             
 
             Camera[] cams = FindObjectsOfType<Camera>();
