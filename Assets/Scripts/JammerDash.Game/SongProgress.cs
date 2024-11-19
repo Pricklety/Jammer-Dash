@@ -25,30 +25,23 @@ namespace JammerDash.Game
             audioSource.loop = false;
             if (SceneManager.GetActiveScene().name == "LevelDefault")
             {
-                string levelName = CustomLevelDataManager.Instance.levelName;
-               
+                string levelName = CustomLevelDataManager.Instance.ID + " - " + CustomLevelDataManager.Instance.levelName;
+                string jsonName = CustomLevelDataManager.Instance.levelName;
 
                 string levelsFolderPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", levelName);
-                string levelJsonFilePath = Path.Combine(levelsFolderPath, $"{levelName}.json");
-                string sceneJsonFilePath = Path.Combine(Application.persistentDataPath, "scenes", levelName, $"{levelName}.json");
+                string levelJsonFilePath = Path.Combine(levelsFolderPath, $"{jsonName}.json");
+                string sceneJsonFilePath = Path.Combine(Application.persistentDataPath, "scenes", levelName, $"{jsonName}.json");
 
                 if (File.Exists(levelJsonFilePath) && !string.IsNullOrEmpty(CustomLevelDataManager.Instance.levelName))
                 {
                     // Load level data from "levels" folder
                     string json = File.ReadAllText(levelJsonFilePath);
                     SceneData sceneData = SceneData.FromJson(json);
-                    StartCoroutine(LoadAudioClip(Path.Combine(Application.persistentDataPath, "levels", "extracted", sceneData.sceneName, sceneData.artist + " - " + sceneData.songName + ".mp3")));
-                }
-                else if (File.Exists(sceneJsonFilePath) && string.IsNullOrEmpty(CustomLevelDataManager.Instance.levelName))
-                {
-                    // Load level data from "scenes" folder if "levels" folder doesn't contain the file
-                    string json = File.ReadAllText(sceneJsonFilePath);
-                    SceneData sceneData = SceneData.FromJson(json);
-                    StartCoroutine(LoadAudioClip(Path.Combine(Application.persistentDataPath, "levels", "extracted", sceneData.sceneName, sceneData.artist + " - " + sceneData.songName + ".mp3")));
+                    StartCoroutine(LoadAudioClip(Path.Combine(levelsFolderPath, sceneData.artist + " - " + sceneData.songName + ".mp3")));
                 }
                 else
                 {
-                    Debug.LogError("Neither 'levels' nor 'scenes' folder contains the required level data.");
+                    Debug.LogError("The 'levels' folder doesn't contain the required level data.");
                 }
             }
 

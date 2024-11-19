@@ -20,8 +20,8 @@ Imported new levels? Click F5 to refresh your play screen!
 Playing ranked-only levels will give you a massive disadvantage in score. Play Approved, Checked and Reviewed maps as well. They give out score to your level too!
 Regularly check your notifications. Randomly we give out a chance to win supporter to free users (MONTHLY)!
 If there's spam parts in levels you play, switch between keys (by default it's K and L, but you can change it in options).
-If you don't like the default game keybind layout, feel free to change it in the Options (Works in versions v0.4.2 and newer)
-You think you're better than your friends? Challenge them to a head-to-head match using "Multiplayer Mode" (versions v0.5.1 and newer)
+If you don't like the default game keybind layout, feel free to change it in the Options (Works in versions v0.4.1 and newer)
+You think you're better than your friends? Challenge them to a head-to-head match using "Multiplayer Mode" (versions  v1.0 and newer)
 If you ever get notified of a new update, download it. Something new just dropped :eyes:
 Play screen is laggy? Delete the levels you don't play. Your scores will still be saved online (This game can support up to 500 levels in one screen)!
 

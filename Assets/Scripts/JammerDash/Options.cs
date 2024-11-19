@@ -636,7 +636,9 @@ namespace JammerDash
                 playlist.value = audio.currentClipIndex;
 
 
-                if (EventSystem.current.currentSelectedGameObject != null && EventSystem.current.currentSelectedGameObject.GetComponent<InputField>() == null)
+              
+                if (EventSystem.current.currentSelectedGameObject == null ||
+                    EventSystem.current.currentSelectedGameObject.GetComponent<InputField>() == null)
                 {
                     if (Input.GetKeyDown(KeybindingManager.prevSong))
                     {
@@ -659,6 +661,7 @@ namespace JammerDash
                 {
                     // do nothing
                 }
+
 
 
             }

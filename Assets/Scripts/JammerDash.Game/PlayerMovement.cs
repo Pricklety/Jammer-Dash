@@ -405,8 +405,7 @@ namespace JammerDash.Game.Player
            
 
             // Calculate skill performance point
-            float distanceInPercent = Mathf.Abs(cam.transform.position.x / FindObjectOfType<FinishLine>().transform.position.x);
-            ShinePerformance calc = new ShinePerformance(five, three, one, misses, combo, highestCombo, CustomLevelDataManager.Instance.diff, distanceInPercent);
+            ShinePerformance calc = new ShinePerformance(five, three, one, misses, combo, highestCombo, CustomLevelDataManager.Instance.diff, CustomLevelDataManager.Instance.data.levelLength, CustomLevelDataManager.Instance.data.cubePositions.Count + CustomLevelDataManager.Instance.data.longCubePositions.Count, CustomLevelDataManager.Instance.data.sawPositions.Count, CustomLevelDataManager.Instance.data.bpm, (float)counter.accCount / Total * 100);
             _performanceScore = calc.PerformanceScore;
             SPInt = Mathf.RoundToInt(_performanceScore);
             if (Total > 0)
@@ -708,7 +707,7 @@ namespace JammerDash.Game.Player
                 if (collision.tag == "Saw" && !invincible)
                 {
 
-                    health -= 150;
+                    health -= int.MaxValue;
                 }
             }
 
@@ -726,10 +725,7 @@ namespace JammerDash.Game.Player
             if (collision.tag == "LongCube" && collision.transform.position.y == transform.position.y)
             {
                 activeCubes.Add(collision.gameObject);
-                if ((Input.GetKey(KeybindingManager.hit1) ||Input.GetKey(KeybindingManager.hit2)) && !isDying)
-                {
-                    bufferActive = false;
-                }
+               
 
             }
         }
@@ -775,7 +771,7 @@ namespace JammerDash.Game.Player
                     DestroyCube(collision.gameObject);
 
                     bufferActive = false;
-                    health += 30;
+                    health += 20;
                 }
             }
 
@@ -793,7 +789,7 @@ namespace JammerDash.Game.Player
                 // Ensure the score reaches the final value precisely
                 counter.score = newDestroyedCubes;
                 
-                health += 0.175f;
+                health += 0.075f;
                 yield return null;
             }
 

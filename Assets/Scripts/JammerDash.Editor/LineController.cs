@@ -73,14 +73,13 @@ namespace JammerDash.Editor
                 initialXPosition = currentLine.transform.position.x;
 
                 audioSource.time = spawnPosition.x / 7;
-                audioSource.pitch = 1f;
+                audioSource.Play();
 
-                // Load saved position from PlayerPrefs
-                savedXPosition = PlayerPrefs.GetFloat("SavedXPosition", 0f);
             }
             else if (!isPaused)
             {
                 StopLine();
+                audioSource.Stop();
                 isPaused = true;
                 audioSource.time = 0;
             }

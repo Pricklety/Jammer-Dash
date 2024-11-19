@@ -26,7 +26,7 @@ namespace JammerDash.Difficulty
 
             updateLoadingText("Starting difficulty calculation...");
 
-            // Synchronously retrieve objects with the specified tags
+            // Asynchronously retrieve objects with the specified tags
             GameObject[] foundObjects = FindObjectsWithTags(new string[] { "Cubes", "Saw", "LongCube" });
 
             if (foundObjects.Length == 0)
@@ -127,7 +127,7 @@ namespace JammerDash.Difficulty
             return Mathf.Clamp01(1 - xPositionVariation / 20f);
         }
 
-        public static int[] CalculateCubesPerY(Vector2[] cubePositions)
+        public static Task<int[]> CalculateCubesPerY(Vector2[] cubePositions, Action<string> updateLoadingText)
         {
             int[] cubesPerY = new int[6];
             foreach (Vector2 position in cubePositions)
@@ -135,8 +135,9 @@ namespace JammerDash.Difficulty
                 int yLevel = Mathf.RoundToInt(position.y);
                 yLevel = Mathf.Clamp(yLevel, -1, 4);
                 cubesPerY[yLevel + 1]++;
+                
             }
-            return cubesPerY;
+            return Task.FromResult(cubesPerY);
         }
 
         public static float CalculateAverageCubeDistance(List<GameObject> cubes)
@@ -236,7 +237,10 @@ namespace JammerDash.Difficulty
         public int _currentCombo, _bestCombo;
         private int _totalActions;
         private float _gameDifficulty;
-        public ShinePerformance(int perfectHits, int greatHits, int goodHits, int missedHits, int currentCombo, int bestCombo, float gameDifficulty, float levelLength)
+        private int _cubeCount, _sawCount;
+        private float _bpm;
+
+        public ShinePerformance(int perfectHits, int greatHits, int goodHits, int missedHits, int currentCombo, int bestCombo, float gameDifficulty, float levelLength, int cubeCount, int sawCount, float bpm, float acc)
         {
             _perfectHits = perfectHits;
             _greatHits = greatHits;
@@ -247,59 +251,85 @@ namespace JammerDash.Difficulty
             _totalActions = perfectHits + greatHits + goodHits + missedHits;
             _gameDifficulty = gameDifficulty;
             _levelLength = levelLength;
+            _cubeCount = cubeCount;
+            _sawCount = sawCount;
+            _bpm = bpm;
 
-            CalculatePrecision();
+            // Calculate performance components
+            CalculateAccuracy(acc);
             CalculateSequenceEfficiency();
-            CalculateVersatility(_perfectHits, _greatHits, _goodHits);
+            CalculateVersatility();
             CalculatePerformanceScore();
         }
 
-        private void CalculatePrecision()
+        // Calculate accuracy as the ratio of successful hits to total actions
+        public void CalculateAccuracy(float acc)
         {
-            _precision = Clamp((float)(_perfectHits + _greatHits + _goodHits) / _totalActions, 0, 1);
+            // Since all the cubes are perfectly hit, accuracy is 100% and perfect hits = cube count
+            _precision = acc / 100; // Directly applying the percentage accuracy here
         }
 
+        // Calculate sequence efficiency based on combo performance
         private void CalculateSequenceEfficiency()
         {
             _sequenceEfficiency = _bestCombo != 0 ? Clamp((float)_currentCombo / _bestCombo + 1, 0, 1) : 0;
         }
 
-        private void CalculateVersatility(float high, float medium, float low)
+        // Calculate versatility based on hit types and missed hits
+        private void CalculateVersatility()
         {
-
-            _versatility = high * 0.05f + medium * 0.025f + low * -0.1f + _missedHits * -0.5f;
+            _versatility = _perfectHits * 0.05f + _greatHits * 0.025f + _goodHits * 0.01f + _missedHits * -0.1f;
         }
 
+        // Exponential function for accuracy scaling
+        private float CalculateAccuracyMultiplier(float accuracy)
+        {
+            // Use a constant 'k' to control how steeply the score drops with accuracy
+            float k = 8f;  // You can adjust this to make the drop-off sharper or more gradual
+            return (float)Math.Exp(-k * (1 - accuracy));
+        }
 
-
-
-
+        // Calculate the performance score considering accuracy, sequence efficiency, versatility, and difficulty
         private void CalculatePerformanceScore()
         {
-            float precisionWeight = 1.24f;
+            // Difficulty-based scaling
+            float difficultyMultiplier = 1 + (_gameDifficulty / 10f);  // Scales with difficulty, e.g., 1.16 becomes 1.116 multiplier
 
-            _performanceScore = Math.Max((
-                MathF.Pow(_precision, 2) * precisionWeight +
+            // Cube interaction weight
+            float c = 5f; // Each hit contributes 5 points
+                          // Saw obstacle weight
+            float s = 20f;
+
+            // BPM scaling (considered inversely)
+            float bpmScaling = 1 / _bpm;
+
+            // Adjusted accuracy multiplier
+            float accuracyMultiplier = CalculateAccuracyMultiplier(_precision);
+
+            // Level length adjustment (bonus for long levels)
+            float levelLengthAdjustment = _levelLength / Math.Max(1000, _levelLength);  // Adjust this formula
+
+            // Calculate the total performance score
+            _performanceScore = Math.Max(
+                accuracyMultiplier *  // Apply accuracy-based scaling
+                (MathF.Pow(_precision, 2) * 1.24f +  // Accuracy weight
                 _sequenceEfficiency * 10 +
                 _versatility * 5 +
-                _levelLength / 100 +
-                _gameDifficulty * 0.35f) / 10,
-                0f
-            );
+                (levelLengthAdjustment) +  // Adjust for long levels (further nerfed)
+                (_gameDifficulty * 0.35f) +
+                (c * _cubeCount) +  // Cube count effect, 5 points per hit
+                (s * _sawCount)    // Saw obstacles effect
+                ) * difficultyMultiplier * bpmScaling, 0f);  // Apply difficulty and BPM scaling
         }
 
+        // Property to get the final performance score
         public float PerformanceScore => _performanceScore;
 
+        // Utility method to clamp values within a given range
         private static float Clamp(float value, float min, float max)
         {
             return Math.Max(min, Math.Min(max, value));
         }
-
-        private static float Clamp01(float value)
-        {
-            return Clamp(value, 0, 1);
-        }
-
-
     }
+
 }

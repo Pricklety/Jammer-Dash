@@ -16,11 +16,16 @@ using Debug = UnityEngine.Debug;
 using JammerDash.Menus;
 using UnityEditor;
 using UnityEditor.Experimental;
+using JammerDash.Audio;
 
 namespace JammerDash.Audio
 {
     public class AudioManager : MonoBehaviour
     {
+        // Keybind function part thingy (Game.FunctionPanel)
+        public Animator toggleAnim;
+        public Text functionName;
+        public Text functionKeybind;
 
         bool isLogoSFX = false;
         int counter = 0;
@@ -34,7 +39,7 @@ namespace JammerDash.Audio
         float bgtimer = 0f;
         float spriteChangeInterval = 15f;
         public static AudioManager Instance { get; private set; }
-
+        public int levelIndex = -1;
         public bool isMusicLoaded = false;
         private int loadedSongsCount;
         private float loadingProgress;
@@ -125,7 +130,37 @@ namespace JammerDash.Audio
        
         public void Update()
         {
-            
+            #region Keybind Checks (The keybindpanel)
+            if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.Return))
+            {
+                KeybindPanel.ToggleFunction("Toggle fullscreen", "Alt + Enter");
+
+            }
+
+            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeybindingManager.toggleUI))
+            {
+                KeybindPanel.ToggleFunction("Toggle gameplay interface", $"Shift + {KeybindingManager.toggleUI}");
+            }
+
+            if (SceneManager.GetActiveScene().buildIndex == 1)
+            {
+
+                if (Input.GetKeyDown(KeybindingManager.nextSong))
+                    KeybindPanel.ToggleFunction("Next song", $"{KeybindingManager.nextSong}");
+                else if (Input.GetKeyDown(KeybindingManager.prevSong))
+                    KeybindPanel.ToggleFunction("Previous song", $"{KeybindingManager.prevSong}");
+                else if (Input.GetKeyDown(KeybindingManager.pause))
+                    KeybindPanel.ToggleFunction("Pause song", $"{KeybindingManager.pause}");
+                else if (Input.GetKeyDown(KeybindingManager.play))
+                    KeybindPanel.ToggleFunction("Play song", $"{KeybindingManager.play}");
+                else if (Input.GetKeyDown(KeyCode.B))
+                {
+                    KeybindPanel.ToggleFunction("Change background", "B");
+                }
+                if ((shuffle || Input.GetKey(KeyCode.LeftShift)) && Input.GetKeyDown(KeybindingManager.nextSong))
+                    KeybindPanel.ToggleFunction("Random song", $"Shift + {KeybindingManager.nextSong}");
+            }
+            #endregion
             if (Input.GetKeyDown(KeyCode.F9))
             {
                 StartCoroutine(LoadAudioClipsAsync());
@@ -733,4 +768,22 @@ namespace JammerDash.Audio
             get { return !Task.WhenAll(tasks).IsCompleted; }
         }
     }
+
+   
 }
+
+namespace JammerDash.Menus
+{
+    public class KeybindPanel
+    {
+        public static void ToggleFunction(string func, string key)
+        {
+           
+            AudioManager.Instance.toggleAnim.Rebind();
+            AudioManager.Instance.toggleAnim.Play("keybindFunc", 0, 0);
+            AudioManager.Instance.functionName.text = func;
+            AudioManager.Instance.functionKeybind.text = key;
+        }
+    }
+}
+

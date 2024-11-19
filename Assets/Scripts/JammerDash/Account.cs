@@ -91,8 +91,8 @@ namespace JammerDash
         }
         public void CalculateXPRequirements()
         {
-            long initialXP = 250000L;
-            float growthRate = 1.05f;
+            long initialXP = 10000000L;
+            float growthRate = 1.005f;
             xpRequiredPerLevel = new long[251];
 
             xpRequiredPerLevel[0] = initialXP;

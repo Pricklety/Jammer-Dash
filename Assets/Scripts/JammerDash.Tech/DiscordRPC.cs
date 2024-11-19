@@ -12,17 +12,17 @@ namespace JammerDash.Tech
     public class DiscordRPC : MonoBehaviour
     {
         Timestamp time;
-        void Start()
+        void Awake()
         {
             time = DateTime.UnixEpoch;
-            
+
+            DiscordManager.current.UpdateStartTime(time);
         }
 
-        private void FixedUpdate()
+        private void Update()
         {
-            DiscordManager.current.UpdateStartTime(time);
-            DiscordManager.current.client.UpdateLargeAsset("logo", $"{JammerDash.Account.Instance.username}: #N/A");
-            DiscordManager.current.client.UpdateSmallAsset("shine", "-- sp");
+            DiscordManager.current.client.UpdateLargeAsset("logo", $"Rank: #0");
+            DiscordManager.current.client.UpdateSmallAsset("shine", "0 sp");
             if (SceneManager.GetActiveScene().name == "LevelDefault")
             {
                 DiscordManager.current.UpdateDetails($"▶ {CustomLevelDataManager.Instance.data.artist} - {CustomLevelDataManager.Instance.data.songName}");
@@ -52,12 +52,13 @@ namespace JammerDash.Tech
                 {
                     DiscordManager.current.UpdateDetails($"Choosing a level to edit");
                 }
-                DiscordManager.current.UpdateState($"♬ {AudioManager.Instance.source.clip.name}");
+                DiscordManager.current.UpdateState("");
             }
             else if (SceneManager.GetActiveScene().name == "intro")
             {
                 DiscordManager.current.UpdateDetails($"Idle");
                 DiscordManager.current.UpdateState($"Loading up...");
+                DiscordManager.current.UpdateStartTime(time);
             }
         }
     }
