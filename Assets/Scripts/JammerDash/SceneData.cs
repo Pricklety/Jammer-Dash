@@ -22,10 +22,11 @@ namespace JammerDash
         public Color defGColor;
 
         // Objects
-        public List<Vector3> cubePositions;
+        public List<Vector3> cubePositions; 
         public List<Vector3> sawPositions;
         public List<Vector3> longCubePositions;
         public List<float> longCubeWidth;
+        public List<int> cubeType;
 
         // Difficulty
         public int playerHP = 300;

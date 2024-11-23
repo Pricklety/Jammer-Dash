@@ -137,8 +137,11 @@ namespace JammerDash.Audio
 
             }
 
+            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
             if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeybindingManager.toggleUI))
             {
+                data.canvasOff = !data.canvasOff;
+                SettingsFileHandler.SaveSettingsToFile(data);
                 KeybindPanel.ToggleFunction("Toggle gameplay interface", $"Shift + {KeybindingManager.toggleUI}");
             }
 
@@ -161,11 +164,10 @@ namespace JammerDash.Audio
                     KeybindPanel.ToggleFunction("Random song", $"Shift + {KeybindingManager.nextSong}");
             }
             #endregion
-            if (Input.GetKeyDown(KeyCode.F9))
+            if (Input.GetKeyDown(KeybindingManager.reloadPlaylist))
             {
                 StartCoroutine(LoadAudioClipsAsync());
             }
-            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
             if (Application.isFocused && data.selectedFPS >= 30)
             {
                 Application.targetFrameRate = data.selectedFPS;
@@ -778,11 +780,15 @@ namespace JammerDash.Menus
     {
         public static void ToggleFunction(string func, string key)
         {
-           
-            AudioManager.Instance.toggleAnim.Rebind();
-            AudioManager.Instance.toggleAnim.Play("keybindFunc", 0, 0);
-            AudioManager.Instance.functionName.text = func;
-            AudioManager.Instance.functionKeybind.text = key;
+            if (EventSystem.current.currentSelectedGameObject == null ||
+                    EventSystem.current.currentSelectedGameObject.GetComponent<InputField>() == null)
+            {
+                AudioManager.Instance.toggleAnim.Rebind();
+                AudioManager.Instance.toggleAnim.Play("keybindFunc", 0, 0);
+                AudioManager.Instance.functionName.text = func;
+                AudioManager.Instance.functionKeybind.text = key;
+            }
+               
         }
     }
 }

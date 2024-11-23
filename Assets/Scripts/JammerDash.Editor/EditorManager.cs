@@ -23,7 +23,6 @@ using JammerDash.Difficulty;
 using UnityEngine.UI.Extensions.Tweens;
 using JammerDash.Audio;
 using System.Threading.Tasks;
-using Lachee.IO.Exceptions;
 using JammerDash.Editor.Screens;
 
 namespace JammerDash.Editor
@@ -39,6 +38,7 @@ namespace JammerDash.Editor
         public RaycastHit hit;
         public int finishCount = 1;
 
+        public AudioClip[] hitSounds;
         [Header("UI and Stuff")]
         public LoadingScreen loadingPanel;
         public GameObject[] editorPages;
@@ -109,10 +109,10 @@ namespace JammerDash.Editor
 
         [Header("Scene Management")]
         public GameObject backgroundImagePrefab;
-        public GameObject cubePrefab; // Replace with your cube prefab
-        public GameObject sawPrefab; // Replace with your saw prefab
+        public GameObject[] cubePrefab;
+        public GameObject sawPrefab;
         public GameObject longCubePrefab;
-        public Transform parentTransform; // Replace with the parent transform for instantiated objects
+        public Transform parentTransform;
         public List<Vector3> cubePositions = new();
         public List<Vector3> sawPositions = new();
         public List<Vector3> longCubePositions = new();
@@ -324,6 +324,15 @@ namespace JammerDash.Editor
             musicPanel.SetActive(false);
         }
 
+        Dictionary<string, int> cubeTypeMapping = new Dictionary<string, int>
+{
+    { "hitter01", 1 },
+    { "hitter03", 3 },
+    { "hitter04", 4 },
+    { "hitter05", 5 },
+    { "hitter06", 6 },
+};
+
         public void LoadSceneData(SceneData scene)
         {
             cubes = new List<GameObject>();
@@ -342,11 +351,44 @@ namespace JammerDash.Editor
                     Destroy(cube);
                 }
                 cubes.Clear();
-                foreach (Vector3 cubePos in sceneData.cubePositions)
+                for (int i = 0; i < sceneData.cubePositions.Count; i++)
                 {
-                    GameObject cube = Instantiate(cubePrefab, cubePos, Quaternion.identity, parentTransform);
-                    cubes.Add(cube);
+                    Vector3 cubePos = sceneData.cubePositions[i];
+                    // Get the original integer index from sceneData.
+                    int originalCubeType;
+                    if (sceneData.cubeType == null || sceneData.cubeType.Count <= i)
+                    {
+                        originalCubeType = 1;
+                    }
+                    else
+                    {
+                        originalCubeType = sceneData.cubeType[i];
+                    }
+                    // Format the name of the cube type based on the index
+                    string cubeTypeName = $"hitter{originalCubeType:D2}"; // Format: hitter01, hitter03, etc.
+
+                    // Look up the mapped index
+                    if (cubeTypeMapping.TryGetValue(cubeTypeName, out int mappedIndex))
+                    {
+                        // Validate mappedIndex within cubePrefab array bounds
+                        if (mappedIndex >= 0 && mappedIndex < cubePrefab.Length)
+                        {
+                            GameObject cube = Instantiate(cubePrefab[mappedIndex], cubePos, Quaternion.identity, parentTransform);
+                            cubes.Add(cube);
+                            Debug.Log($"{mappedIndex}, {cubeTypeName}");
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"Mapped index {mappedIndex} is out of bounds for cubePrefab.");
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Cube type name '{cubeTypeName}' not found in mapping. Skipping instantiation.");
+                    }
                 }
+
+
 
                 // Clear existing saws
                 foreach (GameObject saw in saws)
@@ -654,7 +696,7 @@ namespace JammerDash.Editor
             float xPosNormalized = transform.position.x / 1;
             audio.panStereo = Mathf.Lerp(-1f, 1f, xPosNormalized);
 
-            if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.Delete))
+            if (Input.GetKey(KeybindingManager.deleteBPM) && Input.GetKey(KeybindingManager.delete))
             {
                 foreach (GameObject beat in beats)
                 {
@@ -743,6 +785,30 @@ namespace JammerDash.Editor
                         : new Vector3(worldPos.x, Mathf.Round(worldPos.y), 0);
 
                     GameObject item = Instantiate(objects[currentButtonPressed], instantiatePosition, Quaternion.identity);
+                    switch (item.name)
+                    {
+                        case "hitter01(Clone)":
+                            audio.PlayOneShot(hitSounds[0]);
+                            break;
+                        case "hitter02(Clone)":
+                            audio.PlayOneShot(hitSounds[1]);
+                            break;
+                        case "hitter03(Clone)":
+                            audio.PlayOneShot(hitSounds[2]);
+                            break;
+                        case "hitter04(Clone)":
+                            audio.PlayOneShot(hitSounds[3]);
+                            break;
+                        case "hitter05(Clone)":
+                            audio.PlayOneShot(hitSounds[4]);
+                            break;
+                        case "hitter06(Clone)":
+                            audio.PlayOneShot(hitSounds[5]);
+                            break;
+                        default:
+                            break;
+                    }
+
                     if (item.CompareTag("Cubes"))
                     {
                         cubes.Add(item);
@@ -802,12 +868,12 @@ namespace JammerDash.Editor
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.Return) && !Input.GetKey(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeybindingManager.playMode) && !Input.GetKey(KeybindingManager.songMode))
             {
                 Play();
 
             }
-            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Return))
+            if (Input.GetKey(KeybindingManager.songMode) && Input.GetKeyDown(KeybindingManager.playMode))
             {
                 PlayAudio();
             }
@@ -819,9 +885,9 @@ namespace JammerDash.Editor
                 float moveSpeed = 1f;
 
 
-                if (Input.GetKey(KeyCode.A))
+                if (Input.GetKey(KeybindingManager.moveObjectLeft))
                     moveX -= 1f;
-                if (Input.GetKey(KeyCode.D))
+                if (Input.GetKey(KeybindingManager.moveObjectRight))
                     moveX += 1f;
 
                 // Apply speed modifiers
@@ -836,12 +902,12 @@ namespace JammerDash.Editor
                     moveY *= 2f;
                 }
 
-                if (Input.GetKeyDown(KeyCode.W) && selectedObject.transform.position.y < 4)
+                if (Input.GetKeyDown(KeybindingManager.moveObjectUp) && selectedObject.transform.position.y < 4)
                 {
                     selectedObject.transform.position = new Vector3(selectedObject.transform.position.x, selectedObject.transform.position.y + 1, 0);
                 }
 
-                if (Input.GetKeyDown(KeyCode.S) && selectedObject.transform.position.y > -1)
+                if (Input.GetKeyDown(KeybindingManager.moveObjectDown) && selectedObject.transform.position.y > -1)
                 {
                     selectedObject.transform.position = new Vector3(selectedObject.transform.position.x, selectedObject.transform.position.y - 1, 0);
                 }
@@ -849,7 +915,7 @@ namespace JammerDash.Editor
                 // Apply movement directly to transform.position
                 selectedObject.transform.position += moveSpeed * 0.01f * new Vector3(moveX, moveY, 0);
 
-                if (Input.GetKey(KeyCode.Delete))
+                if (Input.GetKey(KeybindingManager.delete))
                 {
                     cubes.Remove(selectedObject.gameObject);
                     saws.Remove(selectedObject.gameObject);
@@ -1401,6 +1467,22 @@ namespace JammerDash.Editor
 
             loadingScreen.UpdateLoading("Processing positions for cubes, saws, and long cubes...", 0.7f);
             sceneData.cubePositions = this.cubes?.Select(cube => cube.transform.position).ToList() ?? new List<Vector3>();
+            sceneData.cubeType = this.cubes
+    ?.Select(cube =>
+    {
+        // Get the base name without "(Clone)"
+        string name = cube.gameObject.name.Replace("(Clone)", "").Trim();
+
+        // Look up the mapped integer value for the name
+        if (cubeTypeMapping.TryGetValue(name, out int mappedIndex))
+        {
+            return mappedIndex;
+        }
+
+        return 1;
+    })
+    .ToList(); // Convert to a list if sceneData.cubeType expects one
+
             sceneData.sawPositions = saws?.Select(saw => saw.transform.position).ToList() ?? new List<Vector3>();
             if (longCubes != null)
             {
@@ -1417,23 +1499,19 @@ namespace JammerDash.Editor
         {
             loadingScreen.ShowLoadingScreen(); // Show loading screen
 
-            loadingScreen.UpdateLoading("Saving Scene Data...", 0f);
-            await SaveSceneData(); // Ensure SaveSceneData is completed before proceeding
-
-            loadingScreen.UpdateLoading("Retrieving cubes...", 0.1f);
+            loadingScreen.UpdateLoading("Retrieving cubes...", 0f);
             GameObject[] cubes = await GetCubesOnMainThread(loadingPanel);
-            if (cubes == null || cubes.Length == 0)
+            if (cubes == null)
             {
-                Debug.LogError("No cubes found on the main thread.");
+                Debug.LogError("Cubes array is null.");
                 loadingScreen.HideLoadingScreen(); // Hide loading screen
                 return null;
             }
 
             // Update loading screen with the count of cubes retrieved
             int cubeCount = cubes.Length;
-            loadingScreen.UpdateLoading($"Gathering cube positions... Retrieved {cubeCount} cubes", 0.2f);
+            loadingScreen.UpdateLoading($"Gathering cube positions... Retrieved {cubeCount} cubes", 0.1f);
             List<Vector2> cubePositions = cubes.Select(cube => (Vector2)cube.transform.position).ToList();
-
 
             loadingScreen.UpdateLoading("Calculating farthest object...", 0.2f);
             float distance1 = 0f;
@@ -1447,14 +1525,14 @@ namespace JammerDash.Editor
             });
 
 
-            loadingScreen.UpdateLoading("Calculating cubes per Y level...", 0.4f);
+            loadingScreen.UpdateLoading("Calculating cubes per Y level...", 0.3f);
             int[] cubesPerY = await Task.Run(() => Calculator.CalculateCubesPerY(cubePositions.ToArray(), updateLoadingText =>
             {
                 loadingPanel.loadingText.text = updateLoadingText;
             }));
 
-            loadingScreen.UpdateLoading("Calculating difficulty...", 0.5f);
-            float calculateDifficulty = await Task.Run(() => Calculator.CalculateDifficulty(
+            loadingScreen.UpdateLoading("Calculating difficulty...", 0.4f);
+            float calculateDifficulty = Calculator.CalculateDifficulty(
         this.cubes,
         saws,
         longCubes,
@@ -1465,9 +1543,14 @@ namespace JammerDash.Editor
         distance1 / 7, updateLoadingText =>
         {
             loadingPanel.loadingText.text = updateLoadingText;
-        }));
+        });
+
+
+
+            // Load existing scene data if available, with fallback
             SceneData data = await LoadSceneDataFromFile() ?? new SceneData();
-            loadingScreen.UpdateLoading("Creating Scene Data object...", 0.6f);
+
+            loadingScreen.UpdateLoading("Creating Scene Data object...", 0.5f);
             SceneData sceneData = new SceneData
             {
                 levelName = customSongName.text,
@@ -1486,9 +1569,24 @@ namespace JammerDash.Editor
                 offset = float.TryParse(offsetmarker?.text, out float offsetValue) ? offsetValue : 0,
                 ID = (data.ID == 0) ? Random.Range(int.MinValue, int.MaxValue) : data.ID
             };
+            loadingScreen.UpdateLoading("Populating objects...", 0.6f);
 
-            loadingScreen.UpdateLoading("Processing positions for cubes, saws, and long cubes...", 0.65f);
             sceneData.cubePositions = this.cubes?.Select(cube => cube.transform.position).ToList() ?? new List<Vector3>();
+            sceneData.cubeType = this.cubes
+    ?.Select(cube =>
+    {
+        // Get the base name without "(Clone)"
+        string name = cube.gameObject.name.Replace("(Clone)", "").Trim();
+
+        // Look up the mapped integer value for the name
+        if (cubeTypeMapping.TryGetValue(name, out int mappedIndex))
+        {
+            return mappedIndex;
+        }
+
+        return 1;
+    })
+    .ToList();
             sceneData.sawPositions = saws?.Select(saw => saw.transform.position).ToList() ?? new List<Vector3>();
             if (longCubes != null)
             {

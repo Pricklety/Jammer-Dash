@@ -31,7 +31,7 @@ namespace JammerDash.Game.Player
         public AudioClip[] hitSounds;
         public AudioSource sfxS;
         public AudioClip jump;
-        public AudioClip hit;
+        public AudioClip[] hit;
         public AudioClip impact;
         public AudioClip fail;
         private int hpint;
@@ -145,36 +145,7 @@ namespace JammerDash.Game.Player
                 }
             }
             acc = GameObject.Find("acc").GetComponent<Text>();
-            if (data.randomSFX)
-            {
-
-                // Array to store all loaded audio clips
-                hitSounds = new AudioClip[3];
-                // Loop through each possible variation of the hit name
-                for (int i = 0; i < hitSounds.Length; i++)
-                {
-                    // Load the audio clip for each variation
-                    hitSounds[i] = Resources.Load<AudioClip>("Audio/SFX/hit" + i);
-                }
-
-                // Check if any hits were found
-                if (hitSounds.Length > 0)
-                {
-                    // Choose a random hit from the array
-                    AudioClip randomHit = hitSounds[Random.Range(0, hitSounds.Length)];
-
-                    // Now you can play the random hit audio clip
-                    hit = randomHit;
-                }
-                else
-                {
-                    UnityEngine.Debug.LogError("No hits found in the Resources/Audio/SFX folder.");
-                }
-            }
-            else
-            {
-                hit = Resources.Load<AudioClip>("Audio/sfx/hit0");
-            }
+            
             health = maxHealth;
         }
       
@@ -440,7 +411,7 @@ namespace JammerDash.Game.Player
 
             if (hit.transform.position.y == transform.position.y)
             {
-                if (hit.transform.name.Contains("hitter01"))
+                if (!hit.transform.name.Contains("hitter02"))
                 {
                     passedCubes.Add(hit.collider.gameObject);
                     DestroyCube(hit.collider.gameObject);
@@ -560,33 +531,7 @@ namespace JammerDash.Game.Player
                 yield return null;
             }
             lerpTimer = 0f;
-            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-            if (data.randomSFX)
-            {
-
-                // Array to store all loaded audio clips
-                AudioClip[] allHits = new AudioClip[3]; // Adjust the size based on the number of hits you have
-
-                // Loop through each possible variation of the hit name
-                for (int i = 0; i < allHits.Length; i++)
-                {
-                    // Load the audio clip for each variation
-                    allHits[i] = Resources.Load<AudioClip>("Audio/SFX/hit" + (i + 1));
-                }
-
-                // Check if any hits were found
-                if (allHits.Length > 0)
-                {
-                    // Choose a random hit from the array
-                    AudioClip randomHit = allHits[Random.Range(0, allHits.Length)];
-
-                    hit = randomHit;
-                }
-                else
-                {
-                    UnityEngine.Debug.LogError("No hits found in the Resources/Audio/SFX folder.");
-                }
-            }
+           
 
         }
         IEnumerator ChangeScore(float playerDistance)
@@ -666,8 +611,28 @@ namespace JammerDash.Game.Player
         {
             if (Time.timeScale > 0)
             {
+                switch (cube.name)
+                {
+                    case "hitter01(Clone)":
+                        sfxS.PlayOneShot(hitSounds[0]);
+                        break;
+                    case "hitter03(Clone)":
+                        sfxS.PlayOneShot(hitSounds[2]);
+                        break;
+                    case "hitter04(Clone)":
+                        sfxS.PlayOneShot(hitSounds[3]);
+                        break;
+                    case "hitter05(Clone)":
+                        sfxS.PlayOneShot(hitSounds[4]);
+                        break;
+                    case "hitter06(Clone)":
+                        sfxS.PlayOneShot(hitSounds[5]);
+                        break;
+                    default:
+                        break;
+                }
 
-                sfxS.PlayOneShot(hit);
+
                 Destroy(cube);
                 activeCubes.Remove(cube);
 
@@ -730,7 +695,6 @@ namespace JammerDash.Game.Player
             }
         }
 
-
         private void OnTriggerExit2D(Collider2D collision)
         {
             if (collision.tag == "Cubes" && activeCubes.Contains(collision.gameObject) && health > 0)
@@ -769,8 +733,8 @@ namespace JammerDash.Game.Player
                 {
                     UnityEngine.Debug.Log("hit: " + bufferActive);
                     DestroyCube(collision.gameObject);
-
-                    bufferActive = false;
+                        sfxS.PlayOneShot(hitSounds[6]);
+                        bufferActive = false;
                     health += 20;
                 }
             }
@@ -788,7 +752,7 @@ namespace JammerDash.Game.Player
                 scoreText.text = $"{counter.score}\n<color=lime>(+{formula})</color>";
                 // Ensure the score reaches the final value precisely
                 counter.score = newDestroyedCubes;
-                
+
                 health += 0.075f;
                 yield return null;
             }
@@ -809,7 +773,7 @@ namespace JammerDash.Game.Player
                     if (!bufferActive)
                     {
 
-                        sfxS.PlayOneShot(hit);
+                        sfxS.PlayOneShot(hitSounds[1]);
                     }
                     bufferActive = true;
 
@@ -853,9 +817,9 @@ namespace JammerDash.Game.Player
                             Instantiate(okTextPrefab, transform.position, Quaternion.identity);
                         }
                     }
-                    
+
                 }
-                if ((Input.GetKeyUp(KeybindingManager.hit1) || Input.GetKeyUp(KeybindingManager.hit2)) && !isDying && collision.transform.position.y == transform.position.y) 
+                if ((Input.GetKeyUp(KeybindingManager.hit1) || Input.GetKeyUp(KeybindingManager.hit2)) && !isDying && collision.transform.position.y == transform.position.y)
                 {
                     counter.score -= Mathf.RoundToInt((maxScore * factor) / counter.cubes.Length);
                     bufferActive = false;
@@ -891,11 +855,10 @@ namespace JammerDash.Game.Player
             while ((Input.GetKey(KeybindingManager.hit1) || Input.GetKey(KeybindingManager.hit2)) && !isDying && bufferActive)
             {
                 StartCoroutine(OnTriggerEnter2DBuffer());
-                yield return new WaitForSeconds(0.03f);    
+                yield return new WaitForSeconds(0.03f);
             }
             isBufferRunning = false;
         }
     }
 
-   
 }

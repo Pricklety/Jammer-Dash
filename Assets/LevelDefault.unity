@@ -7049,10 +7049,20 @@ MonoBehaviour:
   longcubeLayerMask:
     serializedVersion: 2
     m_Bits: 8
-  hitSounds: []
+  hitSounds:
+  - {fileID: 8300000, guid: 0ba08b04b381ead449009a90f14d17fa, type: 3}
+  - {fileID: 8300000, guid: 6312eeecac40a9f4d805f9d731fcfa3a, type: 3}
+  - {fileID: 8300000, guid: 2d00fb15d1e57f24bac22d73a1bc6b32, type: 3}
+  - {fileID: 8300000, guid: 9f72da751d0b7fd44b95a9f179d3e678, type: 3}
+  - {fileID: 8300000, guid: 4190f51d5036f4642850ba4ed21f96a9, type: 3}
+  - {fileID: 8300000, guid: 1aa979fc9c1416f449e16f135a53b894, type: 3}
+  - {fileID: 8300000, guid: 0ee46368777181540ab096b71d1c7a2f, type: 3}
   sfxS: {fileID: 697466235}
   jump: {fileID: 8300000, guid: f9abde361f355a946a6aa316e42e67fe, type: 3}
-  hit: {fileID: 8300000, guid: 118e3faa2811a934e9d9dfa132b6dbff, type: 3}
+  hit:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   impact: {fileID: 8300000, guid: 29b7f5d749adb6c4db0ecb298ef17983, type: 3}
   fail: {fileID: 8300000, guid: 56c9e2054b4ac0d49be86780aa9e8594, type: 3}
   health: 300
@@ -7206,6 +7216,7 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   progressSlider: {fileID: 65838929}
   progressText: {fileID: 313498815}
+  canvas: {fileID: 353979855}
   finish: {fileID: 870020732}
   player: {fileID: 1467467703}
 --- !u!61 &1467467709
@@ -8498,6 +8509,7 @@ MonoBehaviour:
   audioSource: {fileID: 0}
   progressSlider: {fileID: 65838929}
   progressText: {fileID: 313498815}
+  canvas: {fileID: 353979855}
   finish: {fileID: 870020732}
   player: {fileID: 1765330806}
 --- !u!61 &1765330805
@@ -8571,10 +8583,20 @@ MonoBehaviour:
   longcubeLayerMask:
     serializedVersion: 2
     m_Bits: 8
-  hitSounds: []
+  hitSounds:
+  - {fileID: 8300000, guid: 0ba08b04b381ead449009a90f14d17fa, type: 3}
+  - {fileID: 8300000, guid: 6312eeecac40a9f4d805f9d731fcfa3a, type: 3}
+  - {fileID: 8300000, guid: 2d00fb15d1e57f24bac22d73a1bc6b32, type: 3}
+  - {fileID: 8300000, guid: 9f72da751d0b7fd44b95a9f179d3e678, type: 3}
+  - {fileID: 8300000, guid: 4190f51d5036f4642850ba4ed21f96a9, type: 3}
+  - {fileID: 8300000, guid: 1aa979fc9c1416f449e16f135a53b894, type: 3}
+  - {fileID: 8300000, guid: 0ee46368777181540ab096b71d1c7a2f, type: 3}
   sfxS: {fileID: 1203859840}
   jump: {fileID: 8300000, guid: f9abde361f355a946a6aa316e42e67fe, type: 3}
-  hit: {fileID: 8300000, guid: 118e3faa2811a934e9d9dfa132b6dbff, type: 3}
+  hit:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   impact: {fileID: 8300000, guid: 29b7f5d749adb6c4db0ecb298ef17983, type: 3}
   fail: {fileID: 8300000, guid: 56c9e2054b4ac0d49be86780aa9e8594, type: 3}
   health: 300

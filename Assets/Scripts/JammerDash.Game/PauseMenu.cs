@@ -47,7 +47,7 @@ namespace JammerDash.Game
             if (sd.canvasOff)
             {
                 canvas.SetActive(false);
-                Notifications.instance.Notify($"Playfield UI is off.\nClick Shift+{KeybindingManager.toggleUI.ToString()} to turn it back on.", null);
+                Notifications.instance.Notify($"Playfield UI is off.\nClick Shift+{KeybindingManager.toggleUI} to turn it back on.", null);
                 yield return null;
             }
         }

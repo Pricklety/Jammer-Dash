@@ -57,16 +57,48 @@ namespace JammerDash
         public void GainXP(long amount)
         {
             currentXP += amount;
-            totalXP += amount;
+
+            // Update totalXP by reading the scores.dat file and summing every 5th entry
+            totalXP = CalculateTotalXPFromFile();
+
+            // Check if the player has enough XP to level up
             if (currentXP >= xpRequiredPerLevel[level])
             {
                 LevelUp();
-                SavePlayerDataXP();
+                SavePlayerData();
             }
             else
             {
-                SavePlayerDataXP();
+                SavePlayerData();
             }
+        }
+
+        // Method to calculate totalXP by summing every 5th entry from scores.dat
+        private long CalculateTotalXPFromFile()
+        {
+            long sum = 0;
+            string filePath = Path.Combine(Application.persistentDataPath, "scores.dat");
+
+            try
+            {
+                // Read all lines from the file
+                var lines = File.ReadAllLines(filePath);
+
+                // Iterate through every 5th line (entries are 0-indexed, so we start from index 4 for the 5th entry)
+                for (int i = 4; i < lines.Length; i += 5)
+                {
+                    if (long.TryParse(lines[i], out long score))
+                    {
+                        sum += score;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error reading the file: {ex.Message}");
+            }
+
+            return sum;
         }
 
         // Method to level up
@@ -75,7 +107,7 @@ namespace JammerDash
             currentXP -= xpRequiredPerLevel[level];
             level++;
 
-            if (currentXP >= xpRequiredPerLevel[level] && level <= 249)
+            if (currentXP >= xpRequiredPerLevel[level] && level <= 299)
             {
                 LevelUp();
             }
@@ -92,13 +124,12 @@ namespace JammerDash
         public void CalculateXPRequirements()
         {
             long initialXP = 10000000L;
-            float growthRate = 1.005f;
-            xpRequiredPerLevel = new long[251];
+            float growthRate = 1.03f;
+            xpRequiredPerLevel = new long[300];
 
             xpRequiredPerLevel[0] = initialXP;
             for (int i = 1; i < xpRequiredPerLevel.Length; i++)
             {
-                Debug.Log((long)(xpRequiredPerLevel[i - 1] * growthRate));
                 xpRequiredPerLevel[i] = (long)(xpRequiredPerLevel[i - 1] * growthRate);
             }
 
@@ -126,21 +157,13 @@ namespace JammerDash
             {
                 level = level,
                 currentXP = currentXP,
-                xpRequiredPerLevel = xpRequiredPerLevel,
-                totalXP = totalXP,
                 username = username,
                 user = save,
                 isLocal = true,
-                isOnline = false
+                isOnline = false,
+                country = cc,
+                id = SystemInfo.deviceUniqueIdentifier
             };
-            if (data.user == null)
-            {
-                p = data;
-            }
-            else
-            {
-                data = p;
-            }
             PlayerData accountPost = new PlayerData
             {
                 username = username,
@@ -154,31 +177,11 @@ namespace JammerDash
             XmlSerializer formatter = new XmlSerializer(typeof(PlayerData));
             string path = Application.persistentDataPath + "/playerData.dat";
             FileStream stream = new FileStream(path, FileMode.Create);
-            formatter.Serialize(stream, p);
-            stream.Close();
-        }
-
-        public void SavePlayerDataXP()
-        {
-            string save = sha256_hash(user);
-            PlayerData data = new PlayerData
-            {
-                level = level,
-                currentXP = currentXP,
-                xpRequiredPerLevel = xpRequiredPerLevel,
-                totalXP = totalXP,
-                username = username,
-                user = save,
-                isLocal = true,
-                isOnline = false
-            };
-            XmlSerializer formatter = new XmlSerializer(typeof(PlayerData));
-            string path = Application.persistentDataPath + "/playerData.dat";
-            FileStream stream = new FileStream(path, FileMode.Create);
             formatter.Serialize(stream, data);
             stream.Close();
         }
 
+       
         public IEnumerator Register(string url, PlayerData bodyJsonObject)
         {
             string bodyJsonString = JsonUtility.ToJson(bodyJsonObject);
@@ -226,10 +229,11 @@ namespace JammerDash
                 PlayerData data = formatter.Deserialize(stream) as PlayerData;
                 stream.Close();
 
+                username = data.username;
+                cc = data.country;
                 level = data.level;
                 currentXP = data.currentXP;
                 totalXP = data.totalXP;
-                username = data.username;
                 return data;
             } 
             else

@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using UnityEngine.Video;
 using System.Diagnostics;
 using System.IO.Compression;
-using Lachee.Discord;
 using Button = UnityEngine.UI.Button;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -22,9 +21,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
-using Lachee.Discord.Control;
 using JammerDash.Tech;
 using JammerDash.Menus.Main;
+using System.Xml.Serialization;
 
 namespace JammerDash.Menus
 {
@@ -49,7 +48,7 @@ namespace JammerDash.Menus
         public Image shuffleImage;
         public Animator idle;
         public Animator notIdle;
-        float afkTime;
+        public float afkTime;
         bool hasPlayedIdle;
         [Header("Account System")]
         public InputField usernameInput;
@@ -115,10 +114,9 @@ namespace JammerDash.Menus
         [Header("Profile")]
         public Slider levelSlider;
         public Text levelText;
-        public RawImage[] discordpfp;
-        public Text discordName;
-        public Text[] usernames; 
-
+        public Text[] usernames;
+        public Text spMain;
+        public Text[] sps;
 
         [Header("Parallax")]
         public Transform logo;
@@ -141,11 +139,7 @@ namespace JammerDash.Menus
             AudioManager.Instance.source.pitch = 1f;
             playerData = Account.Instance.LoadData();
             data = SettingsFileHandler.LoadSettingsFromFile();
-            levelSlider.maxValue = Account.Instance.xpRequiredPerLevel[0];
-            levelSlider.value = Account.Instance.currentXP;
             Debug.unityLogger.logEnabled = true;
-            discordName.text = DiscordManager.current.CurrentUser.username + "\n\nID: " +
-            DiscordManager.current.CurrentUser.ID;
            
                 foreach (GameObject go in disableAccess)
                 {
@@ -163,7 +157,14 @@ namespace JammerDash.Menus
                 FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserCanvas")).GetComponent<FileBrowser>();
                 FileBrowser.SetFilters(false, new FileBrowser.Filter("Jammer Dash Level", ".jdl"));
                 FileBrowser.SetDefaultFilter("Levels");
+                FileBrowser.SetDefaultFilter("Levels");
                 FileBrowser.ShowLoadDialog(ImportLevel, null, FileBrowser.PickMode.Files, true, Path.Combine(Application.streamingAssetsPath, "levels"), null, "Import Level...", "Import");
+            }
+
+            spMain.text = $"Jams: 0\t\tPerformance: {Mathf.RoundToInt(Difficulty.Calculator.CalculateSP("scores.dat"))}sp\t\tAccuracy: {Difficulty.Calculator.CalculateAccuracy("scores.dat"):0.00}%";
+            foreach (Text sp in sps)
+            {
+                sp.text = $"{Difficulty.Calculator.CalculateSP("scores.dat"):0}sp";
             }
         }
         public void SetSpectrum()
@@ -573,22 +574,44 @@ namespace JammerDash.Menus
        
         public IEnumerator SetCountry()
         {
-            string ip = new System.Net.WebClient().DownloadString("https://api.ipify.org");
-            string uri = $"https://ipapi.co/{ip}/json/";
+            string path = Application.persistentDataPath + "/playerData.dat";
 
-
-            using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
+            if (File.Exists(path))
             {
-                yield return webRequest.SendWebRequest();
+                XmlSerializer formatter = new XmlSerializer(typeof(PlayerData));
+                FileStream stream = new FileStream(path, FileMode.Open);
 
-                string[] pages = uri.Split('/');
-                int page = pages.Length - 1;
+                PlayerData data = formatter.Deserialize(stream) as PlayerData;
+                stream.Close();
 
-                IpApiData ipApiData = IpApiData.CreateFromJSON(webRequest.downloadHandler.text);
+                
+                cc = data.country;
+            }
+            if (cc == null)
+            {
 
-                cc = ipApiData.country.ToLower();
+                string ip = new System.Net.WebClient().DownloadString("https://api.ipify.org");
+                string uri = $"https://ipapi.co/{ip}/json/";
+
+
+                using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
+                {
+                    yield return webRequest.SendWebRequest();
+
+                    string[] pages = uri.Split('/');
+                    int page = pages.Length - 1;
+
+                    IpApiData ipApiData = IpApiData.CreateFromJSON(webRequest.downloadHandler.text);
+
+                    cc = ipApiData.country.ToLower();
+                    countryIMG.sprite = Resources.Load<Sprite>("icons/countries/" + cc);
+
+                }
+            }
+            else
+            {
+                cc = Account.Instance.cc;
                 countryIMG.sprite = Resources.Load<Sprite>("icons/countries/" + cc);
-
             }
         }
         private void SetBackgroundSprite(Sprite sprite)
@@ -1282,12 +1305,7 @@ namespace JammerDash.Menus
                 timeInfo += "running " + FormatElapsedTime(GameTimer.GetRunningTime());
             }
             clock.text = timeInfo;
-            foreach (RawImage pfp in discordpfp)
-            {
-                 
-                pfp.texture = DiscordManager.current.CurrentUser.avatar;
 
-            }
             foreach (Text text in usernames)
             {
                 if (string.IsNullOrEmpty(Account.Instance.username))
@@ -1300,20 +1318,12 @@ namespace JammerDash.Menus
                 }
 
             }
-            if (Account.Instance.xpRequiredPerLevel[Account.Instance.level] >= 2000000)
-            {
-                levelSlider.maxValue = 2000000;
-                float normalizedValue = (float)(Account.Instance.currentXP / Account.Instance.xpRequiredPerLevel[Account.Instance.level]);
-                levelSlider.value = normalizedValue * levelSlider.maxValue;
-            }
-            else
-            {
-                levelSlider.maxValue = (float)Account.Instance.xpRequiredPerLevel[Account.Instance.level];
-                levelSlider.value = Mathf.Min((float)Account.Instance.currentXP, levelSlider.maxValue);
-            }
+
+           
+            
             if (Account.Instance.currentXP >= 0)
             {
-                levelText.text = "lv" + Account.Instance.level.ToString() + $" (XP: {FormatNumber(Account.Instance.totalXP)})";
+                levelText.text = "Level: " + Account.Instance.level.ToString() + $" (XP: {FormatNumber(Account.Instance.totalXP)})";
 
             }
 
@@ -1420,6 +1430,8 @@ namespace JammerDash.Menus
       
         void Update()
         {
+            levelSlider.maxValue = 1;
+            levelSlider.value = (float)Account.Instance.currentXP / (float)Account.Instance.xpRequiredPerLevel[Account.Instance.level];
             string seconds = System.DateTime.Now.ToLocalTime().ToString("ss");
             SimpleSpectrum[] spectrums = FindObjectsByType<SimpleSpectrum>(FindObjectsSortMode.None);
             AudioManager.Instance.levelIndex = levelRow;
@@ -1431,14 +1443,14 @@ namespace JammerDash.Menus
                 }
             }
            
-            if (Input.GetKeyDown(KeyCode.B))
+            if (Input.GetKeyDown(KeyCode.B) && (EventSystem.current.currentSelectedGameObject == null || EventSystem.current.currentSelectedGameObject.GetComponent<InputField>() == null))
             {
                 LoadRandomBackground();
             }
 
             if ((Input.GetAxis("Mouse X") == 0 || Input.GetAxis("Mouse Y") == 0) && mainPanel.activeSelf)
             {
-                afkTime += Time.fixedDeltaTime;
+                afkTime += Time.unscaledDeltaTime;
 
                 if (afkTime > 25f && (!settingsPanel.activeSelf && !accPanel.activeSelf && !additionalPanel.activeSelf))
                 {
@@ -1482,16 +1494,14 @@ namespace JammerDash.Menus
                 ToggleMenuPanel(mainPanel);
             }
             
-            if (Input.GetKeyDown(KeyCode.F5))
+            if (Input.GetKeyDown(KeybindingManager.reloadData))
             {
                 LoadLevelFromLevels();
                 LoadLevelsFromFiles();
-                Account.Instance.CalculateXPRequirements();
-                Account.Instance.GainXP(0);
-                Account.Instance.LoadData();
-                Notifications.instance.Notify($"Level list, levels and xp are reloaded. \n{levelInfoParent.childCount} levels total, {Account.Instance.totalXP} xp", null);
+                
+                Notifications.instance.Notify($"Level list reloaded. \n{levelInfoParent.childCount} levels total", null);
             }
-            if (Input.GetKeyDown(KeyCode.F2))
+            if (Input.GetKeyDown(KeybindingManager.debug))
             {
                 additionalPanel.SetActive(!additionalPanel.active);
             }

@@ -1,65 +1,115 @@
-﻿using Lachee.Discord;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Discord;
 using JammerDash.Editor;
-using JammerDash.Audio;
 using JammerDash.Menus;
-using System;
+using JammerDash.Audio;
+
 namespace JammerDash.Tech
 {
     public class DiscordRPC : MonoBehaviour
     {
-        Timestamp time;
-        void Awake()
+        private Discord.Activity presence;
+        private Discord.Discord discord;
+        private Discord.ActivityManager manager;
+        private float lastUpdateTime = 0f;
+        private const float UpdateInterval = 5f;
+
+        void Start()
         {
-            time = DateTime.UnixEpoch;
-
-            DiscordManager.current.UpdateStartTime(time);
+            DateTime currentDateTime = DateTime.UtcNow;
+            DateTimeOffset dateTimeOffset = new DateTimeOffset(currentDateTime);
+            try
+            {
+                discord = new Discord.Discord(1127906222482391102, (ulong)Discord.CreateFlags.NoRequireDiscord);
+                presence = new Discord.Activity
+                {
+                    Details = "Enter Sequence",
+                    Assets = new Discord.ActivityAssets()
+                    {
+                        LargeImage = "logo",
+                        SmallImage = "shine",
+                        LargeText = $"{Account.Instance.username} | #0",
+                        SmallText = $"{Mathf.RoundToInt(Difficulty.Calculator.CalculateSP("scores.dat"))}sp | {Difficulty.Calculator.CalculateAccuracy("scores.dat"):0.00}%"
+                    },
+                    Timestamps = new Discord.ActivityTimestamps()
+                    {
+                         
+                         Start = dateTimeOffset.ToUnixTimeSeconds()
+                    },
+                    Instance = true
+                };
+                manager = discord.GetActivityManager();
+                manager.UpdateActivity(presence, null);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error initializing Discord SDK: " + ex.Message);
+            }
         }
-
         private void Update()
         {
-            DiscordManager.current.client.UpdateLargeAsset("logo", $"Rank: #0");
-            DiscordManager.current.client.UpdateSmallAsset("shine", "0 sp");
-            if (SceneManager.GetActiveScene().name == "LevelDefault")
+            discord.RunCallbacks();
+            UpdateDiscordPresence();
+        }
+        private void OnDisable()
+        {
+            discord.Dispose();
+        }
+        private void UpdateDiscordPresence()
+        {
+            string sceneName = SceneManager.GetActiveScene().name;
+
+            // Update presence based on the active scene
+            if (sceneName == "LevelDefault")
             {
-                DiscordManager.current.UpdateDetails($"▶ {CustomLevelDataManager.Instance.data.artist} - {CustomLevelDataManager.Instance.data.songName}");
-                DiscordManager.current.UpdateState($"by {CustomLevelDataManager.Instance.creator}");
+                presence.Details = $"▶ {CustomLevelDataManager.Instance.data.artist} - {CustomLevelDataManager.Instance.data.songName}";
+                presence.State = $"by {CustomLevelDataManager.Instance.creator}";
             }
-            else if (SceneManager.GetActiveScene().name == "SampleScene")
+            else if (sceneName == "SampleScene")
             {
-                DiscordManager.current.UpdateDetails($"✎ {FindObjectOfType<EditorManager>().songArtist.text} - {FindObjectOfType<EditorManager>().customSongName.text}");
-                DiscordManager.current.UpdateState($"{FindObjectOfType<EditorManager>().objectCount.text}");
+                var editorManager = FindObjectOfType<EditorManager>();
+                presence.Details = $"✎ {editorManager.songArtist.text} - {editorManager.customSongName.text}";
+                presence.State = $"{editorManager.objectCount.text}";
             }
-            else if (SceneManager.GetActiveScene().name == "MainMenu")
+            else if (sceneName == "MainMenu")
             {
-                mainMenu menu = FindAnyObjectByType<mainMenu>();
-                if (menu.mainPanel.activeSelf)
+                var menu = FindAnyObjectByType<mainMenu>();
+
+                if (menu.playPanel.activeSelf)
                 {
-                    DiscordManager.current.UpdateDetails($"Idle");
-                }
-                else if (menu.playPanel.activeSelf)
-                {
-                    DiscordManager.current.UpdateDetails($"Choosing a level to play");
+                    presence.State = $"▶ Choosing a level to play";
                 }
                 else if (menu.settingsPanel.activeSelf)
                 {
-                    DiscordManager.current.UpdateDetails($"Changing options");
+                    presence.State = $"⚙︎ Changing options";
                 }
                 else if (menu.levelInfo.activeSelf)
                 {
-                    DiscordManager.current.UpdateDetails($"Choosing a level to edit");
+                    presence.State = $"✎ Choosing a level to edit";
                 }
-                DiscordManager.current.UpdateState("");
+                else if (menu.afkTime < 25f)
+                {
+                    presence.Type = ActivityType.Playing;
+                    presence.Details = "Main Menu";
+                    presence.State = $"ᶻ 𝗓 𐰁 Idle";
+                }
+                else if (menu.afkTime > 25f)
+                {
+                    presence.Type = ActivityType.Listening; 
+                    presence.Details = "AFK";
+                    presence.State = $"♪ {AudioManager.Instance.source.clip.name}";
+                }
+
             }
-            else if (SceneManager.GetActiveScene().name == "intro")
+
+            // Update the Discord activity with the modified presence
+            manager.UpdateActivity(presence, (res) =>
             {
-                DiscordManager.current.UpdateDetails($"Idle");
-                DiscordManager.current.UpdateState($"Loading up...");
-                DiscordManager.current.UpdateStartTime(time);
-            }
+                
+            });
         }
     }
 }
+

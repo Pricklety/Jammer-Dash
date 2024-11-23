@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -11,6 +12,110 @@ namespace JammerDash.Difficulty
 
     public class Calculator : MonoBehaviour
     {
+
+        // Method to calculate the average of all the 4th entry values
+        public static float CalculateAccuracy(string filePath)
+        {
+            // List to store the 4th entries
+            List<float> fourthEntries = new List<float>();
+
+            try
+            {
+                // Read all lines from the file
+                var rows = File.ReadAllLines(Path.Combine(Application.persistentDataPath, filePath));
+
+                foreach (var row in rows)
+                {
+                    // Split the row by commas
+                    var entries = row.Split(',');
+
+                    // Ensure the row has at least 4 columns
+                    if (entries.Length < 4) continue;
+
+                    // Parse the 4th value (index 3)
+                    if (float.TryParse(entries[3], out float fourthValue))
+                    {
+                        // Add the parsed value to the list
+                        fourthEntries.Add(fourthValue);
+                    }
+                }
+
+                // Calculate the average of the 4th entries
+                if (fourthEntries.Count > 0)
+                {
+                    float average = fourthEntries.Average();
+                    return average;
+                }
+                else
+                {
+                    Debug.LogWarning("No valid 4th entry values found.");
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error reading or processing file: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public static float CalculateSP(string filePath)
+        {// List to store the highest adjusted third values for each row
+            List<float> adjustedThirdValues = new List<float>();
+
+            try
+            {
+                // Read all lines from the file
+                var rows = File.ReadAllLines(Path.Combine(Application.persistentDataPath, filePath));
+
+                // A dictionary to track the highest third entry (3rd column) per level ID (1st column)
+                Dictionary<string, float> levelMaxThirdValues = new Dictionary<string, float>();
+
+                foreach (var row in rows)
+                {
+                    // Split the row by commas
+                    var entries = row.Split(',');
+
+                    if (entries.Length < 3) continue; // Ensure at least three columns are present
+
+                    // Get the level ID (1st column) and the 3rd column value
+                    string levelId = entries[0];
+                    if (!float.TryParse(entries[2], out float thirdValue) || float.IsNaN(thirdValue)) continue;
+
+                    // Update the dictionary with the highest third value for each level ID
+                    if (levelMaxThirdValues.ContainsKey(levelId))
+                    {
+                        // Keep the maximum third value for the same level ID
+                        levelMaxThirdValues[levelId] = Math.Max(levelMaxThirdValues[levelId], thirdValue);
+                    }
+                    else
+                    {
+                        levelMaxThirdValues[levelId] = thirdValue;
+                    }
+                }
+
+                // Now calculate the SP score using the decay formula for the top 50 values
+                List<float> topValues = levelMaxThirdValues.Values.OrderByDescending(v => v).Take(50).ToList();
+                float totalSP = 0f;
+
+                // Apply the decay formula: Total sp = p * 0.96^(n-1)
+                for (int i = 0; i < topValues.Count; i++)
+                {
+                    float p = topValues[i];
+                    float adjustedValue = p * Mathf.Pow(0.96f, i); // Apply decay for each value
+                    totalSP += adjustedValue;
+                }
+
+                return totalSP;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error reading or processing file: {ex.Message}");
+                return 0;
+            }
+        }
+
+
         public static float CalculateDifficulty(
             List<GameObject> cubes,
             List<GameObject> saws,
@@ -278,7 +383,7 @@ namespace JammerDash.Difficulty
         // Calculate versatility based on hit types and missed hits
         private void CalculateVersatility()
         {
-            _versatility = _perfectHits * 0.05f + _greatHits * 0.025f + _goodHits * 0.01f + _missedHits * -0.1f;
+            _versatility = _perfectHits * 0.07f + _greatHits * 0.04f + _goodHits * -0.04f + _missedHits * -0.15f;
         }
 
         // Exponential function for accuracy scaling
@@ -307,7 +412,7 @@ namespace JammerDash.Difficulty
             float accuracyMultiplier = CalculateAccuracyMultiplier(_precision);
 
             // Level length adjustment (bonus for long levels)
-            float levelLengthAdjustment = _levelLength / Math.Max(1000, _levelLength);  // Adjust this formula
+            float levelLengthAdjustment = _levelLength / Math.Max(1000, _levelLength); 
 
             // Calculate the total performance score
             _performanceScore = Math.Max(

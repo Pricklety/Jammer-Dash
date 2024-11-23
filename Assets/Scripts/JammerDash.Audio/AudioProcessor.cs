@@ -220,7 +220,7 @@ public class AudioProcessor : MonoBehaviour
             // dobeat array records where we actally place beats
             dobeat[now] = 0; 
             // if current value is largest in the array, probably means we're on a beat
-            if (smaxix == now / 10)
+            if (smaxix == now)
             {
                 tapTempo(); 
                 onBeat.Invoke();

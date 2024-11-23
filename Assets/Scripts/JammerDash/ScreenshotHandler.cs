@@ -21,7 +21,7 @@ namespace JammerDash
         {
             DontDestroyOnLoad(this);
             // Check if F12 key is pressed
-            if (Input.GetKeyDown(KeyCode.F12))
+            if (Input.GetKeyDown(KeybindingManager.screenshot))
             {
                 takeScreenshotOnNextFrame = true;
             }

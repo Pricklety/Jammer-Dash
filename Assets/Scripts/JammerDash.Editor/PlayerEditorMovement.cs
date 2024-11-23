@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 namespace JammerDash.Editor
 {
@@ -37,20 +38,20 @@ namespace JammerDash.Editor
 
 
             // Check for vertical movement
-            if (Input.GetKeyDown(KeyCode.W) && transform.position.y < maxY || Input.GetKeyDown(KeyCode.UpArrow) && transform.position.y < maxY)
+            if (Input.GetKeyDown(KeybindingManager.up) && transform.position.y < maxY)
             {
                 transform.position += new Vector3(0f, jumpHeight, 0f);
             }
-            else if (Input.GetKeyDown(KeyCode.Space) && transform.position.y < maxY - jumpHeight)
+            else if (Input.GetKeyDown(KeybindingManager.boost) && transform.position.y < maxY - jumpHeight)
             {
                 transform.position += new Vector3(0f, jumpHeight * 2f, 0f);
             }
-            else if (Input.GetKeyDown(KeyCode.S) && transform.position.y > minY || Input.GetKeyDown(KeyCode.DownArrow) && transform.position.y > minY)
+            else if (Input.GetKeyDown(KeybindingManager.down) && transform.position.y > minY)
             {
                 transform.position -= new Vector3(0f, jumpHeight, 0f);
             }
 
-            if (Input.GetKeyDown(KeyCode.A) && transform.position.y > -1 || Input.GetKeyDown(KeyCode.LeftArrow) && transform.position.y > -1)
+            if (Input.GetKeyDown(KeybindingManager.ground) && transform.position.y > -1)
             {
                 transform.position = new Vector3(transform.position.x, -1, transform.position.z);
 
@@ -67,15 +68,18 @@ namespace JammerDash.Editor
                 }
             }
         }
+
+        public AudioClip[] hitSounds;
         private void OnTriggerEnter2D(Collider2D collision)
         {
             if (collision.CompareTag("Cubes"))
             {
-                new WaitForSecondsRealtime(0.07f);
-                Debug.Log("hit");
-                AudioClip hitSound = Resources.Load<AudioClip>("Audio/SFX/hit0");
-                GameObject.Find("sfx").GetComponent<AudioSource>().PlayOneShot(hitSound, 1);
-
+                StartCoroutine(HandleTriggerEnter(collision));
+            }
+            if (collision.CompareTag("LongCube")) 
+            {
+                StartCoroutine(HandleTriggerEnter(collision));
+                
             }
             if (collision.CompareTag("Beat"))
             {
@@ -83,6 +87,48 @@ namespace JammerDash.Editor
                 AudioClip hitSound = Resources.Load<AudioClip>("Audio/SFX/metronome");
                 GameObject.Find("sfx").GetComponent<AudioSource>().PlayOneShot(hitSound, 2);
 
+            }
+        }
+
+        public void OnTriggerExit2D(Collider2D collision)
+        {
+            if (collision.CompareTag("LongCube"))
+            {
+               Debug.Log("hit");
+               sfxS.PlayOneShot(hitSounds[6]);
+
+
+            }
+        }
+        private IEnumerator HandleTriggerEnter(Collider2D collision)
+        {
+            // Wait for 0.07 seconds
+            yield return new WaitForSecondsRealtime(0.07f);
+
+            // Logic after delay
+            Debug.Log("hit");
+            switch (collision.gameObject.name)
+            {
+                case "hitter01(Clone)":
+                    sfxS.PlayOneShot(hitSounds[0]);
+                    break;
+                case "hitter02(Clone)":
+                    sfxS.PlayOneShot(hitSounds[1]);
+                    break;
+                case "hitter03(Clone)":
+                    sfxS.PlayOneShot(hitSounds[2]);
+                    break;
+                case "hitter04(Clone)":
+                    sfxS.PlayOneShot(hitSounds[3]);
+                    break;
+                case "hitter05(Clone)":
+                    sfxS.PlayOneShot(hitSounds[4]);
+                    break;
+                case "hitter06(Clone)":
+                    sfxS.PlayOneShot(hitSounds[5]);
+                    break;
+                default:
+                    break;
             }
         }
     }

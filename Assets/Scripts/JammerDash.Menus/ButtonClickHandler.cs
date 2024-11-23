@@ -90,6 +90,7 @@ namespace JammerDash.Menus.Play
                         scoreData[6] = data[8]; // Miss
                         scoreData[9] = data[9]; // Combo
                         scoreData[7] = data[10]; // Username
+                        
 
                         
                         scoresList.Add(scoreData);
@@ -115,7 +116,7 @@ namespace JammerDash.Menus.Play
                 // Display the ranking, score, accuracy, and other data
                 string displayText = string.Format("{0:N0} ({2}x)\n{1}%", scoreData[1], scoreData[2], scoreData[9]); // Score, Accuracy, Combo
                 string rankText = string.Format("{0}", scoreData[0]); // Ranking
-                string acc = string.Format("5: {0}\n3: {1}\n1: {2}\n0: {3}", scoreData[3], scoreData[4], scoreData[5], scoreData[6]); // Accuracy breakdown (Five, Three, One, Miss)
+                string acc = string.Format("5: {0}\n3: {1}\n1: {2}\n0: {3}\n{4}sp", scoreData[3], scoreData[4], scoreData[5], scoreData[6], Mathf.RoundToInt(float.Parse(scoreData[8])).ToString()); // Accuracy breakdown (Five, Three, One, Miss)
                 string user = scoreData[7]; // Username
 
                 // Debug logs to ensure data is correct
@@ -140,7 +141,7 @@ namespace JammerDash.Menus.Play
                 button.onClick.RemoveAllListeners();
                 button.onClick.AddListener(OnClick);
             }
-            if (Input.GetKeyDown(KeyCode.F4) && isSelected)
+            if (Input.GetKeyDown(KeybindingManager.goToSelectedLevel) && isSelected)
             {
                 StartCoroutine(Move(0));
             }
@@ -397,7 +398,7 @@ namespace JammerDash.Menus.Play
         // Helper function to update UI with scene data
         private void UpdateUIWithLevelData(SceneData data)
         {
-            levelLength.text = $"{FormatTime(data.songLength):N0} ({FormatTime(data.levelLength):N0})";
+            levelLength.text = $"{FormatTime(data.songLength):N0}";
             levelBPM.text = $"{data.bpm}";
             diff.text = $"{data.calculatedDifficulty:F2}";
             levelObj.text = $"{(data.cubePositions.Count + data.sawPositions.Count + data.longCubePositions.Count):N0} ({data.cubePositions.Count}, {data.sawPositions.Count}, {data.longCubePositions.Count})";
@@ -411,7 +412,7 @@ namespace JammerDash.Menus.Play
             long unixTime = Convert.ToInt64(data.saveTime);
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(unixTime).ToUniversalTime();
             DateTimeOffset EUTime = TimeZoneInfo.ConvertTime(dateTimeOffset, TimeZoneInfo.Local);
-            return $"mapper: {data.creator}, ID: {data.ID}, last saved on {EUTime:yyyy-MM-dd hh:MM:ss}";
+            return $"mapper: {data.creator}, Local ID: {data.ID}, last saved on {EUTime:yyyy-MM-dd hh:MM:ss}";
         }
 
         // Handle playing the SFX or custom level audio

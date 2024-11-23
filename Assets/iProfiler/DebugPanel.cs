@@ -31,6 +31,7 @@ namespace JammerDash.Tech
         {
             gui.text = $"Debug v13 - Jammer Dash {Application.version} (Unity {Application.unityVersion})\n\n";
 
+            DisplayAccountInfo();
             DisplayAudioInfo();
             DisplayInputInfo();
             DisplaySystemInfo();
@@ -39,6 +40,11 @@ namespace JammerDash.Tech
 
         }
 
+        void DisplayAccountInfo()
+        {
+            gui.text += "Username: " + Account.Instance.username +
+                        "\nExperience: " + Account.Instance.totalXP;
+        }
         void DisplaySystemInfo()
         {
             gui.text += "\n\nSystem Memory: " + (SystemInfo.systemMemorySize / 1000).ToString("f2") + "GB" +
@@ -62,7 +68,7 @@ namespace JammerDash.Tech
 
         void DisplayAudioInfo()
         {
-            gui.text += "Audio Mixer: " + (audioMixer != null ? audioMixer.name : "N/A");
+            gui.text += "\n\nAudio Mixer: " + (audioMixer != null ? audioMixer.name : "N/A");
 
             if (musicSource != null && musicSource.name == "mainmenu")
             {

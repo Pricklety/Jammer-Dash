@@ -3,6 +3,7 @@ using JammerDash.Editor.Basics;
 using JammerDash.Menus.Play;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -166,7 +167,14 @@ namespace JammerDash.Tech
                 StartCoroutine(ProcessAfterSceneLoaded());
             }
         }
-
+        Dictionary<string, int> cubeTypeMapping = new Dictionary<string, int>
+{
+    { "hitter01", 1 },
+    { "hitter03", 3 },
+    { "hitter04", 4 },
+    { "hitter05", 5 },
+    { "hitter06", 6 },
+};
         private IEnumerator ProcessAfterSceneLoaded()
         {
             yield return new WaitForEndOfFrame();
@@ -183,12 +191,40 @@ namespace JammerDash.Tech
             {
                 Destroy(gobject.gameObject);
             }
+            for (int i = 0; i < sceneData.cubePositions.Count; i++)
+                {
+                    Vector3 cubePos = sceneData.cubePositions[i];
+                int originalCubeType;
+                if (sceneData.cubeType == null || sceneData.cubeType.Count <= i)
+                {
+                    originalCubeType = 1;
+                }
+                else
+                {
+                    originalCubeType = sceneData.cubeType[i];
+                }
 
-            foreach (Vector3 cubePos in sceneData.cubePositions)
-            {
-                GameObject cubeObject = Instantiate(Resources.Load<GameObject>("hitter01"), cubePos, Quaternion.identity);
-                Debug.Log("Cube instantiated: " + cubeObject);
-            }
+                // Format the name of the cube type based on the index
+                string cubeTypeName = $"hitter{originalCubeType:D2}"; // Format: hitter01, hitter03, etc.
+
+                    // Look up the mapped index
+                    if (cubeTypeMapping.TryGetValue(cubeTypeName, out int mappedIndex))
+                    {
+                        // Validate mappedIndex within cubePrefab array bounds
+                        if (mappedIndex >= 0 && mappedIndex <= 6)
+                        {
+                            Instantiate(Resources.Load<GameObject>(cubeTypeName), cubePos, Quaternion.identity);
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"Mapped index {mappedIndex} is out of bounds for cubePrefab.");
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Cube type name '{cubeTypeName}' not found in mapping. Skipping instantiation.");
+                    }
+                }
 
             foreach (Vector3 sawPos in sceneData.sawPositions)
             {

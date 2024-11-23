@@ -16,7 +16,7 @@ namespace JammerDash.Game
         public AudioSource audioSource;
         public Slider progressSlider;
         public Text progressText;
-
+        public GameObject canvas;
         public FinishLine finish;
         public PlayerMovement player;
         private void Start()
@@ -68,6 +68,11 @@ namespace JammerDash.Game
 
             // Update the slider value with the current progress
             progressSlider.value = currentProgress;
+            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+               canvas.SetActive(!data.canvasOff);
+            
+           
+            
 
         }
 

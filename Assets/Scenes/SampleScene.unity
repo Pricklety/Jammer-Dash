@@ -2847,11 +2847,7 @@ MonoBehaviour:
   - {fileID: 803514641}
   - {fileID: 1780031880}
   - {fileID: 861284763}
-  - {fileID: 0}
-  - {fileID: 0}
   - {fileID: 2070322050}
-  - {fileID: 0}
-  - {fileID: 0}
   - {fileID: 1856945009}
   objects:
   - {fileID: 2952827130082377523, guid: 65027b124e056534dbf5cc3ff5bd9dea, type: 3}
@@ -2859,15 +2855,18 @@ MonoBehaviour:
   - {fileID: 2127196284957857532, guid: 360b60c1c75c8da45ae93a0a1789f5a3, type: 3}
   - {fileID: 6160194009518253934, guid: 5fca7fead15dff241816eef7d0e9b6fa, type: 3}
   - {fileID: 2358202793727089482, guid: b2b2da03ab9cb7b4091a1ad5c4e3e45a, type: 3}
-  - {fileID: 4614546819338099749, guid: 027c46a6cc8a2674d8709b82f7222f24, type: 3}
-  - {fileID: 4724180033565526227, guid: 8ae2d4ea54c9b334dae6381caf811335, type: 3}
   - {fileID: 213054994964169180, guid: 8b536284fde2d5747bf79890e7cf20a8, type: 3}
-  - {fileID: 4299262136834376883, guid: 3c394a7d29c557e47bf409d8fd861356, type: 3}
-  - {fileID: 7633163515287015639, guid: c457626d21f6f4447a6a59eb1f1b960a, type: 3}
   - {fileID: 7680687014028900761, guid: 2d3fe19b886c0a84197c6917543e1b65, type: 3}
   loadMusicButton: {fileID: 0}
   currentButtonPressed: 0
   finishCount: 1
+  hitSounds:
+  - {fileID: 8300000, guid: 0ba08b04b381ead449009a90f14d17fa, type: 3}
+  - {fileID: 8300000, guid: 6312eeecac40a9f4d805f9d731fcfa3a, type: 3}
+  - {fileID: 8300000, guid: 2d00fb15d1e57f24bac22d73a1bc6b32, type: 3}
+  - {fileID: 8300000, guid: 9f72da751d0b7fd44b95a9f179d3e678, type: 3}
+  - {fileID: 8300000, guid: 4190f51d5036f4642850ba4ed21f96a9, type: 3}
+  - {fileID: 8300000, guid: 1aa979fc9c1416f449e16f135a53b894, type: 3}
   loadingPanel: {fileID: 401841163}
   editorPages:
   - {fileID: 930901649}
@@ -2926,7 +2925,14 @@ MonoBehaviour:
   ground: {fileID: 1323739757}
   elev: {fileID: 1944401546}
   backgroundImagePrefab: {fileID: 1634090605}
-  cubePrefab: {fileID: 2952827130082377523, guid: 65027b124e056534dbf5cc3ff5bd9dea, type: 3}
+  cubePrefab:
+  - {fileID: 0}
+  - {fileID: 2952827130082377523, guid: 65027b124e056534dbf5cc3ff5bd9dea, type: 3}
+  - {fileID: 0}
+  - {fileID: 6160194009518253934, guid: 5fca7fead15dff241816eef7d0e9b6fa, type: 3}
+  - {fileID: 2358202793727089482, guid: b2b2da03ab9cb7b4091a1ad5c4e3e45a, type: 3}
+  - {fileID: 213054994964169180, guid: 8b536284fde2d5747bf79890e7cf20a8, type: 3}
+  - {fileID: 7680687014028900761, guid: 2d3fe19b886c0a84197c6917543e1b65, type: 3}
   sawPrefab: {fileID: 4826993808313219448, guid: 7c4a807722bc24547b62ccd06d2c84e8, type: 3}
   longCubePrefab: {fileID: 2127196284957857532, guid: 360b60c1c75c8da45ae93a0a1789f5a3, type: 3}
   parentTransform: {fileID: 0}
@@ -12039,6 +12045,14 @@ MonoBehaviour:
   jump: {fileID: 8300000, guid: f9abde361f355a946a6aa316e42e67fe, type: 3}
   impact: {fileID: 8300000, guid: 29b7f5d749adb6c4db0ecb298ef17983, type: 3}
   text: {fileID: 382353735}
+  hitSounds:
+  - {fileID: 8300000, guid: 0ba08b04b381ead449009a90f14d17fa, type: 3}
+  - {fileID: 8300000, guid: 6312eeecac40a9f4d805f9d731fcfa3a, type: 3}
+  - {fileID: 8300000, guid: 2d00fb15d1e57f24bac22d73a1bc6b32, type: 3}
+  - {fileID: 8300000, guid: 9f72da751d0b7fd44b95a9f179d3e678, type: 3}
+  - {fileID: 8300000, guid: 4190f51d5036f4642850ba4ed21f96a9, type: 3}
+  - {fileID: 8300000, guid: 1aa979fc9c1416f449e16f135a53b894, type: 3}
+  - {fileID: 8300000, guid: 0ee46368777181540ab096b71d1c7a2f, type: 3}
 --- !u!1 &1692051384
 GameObject:
   m_ObjectHideFlags: 0
