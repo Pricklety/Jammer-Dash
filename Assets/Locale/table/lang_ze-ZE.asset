@@ -1,0 +1,468 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: lang_ze-ZE
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: ze-ZE
+  m_SharedData: {fileID: 11400000, guid: cf72037e39558674484c2c22edf2e151, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 46977377202176
+    m_Localized: "Kre\xE1 nov\xE9 lev\xE9l"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 47223498960896
+    m_Localized: "Chos\xE9n s\xF3l\xEDra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42645680128
+    m_Localized: "J\xF3kan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 714870976512
+    m_Localized: "Mit\xF3j\xF3kan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2991782457344
+    m_Localized: "V\xE1rk\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3021977251840
+    m_Localized: "Oth\xEDr"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3082442338304
+    m_Localized: "Pres\xEB t\xFAr\xEDn d\xF3 mouse an menu\xEB v\xE1len."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6902991908864
+    m_Localized: "V\xE9ral skeyt\xE1r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7116955938816
+    m_Localized: "V\xE1rk\xE9 d\xF3 j\xF3kan klavy\xE9 bindar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7659258474496
+    m_Localized: "T\xFAr\xEDntrak"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7936682323968
+    m_Localized: "Tr\xE1k\xEB fadea"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16284794318848
+    m_Localized: "Tr\xE1k\xEB part\xEDkl numor"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16739842748416
+    m_Localized: "T\xFAr\xEDn d\xF3 mouse encloson"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17375896367104
+    m_Localized: "Mouse wh\xE9l vol\xFAma skort\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17977820934144
+    m_Localized: "R\xE1ndom s\xF3l\xEDra d\xF3 start"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18405602193408
+    m_Localized: "Lingv\xE1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25210185150464
+    m_Localized: "Skeyt\xE1r perform\xE1nka"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25549747613696
+    m_Localized: "Rezolut\xEDon"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25997023997952
+    m_Localized: FPS maxar (0-999)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26351287496704
+    m_Localized: "D\xEDsplar FPS numor"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26584625016832
+    m_Localized: "V-Sink\xE1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28874199101440
+    m_Localized: "Skeyt\xE1r audi\xF3ra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29060447170560
+    m_Localized: "<color=red>(GLOB\xC1R!)</color> Vol\xFAma maxar ar detron 20"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29990836072448
+    m_Localized: "Vol\xFAma r\xE9gal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30263662964736
+    m_Localized: "\xC9fekta L\xF3p\xE1s numor"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30665745723392
+    m_Localized: "Resh\xFAfa d\xF3 plalist\xE1r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31021686943744
+    m_Localized: "\xD3pen plalist\xE1r fald\xE9r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 32798117294080
+    m_Localized: "Skeyt\xE1r gameplara"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33307360325632
+    m_Localized: "Fundask\xE1 vis\xEDon"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33955585814528
+    m_Localized: "H\xEDta n\xF3t\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34381060206592
+    m_Localized: "\xC9fekta d\xF3 son\xE1r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34707171536896
+    m_Localized: "Tip\xE1 d\xF3 karaktar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35511366414336
+    m_Localized: "Text\xFAran d\xF3 n\xF3t\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35901868699648
+    m_Localized: "Skeyt\xE1r men\xFAra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36120773619712
+    m_Localized: "Tip\xE1 d\xF3 fundask\xE1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37224538271744
+    m_Localized: "Tim\xF3n d\xF3 fundask\xE1 v\xE1rk\xE9n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37605414629376
+    m_Localized: "Paral\xE1k"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37869047607296
+    m_Localized: "Sn\xEDvar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38131267104768
+    m_Localized: "Uplod\xE1n fundask\xE1 (im\xE1ge an vid\xE9a)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40729747484672
+    m_Localized: "Skeyt\xE1r am\xFAza"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40986791211008
+    m_Localized: "Baz b\xF3star"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41289854840832
+    m_Localized: "Baz g\xE1nar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41482788630528
+    m_Localized: "Manten\xE1nsa"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42188836794368
+    m_Localized: "R\xE9mov\xF3n al d\xF3 pers\xF3n\xE1r mapa"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42379153338368
+    m_Localized: "Res\xE9t\xF3n al d\xF3 d\xE1t\xF3n d\xF3 jok\xE1r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42804887777280
+    m_Localized: "Test\xE9n an \xE1kttuliz\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 43039567474688
+    m_Localized: "Objekt\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44204417970176
+    m_Localized: "V\xEDtar d\xF3 jok\xE1r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44553841242112
+    m_Localized: "Dimensi\xF3"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44862596542464
+    m_Localized: "TABEL\xC1R R\xC9G\xC1L"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 45690346631168
+    m_Localized: "Lev\xE9l d\xF3 t\xFA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46491345448960
+    m_Localized: "Nov\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246076816535552
+    m_Localized: "Skeyt\xE1r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246175391068160
+    m_Localized: "Shr\xE1v\xEA d\xF3 lev\xE9la \u0161ivr\xE1 d\xF3 fonktra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246360406011904
+    m_Localized: "Skeyt\xE1r lev\xE9la"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246385106268160
+    m_Localized: "Nom\xE9 lev\xE9la"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246414898409472
+    m_Localized: "Kr\xE9at\xF3r lev\xE9la"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246431407190016
+    m_Localized: "r\xE9at\xF3r lev\xE9la (Roman\xEDrka)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246453452451840
+    m_Localized: "Kalky\xFAl d\xF3 BPM t\xF3ntra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246468149293056
+    m_Localized: "Sp\xE1na BPM mark\xF3ra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246745174683648
+    m_Localized: "Im\xE1ga"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247211304464384
+    m_Localized: "Zemn\xE1"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247231307100160
+    m_Localized: "P\u0159\xE9va d\xF3 bakgr\xF3nda"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247244460437504
+    m_Localized: "Skeyt\xE1r dif\xEDkulty"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247283312275456
+    m_Localized: "Sajza d\xF3 k\xFAna"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247300961906688
+    m_Localized: "Skeyt\xE1r t\xF3ntra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247321564327936
+    m_Localized: "Art\xEDsta t\xF3ntra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247342401630208
+    m_Localized: "Art\xEDsta t\xF3ntra (Roman\xEDrka)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247355554967552
+    m_Localized: "Nom\xE9 t\xF3ntra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247369245175808
+    m_Localized: "Nom\xE9 t\xF3ntra (Roman\xEDrka)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247383707136000
+    m_Localized: "BPM t\xF3ntra (nombra)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247408503861248
+    m_Localized: "\xD3fset mark\xF3ra (ms)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247442930708480
+    m_Localized: Plejbek
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247458533519360
+    m_Localized: "M\xFAltipl\xE1r mark\xF3ra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247473800785920
+    m_Localized: "Sel\xE9kt\xEA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247490611556352
+    m_Localized: "An\xFAla"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247512019283968
+    m_Localized: "M\xF3stra fil\xF3ra skr\xEDta"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247524937740288
+    m_Localized: "\u0160erch\xE1..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500536736399360
+    m_Localized: "M\xF3d\u0161a Blinda"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500561184997376
+    m_Localized: "Skritar st\xE1t\xFAs kraxt\xEAna"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500577794441216
+    m_Localized: "Skritar lev\xE9la kraxt\xEAna"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500606051467264
+    m_Localized: "Skritar m\xF3d\u0161a AFK"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500635977826304
+    m_Localized: "Skritar lev\xE9la shr\xE2vena"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500697919307776
+    m_Localized: "M\xE1p\xF3r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500710737100800
+    m_Localized: "M\xE1p\xE9na d\xF3"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500722212716544
+    m_Localized: "ID L\xF3kala"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500748318064640
+    m_Localized: "\xDAlt\xEDma skr\xEDva en"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500982360227840
+    m_Localized: "Kr\xE9dit\xE1r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500992455917568
+    m_Localized: "D\xE9v\xE1kar a stafka"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501015948214272
+    m_Localized: "Art\xEDstka Pr\xE9zent\xE1da"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501050471530496
+    m_Localized: "Pr\xF3gramar uz\xE9na f\xE1 J\xE1mor D\xE1\u0161a"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501076245528576
+    m_Localized: "Otvarar l\xF3gar plej\xE1ra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501106243190784
+    m_Localized: Otvarar settings.json
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501130867949568
+    m_Localized: "Ezta \xE9s \xFAna rel\xEDza tempr\xE1. Ezta versij\xF3na p\xF3dar
+      kont\xE9nar buga"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501183821037568
+    m_Localized: "J\xE1mar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501209586647040
+    m_Localized: "Perform\xE1nka"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501230793048064
+    m_Localized: "Ak\xFCr\xE1ty"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501241060704256
+    m_Localized: "Kol\xF3ra d\xF3 bakgr\xF3nda"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501271393910784
+    m_Localized: "Shr\xE1v\xEA kol\xF3ra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501289848848384
+    m_Localized: "Inzertar k\xF3da HEX"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501322803494912
+    m_Localized: "f\xE1 expanda"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573297709166592
+    m_Localized: "perform\xE1nka"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573474192896000
+    m_Localized: "sk\xF3ra"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573727289782272
+    m_Localized: "k\xF3mb\xF3"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574255201660928
+    m_Localized: "Kont\xEDnyar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574294158356480
+    m_Localized: "Re\u0161t\xE1rta"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574306774822912
+    m_Localized: "R\xF3kar d\xF3 men\xFC"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575789129936896
+    m_Localized: "Lev\xE9la kompletar!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575999075823616
+    m_Localized: "Kraxt\xEAna d\xF3"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574527961444352
+    m_Localized: "F\xE1lyar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575739440017408
+    m_Localized: "\u0160empre \xEDna tempra pr\xF3xima! Kv\xEDz \xE9s d\xE9spa re\u0161t\xE1rta?"
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

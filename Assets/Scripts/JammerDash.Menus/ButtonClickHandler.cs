@@ -9,6 +9,8 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using JammerDash.Audio;
 using JammerDash.Menus.Play.Score;
+using JammerDash.Tech;
+using UnityEngine.Localization.Settings;
 
 namespace JammerDash.Menus.Play
 {
@@ -213,7 +215,8 @@ namespace JammerDash.Menus.Play
             var customLevel = GetComponent<CustomLevelScript>();
             if (customLevel != null)
             {
-
+                CustomLevelDataManager data = CustomLevelDataManager.Instance;
+                data.sceneLoaded = false;
                 levelLength = GameObject.Find("info").GetComponent<Text>();
                 levelBPM = GameObject.Find("infoBPM").GetComponent<Text>();
                 diff = GameObject.Find("infodiff").GetComponent<Text>();
@@ -401,9 +404,9 @@ namespace JammerDash.Menus.Play
             levelLength.text = $"{FormatTime(data.songLength):N0}";
             levelBPM.text = $"{data.bpm}";
             diff.text = $"{data.calculatedDifficulty:F2}";
-            levelObj.text = $"{(data.cubePositions.Count + data.sawPositions.Count + data.longCubePositions.Count):N0} ({data.cubePositions.Count}, {data.sawPositions.Count}, {data.longCubePositions.Count})";
-            hp.text = $"Player HP: {data.playerHP}";
-            size.text = $"Object size: {data.boxSize}";
+            levelObj.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Objects")}: {(data.cubePositions.Count + data.sawPositions.Count + data.longCubePositions.Count):N0} ({data.cubePositions.Count}, {data.sawPositions.Count}, {data.longCubePositions.Count})";
+            hp.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Player HP")}: {data.playerHP}";
+            size.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Object size")}: {data.boxSize}";
         }
 
         // Format and return the bonus information as a string
@@ -412,7 +415,7 @@ namespace JammerDash.Menus.Play
             long unixTime = Convert.ToInt64(data.saveTime);
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(unixTime).ToUniversalTime();
             DateTimeOffset EUTime = TimeZoneInfo.ConvertTime(dateTimeOffset, TimeZoneInfo.Local);
-            return $"mapper: {data.creator}, Local ID: {data.ID}, last saved on {EUTime:yyyy-MM-dd hh:MM:ss}";
+            return $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "mapper")}: {data.creator}, {LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Local ID")}: {data.ID}, {LocalizationSettings.StringDatabase.GetLocalizedString("lang", "last saved on")} {EUTime:yyyy-MM-dd hh:MM:ss}";
         }
 
         // Handle playing the SFX or custom level audio

@@ -18,6 +18,7 @@ namespace JammerDash.Tech
         // Singleton instance
         public static CustomLevelDataManager Instance;
         public string levelName;
+        public string artist;
         public string creator;
         public int diff;
         public int ID;
@@ -61,6 +62,7 @@ namespace JammerDash.Tech
                 SceneData sceneData = SceneData.FromJson(json);
                 levelName = sceneData.sceneName;
                 creator = sceneData.creator;
+                artist = sceneData.artist;
                 diff = (int)sceneData.calculatedDifficulty;
                 ID = sceneData.ID;
                 playerhp = sceneData.playerHP != 0 ? sceneData.playerHP : 300;
@@ -108,6 +110,7 @@ namespace JammerDash.Tech
                     manager.groundToggle.isOn = sceneData.ground;
                     manager.lineController.audioClip = sceneData.clip;
                     manager.LoadSceneData(sceneData);
+                    manager.ID = sceneData.ID;
                     levelName = sceneData.sceneName;
                     creator = sceneData.creator;
                     diff = (int)sceneData.calculatedDifficulty;
@@ -124,15 +127,17 @@ namespace JammerDash.Tech
 
             return null;
         }
-        IEnumerator LoadImage(string url)
+        public IEnumerator LoadImage(string url, RawImage rawImage)
         {
             using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))
             {
                 yield return www.SendWebRequest();
-
+                if (rawImage == null)
+                {
+                    rawImage = FindInactiveObjectOfType<RawImage>();
+                }
                 if (www.result == UnityWebRequest.Result.Success)
                 {
-                    RawImage rawImage = FindInactiveObjectOfType<RawImage>();
                     if (rawImage != null)
                     {
                         rawImage.gameObject.SetActive(true);
@@ -245,7 +250,7 @@ namespace JammerDash.Tech
                 Debug.Log("Instantiated long cube");
             }
 
-                StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{ID} - {levelName}", "bgImage.png")));
+                StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{ID} - {levelName}", "bgImage.png"), null));
             
 
             Camera[] cams = FindObjectsOfType<Camera>();
@@ -255,6 +260,7 @@ namespace JammerDash.Tech
             }
 
             levelName = sceneData.sceneName;
+            artist = sceneData.artist;
             creator = sceneData.creator;
             diff = (int)sceneData.calculatedDifficulty;
             ID = sceneData.ID;

@@ -8,6 +8,8 @@ using JammerDash.Game.Player;
 using JammerDash.Tech;
 using JammerDash.Editor.Basics;
 using JammerDash.Audio;
+using UnityEngine.Localization.Settings;
+using JammerDash.Difficulty;
 
 namespace JammerDash.Game
 {
@@ -23,10 +25,10 @@ namespace JammerDash.Game
         public AudioSource finishSound;
         public GameObject finishMenu;
         public Image scoreRank;
-        public Animation anim;
+        public Animator anim;
         public SceneData data;
         public float maxPos;
-
+        public RawImage img;
         public Text total;
         public Text combo;
         public Text acc;
@@ -209,48 +211,122 @@ namespace JammerDash.Game
 
             return 0;
         }
+        public string FormatNumber(long number)
+        {
+            string formattedNumber;
 
+            if (number < 1000)
+            {
+                formattedNumber = number.ToString();
+                return formattedNumber;
+            }
+            else if (number >= 1000 && number < 1000000)
+            {
+                formattedNumber = (number / 1000f).ToString("F1") + "K";
+                return formattedNumber;
+            }
+            else if (number >= 1000000 && number < 1000000000)
+            {
+                formattedNumber = (number / 1000000f).ToString("F2") + "M";
+                return formattedNumber;
+            }
+            else if (number >= 1000000000 && number < 1000000000000)
+            {
+                formattedNumber = (number / 1000000000f).ToString("F2") + "B";
+                return formattedNumber;
+            }
+            else if (number >= 1000000000000 && number <= 1000000000000000)
+            {
+                formattedNumber = (number / 1000000000000f).ToString("F2") + "T";
+                return formattedNumber;
+            }
+            else
+            {
+                formattedNumber = (number / 1000000000000f).ToString("F3") + "Q";
+                return formattedNumber;
+            }
+        }
         private IEnumerator End()
         {
+            StartCoroutine(CustomLevelDataManager.Instance.LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "bgImage.png"), img));
+            // Play the animation if available
+            if (anim != null)
+            {
+                anim.Play("finish");
+            }
+
             PlayerMovement objectOfType = FindObjectOfType<PlayerMovement>();
             long destruction = objectOfType.counter.score;
             float actualdest = (float)player0.counter.destructionPercentage;
-            Account.Instance.GainXP(destruction); 
-            score.text = $"{player0.SPInt:N0} sp\nLevel XP: {Account.Instance.totalXP:N0} <color=lime>(+{player0.counter.score})</color>";
-            acc.text = $"{player0.counter.accCount / player0.Total * 100}%";
-            total.text = $"{player0.counter.score}";
-            combo.text = $"{player0.highestCombo}x";
-           if (scoreRank != null)
-            scoreRank.sprite = Resources.Load<Sprite>($"ranking/{player0.counter.GetTier(player0.counter.accCount / player0.Total * 100)}");
+            Account.Instance.GainXP(destruction);
+
+            score.text = $"Level: {Account.Instance.level}\n" +
+                $"XP: {FormatNumber(Account.Instance.totalXP)}\n" +
+                $"\n" +
+                $"SP: {player0.SPInt:N0}\n" +
+                $"Ranking: \n" +
+                $"Total SP: {Mathf.RoundToInt(Calculator.CalculateSP("scores.dat"))}\n" +
+                $"\n" +
+                $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "played by")} {Account.Instance.username}";
+            acc.text = $"Accuracy: {player0.counter.accCount / player0.Total * 100}%\n" +
+                $"Score: {player0.counter.score}\n" +
+                $"Combo: {player0.highestCombo}x"; //total and combo texts are free
+            total.text = $"Leaderboard: \n" +
+                $"Total level score: \n" +
+                $"Jams: \n" +
+                $"Level shines: \n";
+
+            if (scoreRank != null)
+            {
+                scoreRank.sprite = Resources.Load<Sprite>($"ranking/{player0.counter.GetTier(player0.counter.accCount / player0.Total * 100)}");
+            }
+
             player.transform.localScale = Vector3.zero;
             objectOfType.enabled = false;
 
-
             SaveLevelData(actualdest, destruction);
-
 
             AudioSource[] audios = FindObjectsOfType<AudioSource>();
             Debug.Log(audios);
             finishMenu.SetActive(true);
-            if (anim != null)
-            anim.Play();
-           
 
+            // Update score breakdown
             five.text = $"{player0.five}";
             three.text = $"{player0.three}";
             one.text = $"{player0.one}";
             miss.text = $"{player0.misses}";
-            main.text = $"{data.artist}\r\n{data.songName}\r\n\r\n<size=6>played by {Account.Instance.username} at {DateTime.Now:dd-MM-yyyy hh:mm.ss tt}</size>";
-            level.value = Account.Instance.currentXP / Account.Instance.xpRequiredPerLevel[Account.Instance.level];
-            lvl.text = $"lv{Account.Instance.level}";
 
-            AudioManager.Instance.source.PlayOneShot(Resources.Load<AudioClip>($"Audio/SFX/ranking/{player0.counter.GetTier(player0.counter.accCount / player0.Total * 100)} Rank"));
+            main.text = $"{data.artist}\r\n{data.songName}";
 
 
-            yield return null;
+            // Play the exponential progress animation with SFX
+            float targetAccuracy = player0.counter.accCount / player0.Total;
+            float progress = 0;
+            float duration = 2f;
+            float elapsedTime = 0f;
+
+            // Play the long SFX
+            AudioManager.Instance.source.PlayOneShot(Resources.Load<AudioClip>("Audio/SFX/progress"));
+
+            // Gradually update the progress slider value
+            while (progress < targetAccuracy)
+            {
+                elapsedTime += Time.deltaTime;
+                float t = elapsedTime / duration;
+                progress = Mathf.Pow(t, 2) * targetAccuracy; // Exponential interpolation
+                level.value = Mathf.Clamp(progress, 0, 1);
+
+                yield return null;
+            }
+
+
+
+            // Play rank SFX after progress completes
+            AudioManager.Instance.source.PlayOneShot(Resources.Load<AudioClip>($"Audio/SFX/ranking/{player0.counter.GetTier(targetAccuracy * 100)} Rank"));
         }
+
 
     }
 
-    
+
 }

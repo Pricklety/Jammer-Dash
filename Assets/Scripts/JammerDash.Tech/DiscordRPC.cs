@@ -5,6 +5,7 @@ using Discord;
 using JammerDash.Editor;
 using JammerDash.Menus;
 using JammerDash.Audio;
+using NUnit.Framework.Constraints;
 
 namespace JammerDash.Tech
 {
@@ -22,6 +23,7 @@ namespace JammerDash.Tech
             DateTimeOffset dateTimeOffset = new DateTimeOffset(currentDateTime);
             try
             {
+                SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
                 discord = new Discord.Discord(1127906222482391102, (ulong)Discord.CreateFlags.NoRequireDiscord);
                 presence = new Discord.Activity
                 {
@@ -35,13 +37,15 @@ namespace JammerDash.Tech
                     },
                     Timestamps = new Discord.ActivityTimestamps()
                     {
-                         
-                         Start = dateTimeOffset.ToUnixTimeSeconds()
+
+                        Start = dateTimeOffset.ToUnixTimeSeconds()
                     },
                     Instance = true
                 };
                 manager = discord.GetActivityManager();
                 manager.UpdateActivity(presence, null);
+
+
             }
             catch (Exception ex)
             {
@@ -50,8 +54,11 @@ namespace JammerDash.Tech
         }
         private void Update()
         {
-            discord.RunCallbacks();
-            UpdateDiscordPresence();
+            
+                discord.RunCallbacks();
+                UpdateDiscordPresence();
+            
+               
         }
         private void OnDisable()
         {
@@ -60,56 +67,64 @@ namespace JammerDash.Tech
         private void UpdateDiscordPresence()
         {
             string sceneName = SceneManager.GetActiveScene().name;
+            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+                if (!data.discordPlay)
+                {
+                    // Update presence based on the active scene
+                    if (sceneName == "LevelDefault")
+                    {
+                        presence.Details = $"▶ {CustomLevelDataManager.Instance.data.artist} - {CustomLevelDataManager.Instance.data.songName}";
+                        presence.State = $"by {CustomLevelDataManager.Instance.creator}";
+                    }
+                }
+                if (!data.discordEdit)
+                {
+                    if (sceneName == "SampleScene")
+                    {
+                        var editorManager = FindObjectOfType<EditorManager>();
+                        presence.Details = $"✎ {editorManager.songArtist.text} - {editorManager.customSongName.text}";
+                        presence.State = $"{editorManager.objectCount.text}";
+                    }
+                }
 
-            // Update presence based on the active scene
-            if (sceneName == "LevelDefault")
-            {
-                presence.Details = $"▶ {CustomLevelDataManager.Instance.data.artist} - {CustomLevelDataManager.Instance.data.songName}";
-                presence.State = $"by {CustomLevelDataManager.Instance.creator}";
+                if (sceneName == "MainMenu")
+                {
+                    var menu = FindAnyObjectByType<mainMenu>();
+
+                    if (menu.playPanel.activeSelf)
+                    {
+                        presence.State = $"▶ Choosing a level to play";
+                    }
+                    else if (menu.settingsPanel.activeSelf)
+                    {
+                        presence.State = $"⚙︎ Changing options";
+                    }
+                    else if (menu.levelInfo.activeSelf)
+                    {
+                        presence.State = $"✎ Choosing a level to edit";
+                    }
+                    else if (menu.afkTime < 25f)
+                    {
+                        presence.Type = ActivityType.Playing;
+                        presence.Details = "Main Menu";
+                        presence.State = $"ᶻ 𝗓 𐰁 Idle";
+                    }
+                    else if (menu.afkTime > 25f && !data.discordAFK)
+                    {
+                        presence.Type = ActivityType.Listening;
+                        presence.Details = "AFK";
+                        presence.State = $"♪ {AudioManager.Instance.source.clip.name}";
+                    }
+
+                }
+
+                // Update the Discord activity with the modified presence
+                manager.UpdateActivity(presence, (res) =>
+                {
+
+                });
             }
-            else if (sceneName == "SampleScene")
-            {
-                var editorManager = FindObjectOfType<EditorManager>();
-                presence.Details = $"✎ {editorManager.songArtist.text} - {editorManager.customSongName.text}";
-                presence.State = $"{editorManager.objectCount.text}";
-            }
-            else if (sceneName == "MainMenu")
-            {
-                var menu = FindAnyObjectByType<mainMenu>();
-
-                if (menu.playPanel.activeSelf)
-                {
-                    presence.State = $"▶ Choosing a level to play";
-                }
-                else if (menu.settingsPanel.activeSelf)
-                {
-                    presence.State = $"⚙︎ Changing options";
-                }
-                else if (menu.levelInfo.activeSelf)
-                {
-                    presence.State = $"✎ Choosing a level to edit";
-                }
-                else if (menu.afkTime < 25f)
-                {
-                    presence.Type = ActivityType.Playing;
-                    presence.Details = "Main Menu";
-                    presence.State = $"ᶻ 𝗓 𐰁 Idle";
-                }
-                else if (menu.afkTime > 25f)
-                {
-                    presence.Type = ActivityType.Listening; 
-                    presence.Details = "AFK";
-                    presence.State = $"♪ {AudioManager.Instance.source.clip.name}";
-                }
-
-            }
-
-            // Update the Discord activity with the modified presence
-            manager.UpdateActivity(presence, (res) =>
-            {
-                
-            });
         }
     }
-}
+
 

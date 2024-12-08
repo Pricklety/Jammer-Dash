@@ -32,13 +32,29 @@ namespace JammerDash
 
         IEnumerator LoadMusicAndMenu()
         {
+           
             AsyncOperation operation = SceneManager.LoadSceneAsync(1);
             operation.allowSceneActivation = false;
 
-            yield return new WaitForSecondsRealtime(17f);
-            sceneActivationAllowed = true;
+           
+            float elapsedTime = 0f;
+
+            while (elapsedTime < 17f)
+            {
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    operation.allowSceneActivation = true;
+                    yield break; 
+                }
+
+                elapsedTime += Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            // If Escape wasn't pressed during the wait, activate the scene after 17 seconds
             operation.allowSceneActivation = true;
         }
+
     }
 
 }

@@ -40,12 +40,12 @@ namespace JammerDash
         void Update()
         {
             SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-            if (Input.GetKey(KeyCode.B) && !Input.GetKeyUp(KeyCode.B))
+            if (Input.GetKey(KeyCode.M) && !Input.GetKeyUp(KeyCode.M))
             {
                 trailImage.GetComponentInChildren<ParticleSystem>().startLifetime = 5f;
                 trailImage.GetComponentInChildren<ParticleSystem>().maxParticles = 3000;
 
-                trailImage.GetComponentInChildren<ParticleSystem>().emissionRate = 250;
+                trailImage.GetComponentInChildren<ParticleSystem>().emissionRate = 2500;
             }
             else
             {

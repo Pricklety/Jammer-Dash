@@ -178,7 +178,7 @@ namespace JammerDash.Game.Player
         {
             if (Input.GetKey(KeybindingManager.hit1))
                 k++;
-            else if (Input.GetKey(KeybindingManager.hit2))
+            if (Input.GetKey(KeybindingManager.hit2))
                 l++;
             RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1f, cubeLayerMask);
 
@@ -669,9 +669,10 @@ namespace JammerDash.Game.Player
         {
             if (GetComponent<BoxCollider2D>().IsTouching(collision))
             {
-                if (collision.tag == "Saw" && !invincible)
+                if (collision.tag == "Saw" && !isDying)
                 {
-
+                    isDying = true;
+                    sfxS.PlayOneShot(hitSounds[7]);
                     health -= int.MaxValue;
                 }
             }
@@ -793,7 +794,7 @@ namespace JammerDash.Game.Player
                         {
                             Instantiate(goodTextPrefab, transform.position, Quaternion.identity);
                         }
-
+                        sfxS.PlayOneShot(hitSounds[1]);
                         Animation anim = combotext.GetComponent<Animation>();
 
                         anim.Stop("comboanim");
@@ -801,6 +802,7 @@ namespace JammerDash.Game.Player
                     }
                     else if (distance < middle && distance >= 1)
                     {
+                        sfxS.PlayOneShot(hitSounds[1]);
                         StartCoroutine(ChangeScore(0.30f));
                         if (AudioManager.Instance != null && AudioManager.Instance.hits)
                         {
@@ -809,6 +811,7 @@ namespace JammerDash.Game.Player
                     }
                     else if (distance >= middle)
                     {
+                        sfxS.PlayOneShot(hitSounds[1]);
                         health -= 35;
                         combo = 0;
                         StartCoroutine(ChangeScore(0.48f));
@@ -819,11 +822,7 @@ namespace JammerDash.Game.Player
                     }
 
                 }
-                if ((Input.GetKeyUp(KeybindingManager.hit1) || Input.GetKeyUp(KeybindingManager.hit2)) && !isDying && collision.transform.position.y == transform.position.y)
-                {
-                    counter.score -= Mathf.RoundToInt((maxScore * factor) / counter.cubes.Length);
-                    bufferActive = false;
-                }
+                
                 if ((Input.GetKey(KeybindingManager.hit1) || Input.GetKey(KeybindingManager.hit2)) && !isDying)
                 {
                     if (!isBufferRunning && bufferActive)
@@ -840,6 +839,7 @@ namespace JammerDash.Game.Player
                 {
                     bufferActive = false;
                 }
+                
             }
 
 

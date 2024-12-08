@@ -1,0 +1,474 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: lang Shared Data
+  m_EditorClassIdentifier: 
+  m_TableCollectionName: lang
+  m_TableCollectionNameGuidString: cf72037e39558674484c2c22edf2e151
+  m_Entries:
+  - m_Id: 42645680128
+    m_Key: play
+    m_Metadata:
+      m_Items: []
+  - m_Id: 714870976512
+    m_Key: multiplayer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2991782457344
+    m_Key: edit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3021977251840
+    m_Key: quit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3082442338304
+    m_Key: Move your mouse to enable menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6902991908864
+    m_Key: General settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7116955938816
+    m_Key: Change gameplay keybinds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7659258474496
+    m_Key: Cursor trail
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7936682323968
+    m_Key: Trail fade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16284794318848
+    m_Key: Mouse trail particle count
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16739842748416
+    m_Key: Confine mouse cursor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17375896367104
+    m_Key: Mouse wheel volume shortcut
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17977820934144
+    m_Key: Random song on startup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18405602193408
+    m_Key: Language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25210185150464
+    m_Key: Performance settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25549747613696
+    m_Key: Resolution
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25997023997952
+    m_Key: Max FPS (0-999)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26351287496704
+    m_Key: Show FPS Counter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26584625016832
+    m_Key: VSync
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28874199101440
+    m_Key: Audio settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29060447170560
+    m_Key: (LOUD!) Increase max volume by 20
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29990836072448
+    m_Key: Master volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30263662964736
+    m_Key: Lowpass effect value
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30665745723392
+    m_Key: Shuffle your music playlist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31021686943744
+    m_Key: Open playlist folder
+    m_Metadata:
+      m_Items: []
+  - m_Id: 32798117294080
+    m_Key: Gameplay settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33307360325632
+    m_Key: Background visibility
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33955585814528
+    m_Key: Hit notes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34381060206592
+    m_Key: Sound effects
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34707171536896
+    m_Key: Character Type
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35511366414336
+    m_Key: Hit note textures
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35901868699648
+    m_Key: Menu settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36120773619712
+    m_Key: Background Type
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37224538271744
+    m_Key: Background Change Time
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37605414629376
+    m_Key: Parallax
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37869047607296
+    m_Key: 'Snow
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38131267104768
+    m_Key: Upload Background
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40729747484672
+    m_Key: Fun settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40986791211008
+    m_Key: Bass
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41289854840832
+    m_Key: Bass gain
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41482788630528
+    m_Key: Maintenance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42188836794368
+    m_Key: Remove maps
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42379153338368
+    m_Key: Reset all of your data
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42804887777280
+    m_Key: Check for Updates
+    m_Metadata:
+      m_Items: []
+  - m_Id: 43039567474688
+    m_Key: Objects
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44204417970176
+    m_Key: Player HP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44553841242112
+    m_Key: Object size
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44862596542464
+    m_Key: Leaderboard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 45690346631168
+    m_Key: Your levels
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46491345448960
+    m_Key: New level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46977377202176
+    m_Key: Create new level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 47223498960896
+    m_Key: Select song
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246076816535552
+    m_Key: Options
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246175391068160
+    m_Key: Change the way your level works
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246360406011904
+    m_Key: Level settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246385106268160
+    m_Key: Level Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246414898409472
+    m_Key: Level Creator
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246431407190016
+    m_Key: Level Creator (Romanized)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246453452451840
+    m_Key: Calculate Song BPM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246468149293056
+    m_Key: Spawn BPM Markers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246745174683648
+    m_Key: Image
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247211304464384
+    m_Key: Ground
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247231307100160
+    m_Key: Background Preview
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247244460437504
+    m_Key: Difficulty Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247283312275456
+    m_Key: Cube size
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247300961906688
+    m_Key: Song settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247321564327936
+    m_Key: Song Artist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247342401630208
+    m_Key: Song Artist (Romanized)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247355554967552
+    m_Key: Song name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247369245175808
+    m_Key: Song name (Romanized)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247383707136000
+    m_Key: Song BPM (number)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247408503861248
+    m_Key: Marker offset (ms)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247442930708480
+    m_Key: Playback
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247458533519360
+    m_Key: Marker multiplier
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247473800785920
+    m_Key: Select
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247490611556352
+    m_Key: Cancel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247512019283968
+    m_Key: Show hidden files
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247524937740288
+    m_Key: Search...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500536736399360
+    m_Key: Blind mode
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500561184997376
+    m_Key: Hide playing status
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500577794441216
+    m_Key: Hide currently playing level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500606051467264
+    m_Key: Hide AFK Mode
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500635977826304
+    m_Key: Hide currently editing level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500697919307776
+    m_Key: mapper
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500710737100800
+    m_Key: 'mapped by '
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500722212716544
+    m_Key: Local ID
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500748318064640
+    m_Key: 'last saved on '
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500982360227840
+    m_Key: Credits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500992455917568
+    m_Key: Devs and Staff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501015948214272
+    m_Key: Featured Artists
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501050471530496
+    m_Key: Programs used to make Jammer Dash
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501076245528576
+    m_Key: Open the player logs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501106243190784
+    m_Key: Open the settings.json
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501130867949568
+    m_Key: This is an early release. This version may contain bugs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501183821037568
+    m_Key: Jams
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501209586647040
+    m_Key: Performance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501230793048064
+    m_Key: Accuracy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501241060704256
+    m_Key: Background Color
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501271393910784
+    m_Key: Change color
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501289848848384
+    m_Key: Insert HEX Code
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501322803494912
+    m_Key: to expand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573297709166592
+    m_Key: Health
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573474192896000
+    m_Key: Score
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573727289782272
+    m_Key: Combo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574255201660928
+    m_Key: Continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574294158356480
+    m_Key: Restart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574306774822912
+    m_Key: Back to Menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574527961444352
+    m_Key: Failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575739440017408
+    m_Key: There's always another time! Maybe it's after you restart?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575789129936896
+    m_Key: Level complete!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575999075823616
+    m_Key: played by
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 8662629349475483947
+  references:
+    version: 2
+    RefIds:
+    - rid: 8662629349475483947
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1732451057564

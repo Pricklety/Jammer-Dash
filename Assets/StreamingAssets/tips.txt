@@ -35,7 +35,7 @@ Play screen is laggy? Delete the levels you don't play. Your scores will still b
 <FUN>: Also try <color=cyan>Just Shapes & Beats</color>!
 <FUN>: Also try <color=cyan>Minecraft</color>!
 <FUN>: Also try <color=cyan>Cities: Skylines 2</color>!
-<FUN>: Also try <color=cyan>Fall'd</color>!
+<FUN>: Also try <color=cyan>Lost Stray</color>!
 <FUN>: You are not a <color=yellow>note</color>!
 <FUN>: Doctor Who?
 <FUN>: bro im dead
@@ -91,6 +91,7 @@ Play screen is laggy? Delete the levels you don't play. Your scores will still b
 <FUN>: Quality seal? Nah, it’s a "slightly acceptable" stamp.
 <FUN>: We don't talk about the s**t code in this game. It works, that's all that matters.
 <FUN>: meow~
+<FUN>: Me tása dó anánar an bita ínor.
 
 [Undertale references]
 <REF>: Get dunked on.
@@ -124,6 +125,7 @@ Play screen is laggy? Delete the levels you don't play. Your scores will still b
 <QUOTE>: "why florida? don't y'all got alligators and shit" -konro
 <QUOTE>: "im gladnkynkom died brook" -konro
 <QUOTE>: "if you hit that subscribe button down below i will PERSONALLY send you 1000 TONS of COCAINE!!" -konro
+<QUOTE>: "call me harry hong the way i use a left well :33" -konro
 <QUOTE>: "berets are the best and the cutest" -adasko
 <QUOTE>: "Why fail once when you can fail spectacularly?" -ChatGPT
 <QUOTE>: "山田リョウ大好き" -Pricklety, not noticing he's a f*****g simp. (Wait, that means I noticed now, I wrote this myself...)

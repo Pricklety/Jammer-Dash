@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 
@@ -31,6 +32,23 @@ namespace JammerDash
                 return new SettingsData();
             }
         }
+
+        public static string GetLanguageName()
+        {
+            // Detect system locale
+            string systemLocale = CultureInfo.CurrentCulture.Name;
+
+            if (systemLocale == "pl-PL")
+            {
+                systemLocale = "pl";
+            }
+
+            if (Enum.TryParse<Options.Language>(systemLocale, false, out _))
+                return systemLocale;
+
+            return "en-US";
+            
+        }
     }
 
     public class SettingsData
@@ -52,7 +70,6 @@ namespace JammerDash
         public int hitType = 0;
         public float cursorFade = 0.24f;
         public bool parallax = true;
-        public bool randomSFX = true;
         public bool confinedMouse = false;
         public int bgTime = 0;
         public bool wheelShortcut = true;
@@ -63,6 +80,10 @@ namespace JammerDash
         public bool bass = false;
         public float bassgain = 1.5f;
         public float dim = 1;
+        public bool discordPlay = false;
+        public bool discordAFK = false;
+        public bool discordEdit = false;
+        public string language = SettingsFileHandler.GetLanguageName();
         public string gameVersion = Application.version;
         public string saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
 

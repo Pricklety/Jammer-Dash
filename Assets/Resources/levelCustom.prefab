@@ -377,6 +377,7 @@ MonoBehaviour:
     sawPositions: []
     longCubePositions: []
     longCubeWidth: []
+    cubeType: 
     playerHP: 300
     boxSize: 1
     bpm: 0
@@ -437,7 +438,7 @@ MonoBehaviour:
   bonus: {fileID: 0}
   lb: {fileID: 0}
   sfx: {fileID: 0}
-  sfxclip: {fileID: 0}
+  sfxclip: {fileID: 8300000, guid: c5e1cda7f81981747aac71c7518c7134, type: 3}
 --- !u!114 &4478954875226480921
 MonoBehaviour:
   m_ObjectHideFlags: 0

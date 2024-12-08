@@ -33,7 +33,7 @@ namespace JammerDash
         public float boxSize = 1;
 
         // Song
-        public int bpm;
+        public float bpm;
         public string artist;
         public string romanizedArtist;
         public string songName;

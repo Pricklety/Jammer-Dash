@@ -85,7 +85,7 @@ namespace JammerDash.Editor
             {
                 Debug.Log("hit");
                 AudioClip hitSound = Resources.Load<AudioClip>("Audio/SFX/metronome");
-                GameObject.Find("sfx").GetComponent<AudioSource>().PlayOneShot(hitSound, 2);
+                GameObject.Find("sfx").GetComponent<AudioSource>().PlayOneShot(hitSound, 1);
 
             }
         }
@@ -103,7 +103,7 @@ namespace JammerDash.Editor
         private IEnumerator HandleTriggerEnter(Collider2D collision)
         {
             // Wait for 0.07 seconds
-            yield return new WaitForSecondsRealtime(0.07f);
+            yield return new WaitForSeconds(0.07f);
 
             // Logic after delay
             Debug.Log("hit");

@@ -1,4 +1,4 @@
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,7 +26,7 @@ namespace JammerDash.Audio
         public Animator toggleAnim;
         public Text functionName;
         public Text functionKeybind;
-
+        public Font font;
         bool isLogoSFX = false;
         int counter = 0;
         public AudioClip sfxShort;
@@ -127,17 +127,27 @@ namespace JammerDash.Audio
 
             return 0f;
         }
-       
+
+        Dictionary<Text, Font> originalFonts = new Dictionary<Text, Font>();
+
+
+
+
         public void Update()
         {
-            #region Keybind Checks (The keybindpanel)
+           
+            // Load settings and update fonts
+            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+
+           
+
+            #region Keybind Checks (The keybind panel)
             if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.Return))
             {
                 KeybindPanel.ToggleFunction("Toggle fullscreen", "Alt + Enter");
-
             }
 
-            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+
             if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeybindingManager.toggleUI))
             {
                 data.canvasOff = !data.canvasOff;
@@ -694,6 +704,10 @@ namespace JammerDash.Audio
                         options.musicSlider.maxValue = audioClip.length;
                         options.musicSlider.value = 0f;
                         options.musicText.text = "";
+                        options.DisplayMusicInfo(audioClip, source.time);
+                        options.newSong.Rebind();
+                        options.newSong.Play("newSong");
+
                         source.Play();
                         songLoaded = true;
                     }

@@ -18,11 +18,16 @@ using System.Threading.Tasks;
 using UnityEngine.Events;
 using Debug = UnityEngine.Debug;
 using TMPro;
+using UnityEngine.Localization.Settings;
+using UnityEngine.Localization.Tables;
 
 namespace JammerDash
 {
     public class Options : MonoBehaviour
     {
+        public Animator newSong;
+        public Text newName;
+        public Text newName2;
         public Button apply;
         public Dropdown resolutionDropdown;
         public GameObject keybind;
@@ -54,7 +59,6 @@ namespace JammerDash
         public Toggle parallax;
         public Image backgroundImage;
         public Dropdown gameplayDir;
-        public Toggle randomSFX;
         public Toggle confineMouse;
         public Toggle wheelShortcut;
         public Toggle snow;
@@ -65,11 +69,17 @@ namespace JammerDash
         private static readonly HttpClient client = new();
         public Text version;
         public Slider dim;
-
+        public Dropdown languageDropdown;
+        string language;
         bool artBG = false;
         bool customBG = false;
         bool seasonBG = false;
         bool vidBG = false;
+
+        public Toggle discordAFK;
+        public Toggle discordPlay;
+        public Toggle discordEdit;
+
         [Header("Next Update")]
         public GameObject nextChangelogs;
         public TMP_Text changelogs;
@@ -91,6 +101,7 @@ namespace JammerDash
             // Log statements for debugging
             UnityEngine.Debug.Log($"audio is {(audio != null ? "not null" : "null")}");
             UnityEngine.Debug.Log($"settingsData is {(settingsData != null ? "not null" : "null")}");
+            
 
             LoadSettings(); // Load settings at the start
             ApplySettings();
@@ -115,7 +126,99 @@ namespace JammerDash
             playlist.AddOptions(optionDataList);
             version.text = Application.version;
         }
-       
+
+        public enum Language
+        {
+            English, // English
+            日本語,  // Japanese
+            Русский,  // Russian
+            Español, // Spanish (Latin America)
+            Deutsch, // German
+            اردو, // Urdu
+            BahasaIndonesia, // Indonesian
+            portuguêsBrasil, // Brazilian Portuguese
+            Hrvatski, // Croatian
+            Српски,  // Serbian Cyrillic
+            Polski, // Polish
+            TiếngViệt,  // Vietnamese
+            Zénorik, // Jammer Dash's language
+            nya // uwu nya mrrp~
+        }
+
+        public void OnLanguageChanged(int index)
+        {
+            Dictionary<string, Language> dropdownToEnumMapping = new()
+            {
+                { "English", Language.English },
+                { "日本語", Language.日本語 },
+                { "Русский", Language.Русский },
+                { "Español (américa latina)", Language.Español },
+                { "Deutsch", Language.Deutsch },
+                { "اردو", Language.اردو },
+                { "bahasa indonesia", Language.BahasaIndonesia },
+                { "português (brasil)", Language.portuguêsBrasil },
+                { "Hrvatski", Language.Hrvatski },
+                { "Српски", Language.Српски },
+                { "Polski", Language.Polski },
+                { "Tiếng Việt", Language.TiếngViệt },
+                { "Zénorik", Language.Zénorik },
+                { "meow", Language.nya }
+            };
+
+            Dictionary<Language, (string Locale, string Language)> languageMapping = new()
+            {
+                { Language.English, ("en-US", "en-US") },
+                { Language.日本語, ("ja-JP", "ja-JP") },
+                { Language.Русский, ("ru-RU", "ru-RU") },
+                { Language.Español, ("es", "es") },
+                { Language.Deutsch, ("de-DE", "de-DE") },
+                { Language.اردو, ("ur-PK", "ur-PK") },
+                { Language.BahasaIndonesia, ("id-ID", "id-ID") },
+                { Language.portuguêsBrasil, ("pt-BR", "pt-BR") },
+                { Language.Hrvatski, ("hr-HR", "hr-HR") },
+                { Language.Српски, ("sr-Cyrl-RS", "sr-Cyrl-RS") },
+                { Language.Polski, ("pl", "pl") },
+                { Language.TiếngViệt, ("vi-VN", "vi-VN") },
+                { Language.Zénorik, ("ze-ZE", "ze-ZE") },
+                { Language.nya, ("nya-UWU", "nya-UWU") }
+        };
+
+            string selectedLanguageText = languageDropdown.options[index].text;
+
+            if (dropdownToEnumMapping.TryGetValue(selectedLanguageText, out Language selectedLanguage))
+            {
+                if (languageMapping.TryGetValue(selectedLanguage, out var data))
+                {
+                    SetLocale(data.Locale);
+                    language = data.Language;
+                }
+                else
+                {
+                    SetLocale("en-US");
+                    language = "en-US";
+                }
+            }
+            else
+            {
+                SetLocale("en-US");
+                language = "en-US";
+            }
+        }
+
+        private void SetLocale(string localeCode)
+        {
+            var locale = LocalizationSettings.AvailableLocales.GetLocale(localeCode);
+            if (locale != null)
+            {
+                LocalizationSettings.SelectedLocale = locale;
+                Debug.Log($"Language set to {locale.LocaleName} ({locale.Identifier.Code})");
+            }
+            else
+            {
+                Debug.LogWarning($"Locale with code {localeCode} not found!");
+            }
+        }
+
         public void ToggleKeybinds()
         {
             keybind.SetActive(!keybind.activeSelf);
@@ -232,7 +335,6 @@ namespace JammerDash
             hitType.value = settingsData.hitType;
             trailFade.value = settingsData.cursorFade;
             parallax.isOn = settingsData.parallax;
-            randomSFX.isOn = settingsData.randomSFX;
             confineMouse.isOn = settingsData.confinedMouse;
             wheelShortcut.isOn = settingsData.wheelShortcut;
             bgTime.value = settingsData.bgTime;
@@ -241,8 +343,49 @@ namespace JammerDash
             bass.isOn = settingsData.bass;
             bassGain.value = settingsData.bassgain;
             dim.value = settingsData.dim * 100;
+            discordPlay.isOn = settingsData.discordPlay;
+            discordEdit.isOn = settingsData.discordEdit;
+            discordAFK.isOn = settingsData.discordAFK;
+            SetDropdownValueFromSettings();
+            
         }
+        private readonly static string[] localeCodes =
+   {
+        "en-US", // English
+        "ja-JP", // Japanese
+        "ru-RU", // Russian
+        "es", // Spanish (Latin America)
+        "de-DE", // German
+        "ur-PK", // Urdu
+        "id-ID", // Indonesian
+        "pt-BR", // Portuguese (Brazil)
+        "hr-HR", // Croatian
+        "sr-Cyrl-RS", // Serbian
+        "pl",  // Polish
+        "vi-VN", // Vietnamese
+        "ze-ZE", // Zenorik
+        "nya-UWU" // meow
+    };
+        private void SetDropdownValueFromSettings()
+        {
+            string currentLanguage = settingsData.language;
 
+            for (int i = 0; i < localeCodes.Length; i++)
+            {
+                if (localeCodes[i] == currentLanguage)
+                {
+                    languageDropdown.value = i;
+                    languageDropdown.RefreshShownValue();
+                    Debug.Log($"Dropdown value set to match settingsData.language: {currentLanguage} (index {i})");
+                    return;
+                }
+            }
+
+            // Fallback if no matching language is found
+            Debug.LogWarning($"Language '{currentLanguage}' not found in locale codes, defaulting to English.");
+            languageDropdown.value = 0;
+            languageDropdown.RefreshShownValue();
+        }
         public void ApplyOptions()
         {
             // Apply the changes
@@ -267,7 +410,6 @@ namespace JammerDash
             settingsData.isShowingFPS = showFPS.isOn;
             settingsData.cursorFade = trailFade.value;
             settingsData.parallax = parallax.isOn;
-            settingsData.randomSFX = randomSFX.isOn;
             settingsData.confinedMouse = confineMouse.isOn;
             settingsData.wheelShortcut = wheelShortcut.isOn;
             settingsData.bgTime = bgTime.value;
@@ -276,6 +418,10 @@ namespace JammerDash
             settingsData.bass = bass.isOn;
             settingsData.bassgain = bassGain.value;
             settingsData.dim = dim.value / 100;
+            settingsData.language = language;
+            settingsData.discordAFK = discordAFK.isOn;
+            settingsData.discordPlay = discordPlay.isOn;
+            settingsData.discordEdit = discordEdit.isOn;
             ApplyMasterVolume(settingsData.volume);
             ApplyFPSCap(settingsData.selectedFPS);
             ApplyResolution();
@@ -284,6 +430,7 @@ namespace JammerDash
             Focus(settingsData.focusVol);
             Vsync(settingsData.vsync);
             Cursor(settingsData.cursorTrail);
+            SetLocale(settingsData.language);
         }
 
        
@@ -370,6 +517,7 @@ namespace JammerDash
             // Create a new SettingsData instance based on the current UI state
             SettingsData newSettingsData = new SettingsData
             {
+                language = language,
                 selectedFPS = int.TryParse(fpsInputField.text, out int fpsCap) ? Mathf.Clamp(fpsCap, 1, 9999) : 60,
                 vsync = vsync.isOn,
                 volume = masterVolumeSlider.value,
@@ -385,7 +533,6 @@ namespace JammerDash
                 hitType = hitType.value,
                 cursorFade = trailFade.value,
                 parallax = parallax.isOn,
-                randomSFX = randomSFX.isOn,
                 confinedMouse = confineMouse.isOn,
                 wheelShortcut = wheelShortcut.isOn,
                 bgTime = bgTime.value,
@@ -394,6 +541,9 @@ namespace JammerDash
                 bass = bass.isOn,
                 bassgain = bassGain.value,
                 dim = dim.value / 100,
+                discordAFK = discordAFK.isOn,
+                discordPlay = discordPlay.isOn,
+                discordEdit = discordEdit.isOn,
                 saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                 gameVersion = Application.version
             };
@@ -463,6 +613,9 @@ namespace JammerDash
 
                 // Display music information
                 DisplayMusicInfo(currentClip, currentTime);
+                newSong.Rebind();
+                newSong.Play("newSong");
+
             }
             else
             {
@@ -543,6 +696,18 @@ namespace JammerDash
                 musicText.text = formattedText;
                 musicSlider.value = (int)currentTime;
                 musicSlider.maxValue = length;
+                string[] n = clipName.Split(" - ");
+
+                if (n.Length >= 2) 
+                {
+                    newName.text = n[0];
+                    newName2.text = n[1];
+                }
+                else
+                {
+                    newName.text = "Unknown";
+                    newName2.text = clipName; 
+                }
             }
             else
             {
@@ -740,7 +905,7 @@ namespace JammerDash
             Account.Instance.totalXP = 0;
             Account.Instance.level = 0;
             Account.Instance.currentXP = 0;
-            Account.Instance.SavePlayerData();
+            Account.Instance.SavePlayerData(Account.Instance.user);
            FindObjectOfType<mainMenu>().LoadLevelFromLevels();
             confirmation.onClick.RemoveAllListeners();
 
@@ -778,8 +943,8 @@ namespace JammerDash
 
         public void FixedUpdate()
         {
-            trailFadeText.text = $"Trail fade ({trailFade.value:0.00}s)";
-            dim.GetComponentInChildren<Text>().text = $"Background visibility ({dim.value}%)";
+            trailFadeText.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Trail fade")} ({trailFade.value:0.00}s)";
+            dim.GetComponentInChildren<Text>().text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Background visibility")} ({dim.value}%)";
         }
     }
 }

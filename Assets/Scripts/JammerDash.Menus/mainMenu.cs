@@ -24,6 +24,8 @@ using Debug = UnityEngine.Debug;
 using JammerDash.Tech;
 using JammerDash.Menus.Main;
 using System.Xml.Serialization;
+using UnityEngine.Localization.Settings;
+using JammerDash.Difficulty;
 
 namespace JammerDash.Menus
 {
@@ -99,7 +101,7 @@ namespace JammerDash.Menus
         public GameObject videoImage;
         public VideoPlayer videoPlayer;
         public VideoClip[] videoClips;
-        private List<string> videoUrls;
+        private List<string> videoUrls = new List<string>();
         private int currentVideoIndex = 0;
 
        
@@ -117,10 +119,12 @@ namespace JammerDash.Menus
         public Text[] usernames;
         public Text spMain;
         public Text[] sps;
+        public Text bigStatsText;
 
         [Header("Parallax")]
         public Transform logo;
         public Transform background;
+        public Transform backgroundVideo;
         public float backgroundParallaxSpeed;
         public float maxMovementOffset;
         public float scaleMultiplier;
@@ -161,7 +165,9 @@ namespace JammerDash.Menus
                 FileBrowser.ShowLoadDialog(ImportLevel, null, FileBrowser.PickMode.Files, true, Path.Combine(Application.streamingAssetsPath, "levels"), null, "Import Level...", "Import");
             }
 
-            spMain.text = $"Jams: 0\t\tPerformance: {Mathf.RoundToInt(Difficulty.Calculator.CalculateSP("scores.dat"))}sp\t\tAccuracy: {Difficulty.Calculator.CalculateAccuracy("scores.dat"):0.00}%";
+            spMain.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Jams")}: 0" +
+                $"\t\t{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Performance")}: {Mathf.RoundToInt(Difficulty.Calculator.CalculateSP("scores.dat"))}sp" +
+                $"\t\t{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Accuracy")}: {Difficulty.Calculator.CalculateAccuracy("scores.dat"):0.00}%";
             foreach (Text sp in sps)
             {
                 sp.text = $"{Difficulty.Calculator.CalculateSP("scores.dat"):0}sp";
@@ -452,7 +458,7 @@ namespace JammerDash.Menus
             {
                 case 1:
                     sprite = Resources.LoadAll<Sprite>("backgrounds/default");
-                    if (videoPlayerObject != null)
+                    if (videoImage != null)
                     {
                         videoPlayerObject.SetActive(false);
                         videoImage.SetActive(false);
@@ -460,7 +466,7 @@ namespace JammerDash.Menus
                     if (DateTime.Now.Month == 12)
                     {
                         sprite = Resources.LoadAll<Sprite>("backgrounds/christmas");
-                        if (videoPlayerObject != null)
+                        if (videoImage != null)
                         {
                             videoPlayerObject.SetActive(false);
                             videoImage.SetActive(false);
@@ -469,7 +475,7 @@ namespace JammerDash.Menus
                     else if (DateTime.Now.Month == 2 && DateTime.Now.Day == 14)
                     {
                         sprite = Resources.LoadAll<Sprite>("backgrounds/valentine");
-                        if (videoPlayerObject != null)
+                        if (videoImage != null)
                         {
                             videoPlayerObject.SetActive(false);
                             videoImage.SetActive(false);
@@ -484,28 +490,24 @@ namespace JammerDash.Menus
                     _ = LoadCustomBackgroundAsync();
                     break;
                 case 4:
-                    string[] files = Directory.GetFiles(Application.persistentDataPath + "/backgrounds", "*.mp4");
-                    List<VideoClip> clips = new List<VideoClip>();
-
-                    foreach (string file in files)
-                    {
-                        // Check the size of each file before adding it to the list
-                        FileInfo fileInfo = new FileInfo(file);
-                        if (fileInfo.Length <= 5 * 1024 * 1024) // 5MB in bytes
+                    videoPlayerObject.SetActive(true);
+                    videoImage.SetActive(true);    
+                    string videoDirectory = Path.Combine(Application.persistentDataPath, "backgrounds");
+                        List<string> validVideoFiles = GetValidVideoFiles(videoDirectory, 250 * 1024 * 1024); // 250MB limit
+                        if (validVideoFiles.Count == 0)
                         {
-                            // Create a video clip from the file path
-                            LoadVideoClipFromFile(file);
+                            Debug.LogWarning("No valid video files found within size constraints.");
+                            break;
+                        }
 
-                        }
-                        else
+                        // Assign video clips or URLs to the video player
+                        foreach (string file in validVideoFiles)
                         {
-                            UnityEngine.Debug.LogError("Video file size exceeds the limit (5MB): " + file);
+                            videoUrls.Add(file);
+                            Debug.Log("Loading video: " + file);
+                            AddVideoToPlayer(file);
                         }
-                    }
-                    videoPlayer.loopPointReached += OnVideoLoopPointReached;
-                    // Assign the video clips array
-                    videoClips = clips.ToArray();
-                    break;
+                        break;
                 default:
                     sprite = Resources.LoadAll<Sprite>("backgrounds/basic");
                     if (videoPlayerObject != null)
@@ -626,59 +628,76 @@ namespace JammerDash.Menus
             this.sprite[0] = sprite;
             Resources.UnloadUnusedAssets();
         }
-            private void LoadVideoClipFromFile(string filePath)
+        private List<string> GetValidVideoFiles(string directory, long maxSizeBytes)
         {
-            string[] files = Directory.GetFiles(Application.persistentDataPath + "/backgrounds", "*.mp4");
-            List<string> urls = new List<string>();
+            List<string> validFiles = new List<string>();
 
-            foreach (string file in files)
+            if (Directory.Exists(directory))
             {
-                // Add file paths as URLs
-                urls.Add("file://" + file);
+                string[] files = Directory.GetFiles(directory, "*.mp4");
+                foreach (string file in files)
+                {
+                    FileInfo fileInfo = new FileInfo(file);
+                    if (fileInfo.Length <= maxSizeBytes)
+                    {
+                        validFiles.Add(file);
+                    }
+                    else
+                    {
+                        Debug.LogError($"Video file size exceeds the limit ({maxSizeBytes / (1024 * 1024)}MB): {file}");
+                    }
+                }
             }
-            videoUrls = urls;
-            // Assign the video URLs to the VideoPlayer
-            videoPlayer.clip = null;
-            videoPlayer.url = urls[Random.Range(0, urls.Count)];
-            videoPlayer.Prepare();
-
-            // Handle PrepareCompleted event to start playing the video
-            videoPlayer.prepareCompleted += OnVideoPrepareCompleted;
-
-        }
-
-        void OnVideoLoopPointReached(VideoPlayer vp)
-        {
-            // Video finished playing, play the next video
-            currentVideoIndex = (currentVideoIndex + 1) % videoUrls.Count;
-            if (currentVideoIndex == videoUrls.Count)
+            else
             {
-                currentVideoIndex = 0;
+                Debug.LogError("Directory does not exist: " + directory);
             }
-            PlayVideo(videoUrls[currentVideoIndex]);
+
+            return validFiles;
         }
-        void PlayVideo(string url)
+
+        private void AddVideoToPlayer(string filePath)
         {
-            videoPlayer.clip = null;
-            videoPlayer.url = url;
+            string fileUrl = "file://" + filePath;
+
+            if (videoPlayer != null)
+            {
+                videoPlayer.url = fileUrl; // This assumes a single video at a time.
+                videoPlayer.Prepare();
+                videoPlayer.prepareCompleted += OnVideoPrepareCompleted;
+            }
+            else
+            {
+                Debug.LogError("VideoPlayer is not assigned.");
+            }
+        }
+        private void PlayVideoAtIndex(int index)
+        {
+            if (videoUrls.Count == 0) return;
+
+            currentVideoIndex = index % videoUrls.Count;
+            videoPlayer.url = videoUrls[currentVideoIndex];
+            videoPlayer.isLooping = true;
+
+            if (!isPrepareEventAttached)
+            {
+                videoPlayer.prepareCompleted += OnVideoPrepareCompleted;
+                isPrepareEventAttached = true;
+            }
+
             videoPlayer.Prepare();
-            videoPlayer.prepareCompleted += OnVideoPrepareCompleted;
-            videoPlayer.loopPointReached += OnVideoLoopPointReached;
         }
-        void OnVideoPrepareCompleted(VideoPlayer vp)
+
+        private bool isPrepareEventAttached = false;
+
+        private void OnVideoPrepareCompleted(VideoPlayer vp)
         {
-            // Video preparation is complete, start playing the video
+            Debug.Log("Video prepared. Starting playback.");
             vp.Play();
         }
-        
-
-        public float elapsedTime;
-
-     
-
 
        
-
+        public float elapsedTime;
       
         public void CreatePanel()
         {
@@ -852,7 +871,7 @@ namespace JammerDash.Menus
             {
                 // Assuming YourPanelScript has methods to set text or image properties
                 level.SetLevelName($"{sceneData.sceneName}");
-                level.SetInfo($"♫ {sceneData.artist} - {sceneData.songName} // mapped by {sceneData.creator}");
+                level.SetInfo($"♫ {sceneData.artist} - {sceneData.songName} // {LocalizationSettings.StringDatabase.GetLocalizedString("lang", "mapped by")} {sceneData.creator}");
             }
             else
             {
@@ -1326,8 +1345,17 @@ namespace JammerDash.Menus
                 levelText.text = "Level: " + Account.Instance.level.ToString() + $" (XP: {FormatNumber(Account.Instance.totalXP)})";
 
             }
+            PlayerStats stats = Calculator.CalculateOtherPlayerInfo("scores.dat");
+            bigStatsText.text = $"Playtime: {Account.Instance.ConvertPlaytimeToReadableFormat()}\r\n" +
+                $"Play count: {stats.TotalPlays:N0}\r\n" +
+                $"SS+: {stats.RankCounts["SS+"]:N0}\r\n" +
+                $"SS: {stats.RankCounts["SS"]:N0}\r\n" +
+                $"S: {stats.RankCounts["S"]:N0}\r\n" +
+                $"A: {stats.RankCounts["A"]:N0}\r\n" +
+                $"Highest combo: {stats.HighestCombo:N0}x\r\n" +
+                $"Accuracy: {Calculator.CalculateAccuracy("scores.dat"):0.00}%";
 
-           
+
 
             if (quitPanel.activeSelf)
             {
@@ -1345,6 +1373,7 @@ namespace JammerDash.Menus
 
                 // Background parallax effect
                 background.localScale = new Vector3(scaleMultiplier, scaleMultiplier, 1);
+                backgroundVideo.localScale = background.localScale;
 
                 Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 Vector3 mouseDelta = new Vector3(-mouseWorldPos.x / 1.5f, -mouseWorldPos.y / 30, 0);
@@ -1352,21 +1381,7 @@ namespace JammerDash.Menus
                 float cameraMovement = Mathf.Clamp(mouseDelta.x, -maxMovementOffset, maxMovementOffset) * backgroundParallaxSpeed * Time.unscaledDeltaTime;
                 Vector3 backgroundOffset = new Vector3(cameraMovement, 0, 0);
                 background.position = backgroundOffset + new Vector3(mouseDelta.x / 100, mouseDelta.y, mouseDelta.z);
-
-                // Calculate the movement based on the change in mouse position
-                float layerMovement = 0;
-
-                // Calculate the adjustment based on mouseDelta
-                Vector3 layerMouseDelta = new Vector3(Mathf.Clamp(-mouseDelta.x / 1.07f, -25, 25), Mathf.Clamp(-mouseDelta.y / 1.07f, -25, 25), mouseDelta.z);
-
-                // Calculate the new position relative to the current position
-                float newPositionX = layerMouseDelta.x / 30;
-                float newPositionY = layerMouseDelta.y / 10;
-
-                // Set the new position
-                logo.position = new Vector3(newPositionX - 4.2f, newPositionY, mouseDelta.z);
-
-               
+                backgroundVideo.position = background.position;
             }
             else
             {
@@ -1499,7 +1514,7 @@ namespace JammerDash.Menus
                 LoadLevelFromLevels();
                 LoadLevelsFromFiles();
                 
-                Notifications.instance.Notify($"Level list reloaded. \n{levelInfoParent.childCount} levels total", null);
+                Notifications.instance.Notify($"Level list reloaded. \n{Directory.GetFiles(Path.Combine(Application.persistentDataPath, "levels"), "*.jdl").Count()} levels total", null);
             }
             if (Input.GetKeyDown(KeybindingManager.debug))
             {

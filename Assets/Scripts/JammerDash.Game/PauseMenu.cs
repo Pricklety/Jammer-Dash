@@ -10,6 +10,7 @@ using UnityEngine.UI;
 using JammerDash.Tech;
 using JammerDash.Game.Player;
 using JammerDash.Audio;
+using UnityEngine.Localization.Settings;
 
 namespace JammerDash.Game
 {
@@ -31,10 +32,9 @@ namespace JammerDash.Game
             music = AudioManager.Instance.source;
             SettingsData sd = SettingsFileHandler.LoadSettingsFromFile();
             dim.value = sd.dim;
-            GameObject animA = GameObject.Find("Main Camera");
            
-                string levelName = CustomLevelDataManager.Instance.levelName;
-                string creator = $"by {CustomLevelDataManager.Instance.creator}";
+                string levelName = CustomLevelDataManager.Instance.artist + " - " + CustomLevelDataManager.Instance.levelName;
+                string creator = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "mapped by")} {CustomLevelDataManager.Instance.creator}";
                 this.creator.text = creator;
                 song.text = levelName;
             
@@ -62,6 +62,7 @@ namespace JammerDash.Game
         // Update is called once per frame
         void Update()
         {
+
             if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>() != null)
                 music = AudioManager.Instance.source;
 

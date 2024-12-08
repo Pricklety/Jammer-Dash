@@ -1,0 +1,469 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: lang_hr-HR
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: hr-HR
+  m_SharedData: {fileID: 11400000, guid: cf72037e39558674484c2c22edf2e151, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 42645680128
+    m_Localized: igraj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 714870976512
+    m_Localized: multiplayer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2991782457344
+    m_Localized: uredi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3021977251840
+    m_Localized: "iza\u0111i"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3082442338304
+    m_Localized: "Pomakni mi\u0161 da aktivira\u0161 izbornik"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6902991908864
+    m_Localized: Generalne postavke
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7116955938816
+    m_Localized: Promijeni tipke
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7659258474496
+    m_Localized: "Trag mi\u0161a"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7936682323968
+    m_Localized: "Nestajanje traga mi\u0161a"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16284794318848
+    m_Localized: "Broj partikala traga mi\u0161a"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16739842748416
+    m_Localized: "Ograni\u010Di mi\u0161 na instancu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17375896367104
+    m_Localized: "Pre\u010Dac kota\u010Da mi\u0161a za promjenu glasno\u0107e"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17977820934144
+    m_Localized: "Nasumi\u010Dna pjesma na startu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18405602193408
+    m_Localized: Jezik
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25210185150464
+    m_Localized: Opcije performanse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25549747613696
+    m_Localized: Rezolucija
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25997023997952
+    m_Localized: Maks. FPS (0-999)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26351287496704
+    m_Localized: "Poka\u017Ei mjerilo FPS-a"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26584625016832
+    m_Localized: VSync
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28874199101440
+    m_Localized: Audio postavke
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29060447170560
+    m_Localized: "<color=red>(GLASNO!)</color> Pove\u0107aj maksimalnu glasno\u0107u
+      za 20"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29990836072448
+    m_Localized: "Glasno\u0107a igre"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30263662964736
+    m_Localized: "Ja\u010Dina u\u010Dinka lowpass"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30665745723392
+    m_Localized: "Promije\u0161aj plejlistu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31021686943744
+    m_Localized: Otvori plejlist mapu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 32798117294080
+    m_Localized: Postavke igranja
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33307360325632
+    m_Localized: Vidljivost pozadine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33955585814528
+    m_Localized: Note udara
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34381060206592
+    m_Localized: "Zvukovni efekti\r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34707171536896
+    m_Localized: Tip lika
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35511366414336
+    m_Localized: Tekstura udarne note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35901868699648
+    m_Localized: Postavke izbornika
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36120773619712
+    m_Localized: Tip pozadine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37224538271744
+    m_Localized: Vrijeme promjene pozadine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37605414629376
+    m_Localized: Parallax
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37869047607296
+    m_Localized: Snijeg
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38131267104768
+    m_Localized: Prilagodi pozadinu (slika ili video)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40729747484672
+    m_Localized: Zabavne postavke
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40986791211008
+    m_Localized: Bass
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41289854840832
+    m_Localized: "Ja\u010Dina basse"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41482788630528
+    m_Localized: "Odr\u017Eavanje"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42188836794368
+    m_Localized: "Izbri\u0161i sve levele"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42379153338368
+    m_Localized: Resetiraj sve vlastite podatke
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42804887777280
+    m_Localized: Provjeri za update-e
+    m_Metadata:
+      m_Items: []
+  - m_Id: 43039567474688
+    m_Localized: Objekti
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44204417970176
+    m_Localized: "Igra\u010Dev HP"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44553841242112
+    m_Localized: "Veli\u010Dina"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44862596542464
+    m_Localized: LJESTVICA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 45690346631168
+    m_Localized: Tvoji leveli
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46491345448960
+    m_Localized: Novi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46977377202176
+    m_Localized: Izradi novi level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 47223498960896
+    m_Localized: Izaberi pjesmu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246076816535552
+    m_Localized: Postavke
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246175391068160
+    m_Localized: "Promijeni na\u010Din kako tvoj level radi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246360406011904
+    m_Localized: Postavke levela
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246385106268160
+    m_Localized: Ime levela
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246414898409472
+    m_Localized: Kreator levela
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246431407190016
+    m_Localized: Kreator levela (Latinica)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246453452451840
+    m_Localized: "Izra\u010Dunaj BPM pjesme"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246468149293056
+    m_Localized: Stvori markere beat-a
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246745174683648
+    m_Localized: Pozadina
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247211304464384
+    m_Localized: Pod
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247231307100160
+    m_Localized: Izgled pozadine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247244460437504
+    m_Localized: "Postavke te\u017Eine"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247283312275456
+    m_Localized: "Veli\u010Dina kocke"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247300961906688
+    m_Localized: Postavke pjesme
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247321564327936
+    m_Localized: Kompozer pjesme
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247342401630208
+    m_Localized: Kompozer pjesme (Latinica)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247355554967552
+    m_Localized: Ime pjesme
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247369245175808
+    m_Localized: Ime pjesme (Latinica)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247383707136000
+    m_Localized: BPM pjesme (broj)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247408503861248
+    m_Localized: Ofset markera BPM-a (ms)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247442930708480
+    m_Localized: Reprodukcija
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247458533519360
+    m_Localized: "Mno\u017Eina markera"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247473800785920
+    m_Localized: Izaberi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247490611556352
+    m_Localized: Odustani
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247512019283968
+    m_Localized: "Poka\u017Ei skrivene fajlove"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247524937740288
+    m_Localized: "Pretra\u017Ei..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500536736399360
+    m_Localized: "Slijep na\u010Din igranja"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500561184997376
+    m_Localized: Skrivaj status igranja
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500577794441216
+    m_Localized: Skrivaj "trenutno igranje"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500606051467264
+    m_Localized: Skrivaj AFK mod
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500635977826304
+    m_Localized: "Skrivaj \"trenutno ure\u0111ivanje\""
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500697919307776
+    m_Localized: kreator
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500710737100800
+    m_Localized: kreirao
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500722212716544
+    m_Localized: Lokalni ID
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500748318064640
+    m_Localized: zadnje spremljeno
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500982360227840
+    m_Localized: Zahvale
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500992455917568
+    m_Localized: "Developeri i pomaga\u010Di"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501015948214272
+    m_Localized: "Istaknuti Izvo\u0111a\u010Di"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501050471530496
+    m_Localized: "Programi kori\u0161teni za programiranje Jammer Dash-a"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501076245528576
+    m_Localized: "Upali logove igra\u010Da"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501106243190784
+    m_Localized: Upali settings.json
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501130867949568
+    m_Localized: "Ovo je rani pristup igre. Ova verzija mo\u017Ee da sadr\u017Ei
+      bug-ove."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501183821037568
+    m_Localized: "D\u017Eemovi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501209586647040
+    m_Localized: Performansa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501230793048064
+    m_Localized: "To\u010Dnost"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501241060704256
+    m_Localized: Pozadinska boja
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501271393910784
+    m_Localized: Promijeni boju
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501289848848384
+    m_Localized: Unesi HEX kod
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501322803494912
+    m_Localized: "da pove\u0107a\u0161"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573297709166592
+    m_Localized: performansa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573474192896000
+    m_Localized: bodovi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573727289782272
+    m_Localized: kombo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574255201660928
+    m_Localized: Nastavi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574294158356480
+    m_Localized: Ponovno pokreni
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574306774822912
+    m_Localized: Povratak na izbornik
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574527961444352
+    m_Localized: Izgubio si
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575739440017408
+    m_Localized: "Uvijek ima druga \u0161ansa! Mo\u017Eda ako restartuje\u0161?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575789129936896
+    m_Localized: "Level zavr\u0161en!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575999075823616
+    m_Localized: igrao
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

@@ -1,0 +1,335 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: lang_pt-BR
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: pt-BR
+  m_SharedData: {fileID: 11400000, guid: cf72037e39558674484c2c22edf2e151, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 42645680128
+    m_Localized: jogar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 714870976512
+    m_Localized: multijogador
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2991782457344
+    m_Localized: editar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3021977251840
+    m_Localized: sair
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3082442338304
+    m_Localized: Mova seu cursor para habilitar o menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6902991908864
+    m_Localized: "Configura\xE7\xF5es gerais"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7116955938816
+    m_Localized: Mudar teclas de atalho
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7659258474496
+    m_Localized: Rastro do cursor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7936682323968
+    m_Localized: Fade do rastro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16284794318848
+    m_Localized: "Quantidade de part\xEDculas do rastro"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16739842748416
+    m_Localized: Confinar o cursor do mouse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17375896367104
+    m_Localized: Scroll do mouse para volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17977820934144
+    m_Localized: "M\xFAsica aleat\xF3ria na inicializa\xE7\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18405602193408
+    m_Localized: Idioma
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25210185150464
+    m_Localized: "Configura\xE7\xF5es de performance"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25549747613696
+    m_Localized: "Resolu\xE7\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25997023997952
+    m_Localized: "FPS M\xE1ximo (0-999)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26351287496704
+    m_Localized: Exibir contador de FPS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26584625016832
+    m_Localized: VSync
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28874199101440
+    m_Localized: "Configura\xE7\xF5es de \xE1udio"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29060447170560
+    m_Localized: "<color=red>(ALTO!)</color> Aumentar o volume m\xE1ximo em 20"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29990836072448
+    m_Localized: Volume geral
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30263662964736
+    m_Localized: Efeito de passo baixo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30665745723392
+    m_Localized: Re-embaralhar playlist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31021686943744
+    m_Localized: Abrir pasta de playlist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 32798117294080
+    m_Localized: "Configura\xE7\xF5es de gameplay"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33307360325632
+    m_Localized: Visibilidade do background
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33955585814528
+    m_Localized: Hit notes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34381060206592
+    m_Localized: Efeitos sonoros
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34707171536896
+    m_Localized: Tipo de personagem
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35511366414336
+    m_Localized: Texturas de hitnotes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35901868699648
+    m_Localized: "Configura\xE7\xF5es de menu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36120773619712
+    m_Localized: Tipo de background
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37224538271744
+    m_Localized: "Frequ\xEAncia de troca de background"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37605414629376
+    m_Localized: Paralaxe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37869047607296
+    m_Localized: Neve
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38131267104768
+    m_Localized: "Carregar background (imagem ou v\xEDdeo)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40729747484672
+    m_Localized: "Configura\xE7\xF5es divertidas"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40986791211008
+    m_Localized: Intensificar graves
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41289854840832
+    m_Localized: "Mais graves\r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41482788630528
+    m_Localized: "Manuten\xE7\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42188836794368
+    m_Localized: Remover todos os mapas customizados
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42379153338368
+    m_Localized: Resetar todos os dados de jogador
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42804887777280
+    m_Localized: Procurar por updates
+    m_Metadata:
+      m_Items: []
+  - m_Id: 43039567474688
+    m_Localized: Objetos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44204417970176
+    m_Localized: PV de jogador
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44553841242112
+    m_Localized: Tamanho
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44862596542464
+    m_Localized: "CLASSIFICA\xC7\xD5ES"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 45690346631168
+    m_Localized: "Seus n\xEDveis"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46491345448960
+    m_Localized: Novo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 47223498960896
+    m_Localized: "Selecione uma m\xFAsica"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46977377202176
+    m_Localized: "Criar novo n\xEDvel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246076816535552
+    m_Localized: "Op\xE7\xF5es"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246175391068160
+    m_Localized: "Mudar o jeito que seu n\xEDvel funciona"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246360406011904
+    m_Localized: "Configura\xE7\xF5es do n\xEDvel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246385106268160
+    m_Localized: "Nome do n\xEDvel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246414898409472
+    m_Localized: "Criador do n\xEDvel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246431407190016
+    m_Localized: "Criador do n\xEDvel (Romanizado)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246453452451840
+    m_Localized: "Calcular BPM da m\xFAsica"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246468149293056
+    m_Localized: Gerar marcadores de BPM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246745174683648
+    m_Localized: Imagem
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247211304464384
+    m_Localized: "Ch\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247231307100160
+    m_Localized: Preview de background
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247244460437504
+    m_Localized: "Configura\xE7\xF5es de dificuldade"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247283312275456
+    m_Localized: Tamanho das caixas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247300961906688
+    m_Localized: "Configura\xE7\xF5es da m\xFAsica"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247321564327936
+    m_Localized: "Artista da m\xFAsica"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247342401630208
+    m_Localized: "Artista da m\xFAsica (Romanizado)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247355554967552
+    m_Localized: "T\xEDtulo da m\xFAsica"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247369245175808
+    m_Localized: "T\xEDtulo da m\xFAsica (Romanizado)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247383707136000
+    m_Localized: "BPM da m\xFAsica (n\xFAmero)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247408503861248
+    m_Localized: Marcador de offset (ms)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247442930708480
+    m_Localized: Reproduzir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247458533519360
+    m_Localized: Multiplicador de marcadores
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247473800785920
+    m_Localized: Selecionar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247490611556352
+    m_Localized: Cancelar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247512019283968
+    m_Localized: Mostrar arquivos ocultos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247524937740288
+    m_Localized: Pesquisar...
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

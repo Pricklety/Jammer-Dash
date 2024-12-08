@@ -43,7 +43,8 @@ namespace JammerDash.Tech
         void DisplayAccountInfo()
         {
             gui.text += "Username: " + Account.Instance.username +
-                        "\nExperience: " + Account.Instance.totalXP;
+                        "\nExperience: " + Account.Instance.totalXP +
+                        "\nLogged in: " + Account.Instance.LoadData();
         }
         void DisplaySystemInfo()
         {

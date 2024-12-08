@@ -25,6 +25,7 @@ namespace JammerDash.Game
         public TextMeshProUGUI infotext;
 
         public Transform ground;
+        public RawImage image;
 
         private void Start()
         {
@@ -43,6 +44,8 @@ namespace JammerDash.Game
 
         IEnumerator LateStart()
         {
+            StartCoroutine(CustomLevelDataManager.Instance.LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "bgImage.png"), image));
+
             if (player0 != null && player1 != null)
             {
                 SettingsData data = SettingsFileHandler.LoadSettingsFromFile();

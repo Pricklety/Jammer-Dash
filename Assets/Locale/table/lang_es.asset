@@ -1,0 +1,336 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: lang_es
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: es
+  m_SharedData: {fileID: 11400000, guid: cf72037e39558674484c2c22edf2e151, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 2246076816535552
+    m_Localized: Opciones
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246175391068160
+    m_Localized: "Cambia c\xF3mo tu nivel funciona"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246360406011904
+    m_Localized: "Configuraci\xF3n - Nivel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246385106268160
+    m_Localized: Nombre del nivel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246414898409472
+    m_Localized: Creador del nivel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246431407190016
+    m_Localized: Creador del nivel (Romanizado)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246453452451840
+    m_Localized: "Calcular el BPM de la Canci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246468149293056
+    m_Localized: Crear Marcadores de BPM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246745174683648
+    m_Localized: Imagen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247211304464384
+    m_Localized: Suelo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247231307100160
+    m_Localized: Vista previa del fondo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247244460437504
+    m_Localized: "Configuraci\xF3n - Dificultad"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247283312275456
+    m_Localized: "Tama\xF1o del cubo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247300961906688
+    m_Localized: "Configuraci\xF3n - Canci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247321564327936
+    m_Localized: "Artista de la canci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247342401630208
+    m_Localized: "Artista de la canci\xF3n (Romanizado)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247355554967552
+    m_Localized: "Nombre de la canci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247369245175808
+    m_Localized: "Nombre de la canci\xF3n (Romanizado)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247383707136000
+    m_Localized: "BPM de la canci\xF3n (n\xFAmero)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247408503861248
+    m_Localized: "Desviaci\xF3n/Offset del marcador (ms)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247442930708480
+    m_Localized: Reproducir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247458533519360
+    m_Localized: Multiplicador del marcador
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247473800785920
+    m_Localized: Seleccionar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247490611556352
+    m_Localized: Cancelar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247512019283968
+    m_Localized: Mostrar archivos ocultos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247524937740288
+    m_Localized: Buscar...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42645680128
+    m_Localized: jugar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 714870976512
+    m_Localized: multijugador
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2991782457344
+    m_Localized: editar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3021977251840
+    m_Localized: salir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3082442338304
+    m_Localized: "Mueve tu mouse para activar el men\xFA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6902991908864
+    m_Localized: "Configuraci\xF3n - General"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7116955938816
+    m_Localized: "Cambiar las teclas r\xE1pidas del gameplay"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7659258474496
+    m_Localized: Rastro del cursor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7936682323968
+    m_Localized: Desvanecimiento del rastro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16284794318848
+    m_Localized: "Cantidad de part\xEDculas del rastro"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16739842748416
+    m_Localized: Confinar el cursor del mouse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17375896367104
+    m_Localized: "Atajo de vol\xFAmen con la rueda del mouse"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17977820934144
+    m_Localized: "Canci\xF3n aleatoria al comienzo del juego"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18405602193408
+    m_Localized: Idioma
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25210185150464
+    m_Localized: "Configuraci\xF3n - Rendimiento"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25549747613696
+    m_Localized: "Resoluci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25997023997952
+    m_Localized: "FPS m\xE1ximos (0-999)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26351287496704
+    m_Localized: Mostrar el contador de FPS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26584625016832
+    m_Localized: VSync
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28874199101440
+    m_Localized: "Configuraci\xF3n - Audio"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29060447170560
+    m_Localized: "<color=red>(\xA1RUIDOSO Y FUERTE!)</color> Aumentar el vol\xFAmen
+      m\xE1ximo por 20"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29990836072448
+    m_Localized: "Vol\xFAmen General"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30263662964736
+    m_Localized: Efecto del filtro de frecuencias
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30665745723392
+    m_Localized: Re-ordenar la playlist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31021686943744
+    m_Localized: Abrir la carpeta de la playlist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 32798117294080
+    m_Localized: "Configuraci\xF3n - Gameplay"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33307360325632
+    m_Localized: Visibilidad del fondo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33955585814528
+    m_Localized: Notas tocadas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34381060206592
+    m_Localized: Efectos de sonido
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34707171536896
+    m_Localized: Tipo de personaje
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35511366414336
+    m_Localized: Texturas de nota tocada
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35901868699648
+    m_Localized: "Configuraci\xF3n - Men\xFA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36120773619712
+    m_Localized: Tipo de Fondo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37224538271744
+    m_Localized: "Cu\xE1ndo se cambia el Fondo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37605414629376
+    m_Localized: Paralaje
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38131267104768
+    m_Localized: "Subir Fondo (imagen o video)\r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37869047607296
+    m_Localized: Nieve
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40729747484672
+    m_Localized: "Configuraci\xF3n - Diversi\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40986791211008
+    m_Localized: Amplificador del bajo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41289854840832
+    m_Localized: Ganancia del bajo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41482788630528
+    m_Localized: Mantenimiento
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42188836794368
+    m_Localized: Eliminar todos los mapas personalizados
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42379153338368
+    m_Localized: Reiniciar todos los datos del jugador
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42804887777280
+    m_Localized: Revisar para actualizaciones
+    m_Metadata:
+      m_Items: []
+  - m_Id: 43039567474688
+    m_Localized: Objetos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44204417970176
+    m_Localized: HP del jugador
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44553841242112
+    m_Localized: "Tama\xF1o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44862596542464
+    m_Localized: "TABLA DE CLASIFICACI\xD3N"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 45690346631168
+    m_Localized: Tus niveles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46491345448960
+    m_Localized: Nuevo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46977377202176
+    m_Localized: Crear nuevo nivel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 47223498960896
+    m_Localized: "Seleccionar una canci\xF3n"
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

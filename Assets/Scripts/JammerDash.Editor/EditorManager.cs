@@ -24,6 +24,8 @@ using UnityEngine.UI.Extensions.Tweens;
 using JammerDash.Audio;
 using System.Threading.Tasks;
 using JammerDash.Editor.Screens;
+using UnityEngine.Localization.Settings;
+using System.Diagnostics;
 
 namespace JammerDash.Editor
 {
@@ -37,7 +39,7 @@ namespace JammerDash.Editor
         public Ray ray;
         public RaycastHit hit;
         public int finishCount = 1;
-
+        public Text expandText;
         public AudioClip[] hitSounds;
         [Header("UI and Stuff")]
         public LoadingScreen loadingPanel;
@@ -81,7 +83,7 @@ namespace JammerDash.Editor
         public Text lengthText;
         public InputField romaji;
         public InputField romajiArtist;
-
+        
         public Slider hp;
         public Slider size;
 
@@ -125,7 +127,7 @@ namespace JammerDash.Editor
         public List<GameObject> saws; // List of saw game objects
         public List<GameObject> longCubes;
         public InputField bpm;
-        int ID;
+        public int ID;
 
         [Header("Length Calculator")]
         public string[] targetTags = { "Cube", "Saw" }; // Set the desired tags
@@ -137,6 +139,7 @@ namespace JammerDash.Editor
         private string selectedImagePath;
         public float delay;
         public float delayLimit = 0.25f;
+        public Animator autoSave;
 
         [Header("Long Cube")]
         public float minWidth = 1f;
@@ -166,7 +169,7 @@ namespace JammerDash.Editor
             Time.timeScale = playback.value;
             cubes.AddRange(GameObject.FindGameObjectsWithTag("Cubes"));
             saws.AddRange(GameObject.FindGameObjectsWithTag("Saw"));
-
+            StartCoroutine(AutoSave());
         }
 
         public void OnMultiplierChange()
@@ -185,7 +188,7 @@ namespace JammerDash.Editor
                 return;
             }
             parsedBPM *= (int)bpmMultiplier.value;
-            bpmMultiplier.GetComponentInChildren<Text>().text = "Marker Multiplier (" + bpmMultiplier.value + ")";
+            bpmMultiplier.GetComponentInChildren<Text>().text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Marker multiplier")} (" + bpmMultiplier.value + "x)";
 
             // Calculate the length of each line
             float lineLength = audio.clip.length * 7f;
@@ -478,6 +481,8 @@ namespace JammerDash.Editor
                 // Get the directory path based on the scene name
                 string directoryPath = GetLevelDataPath($"{sceneData.ID} - {sceneData.sceneName}");
                 UnityEngine.Debug.Log(directoryPath);
+
+                Notifications.instance.Notify($"{sceneData.sceneName} successfully exported with ID {sceneData.ID}.", null);
             }
             catch (Exception e)
             {
@@ -597,6 +602,7 @@ namespace JammerDash.Editor
         // Update is called once per frame
         void Update()
         {
+            expandText.text = $"{KeybindingManager.changeLongCubeSize} + {KeybindingManager.place} {LocalizationSettings.StringDatabase.GetLocalizedString("lang", "to expand")}";
             lengthText.text = FormatTime(lengthSlider.value / 7);
             if (Camera.main.transform.position.x > lengthSlider.value / 7)
             {
@@ -607,8 +613,8 @@ namespace JammerDash.Editor
             GameObject[] beats = GameObject.FindGameObjectsWithTag("Beat");
 
 
-            size.gameObject.GetComponentInChildren<Text>().text = $"Cube size: {size.value}x";
-            hp.gameObject.GetComponentInChildren<Text>().text = $"Player health: {hp.value}";
+            size.gameObject.GetComponentInChildren<Text>().text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Cube size")}: {size.value}x";
+            hp.gameObject.GetComponentInChildren<Text>().text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Player HP")}: {hp.value}";
 
             if (Input.GetKey(KeybindingManager.changeLongCubeSize) && Input.GetKeyDown(KeybindingManager.place) && selectedObject != null && selectedObject.gameObject.name.Contains("hitter02"))
             {
@@ -685,7 +691,7 @@ namespace JammerDash.Editor
                     Time.timeScale = playback.value;
                 }
             }
-            playbackText.text = $"Playback ({Time.timeScale:0.00}x)";
+            playbackText.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Playback")} ({Time.timeScale:0.00}x)";
             audio = AudioManager.Instance.source;
             audio.pitch = Time.timeScale;
             PlayerEditorMovement player = GameObject.FindObjectOfType<PlayerEditorMovement>();
@@ -716,7 +722,7 @@ namespace JammerDash.Editor
 
             int accurateCount = cubes.Count + saws.Count + longCubes.Count;
 
-            objectCount.text = "Objects: " + accurateCount.ToString() + "/100000";
+            objectCount.text = LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Objects") + ": " + accurateCount.ToString() + "/100000";
 
 
 
@@ -1106,10 +1112,28 @@ namespace JammerDash.Editor
         {
             grSelector.SetActive(false);
         }
-
-        public void MainMenu()
+        public void OpenSongFolder()
         {
-            SceneManager.LoadSceneAsync(1);
+            string path = @Path.Combine(Application.persistentDataPath, "scenes", $"{ID} - {customSongName.text}");
+            path = path.Replace("\\", "/");
+            string normalizedPath = Path.GetFullPath(path);
+            Process.Start("explorer.exe", normalizedPath);
+        }
+        public async void MainMenu()
+        {
+            if (!Input.GetKey(KeyCode.LeftShift))
+            {
+
+                await SaveSceneData().ContinueWith(task =>
+                {
+                    if (task.IsFaulted)
+                    {
+                        UnityEngine.Debug.LogError($"Error saving scene: {task.Exception?.Flatten().Message}");
+                    }
+                });
+
+            }
+            SceneManager.LoadScene(1);
             Time.timeScale = 1f;
         }
 
@@ -1202,6 +1226,17 @@ namespace JammerDash.Editor
             FileBrowser.SetDefaultFilter(".png");
             FileBrowser.ShowLoadDialog(OnFileSelected, null, FileBrowser.PickMode.Files);
         }
+        private IEnumerator AutoSave()
+        {
+            while (true)
+            {
+                // Trigger the save operation
+                yield return SaveSceneData();
+
+                // Wait for 3 minutes before the next save
+                yield return new WaitForSeconds(5 * 60);
+            }
+        }
 
         void OnFileSelected(string[] paths)
         {
@@ -1245,6 +1280,8 @@ namespace JammerDash.Editor
         }
         public void SaveSceneButton()
         {
+
+            loadingPanel.ShowLoadingScreen(); // Show loading screen
             // Call the async method without awaiting it; logs the exception if it fails
             _ = SaveSceneData().ContinueWith(task =>
             {
@@ -1254,6 +1291,8 @@ namespace JammerDash.Editor
                 }
             }, TaskContinuationOptions.OnlyOnFaulted);
         }
+
+        
 
         public void SaveLevel()
         {
@@ -1271,6 +1310,7 @@ namespace JammerDash.Editor
         {
             try
             {
+                autoSave.Play("autoSave");
                 // Create a new SceneData instance and populate it with current objects' positions
                 SceneData sceneData = await CreateSceneData(loadingPanel);
 
@@ -1283,9 +1323,7 @@ namespace JammerDash.Editor
                 // Write the JSON data to the file
                 File.WriteAllText(filePath, json);
 
-                Notifications.instance.Notify($"{sceneData.sceneName} successfully saved." +
-                $"\nDifficulty: {sceneData.calculatedDifficulty}sn" +
-                $"\nLength: {sceneData.levelLength} seconds", null);
+                Notifications.instance.Notify($"{sceneData.sceneName} successfully saved.", null);
             }
             catch (Exception e)
             {
@@ -1382,7 +1420,6 @@ namespace JammerDash.Editor
         private async Task<SceneData> CreateSceneData(LoadingScreen loadingScreen)
         {
 
-            loadingScreen.ShowLoadingScreen(); // Show loading screen
 
             loadingScreen.UpdateLoading("Retrieving cubes...", 0f);
             GameObject[] cubes = await GetCubesOnMainThread(loadingPanel);
@@ -1392,12 +1429,12 @@ namespace JammerDash.Editor
                 loadingScreen.HideLoadingScreen(); // Hide loading screen
                 return null;
             }
-
+            await Task.Delay(500);
             // Update loading screen with the count of cubes retrieved
             int cubeCount = cubes.Length;
             loadingScreen.UpdateLoading($"Gathering cube positions... Retrieved {cubeCount} cubes", 0.1f);
             List<Vector2> cubePositions = cubes.Select(cube => (Vector2)cube.transform.position).ToList();
-
+            await Task.Delay(500);
             loadingScreen.UpdateLoading("Calculating farthest object...", 0.2f);
             float distance1 = 0f;
             GetFarthestObjectOnMainThread(cubes, (targetObject) =>
@@ -1409,27 +1446,25 @@ namespace JammerDash.Editor
                 Debug.Log($"Calculated distance: {distance}");
             });
 
-
-            loadingScreen.UpdateLoading("Calculating cubes per Y level...", 0.3f);
-            int[] cubesPerY = await Task.Run(() => Calculator.CalculateCubesPerY(cubePositions.ToArray(), updateLoadingText =>
-            {
-                loadingPanel.loadingText.text = updateLoadingText;
-            }));
-
-            loadingScreen.UpdateLoading("Calculating difficulty...", 0.4f);
-            float calculateDifficulty = Calculator.CalculateDifficulty(
-        this.cubes,
-        saws,
-        longCubes,
-        hp,
-        size,
-        cubesPerY,
-        cubePositions.ToArray(),
-        distance1 / 7, updateLoadingText =>
-        {
-            loadingPanel.loadingText.text = updateLoadingText;
-        });
-
+            await Task.Delay(500);
+            float calculateDifficulty = await Calculator.CalculateDifficultyAsync(
+         this.cubes,
+         saws,
+         longCubes,
+         hp,
+         size,
+         cubePositions.ToArray(),
+         float.Parse(bpm.text),
+         updateLoadingText: (text) =>
+         {
+             // Ensure updateLoadingText is executed on the main thread
+             MainThreadDispatcher.Enqueue(() =>
+             {
+                 loadingPanel.UpdateLoading(text, 0.45f);
+             });
+         }
+     );
+            await Task.Delay(5000);
 
 
             // Load existing scene data if available, with fallback
@@ -1440,7 +1475,7 @@ namespace JammerDash.Editor
             {
                 sceneName = customSongName.text,
                 bpm = int.TryParse(bpmInput.text, out int bpmValue) ? bpmValue : 0,
-                calculatedDifficulty = calculateDifficulty % 150,
+                calculatedDifficulty = calculateDifficulty,
                 gameVersion = Application.version,
                 saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 songLength = audio.clip != null ? audio.clip.length : 0,
@@ -1457,14 +1492,14 @@ namespace JammerDash.Editor
                 ID = (data.ID == 0) ? Random.Range(int.MinValue, int.MaxValue) : data.ID,
                 defBGColor = Camera.main != null ? Camera.main.backgroundColor : Color.black
             };
-
+            await Task.Delay(500);
             loadingScreen.UpdateLoading("Saving background image if enabled...", 0.6f);
             // Save background image if enabled
             if (bgPreview != null && bgPreview.texture != null && bgImage != null && bgImage.isOn)
             {
                 SaveBackgroundImageTexture(Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneData.sceneName, "bgImage.png"));
             }
-
+            await Task.Delay(500);
             loadingScreen.UpdateLoading("Processing positions for cubes, saws, and long cubes...", 0.7f);
             sceneData.cubePositions = this.cubes?.Select(cube => cube.transform.position).ToList() ?? new List<Vector3>();
             sceneData.cubeType = this.cubes
@@ -1507,12 +1542,12 @@ namespace JammerDash.Editor
                 loadingScreen.HideLoadingScreen(); // Hide loading screen
                 return null;
             }
-
+            await Task.Delay(500);
             // Update loading screen with the count of cubes retrieved
             int cubeCount = cubes.Length;
             loadingScreen.UpdateLoading($"Gathering cube positions... Retrieved {cubeCount} cubes", 0.1f);
             List<Vector2> cubePositions = cubes.Select(cube => (Vector2)cube.transform.position).ToList();
-
+            await Task.Delay(500);
             loadingScreen.UpdateLoading("Calculating farthest object...", 0.2f);
             float distance1 = 0f;
             GetFarthestObjectOnMainThread(cubes, (targetObject) =>
@@ -1524,29 +1559,27 @@ namespace JammerDash.Editor
                 Debug.Log($"Calculated distance: {distance}");
             });
 
-
-            loadingScreen.UpdateLoading("Calculating cubes per Y level...", 0.3f);
-            int[] cubesPerY = await Task.Run(() => Calculator.CalculateCubesPerY(cubePositions.ToArray(), updateLoadingText =>
-            {
-                loadingPanel.loadingText.text = updateLoadingText;
-            }));
+            await Task.Delay(500);
 
             loadingScreen.UpdateLoading("Calculating difficulty...", 0.4f);
-            float calculateDifficulty = Calculator.CalculateDifficulty(
+            float calculateDifficulty = await Calculator.CalculateDifficultyAsync(
         this.cubes,
         saws,
         longCubes,
         hp,
         size,
-        cubesPerY,
         cubePositions.ToArray(),
-        distance1 / 7, updateLoadingText =>
+        float.Parse(bpm.text),
+        updateLoadingText: (text) =>
         {
-            loadingPanel.loadingText.text = updateLoadingText;
-        });
-
-
-
+            // Ensure updateLoadingText is executed on the main thread
+            MainThreadDispatcher.Enqueue(() =>
+            {
+                loadingPanel.UpdateLoading(text, 0.45f);
+            });
+        }
+    );
+            await Task.Delay(5000);
             // Load existing scene data if available, with fallback
             SceneData data = await LoadSceneDataFromFile() ?? new SceneData();
 
@@ -1568,7 +1601,7 @@ namespace JammerDash.Editor
                 romanizedArtist = romajiArtist != null ? romajiArtist.text : "Unknown",
                 offset = float.TryParse(offsetmarker?.text, out float offsetValue) ? offsetValue : 0,
                 ID = (data.ID == 0) ? Random.Range(int.MinValue, int.MaxValue) : data.ID
-            };
+            }; await Task.Delay(500);
             loadingScreen.UpdateLoading("Populating objects...", 0.6f);
 
             sceneData.cubePositions = this.cubes?.Select(cube => cube.transform.position).ToList() ?? new List<Vector3>();
@@ -1597,7 +1630,7 @@ namespace JammerDash.Editor
             // Set source and destination paths for the scene
             string sourceFolderPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneData.levelName);
             string destinationFolderPath = Path.Combine(Application.persistentDataPath, "levels", sceneData.ID + " - " + sceneData.levelName);
-
+            await Task.Delay(500);
             loadingScreen.UpdateLoading("Copying files...", 0.7f);
             try
             {
@@ -1609,7 +1642,7 @@ namespace JammerDash.Editor
                 loadingScreen.HideLoadingScreen(); // Hide loading screen
                 return null;
             }
-
+            await Task.Delay(500);
             loadingScreen.UpdateLoading("Creating ZIP file...", 0.8f);
             string zipFilePath = Path.Combine(Application.persistentDataPath, "levels", $"{sceneData.ID} - {sceneData.sceneName}.jdl");
 

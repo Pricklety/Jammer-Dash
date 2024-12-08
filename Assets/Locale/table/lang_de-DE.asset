@@ -1,0 +1,469 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: lang_de-DE
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: de-DE
+  m_SharedData: {fileID: 11400000, guid: cf72037e39558674484c2c22edf2e151, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 42645680128
+    m_Localized: Spielen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 714870976512
+    m_Localized: Mehrspieler
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2991782457344
+    m_Localized: Bearbeiten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3021977251840
+    m_Localized: Verlassen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3082442338304
+    m_Localized: "Bewege deine Maus um das Men\xFC aufzurufen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6902991908864
+    m_Localized: Allgemeine Einstellungen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7116955938816
+    m_Localized: "\xC4ndere Gameplay Tastenkombinationen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7659258474496
+    m_Localized: Mausspur
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7936682323968
+    m_Localized: "Mausspur l\xE4nge"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16284794318848
+    m_Localized: Mausspur - Partikelanzahl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16739842748416
+    m_Localized: "Mauszeiger einschr\xE4nken"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17375896367104
+    m_Localized: "Lautst\xE4rke mit dem Mausrad \xE4ndern"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17977820934144
+    m_Localized: "zuf\xE4lliges Lied beim Start"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18405602193408
+    m_Localized: Sprache
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25210185150464
+    m_Localized: Leistungs Einstellungen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25549747613696
+    m_Localized: "Aufl\xF6sung"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25997023997952
+    m_Localized: Maximale FPS (0-999)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26351287496704
+    m_Localized: "Zeige FPS Z\xE4hler"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26584625016832
+    m_Localized: VSync
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28874199101440
+    m_Localized: Audio Einstellungen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29060447170560
+    m_Localized: "<color=red>(LAUT!)</color> Erh\xF6he die maximale Lautst\xE4ke
+      um 20"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29990836072448
+    m_Localized: "Master Lautst\xE4rke"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30263662964736
+    m_Localized: Tiefpasseffektwert
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30665745723392
+    m_Localized: Shuffle Playlist erneut
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31021686943744
+    m_Localized: "\xD6ffne Playlist Ordner"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 32798117294080
+    m_Localized: Gameplay Einstellungen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33307360325632
+    m_Localized: Hintergrundsichtbarkeit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33955585814528
+    m_Localized: Treffer Noten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34381060206592
+    m_Localized: Soundeffekte
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34707171536896
+    m_Localized: Charakter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35511366414336
+    m_Localized: Treffer Noten Texturen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35901868699648
+    m_Localized: "Men\xFC Einstellungen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36120773619712
+    m_Localized: Hintergrund Typ
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37224538271744
+    m_Localized: "Hintergrund \xE4nderungs Zei"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37605414629376
+    m_Localized: Parallax
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37869047607296
+    m_Localized: Schnee
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38131267104768
+    m_Localized: Lade Hintergrund hoch (Bild oder Video)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40729747484672
+    m_Localized: Spass Einstellungen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40986791211008
+    m_Localized: "Bassverst\xE4rker"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41289854840832
+    m_Localized: "Bassverst\xE4rkung"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41482788630528
+    m_Localized: Wartung
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42188836794368
+    m_Localized: "L\xF6sche alle benutzerdefinerten Maps"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42379153338368
+    m_Localized: "L\xF6sche alle Spieler Daten"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42804887777280
+    m_Localized: "\xDCberpr\xFCfen nach Updates"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 43039567474688
+    m_Localized: Objekte
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44204417970176
+    m_Localized: Spieler LP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44553841242112
+    m_Localized: "Gr\xF6\xDFe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44862596542464
+    m_Localized: BESTENLISTE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 45690346631168
+    m_Localized: Deine Levels
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46491345448960
+    m_Localized: Neu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46977377202176
+    m_Localized: Erstelle ein neues Level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 47223498960896
+    m_Localized: "W\xE4hle ein Lied aus"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246076816535552
+    m_Localized: Einstellungen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246175391068160
+    m_Localized: "\xC4ndere wie dein Level funktioniert"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246360406011904
+    m_Localized: Stufeeinstellungen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246385106268160
+    m_Localized: Stufename
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246414898409472
+    m_Localized: Stufe Gestalter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246431407190016
+    m_Localized: Stufe Gestalter (romanisiert)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246453452451840
+    m_Localized: Berechne Lied BPM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246468149293056
+    m_Localized: "Zeige BPM Markierungen\r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246745174683648
+    m_Localized: Hintergrund
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247211304464384
+    m_Localized: Grund
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247231307100160
+    m_Localized: Hintergrund-Vorschau
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247244460437504
+    m_Localized: Schwierigkeits Einstellungen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247283312275456
+    m_Localized: "W\xFCrfel gr\xF6\xDFe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247300961906688
+    m_Localized: Lied Einstellungen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247321564327936
+    m_Localized: "Lied K\xFCnstler"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247342401630208
+    m_Localized: "Lied K\xFCnstler (romanisiert)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247355554967552
+    m_Localized: Lied Name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247369245175808
+    m_Localized: Lied Name (romanisiert)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247383707136000
+    m_Localized: Lied BPM (Nummer)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247408503861248
+    m_Localized: Markierungen Vorlauf (ms)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247442930708480
+    m_Localized: Wiedergabe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247458533519360
+    m_Localized: Markierungen Multiplikator
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247473800785920
+    m_Localized: "Ausw\xE4hlen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247490611556352
+    m_Localized: "Zur\xFCck"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247512019283968
+    m_Localized: Zeige versteckte Dateien
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247524937740288
+    m_Localized: Suche nach...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500536736399360
+    m_Localized: Blinden Modus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500561184997376
+    m_Localized: Verstecke spiel Status
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500577794441216
+    m_Localized: Verstecke derzeitig spielendes Level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500606051467264
+    m_Localized: Verstecke AFK Modus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500635977826304
+    m_Localized: Verstecke derzeit bearbeitendes Level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500697919307776
+    m_Localized: mapper
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500710737100800
+    m_Localized: gemapped von
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500722212716544
+    m_Localized: Lokale ID
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500748318064640
+    m_Localized: zuletzt gespeichert auf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500982360227840
+    m_Localized: Credits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500992455917568
+    m_Localized: Entwickler und Team
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501015948214272
+    m_Localized: Featured Artists
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501050471530496
+    m_Localized: Programme genutzt bei der Entwicklung von Jammer Dash
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501076245528576
+    m_Localized: "\xD6ffne die player logs"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501106243190784
+    m_Localized: "\xD6ffne die settings.json"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501130867949568
+    m_Localized: "Dies ist eine fr\xFChe Ver\xF6ffentlichung. Diese Version k\xF6nnte
+      bugs haben."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501209586647040
+    m_Localized: Performance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501183821037568
+    m_Localized: Jams
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501230793048064
+    m_Localized: Accuracy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501241060704256
+    m_Localized: Hintergrund Farbe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501271393910784
+    m_Localized: "\xC4ndere Farbe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501289848848384
+    m_Localized: "f\xFCge HEX Code ein"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501322803494912
+    m_Localized: zum Erweitern
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573297709166592
+    m_Localized: lebenspunkte
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573474192896000
+    m_Localized: punkte
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573727289782272
+    m_Localized: combo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574255201660928
+    m_Localized: Weiter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574294158356480
+    m_Localized: Neustart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574306774822912
+    m_Localized: "Zur\xFCck zum Menu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574527961444352
+    m_Localized: Fehlgeschlagen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575739440017408
+    m_Localized: " Es gibt immer ein n\xE4chstes Mal! Vielleicht nach diesem Neustart?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575789129936896
+    m_Localized: Level geschafft!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575999075823616
+    m_Localized: gespielt von
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []
