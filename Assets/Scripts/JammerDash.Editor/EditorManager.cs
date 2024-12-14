@@ -478,9 +478,6 @@ namespace JammerDash.Editor
                 // Create a new SceneData instance and populate it with current objects' positions
                 SceneData sceneData = await CreateLevelSceneData(loadingPanel);
 
-                // Get the directory path based on the scene name
-                string directoryPath = GetLevelDataPath($"{sceneData.ID} - {sceneData.sceneName}");
-                UnityEngine.Debug.Log(directoryPath);
 
                 Notifications.instance.Notify($"{sceneData.sceneName} successfully exported with ID {sceneData.ID}.", null);
             }
@@ -490,37 +487,6 @@ namespace JammerDash.Editor
                 Notifications.instance.Notify($"Couldn't save scene: {e.Message}.\nTry again later.", null);
             }
         }
-
-
-
-        private string GetLevelDataPath(string sceneName)
-        {
-
-            // Combine the application's persistent data path with "levels" folder and the sanitized scene name
-            string directoryPath = Path.Combine(Application.persistentDataPath, "levels", sceneName);
-
-            try
-            {
-                // Create the directory if it doesn't exist
-                Directory.CreateDirectory(directoryPath);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Failed to create directory: {ex.Message}");
-                return null; // or throw; handle accordingly
-            }
-
-            // Combine the directory path with the sanitized scene name and ".jdl" extension for the file
-            string jdlFilePath = Path.Combine(directoryPath, $"{sceneName}.jdl");
-
-
-            return directoryPath; // Return the directory path or jdlFilePath as needed
-        }
-
-
-
-
-
         public void InstantiateLines()
         {
             // Check if the audio clip is assigned
@@ -1644,6 +1610,10 @@ namespace JammerDash.Editor
             }
             await Task.Delay(500);
             loadingScreen.UpdateLoading("Creating ZIP file...", 0.8f);
+            string exportFolder = Path.Combine(Application.persistentDataPath, "exports");
+            if (!Directory.Exists(exportFolder))
+                Directory.CreateDirectory(exportFolder);
+            string zipExport = Path.Combine(Application.persistentDataPath, "exports", $"{sceneData.ID} - {sceneData.sceneName}.jdl");
             string zipFilePath = Path.Combine(Application.persistentDataPath, "levels", $"{sceneData.ID} - {sceneData.sceneName}.jdl");
 
 
@@ -1653,6 +1623,11 @@ namespace JammerDash.Editor
                 {
                     File.Delete(zipFilePath);
                 }
+                if (File.Exists(zipExport))
+                {
+                    File.Delete(zipExport);
+                }
+                ZipFile.CreateFromDirectory(destinationFolderPath, zipExport, System.IO.Compression.CompressionLevel.NoCompression, false, null);
                 ZipFile.CreateFromDirectory(destinationFolderPath, zipFilePath, System.IO.Compression.CompressionLevel.NoCompression, false, null);
                 // Delete the original copied folder
                 Directory.Delete(destinationFolderPath, true);

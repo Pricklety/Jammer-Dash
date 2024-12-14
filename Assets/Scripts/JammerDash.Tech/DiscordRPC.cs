@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_STANDALONE_WIN
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Discord;
@@ -9,6 +10,7 @@ using NUnit.Framework.Constraints;
 
 namespace JammerDash.Tech
 {
+
     public class DiscordRPC : MonoBehaviour
     {
         private Discord.Activity presence;
@@ -54,9 +56,12 @@ namespace JammerDash.Tech
         }
         private void Update()
         {
-            
+            if (discord != null)
+            {
                 discord.RunCallbacks();
                 UpdateDiscordPresence();
+            }
+               
             
                
         }
@@ -127,4 +132,4 @@ namespace JammerDash.Tech
         }
     }
 
-
+    #endif

@@ -37,7 +37,7 @@ namespace JammerDash
 
         public bool loggedIn;
 
-        private void Awake()
+        private void Awake()    
         {
             if (Instance == null)
             {
@@ -212,13 +212,6 @@ namespace JammerDash
                 var errors = jsonObject["errors"];
                 Notifications.instance.Notify($"An error happened.\n{errors}", null);
 
-                // Check if email or username are taken
-                if (errors != null && errors["email"] != null && errors["email"].ToString() == "Email Taken!" &&
-                    errors["username"] != null && errors["username"].ToString() == "Username Taken!")
-                {
-                    // Perform login check since the user already exists
-                    StartCoroutine(HandleLogin(bodyJsonObject.email, inputPassword)); // pass plain password
-                }
             }
             else
             {
@@ -231,30 +224,10 @@ namespace JammerDash
             }
         }
 
-        public IEnumerator HandleLogin(string email, string inputPassword)
-        {
-            // Assuming you have an endpoint or method to get user data by email
-            string loginUrl = "https://yourapi.com/getUser"; // Replace with your actual URL
-            UnityWebRequest request = UnityWebRequest.Get(loginUrl + "?email=" + email);
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
-            {
-                Debug.LogError("Error: " + request.error);
-                yield break;
-            }
-
-            JObject jsonObject = JObject.Parse(request.downloadHandler.text);
-            string hashedPasswordFromDb = jsonObject["password"].ToString(); // Assuming the password is hashed in the database
-
-            // add checking passwords soon
-        }
-
+       
         public IEnumerator Login(string url, PlayerData loginData, JToken token)
         {
-            // Perform the login with the received token or user data
-            // Save the login state, and continue with game logic
-            Debug.Log("User logged in successfully with token: " + token.ToString());
+            Debug.Log("User logged in successfully");
             loggedIn = true;
             yield return null;
         }

@@ -115,7 +115,14 @@ namespace JammerDash.Game
             }
 
             deadScore.text = "There's always another time! Maybe it's after you restart?";
-
+            SimpleSpectrum[] spectrums = FindObjectsByType<SimpleSpectrum>(FindObjectsSortMode.None);
+            foreach (SimpleSpectrum spectrum in spectrums)
+            {
+                if (spectrum.audioSource == null)
+                {
+                    SetSpectrum();
+                }
+            }
         }
 
         void SaveLevelData(float actualdest, float destruction)
@@ -168,6 +175,15 @@ namespace JammerDash.Game
                 string formattedDestruction = destruction.ToString("0.#################");
 
                 writer.WriteLine($"{levelID},{tierName}, {sp},{formattedActualDest},{formattedDestruction},{five},{three},{one},{miss},{combo},{username}");
+            }
+        }
+        public void SetSpectrum()
+        {
+            SimpleSpectrum[] spectrums = FindObjectsByType<SimpleSpectrum>(FindObjectsSortMode.None);
+
+            foreach (SimpleSpectrum spectrum in spectrums)
+            {
+                spectrum.audioSource = AudioManager.Instance.source;
             }
         }
 

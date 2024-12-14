@@ -458,7 +458,7 @@ namespace JammerDash.Difficulty
         // Calculate versatility based on hit types and missed hits
         private void CalculateVersatility()
         {
-            _versatility = _perfectHits * (MathF.Exp(_gameDifficulty * 0.3f) - 1) * 0.41f + _greatHits * (MathF.Exp(_gameDifficulty * 0.3f) - 1) * 0.1f + _goodHits * -0.54f + _missedHits * -1.45f;
+            _versatility = _perfectHits * (MathF.Exp(_gameDifficulty * 0.3f) - 1) * 0.41f + _greatHits * (MathF.Exp(_gameDifficulty * 0.3f) - 1) * -0.1f + _goodHits * (MathF.Exp(_gameDifficulty * 0.3f) - 1) * -0.54f + _missedHits * (MathF.Exp(_gameDifficulty * 0.3f) - 1) *  -4.45f;
         }
 
         // Exponential function for accuracy scaling

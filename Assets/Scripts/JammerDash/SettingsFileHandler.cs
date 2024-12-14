@@ -80,6 +80,7 @@ namespace JammerDash
         public bool bass = false;
         public float bassgain = 1.5f;
         public float dim = 1;
+        public bool shaders = false;
         public bool discordPlay = false;
         public bool discordAFK = false;
         public bool discordEdit = false;

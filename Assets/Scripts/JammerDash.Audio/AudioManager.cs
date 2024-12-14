@@ -17,6 +17,7 @@ using JammerDash.Menus;
 using UnityEditor;
 using UnityEditor.Experimental;
 using JammerDash.Audio;
+using UnityEngine.Rendering.PostProcessing;
 
 namespace JammerDash.Audio
 {
@@ -363,7 +364,6 @@ namespace JammerDash.Audio
 
         private void FixedUpdate()
         {
-
             if (Input.GetKey(KeyCode.Plus))
             {
                 masterS.value++;
@@ -375,23 +375,23 @@ namespace JammerDash.Audio
                 masterS.value--;
             }
 
+            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
             if (SceneManager.GetActiveScene().buildIndex == 1)
             {
-                SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
                 if (FindObjectOfType<mainMenu>().mainPanel.activeSelf)
                 {
                     bgtimer += Time.deltaTime;
                     if (bgtimer >= spriteChangeInterval && data.bgTime == 1)
                     {
                         bgtimer = 0f;
-                        StartCoroutine(ChangeSprite());
+                        StartCoroutine(ChangeSprite(null));
 
                     }
                     else if (bgtimer >= spriteChangeInterval && data.bgTime == 2)
                     {
                         spriteChangeInterval = 30f;
                         bgtimer = 0f;
-                        StartCoroutine(ChangeSprite());
+                        StartCoroutine(ChangeSprite(null));
                     }
 
                 }
@@ -401,6 +401,8 @@ namespace JammerDash.Audio
             {
                 bgtimer = 0f;
             }
+
+            Camera.main.GetComponent<PostProcessVolume>().isGlobal = data.shaders;
         }
         bool IsScrollingUI()
         {
@@ -596,7 +598,7 @@ namespace JammerDash.Audio
                 new WaitForSecondsRealtime(1f);
                 SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
                 if (data.bgTime == 0)
-                    StartCoroutine(ChangeSprite());
+                    StartCoroutine(ChangeSprite(null));
             }
         }
 
@@ -621,7 +623,7 @@ namespace JammerDash.Audio
                 new WaitForSecondsRealtime(1f);
                 SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
                 if (data.bgTime == 0)
-                    StartCoroutine(ChangeSprite());
+                    StartCoroutine(ChangeSprite(null));
 
                 PlayCurrentSong();
             }
@@ -629,12 +631,12 @@ namespace JammerDash.Audio
 
 
 
-        public IEnumerator ChangeSprite()
+        public IEnumerator ChangeSprite(string filePath)
         {
             mainMenu menu = options.GetComponent<mainMenu>();
 
             // Ensure there are sprites available
-            if (menu.sprite.Length > 0 && (menu.data.backgroundType >= 1 || menu.data.backgroundType <= 3))
+            if (menu.sprite.Length > 0 && (menu.data.backgroundType >= 1 || menu.data.backgroundType <= 3) && filePath == null)
             {
 
                 // Set the new sprite gradually over a specified duration
@@ -655,7 +657,11 @@ namespace JammerDash.Audio
                 startColor = imageComponent.color;
                 targetColor = Color.white;
                 imageComponent.color = Color.Lerp(startColor, targetColor, 1f);
-                menu.LoadRandomBackground();
+                menu.LoadRandomBackground(null);
+            }
+            else
+            {
+                _ = menu.LoadLevelBackgroundAsync(filePath);
             }
 
         }

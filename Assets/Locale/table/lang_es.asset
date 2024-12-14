@@ -331,6 +331,99 @@ MonoBehaviour:
     m_Localized: "Seleccionar una canci\xF3n"
     m_Metadata:
       m_Items: []
+  - m_Id: 2500536736399360
+    m_Localized: Modo Ciego
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500561184997376
+    m_Localized: Esconder el estado de jugando
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500577794441216
+    m_Localized: "Esconder el nivel que se est\xE1 jugando"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500606051467264
+    m_Localized: Esconder modo AFK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500635977826304
+    m_Localized: "Esconder el nivel que se est\xE1 editando\r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500697919307776
+    m_Localized: mapeador
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500710737100800
+    m_Localized: mapeado por
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500722212716544
+    m_Localized: ID local
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500748318064640
+    m_Localized: "\xFAltima vez guardado en"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500982360227840
+    m_Localized: "Cr\xE9ditos"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500992455917568
+    m_Localized: Desarrolladores y personal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501015948214272
+    m_Localized: Artistas destacados
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501050471530496
+    m_Localized: Programas usados para hacer Jammer Dash
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501076245528576
+    m_Localized: Abrir el registro del jugador
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501106243190784
+    m_Localized: Abrir el settings.json
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501130867949568
+    m_Localized: "Este es un lanzamiento anticipado. Esta versi\xF3n puede contener
+      bugs y fallos."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501183821037568
+    m_Localized: Jams
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501209586647040
+    m_Localized: Rendimiento
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501230793048064
+    m_Localized: "Precisi\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501241060704256
+    m_Localized: Color del Fondo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501271393910784
+    m_Localized: Cambiar Color
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501289848848384
+    m_Localized: "Insertar C\xF3digo HEX"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501322803494912
+    m_Localized: para expandir
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

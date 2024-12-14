@@ -76,6 +76,8 @@ namespace JammerDash
         bool seasonBG = false;
         bool vidBG = false;
 
+        public Toggle shaders;
+
         public Toggle discordAFK;
         public Toggle discordPlay;
         public Toggle discordEdit;
@@ -216,6 +218,8 @@ namespace JammerDash
             else
             {
                 Debug.LogWarning($"Locale with code {localeCode} not found!");
+                SetLocale("en-US");
+                language = "en-US";
             }
         }
 
@@ -313,7 +317,7 @@ namespace JammerDash
         public void PlaySelectedAudio(int index)
         {
             audio.Play(index);
-            StartCoroutine(audio.ChangeSprite());
+            StartCoroutine(audio.ChangeSprite(null));
         }
 
 
@@ -343,6 +347,7 @@ namespace JammerDash
             bass.isOn = settingsData.bass;
             bassGain.value = settingsData.bassgain;
             dim.value = settingsData.dim * 100;
+            shaders.isOn = settingsData.shaders;
             discordPlay.isOn = settingsData.discordPlay;
             discordEdit.isOn = settingsData.discordEdit;
             discordAFK.isOn = settingsData.discordAFK;
@@ -422,6 +427,7 @@ namespace JammerDash
             settingsData.discordAFK = discordAFK.isOn;
             settingsData.discordPlay = discordPlay.isOn;
             settingsData.discordEdit = discordEdit.isOn;
+            settingsData.shaders = shaders.isOn;
             ApplyMasterVolume(settingsData.volume);
             ApplyFPSCap(settingsData.selectedFPS);
             ApplyResolution();
@@ -541,6 +547,7 @@ namespace JammerDash
                 bass = bass.isOn,
                 bassgain = bassGain.value,
                 dim = dim.value / 100,
+                shaders = shaders.isOn,
                 discordAFK = discordAFK.isOn,
                 discordPlay = discordPlay.isOn,
                 discordEdit = discordEdit.isOn,

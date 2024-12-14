@@ -32,8 +32,6 @@ namespace JammerDash.Menus.Play
         public Text size;
         public Text bonus;  
         public leaderboard lb;
-        public AudioSource sfx;
-        public AudioClip sfxclip;
         void Start()
         {
             new WaitForEndOfFrame();
@@ -421,7 +419,6 @@ namespace JammerDash.Menus.Play
         // Handle playing the SFX or custom level audio
         private void PlayLevelAudioOrSFX()
         {
-            sfx.PlayOneShot(sfxclip);
             if (GetComponent<CustomLevelScript>() == null)
             {
                 FindFirstObjectByType<mainMenu>().OpenLevel(GetComponent<RankDisplay>().sceneIndex);
@@ -481,11 +478,13 @@ namespace JammerDash.Menus.Play
                     Texture2D texture = DownloadHandlerTexture.GetContent(www);
                     Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
                     UnityEngine.Debug.Log(url);
-                    bg.sprite = sprite;
                     levelImage.sprite = sprite;
+                    new WaitForEndOfFrame();
+                    StartCoroutine(AudioManager.Instance.ChangeSprite(url));
                 }
                 else
                 {
+                    StartCoroutine(AudioManager.Instance.ChangeSprite(null)); levelImage.sprite = null;
                     Debug.LogError(www.error);
                 }
             }

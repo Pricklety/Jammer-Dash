@@ -1,3 +1,4 @@
+using JammerDash.Audio;
 using JammerDash.Editor;
 using JammerDash.Editor.Basics;
 using JammerDash.Menus.Play;
@@ -52,11 +53,10 @@ namespace JammerDash.Tech
 
             levelName = sceneName;
             ID = id;
-            string filePath = Path.Combine(Application.persistentDataPath, "levels", $"{id} - {levelName}.jdl");
+            string filePath = Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{id} - {levelName}", $"{levelName}.json");
 
             if (File.Exists(filePath))
             {
-                filePath = Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{id} - {levelName}", $"{levelName}.json");
                 string json = File.ReadAllText(filePath);
                 Debug.LogWarning(filePath);
                 SceneData sceneData = SceneData.FromJson(json);
@@ -73,7 +73,8 @@ namespace JammerDash.Tech
             }
             else
             {
-                Debug.LogWarning("JDL file not found: " + filePath);
+                Notifications.instance.Notify("Error opening level. This level does not exist.", null);
+                Debug.LogWarning("Error opening level. This level does not exist: " + filePath);
             }
 
             return null;
@@ -132,6 +133,7 @@ namespace JammerDash.Tech
             using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))
             {
                 yield return www.SendWebRequest();
+
                 if (rawImage == null)
                 {
                     rawImage = FindInactiveObjectOfType<RawImage>();

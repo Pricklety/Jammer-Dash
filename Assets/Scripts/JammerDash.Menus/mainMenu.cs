@@ -22,10 +22,11 @@ using System.Threading.Tasks;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 using JammerDash.Tech;
-using JammerDash.Menus.Main;
+using JammerDash.Menus.Options;
 using System.Xml.Serialization;
 using UnityEngine.Localization.Settings;
 using JammerDash.Difficulty;
+using System.Text.RegularExpressions;
 
 namespace JammerDash.Menus
 {
@@ -109,7 +110,9 @@ namespace JammerDash.Menus
         public AudioMixer audioMixer;
         AudioSource source;
         private float lowpassTargetValue;
-        private float fadeDuration = 0.25f;
+        [Range(0.25f, 5f)]
+        public float fadeDuration = 0.25f;
+
         private float currentLerpTime = 0f;
         public bool focus = true;
 
@@ -154,15 +157,15 @@ namespace JammerDash.Menus
             LoadLevelFromLevels();
             StartCoroutine(SetCountry());
             SetSpectrum();
-            LoadRandomBackground();
-            string path = Path.Combine(Application.persistentDataPath, "levels");
-            if (Directory.GetFiles(path, "*.jdl").Length == 0)
+            LoadRandomBackground(null);
+            string path = Path.Combine(Application.persistentDataPath, "levels", "extracted");
+            if (Directory.GetDirectories(path, "*").Length == 0)
             {
                 FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserCanvas")).GetComponent<FileBrowser>();
                 FileBrowser.SetFilters(false, new FileBrowser.Filter("Jammer Dash Level", ".jdl"));
                 FileBrowser.SetDefaultFilter("Levels");
                 FileBrowser.SetDefaultFilter("Levels");
-                FileBrowser.ShowLoadDialog(ImportLevel, null, FileBrowser.PickMode.Files, true, Path.Combine(Application.streamingAssetsPath, "levels"), null, "Import Level...", "Import");
+                FileBrowser.ShowLoadDialog(ImportLevel, null, FileBrowser.PickMode.Files, true, Path.Combine(Application.streamingAssetsPath, "levels"), null, "Import Level...", $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Select")}");
             }
 
             spMain.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Jams")}: 0" +
@@ -229,100 +232,146 @@ namespace JammerDash.Menus
         }
         public void LoadLevelFromLevels()
         {
+            // Clear existing level UI elements
             foreach (Transform child in playlevelInfoParent)
             {
                 Destroy(child.gameObject);
             }
 
-            string defaultLevelsPath = Path.Combine(Application.streamingAssetsPath, "levels");
+            // Define the levels and extracted folder paths
             string levelsPath = Path.Combine(Application.persistentDataPath, "levels");
+            string extractedFolderPath = Path.Combine(levelsPath, "extracted");
 
+            // Ensure the levels and extracted folders exist
             if (!Directory.Exists(levelsPath))
             {
-                UnityEngine.Debug.LogError("The 'levels' folder does not exist in persistentDataPath.");
+                UnityEngine.Debug.LogError("The 'levels' folder does not exist.");
                 Directory.CreateDirectory(levelsPath);
-                return;
             }
 
-            string[] levelFiles = Directory.GetFiles(levelsPath, "*.jdl", SearchOption.AllDirectories);
-            string[] defaultLevelFiles = Directory.GetFiles(defaultLevelsPath, "*.jdl");
-
-            string[] allLevelFiles = new string[levelFiles.Length + defaultLevelFiles.Length];
-            levelFiles.CopyTo(allLevelFiles, 0);
-            defaultLevelFiles.CopyTo(allLevelFiles, levelFiles.Length);
-
-            HashSet<int> processedIDs = new HashSet<int>();
-
-            foreach (string filePath in allLevelFiles)
+            if (!Directory.Exists(extractedFolderPath))
             {
-                if (Path.GetFileName(filePath).Equals("LevelDefault.jdl"))
-                {
-                    continue; // Skip LevelDefault.jdl
-                }
+                Directory.CreateDirectory(extractedFolderPath);
+            }
 
-                // Create a temporary folder
+            // Process .jdl files
+            string[] jdlFiles = Directory.GetFiles(levelsPath, "*.jdl", SearchOption.TopDirectoryOnly);
+
+            foreach (string jdlFilePath in jdlFiles)
+            {
+                // Create a temporary folder for extracting .jdl contents
                 string tempFolder = Path.Combine(Application.temporaryCachePath, "tempExtractedJson");
                 Directory.CreateDirectory(tempFolder);
 
                 try
                 {
-                    // Extract JSON data from JDL file to the temporary folder
-                    string jsonFilePath = ExtractJSONFromJDL(filePath);
-
+                    // Extract JSON data and other files from JDL
+                    string jsonFilePath = ExtractJSONFromJDL(jdlFilePath);
                     if (jsonFilePath == null)
                     {
-                        UnityEngine.Debug.LogError("Failed to extract JSON from JDL: " + filePath);
+                        UnityEngine.Debug.LogError($"Failed to extract JSON from JDL: {jdlFilePath}");
                         continue;
                     }
 
-                    // Read JSON content from the extracted JSON file
+                    // Read the extracted JSON and deserialize it
                     string json = File.ReadAllText(jsonFilePath);
-
-                    // Deserialize JSON data into SceneData object
                     SceneData sceneData = SceneData.FromJson(json);
-
                     if (sceneData == null)
                     {
-                        UnityEngine.Debug.LogError("Failed to deserialize JSON from file: " + jsonFilePath);
+                        UnityEngine.Debug.LogError($"Failed to deserialize JSON from file: {jsonFilePath}");
                         continue;
                     }
 
-                    // Check if the sceneData.ID has already been processed
-                    if (processedIDs.Contains(sceneData.ID))
-                    {
-                        continue; // Skip duplicate levels
-                    }
-
-                    // Add the ID to the processed set
-                    processedIDs.Add(sceneData.ID);
-
-                    // Log the level name to verify if sceneData is successfully deserialized
-                    UnityEngine.Debug.LogWarning(sceneData.sceneName);
-
-                    // Create a directory with the level name
-                    string extractedPath = Path.Combine(levelsPath, "extracted", sceneData.ID + " - " + sceneData.sceneName);
+                    // Create a directory in "extracted" with the format "ID - Name"
+                    string extractedPath = Path.Combine(extractedFolderPath, $"{sceneData.ID} - {sceneData.sceneName}");
                     Directory.CreateDirectory(extractedPath);
 
-                    // Move the JSON file to the new directory
+                    // Move JSON file to the extracted directory
                     string jsonDestinationPath = Path.Combine(extractedPath, sceneData.sceneName + ".json");
                     if (File.Exists(jsonDestinationPath))
                     {
                         File.Delete(jsonDestinationPath);
                     }
                     File.Move(jsonFilePath, jsonDestinationPath);
-                    ExtractOtherFromJDL(filePath, extractedPath);
-                    GameObject levelInfoPanel = Instantiate(playPrefab, playlevelInfoParent);
-                    // Display level information on UI
-                    DisplayCustomLevelInfo(sceneData, levelInfoPanel.GetComponent<CustomLevelScript>());
-                    levelInfoPanel.GetComponent<CustomLevelScript>().SetSceneData(sceneData);
+
+                    // Extract other content from the JDL into the extracted folder
+                    ExtractOtherFromJDL(jdlFilePath, extractedPath);
                 }
                 finally
                 {
-                    // Clean up the temporary folder
+                    // Clean up the temporary folder and delete the processed JDL file
                     Directory.Delete(tempFolder, true);
+                    File.Delete(jdlFilePath);
+                }
+            }
+
+            // Regex to match "int - string" or "negative int - string" format
+            Regex folderNameRegex = new Regex(@"^-?\d+ - .+$");
+
+            // Get all folders in the extracted directory
+            string[] allFolders = Directory.GetDirectories(extractedFolderPath, "*", SearchOption.TopDirectoryOnly);
+
+            foreach (string folder in allFolders)
+            {
+                // Delete non-matching folders
+                if (!folderNameRegex.IsMatch(Path.GetFileName(folder)))
+                {
+                    Directory.Delete(folder, true);
+                }
+            }
+
+            // Instantiate UI elements for the extracted folders
+            HashSet<int> processedIDs = new HashSet<int>();
+
+            string[] extractedFolders = allFolders
+                .Where(dir => folderNameRegex.IsMatch(Path.GetFileName(dir)))
+                .ToArray();
+
+            foreach (string folderPath in extractedFolders)
+            {
+                try
+                {
+                    // Look for JSON files in the folder
+                    string[] jsonFiles = Directory.GetFiles(folderPath, "*.json", SearchOption.TopDirectoryOnly);
+                    if (jsonFiles.Length == 0)
+                    {
+                        UnityEngine.Debug.LogWarning($"No JSON files found in folder: {folderPath}");
+                        continue;
+                    }
+
+                    foreach (string jsonFilePath in jsonFiles)
+                    {
+                        string json = File.ReadAllText(jsonFilePath);
+
+                        // Deserialize JSON data into SceneData object
+                        SceneData sceneData = SceneData.FromJson(json);
+                        if (sceneData == null)
+                        {
+                            UnityEngine.Debug.LogError($"Failed to deserialize JSON from file: {jsonFilePath}");
+                            continue;
+                        }
+
+                        if (processedIDs.Contains(sceneData.ID))
+                        {
+                            continue; // Skip duplicate levels
+                        }
+
+                        processedIDs.Add(sceneData.ID);
+
+                        // Instantiate level info UI and display information
+                        GameObject levelInfoPanel = Instantiate(playPrefab, playlevelInfoParent);
+                        DisplayCustomLevelInfo(sceneData, levelInfoPanel.GetComponent<CustomLevelScript>());
+                        levelInfoPanel.GetComponent<CustomLevelScript>().SetSceneData(sceneData);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    UnityEngine.Debug.LogError($"Error processing folder {folderPath}: {ex.Message}");
                 }
             }
         }
+
+
         public void Import()
         {
             FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserCanvas")).GetComponent<FileBrowser>();
@@ -450,7 +499,7 @@ namespace JammerDash.Menus
         {
             Application.OpenURL(url);
         }
-        public void LoadRandomBackground()
+        public void LoadRandomBackground(string filePath)
         {
             UnityEngine.Debug.Log(data);
 
@@ -491,23 +540,23 @@ namespace JammerDash.Menus
                     break;
                 case 4:
                     videoPlayerObject.SetActive(true);
-                    videoImage.SetActive(true);    
+                    videoImage.SetActive(true);
                     string videoDirectory = Path.Combine(Application.persistentDataPath, "backgrounds");
-                        List<string> validVideoFiles = GetValidVideoFiles(videoDirectory, 250 * 1024 * 1024); // 250MB limit
-                        if (validVideoFiles.Count == 0)
-                        {
-                            Debug.LogWarning("No valid video files found within size constraints.");
-                            break;
-                        }
-
-                        // Assign video clips or URLs to the video player
-                        foreach (string file in validVideoFiles)
-                        {
-                            videoUrls.Add(file);
-                            Debug.Log("Loading video: " + file);
-                            AddVideoToPlayer(file);
-                        }
+                    List<string> validVideoFiles = GetValidVideoFiles(videoDirectory, 250 * 1024 * 1024); // 250MB limit
+                    if (validVideoFiles.Count == 0)
+                    {
+                        Debug.LogWarning("No valid video files found within size constraints.");
                         break;
+                    }
+
+                    // Assign video clips or URLs to the video player
+                    foreach (string file in validVideoFiles)
+                    {
+                        videoUrls.Add(file);
+                        Debug.Log("Loading video: " + file);
+                        AddVideoToPlayer(file);
+                    }
+                    break;
                 default:
                     sprite = Resources.LoadAll<Sprite>("backgrounds/basic");
                     if (videoPlayerObject != null)
@@ -517,16 +566,34 @@ namespace JammerDash.Menus
                     }
                     break;
             }
-           
-                bg.color = Color.white;
-            if (sprite.Length > 0)
+
+            bg.color = Color.white;
+            if (sprite.Length > 0 && filePath == null)
             {
                 int randomIndex = (sprite.Length == 1) ? 0 : Random.Range(0, sprite.Length);
                 bg.sprite = sprite[randomIndex];
             }
            
+           
 
 
+        }
+
+        public async Task LoadLevelBackgroundAsync(string filePath)
+        {
+            // Supported image file types in Unity
+            string[] supportedExtensions = new string[] { "*.png" };
+
+            // Gather all files with supported extensions
+            List<string> files = new List<string>();
+            foreach (var extension in supportedExtensions)
+            {
+                files.AddRange(Directory.GetFiles(filePath, extension, SearchOption.AllDirectories));
+            }
+
+            // Choose a random file path
+            string randomFilePath = files[0];
+            await LoadSpriteAsync(randomFilePath);
         }
         private async Task LoadCustomBackgroundAsync()
         {
@@ -866,10 +933,8 @@ namespace JammerDash.Menus
         void DisplayCustomLevelInfo(SceneData sceneData, CustomLevelScript level)
         {
 
-            // Check if LevelScript component is not null
             if (level != null)
             {
-                // Assuming YourPanelScript has methods to set text or image properties
                 level.SetLevelName($"{sceneData.sceneName}");
                 level.SetInfo($"♫ {sceneData.artist} - {sceneData.songName} // {LocalizationSettings.StringDatabase.GetLocalizedString("lang", "mapped by")} {sceneData.creator}");
             }
@@ -879,7 +944,6 @@ namespace JammerDash.Menus
                 UnityEngine.Debug.LogError("Failed to load level " + sceneData.ID);
             }
 
-            // Method to toggle menu panels
         }
 
         // Method to toggle menu panels
@@ -940,7 +1004,7 @@ namespace JammerDash.Menus
                 else if (!playPanel.activeSelf || !creditsPanel.activeSelf || !settingsPanel.activeSelf)
                 {
                     mainPanel.SetActive(true);
-                    LoadRandomBackground();
+                    LoadRandomBackground(null);
                     AudioManager.Instance.source.loop = false;
                 }
 
@@ -1113,11 +1177,10 @@ namespace JammerDash.Menus
         }
 
         // Coroutine for fading the Lowpass filter
-        private IEnumerator FadeLowpass()
+        private IEnumerator FadeLowpass(int value)
         {
-            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
 
-            lowpassTargetValue = data.lowpassValue;
+            lowpassTargetValue = value;
             float timer = 0f;
             float startValue = lowpassTargetValue;  // Initial value based on fade in or out
 
@@ -1170,8 +1233,7 @@ namespace JammerDash.Menus
             quittingAllowed = false;
             HideQuit();
             UnityEngine.Debug.Log("User canceled quitting");
-            // Set the Lowpass filter parameter on the Master AudioMixer
-            audioMixer.SetFloat("Lowpass", 22000);
+            StartCoroutine(FadeLowpass(22000));
         }
 
 
@@ -1179,7 +1241,7 @@ namespace JammerDash.Menus
         public void Menu()
         {
             AudioManager.Instance.source.loop = false;
-            StartCoroutine(AudioManager.Instance.ChangeSprite());
+            StartCoroutine(AudioManager.Instance.ChangeSprite(null));
             settingsPanel.SetActive(false);
             creditsPanel.SetActive(false);
             playPanel.SetActive(false);
@@ -1359,13 +1421,11 @@ namespace JammerDash.Menus
 
             if (quitPanel.activeSelf)
             {
-                // Set the Lowpass filter parameter on the Master AudioMixer
-                audioMixer.SetFloat("Lowpass", data.lowpassValue);
+                StartCoroutine(FadeLowpass((int)data.lowpassValue));
             }
             else
             {
-                // Set the Lowpass filter parameter on the Master AudioMixer
-                audioMixer.SetFloat("Lowpass", 22000);
+                StartCoroutine(FadeLowpass(22000));
             }
             data = SettingsFileHandler.LoadSettingsFromFile();
             if (data.parallax && (Screen.fullScreenMode == FullScreenMode.FullScreenWindow || Screen.fullScreenMode == FullScreenMode.ExclusiveFullScreen || Application.isEditor))
@@ -1460,7 +1520,7 @@ namespace JammerDash.Menus
            
             if (Input.GetKeyDown(KeyCode.B) && (EventSystem.current.currentSelectedGameObject == null || EventSystem.current.currentSelectedGameObject.GetComponent<InputField>() == null))
             {
-                LoadRandomBackground();
+                LoadRandomBackground(null);
             }
 
             if ((Input.GetAxis("Mouse X") == 0 || Input.GetAxis("Mouse Y") == 0) && mainPanel.activeSelf)
@@ -1506,6 +1566,7 @@ namespace JammerDash.Menus
             } 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
+                GetComponent<JammerDash.Options>().ApplySettings();
                 ToggleMenuPanel(mainPanel);
             }
             
@@ -1514,7 +1575,7 @@ namespace JammerDash.Menus
                 LoadLevelFromLevels();
                 LoadLevelsFromFiles();
                 
-                Notifications.instance.Notify($"Level list reloaded. \n{Directory.GetFiles(Path.Combine(Application.persistentDataPath, "levels"), "*.jdl").Count()} levels total", null);
+                Notifications.instance.Notify($"Level list reloaded. \n{Directory.GetDirectories(Path.Combine(Application.persistentDataPath, "levels", "extracted"), "*").Count()} levels total", null);
             }
             if (Input.GetKeyDown(KeybindingManager.debug))
             {

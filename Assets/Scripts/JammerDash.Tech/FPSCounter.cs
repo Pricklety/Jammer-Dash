@@ -10,12 +10,12 @@ namespace JammerDash.Tech
         public GameObject panel;
         private int[] _frameRateSamples;
         private int _cacheNumbersAmount = 300;
-        private int _averageFromAmount = 30;
+        private int _averageFromAmount = 10;
         private int _averageCounter = 0;
         private int _currentAveraged;
         private Color _currentColor;
         private Color _targetColor;
-        private float _smoothTime = 0.3f; // Smoothing time in seconds
+        private float _smoothTime = 0.10f; // Smoothing time in seconds
 
         void Awake()
         {

@@ -330,6 +330,140 @@ MonoBehaviour:
     m_Localized: Pesquisar...
     m_Metadata:
       m_Items: []
+  - m_Id: 2500536736399360
+    m_Localized: Modo cego
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500561184997376
+    m_Localized: Ocultar status de jogando
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500577794441216
+    m_Localized: "Ocultar jogando n\xEDvel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500606051467264
+    m_Localized: Ocultar modo AFK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500635977826304
+    m_Localized: "Ocultar editando n\xEDvel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500697919307776
+    m_Localized: mapper
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500710737100800
+    m_Localized: mapeado por
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500722212716544
+    m_Localized: ID Local
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500748318064640
+    m_Localized: "salvo pela \xFAltima vez em"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500982360227840
+    m_Localized: "Cr\xE9ditos"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500992455917568
+    m_Localized: Desenvolvedores e equipe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501015948214272
+    m_Localized: Artistas em destaque
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501050471530496
+    m_Localized: "Programas usados na produ\xE7\xE3o de Jammer Dash"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501076245528576
+    m_Localized: Abrir logs de jogador
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501106243190784
+    m_Localized: Abrir settings.json
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501130867949568
+    m_Localized: "Esta vers\xE3o \xE9 um acesso antecipado, e pode conter bugs ou
+      erros."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501183821037568
+    m_Localized: Jams
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501209586647040
+    m_Localized: Performance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501230793048064
+    m_Localized: "Precis\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501241060704256
+    m_Localized: Cor do fundo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501271393910784
+    m_Localized: Mudar cor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501289848848384
+    m_Localized: "Inserir c\xF3digo HEX"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501322803494912
+    m_Localized: para expandir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573297709166592
+    m_Localized: performance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573474192896000
+    m_Localized: "pontua\xE7\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573727289782272
+    m_Localized: combo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574255201660928
+    m_Localized: Continuar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574294158356480
+    m_Localized: Reiniciar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574306774822912
+    m_Localized: Voltar ao menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574527961444352
+    m_Localized: Falhou
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575739440017408
+    m_Localized: "Existe sempre uma pr\xF3xima vez! Talvez voc\xEA consiga se tentar
+      de novo?\r"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575789129936896
+    m_Localized: "N\xEDvel completo!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575999075823616
+    m_Localized: jogado por
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

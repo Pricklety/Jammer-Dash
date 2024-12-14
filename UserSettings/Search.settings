@@ -9,9 +9,9 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
-	"picker_window_position_offset.075BCD15" = "62;34;320;550"
+	"picker_window_position_offset.075BCD15" = "-152;95;320;550"
 	"picker_visibility_flags.075BCD15" = "264"
-	"picker_item_size.075BCD15" = "96"
+	"picker_item_size.075BCD15" = "55"
 	"picker_inspector.075BCD15" = "0"
 	"picker_current_group.075BCD15" = "st"
 }
@@ -100,9 +100,26 @@ providers = {
 objectSelectors = {
 }
 recentSearches = [
-	""
-	"st: tr(ja):遊ぶ"
-	"st: tr(ja):\"some value\""
+	"at: tr(ja-JP):\"some value\""
+	"st: resta"
+	"st: failed"
+	"st: comple"
+	"st:"
+	"st: there"
+	"st: mapped by"
+	"st: mapped"
+	"st: combo"
+	"st: score"
+	"st: health"
+	"st: backgro"
+	"st: change"
+	"st: backg"
+	"st: open the "
+	"st: edfiting"
+	"st: hide afk"
+	"st: hide currently"
+	"st: hide playing"
+	"st: blind"
 ]
 searchItemFavorites = [
 ]
