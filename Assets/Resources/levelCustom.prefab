@@ -222,6 +222,7 @@ GameObject:
   - component: {fileID: 4478954875226480921}
   - component: {fileID: 7676801418476830986}
   - component: {fileID: 6443683739460069980}
+  - component: {fileID: 6168036094094494259}
   m_Layer: 5
   m_Name: levelCustom
   m_TagString: Untagged
@@ -437,8 +438,6 @@ MonoBehaviour:
   size: {fileID: 0}
   bonus: {fileID: 0}
   lb: {fileID: 0}
-  sfx: {fileID: 0}
-  sfxclip: {fileID: 8300000, guid: c5e1cda7f81981747aac71c7518c7134, type: 3}
 --- !u!114 &4478954875226480921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -483,6 +482,59 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panelPrefab: {fileID: 8361095662683918815, guid: d911aae63cd445a409b5ca02b75ca34c, type: 3}
   panelContainer: {fileID: 0}
+--- !u!114 &6168036094094494259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7639366849960705808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 093d8d6245e39e64dbd48d45cc3c40c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OnInteractionStart:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnInteractionEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnInteractionAbort:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ForceStartHere: 0
+  m_ManualPositionOrder: -1
+  m_ManualPositionParent: {fileID: 0}
+  m_UseTargetForOutline: 0
+  m_PositionOrder: 0
+  m_SecondaryOrder: 0
+  m_Pos: {x: 0, y: 0}
+  m_TextAsAudio: {fileID: 0}
+  m_Prefix: 
+  m_PrefixIsLocalizationKey: 0
+  m_PrefixIsPostFix: 0
+  m_FilterText: 1
+  m_Text: Level Name
+  m_NameLabel: {fileID: 7639366849289852409}
+  m_AdditionalNameLabels: []
+  m_TestList: []
+  m_IsLocalizationKey: 0
+  m_TryToReadLabel: 1
+  m_ReferenceElement: {fileID: 0}
+  m_AllowVoiceOver: 1
+  m_ReadType: 1
+  m_WasJustAdded: 1
+  m_Type: 1
+  m_CustomHint: 0
+  m_HintAsAudio: {fileID: 0}
+  m_Hint: 
+  m_HintIsLocalizationKey: 0
+  m_IsInsideScrollView: 0
+  m_IsInitialized: 1
+  m_CallbackOnHighlight:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &7639366850392796567
 GameObject:
   m_ObjectHideFlags: 0

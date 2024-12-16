@@ -7964,6 +7964,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2810003822230129094, guid: 3b85ea57d6ecc9144b964fb6ef498752, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2810003823231954473}
+    - targetCorrespondingSourceObject: {fileID: 2810003822230129094, guid: 3b85ea57d6ecc9144b964fb6ef498752, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2810003823231954474}
   m_SourcePrefab: {fileID: 100100000, guid: 3b85ea57d6ecc9144b964fb6ef498752, type: 3}
 --- !u!4 &2810003823231954467 stripped
 Transform:
@@ -8031,6 +8034,56 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shutter: {fileID: 8300000, guid: 0072c353ad01a7948bd8af9d0a4dd80f, type: 3}
+--- !u!114 &2810003823231954474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 156647891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd9e42417444b96439dd7aeff0814d84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_DefaultState: 0
+  m_AutoTurnOnIfScreenReaderDetected: 1
+  m_RecheckAutoEnablingOnResume: 0
+  m_SaveEnabledState: 1
+  m_HandleUI: 1
+  m_HandleMagicGestures: 1
+  m_ExploreByTouch: 1
+  m_ReadDisabledInteractables: 1
+  m_CyclicMenus: 0
+  m_AllowBuiltInVirtualKeyboard: 1
+  m_DebugOutput: 0
+  m_WindowsUseMouseSwipes: 0
+  m_EditorOverride: 1
+  m_EditorEnabledState: 0
+  m_WebGLTTS: 1
+  m_GoogleTTSAPIKey: 
+  m_WindowsTTS: 1
+  m_WindowsTTSVolume: 100
+  m_WindowsUseKeys: 1
+  m_AndroidTTS: 0
+  m_AndroidUseUpAndDownForElements: 0
+  m_iOSTTS: 0
+  m_MacOSTTS: 0
+  m_UINavigationClick: {fileID: 8300000, guid: ca3a02c0d1e35d045834212832bda631, type: 3}
+  m_UIInteract: {fileID: 8300000, guid: 228efacca0f36e446ae59b7e7d63130b, type: 3}
+  m_UIFocusEnter: {fileID: 8300000, guid: b600d616dafd8754fa0411b32b896dee, type: 3}
+  m_UIFocusLeave: {fileID: 8300000, guid: ebbb690dfdc304a498a0b01e80019c34, type: 3}
+  m_UIBoundsReached: {fileID: 8300000, guid: bc2878c91d381e348b6123c492b37355, type: 3}
+  m_UIPopUpOpen: {fileID: 8300000, guid: b891607285afae746af02b8fbe796eab, type: 3}
+  m_UIPopUpClose: {fileID: 8300000, guid: 2f54e98b49b6d854994749fd6facb731, type: 3}
+  m_AudioPlayer: {fileID: 1287563237}
+  m_SFXPlayer: {fileID: 1287563237}
+  m_Frame: {fileID: 1077354635638745053, guid: eb3c8c5a06a28c5478d57942ce9a7349, type: 3}
+  m_FrameTemplate: {fileID: 3143606824782078380, guid: eb3c8c5a06a28c5478d57942ce9a7349, type: 3}
+  m_TouchBlocker: {fileID: 3143606824782078380, guid: eb3c8c5a06a28c5478d57942ce9a7349, type: 3}
+  m_DebugOutputLabel: {fileID: 0}
+  m_AllowVoiceOverGlobal: 1
+  m_DetectVoiceOverAtRuntime: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

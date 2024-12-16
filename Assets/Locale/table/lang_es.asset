@@ -424,6 +424,46 @@ MonoBehaviour:
     m_Localized: para expandir
     m_Metadata:
       m_Items: []
+  - m_Id: 2573297709166592
+    m_Localized: salud
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573474192896000
+    m_Localized: "puntuaci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573727289782272
+    m_Localized: combo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574255201660928
+    m_Localized: Continuar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574294158356480
+    m_Localized: Reiniciar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574306774822912
+    m_Localized: "Regresar al Men\xFA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575789129936896
+    m_Localized: "\xA1Nivel completo!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575999075823616
+    m_Localized: jugado por
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574527961444352
+    m_Localized: Fallido
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575739440017408
+    m_Localized: "\xA1Siempre hay otra oportunidad! \xBFTal vez al reiniciar?"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

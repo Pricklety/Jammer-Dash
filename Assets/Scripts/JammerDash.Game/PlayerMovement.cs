@@ -13,6 +13,7 @@ using JammerDash.Tech;
 using JammerDash.Game.Player;
 using UnityEngine.InputSystem.Controls;
 using JammerDash.Difficulty;
+using System.Linq;
 namespace JammerDash.Game.Player
 {
     public class PlayerMovement : MonoBehaviour 
@@ -41,7 +42,7 @@ namespace JammerDash.Game.Player
         public CubeCounter counter;
         public Text combotext;
         public Animation cubeanim;
-        public Animation godmode;
+        public Animation movement;
         private Animation dash;
         public AudioSource music;
         public HashSet<GameObject> passedCubes = new HashSet<GameObject>();
@@ -289,7 +290,7 @@ namespace JammerDash.Game.Player
                 health = 0;
             }
             float playerPositionInSeconds = transform.position.x / 7;
-            float finishLinePositionInSeconds = FindObjectOfType<FinishLine>().transform.position.x / 7 - playerPositionInSeconds;
+            float finishLinePositionInSeconds = FindObjectOfType<FinishLine>().transform.position.x / 7;
 
             // Calculate time in minutes and seconds
             int playerMinutes = Mathf.FloorToInt(playerPositionInSeconds / 60);
@@ -308,12 +309,6 @@ namespace JammerDash.Game.Player
         }
         private void Update()
         {
-#if UNITY_EDITOR
-            if (Input.GetKey(KeyCode.H))
-                Time.timeScale = 0.25f;
-            else if (Input.GetKeyUp(KeyCode.H))
-                Time.timeScale = 1f;
-#endif
             if (!isDying)
             {
                 if (Input.GetKeyDown(KeybindingManager.up))
@@ -423,7 +418,7 @@ namespace JammerDash.Game.Player
                     }
                     combo++;
 
-                    StartCoroutine(ChangeScore(Vector3.Distance(hit.collider.transform.position, transform.position)));
+                    StartCoroutine(ChangeScore(Vector3.Distance(hit.collider.transform.position, transform.position), hit));
 
                     anim.Stop("comboanim");
                     anim.Play("comboanim");
@@ -454,7 +449,6 @@ namespace JammerDash.Game.Player
             {
                 if (IsWithinColliderBounds(collider))
                 {
-                    // If within bounds, distance is effectively 0
                     return 0;
                 }
 
@@ -534,38 +528,125 @@ namespace JammerDash.Game.Player
            
 
         }
-        IEnumerator ChangeScore(float playerDistance)
+        public RectTransform accuracyBar;
+        public GameObject deviationMarker;
+        private List<GameObject> activeMarkers = new List<GameObject>();
+        private float maxDeviation = 0.75f;
+        public int maxMarkers = 10; // Limit the number of markers
+        public Image averageTimingImage; 
+        private List<float> playerDistances = new List<float>();
+
+        private void CreateDeviationMarker(Vector2 playerPosition, Vector2 cubePosition)
+        {
+            if (accuracyBar == null || deviationMarker == null) return;
+
+            // Calculate the player distance relative to the cube's position (positive or negative)
+            float playerDistance = playerPosition.x - cubePosition.x;  // Difference in x position
+
+            // Instantiate a new marker from the prefab
+            GameObject marker = Instantiate(deviationMarker, accuracyBar);
+
+            // Get the width of the accuracy bar
+            float barWidth = accuracyBar.rect.width;
+
+            // Normalize the playerDistance to a value between -1 and 1 (map to the width of the bar)
+            // The center of the bar (perfect hit) should be 0.
+            // The -1 value will represent early hits (left), and 1 will represent late hits (right)
+            float normalizedOffset = Mathf.Clamp(playerDistance / maxDeviation, -0.5f, 0.5f);
+
+            // Convert the normalized offset to the position on the bar
+            // 0 = Perfect (center), negative values go left (early), positive values go right (late)
+            float markerPosition = normalizedOffset * (barWidth / 2);  // Range from -barWidth/2 to +barWidth/2
+
+            // Position the marker within the accuracy bar (centered)
+            RectTransform markerTransform = marker.GetComponent<RectTransform>();
+            markerTransform.anchoredPosition = new Vector2(markerPosition, 0);
+
+            // Get the Image component of the marker prefab to change its color
+            Image markerImage = marker.GetComponent<Image>();
+
+            // Color the marker based on how early or late the player hit
+            if (Mathf.Abs(playerDistance) <= 0.2f)  // Perfect timing range (within tolerance)
+            {
+                markerImage.color = Color.green;  // Green for perfect
+            }
+            else if (Mathf.Abs(playerDistance) <= 0.38f)  // Good timing range
+            {
+                markerImage.color = Color.yellow;  // Yellow for good
+            }
+            else  // Bad timing range
+            {
+                markerImage.color = Color.red;  // Red for bad
+            }
+
+            // Add the current playerDistance to the list to calculate the average
+            playerDistances.Add(playerDistance);
+
+            // Update the average timing position image based on the average of all hits
+            UpdateAverageTimingImage();
+
+            // Optional: Store the active markers
+            activeMarkers.Add(marker);
+
+            // Remove old markers if the limit is exceeded
+            if (activeMarkers.Count > maxMarkers)
+            {
+                Destroy(activeMarkers[0]);
+                activeMarkers.RemoveAt(0);
+            }
+        }
+
+        // Method to update the image based on the average of all hits
+        private void UpdateAverageTimingImage()
+        {
+            // Calculate the average player distance
+            float averageDistance = playerDistances.Sum() / playerDistances.Count;
+
+            // Normalize the average distance to a value between -1 and 1
+            float normalizedOffset = Mathf.Clamp(averageDistance / maxDeviation, -1f, 1f);
+
+            // Get the width of the accuracy bar
+            float barWidth = accuracyBar.rect.width;
+
+            // Convert the normalized offset to the position on the bar
+            float averagePosition = normalizedOffset * (barWidth / 2);  // Range from -barWidth/2 to +barWidth/2
+
+            // Update the position of the average timing image (centered)
+            RectTransform averageTimingRectTransform = averageTimingImage.GetComponent<RectTransform>();
+            averageTimingRectTransform.anchoredPosition = new Vector2(averagePosition, 15);
+        }
+
+
+
+        IEnumerator ChangeScore(float playerDistance, RaycastHit2D hit)
         {
             UnityEngine.Debug.Log(playerDistance);
-            if (playerDistance <= 0.29f)
+
+            // Create a deviation marker
+            CreateDeviationMarker(transform.position, hit.transform.position);
+
+            // Handle scoring logic
+            if (playerDistance <= 0.2f)
             {
                 factor = 1f;
                 five++;
                 counter.accCount += 5;
                 Total += 5;
-                if (AudioManager.Instance != null)
+                if (AudioManager.Instance != null && AudioManager.Instance.hits)
                 {
-                    if (AudioManager.Instance.hits)
-                    {
-                        Instantiate(goodTextPrefab, transform.position, Quaternion.identity);
-                    }
+                    Instantiate(goodTextPrefab, transform.position, Quaternion.identity);
                 }
-                 
             }
-            else if (playerDistance <= 0.45 && playerDistance > 0.29f)
+            else if (playerDistance <= 0.38f && playerDistance > 0.2f)
             {
                 factor = 1f / 3f;
                 three++;
                 counter.accCount += 3;
                 Total += 5;
-                if (AudioManager.Instance != null)
+                if (AudioManager.Instance != null && AudioManager.Instance.hits)
                 {
-                    if (AudioManager.Instance.hits)
-                    {
-                        Instantiate(normalTextPrefab, transform.position, Quaternion.identity);
-                    }
+                    Instantiate(normalTextPrefab, transform.position, Quaternion.identity);
                 }
-
             }
             else
             {
@@ -573,12 +654,9 @@ namespace JammerDash.Game.Player
                 one++;
                 counter.accCount += 1;
                 Total += 5;
-                if (AudioManager.Instance != null)
+                if (AudioManager.Instance != null && AudioManager.Instance.hits)
                 {
-                    if (AudioManager.Instance.hits)
-                    {
-                        Instantiate(okTextPrefab, transform.position, Quaternion.identity);
-                    }
+                    Instantiate(okTextPrefab, transform.position, Quaternion.identity);
                 }
             }
 
@@ -590,7 +668,7 @@ namespace JammerDash.Game.Player
             float elapsedTime = 0f;
             float duration = 0.1f;
 
-            health += maxHealth / (20f * factor); 
+            health += maxHealth / (20f * factor);
 
             while (elapsedTime < duration)
             {
@@ -605,6 +683,7 @@ namespace JammerDash.Game.Player
             yield return new WaitForSeconds(0.2f);
         }
 
+      
 
 
         private void DestroyCube(GameObject cube)
@@ -789,7 +868,7 @@ namespace JammerDash.Game.Player
                             highestCombo++;
                         }
 
-                        StartCoroutine(ChangeScore(0f));
+                        StartCoroutine(ChangeScore(0f, new RaycastHit2D()));
                         if (AudioManager.Instance != null && AudioManager.Instance.hits)
                         {
                             Instantiate(goodTextPrefab, transform.position, Quaternion.identity);
@@ -803,7 +882,7 @@ namespace JammerDash.Game.Player
                     else if (distance < middle && distance >= 1)
                     {
                         sfxS.PlayOneShot(hitSounds[1]);
-                        StartCoroutine(ChangeScore(0.30f));
+                        StartCoroutine(ChangeScore(0.30f, new RaycastHit2D()));
                         if (AudioManager.Instance != null && AudioManager.Instance.hits)
                         {
                             Instantiate(normalTextPrefab, transform.position, Quaternion.identity);
@@ -814,7 +893,7 @@ namespace JammerDash.Game.Player
                         sfxS.PlayOneShot(hitSounds[1]);
                         health -= 35;
                         combo = 0;
-                        StartCoroutine(ChangeScore(0.48f));
+                        StartCoroutine(ChangeScore(0.48f, new RaycastHit2D()));
                         if (AudioManager.Instance != null && AudioManager.Instance.hits)
                         {
                             Instantiate(okTextPrefab, transform.position, Quaternion.identity);

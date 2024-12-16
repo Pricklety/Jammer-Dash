@@ -66,9 +66,9 @@ namespace JammerDash.Game
             if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>() != null)
                 music = AudioManager.Instance.source;
 
+            SettingsData sd = SettingsFileHandler.LoadSettingsFromFile();
             if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeybindingManager.toggleUI))
             {
-                SettingsData sd = SettingsFileHandler.LoadSettingsFromFile();
                 sd.canvasOff = true;
                 SettingsFileHandler.SaveSettingsToFile(sd);
                 CheckUI();
@@ -110,7 +110,7 @@ namespace JammerDash.Game
                 OnApplicationFocus(focus);
             }
 
-            if (Time.timeScale > 0f)
+            if (Time.timeScale > 0f && !sd.canvasOff)
             {
                 GameObject.Find("loadingText").GetComponent<Text>().text = "";
             }
