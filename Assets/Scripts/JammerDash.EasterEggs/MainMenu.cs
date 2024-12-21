@@ -19,6 +19,7 @@ namespace JammerDash.EasterEggs
 
         public Image logo;
 
+        public GameObject snow;
         public void FixedUpdate()
         {
             if (LocalizationSettings.SelectedLocale.Identifier == "ja-JP")
@@ -27,7 +28,7 @@ namespace JammerDash.EasterEggs
             }
             else
             {
-                if (DateTime.Now.Month == 12)
+                if (DateTime.Now.Month == 12 && DateTime.Now.Day >= 21 || DateTime.Now.Month == 1 && DateTime.Now.Day <= 6) 
                 {
                     logo.sprite = christmas;
                 }
@@ -52,7 +53,12 @@ namespace JammerDash.EasterEggs
                     logo.sprite = main;
                 }
             }
-           
+
+            if (DateTime.Now.Month == 12 && DateTime.Now.Day > 21 || DateTime.Now.Month == 1 && DateTime.Now.Day < 6)
+            {
+                snow.SetActive(true);
+            }
+
         }
     }
 }

@@ -60,7 +60,7 @@ namespace JammerDash.Editor
             if (Input.GetKey(KeyCode.R))
             {
                 Time.timeScale = 2f;
-                AudioSource[] sources = FindObjectsOfType<AudioSource>();
+                AudioSource[] sources = FindObjectsByType<AudioSource>(FindObjectsSortMode.None);
 
                 foreach (AudioSource source in sources)
                 {

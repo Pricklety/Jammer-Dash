@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 555665199689378052}
   - component: {fileID: 7833816203219970048}
   - component: {fileID: -9050124104227533392}
-  - component: {fileID: 7060365757077132007}
   m_Layer: 0
   m_Name: good
   m_TagString: GoodNote
@@ -139,15 +138,3 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &7060365757077132007
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5240017745283604475}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 69327916109cfc14890626df117aad11, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

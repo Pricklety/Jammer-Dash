@@ -32,133 +32,135 @@ namespace JammerDash.Menus
 {
     public class mainMenu : MonoBehaviour, IPointerClickHandler
     {
-        public bool areLevelsImported = false;
+        /// <summary>
+        /// These objects are a necessity to have the main menu working properly.
+        /// </summary>
 
+        [Header("Assets and Objects")] 
+        public Image bg; // Background Display 
+        public Sprite[] sprite; // Sprite array to handle images loaded
+        public Image quitPanel2; // Overlay which opacity increases whilst holding Escape
+        public Image shuffleImage; // Shuffle button Image on the playlist.
+        public Text nolevelerror; // Text that is shown only if there's ZERO levels.
+        public Animator idle; // Idle mode animation
+        public Animator notIdle; // Normal mode animation
+        public Text clock; // Clock
 
-        public GameObject musicAsset;
-        public Image bg;
-        public Sprite[] sprite;
-        private bool quittingAllowed = false;
-        public SettingsData data;
-        public float quitTimer = 1f;
-        public float quitTime = 0f;
-        public Image quitPanel2;
-        PlayerData playerData;
-        public GameObject accessoverPanel;
-        public Text nolevelerror;
-        public GameObject[] disableAccess;
-        string oldSeconds;
-        public Image shuffleImage;
-        public Animator idle;
-        public Animator notIdle;
-        public float afkTime;
-        bool hasPlayedIdle;
+        [Header("Bools")]
+        private bool quittingAllowed = false; // Bool that helps with handling quit 
+        bool hasPlayedIdle; // True if afkTime is above 25
+
+        [Header("Floats")]
+        public float quitTimer = 1f; // Amount of seconds to hold the Escape button to quit the game
+        public float quitTime = 0f; // This float increases while holding the Escape button
+        public float afkTime; // This float increases if no mouse movement is detected. If it's above 25, toggle idle mode (play idle anim)
+
+        [Header("Strings")]
+        string oldSeconds; // Current live time
+
+        [Header("Classes and Attributes")]
+        public SettingsData data; // Settings
+        private PlayerData playerData; // Account data
+
         [Header("Account System")]
-        public InputField usernameInput;
-        public InputField password;
-        public InputField email;
-        public Image countryIMG;
-        string cc;
+        public InputField usernameInput; // Username input field
+        public InputField password; // Password input field
+        public InputField email; // Mail input field
+        public Image countryIMG; // Community Penel - Country Display
+        string cc; // Country code based on IP
+
         [Header("Clock")]
-        public GameObject hour;
-        public GameObject min;
-        public GameObject sec;
+        public GameObject hour; // Clock handle - hour
+        public GameObject min; // Clock handle - minute
+        public GameObject sec; // Clock handle - second
 
         [Header("Panels")]
-        public GameObject mainPanel;
-        public GameObject playPanel;
-        public GameObject creditsPanel;
-        public GameObject settingsPanel;
-        public GameObject additionalPanel;
-        public GameObject levelInfo;
-        public GameObject quitPanel;
-        public GameObject community;
-        public GameObject musicPanel;
-        public GameObject changelogs;
-        public GameObject overPanel;
-        public GameObject accPanel;
-        public GameObject multiPanel;
+        public GameObject mainPanel; // Main Panel
+        public GameObject playPanel; // Level List
+        public GameObject creditsPanel; // Credits
+        public GameObject settingsPanel; // Settings
+        public GameObject additionalPanel; // Debug (F2)
+        public GameObject levelInfo; // Editor 
+        public GameObject quitPanel; // Quit panel
+        public GameObject community; // Community panel
+        public GameObject musicPanel; // Playlist
+        public GameObject changelogs; // Changelogs
+        public GameObject accPanel; // Account creation Panel
+        public GameObject multiPanel; // Multiplayer
 
-        [Header("LevelInfo")]
-        public GameObject levelInfoPanelPrefab;
-        public Transform levelInfoParent;
-        public GameObject levelCreatePanel;
-        public InputField song;
-        public InputField artists;
-        public InputField map;
-        public GameObject cubePrefab;
-        public GameObject sawPrefab;
-        public GameObject playPrefab;
-        public Transform playlevelInfoParent;
-        public string songName;
-        public string mapper;
-        public string artist;
-        public string path;
-        public Text songMP3Name;
-        public int levelRow = -1;
+        [Header("Editor Panel")]
+        public GameObject levelInfoPanelPrefab; // Level prefab for editor
+        public Transform levelInfoParent; // Content that displays the levels in the editor panel
+        public GameObject levelCreatePanel; // Create new level
+        public InputField song; // Song input field
+        public InputField artists; // Artist input field
+        public InputField map; // Mapper input field
+        public Text songMP3Name; // Text object that shows the current selected song (Create screen)
+
+        [Header("Level list")]
+        public GameObject playPrefab; // Level
+        public Transform playlevelInfoParent; // Content that displays the levels in the level list
+        public string songName; // Song name on the level item
+        public string mapper; // Mapper name on the level item
+        public string artist; // Artist name on the level item
+        public string path; // Level's extracted path
+        public int levelRow = -1; // Selected level index
       
         [Header("Video Background")]
-        public GameObject videoPlayerObject;
-        public GameObject videoImage;
-        public VideoPlayer videoPlayer;
-        public VideoClip[] videoClips;
-        private List<string> videoUrls = new List<string>();
-        private int currentVideoIndex = 0;
+        public GameObject videoPlayerObject; // Video player object
+        public GameObject videoImage; // Video display
+        public VideoPlayer videoPlayer; // Video player
+        public VideoClip[] videoClips; // Array of loaded video clips
+        private List<string> videoUrls = new List<string>(); // List of loaded video files (file:// URL)
+        private int currentVideoIndex = 0; // Currently playing video index
 
        
         [Header("Music")]
-        public AudioMixer audioMixer;
-        AudioSource source;
-        private float lowpassTargetValue;
+        public AudioMixer audioMixer; // Audiomixer that handles the lowpass instance
+        private float lowpassTargetValue; // Lowpass value (loaded from settings)
         [Range(0.25f, 5f)]
-        public float fadeDuration = 0.25f;
+        public float fadeDuration = 0.25f; // Lowpass duration when the quit button is clicked
 
-        private float currentLerpTime = 0f;
-        public bool focus = true;
 
         [Header("Profile")]
-        public Slider levelSlider;
-        public Text levelText;
-        public Text[] usernames;
-        public Text spMain;
-        public Text[] sps;
-        public Text bigStatsText;
+        public Slider levelSlider; // Level display
+        public Text levelText; // Level text display
+        public Text[] usernames; // Array of texts that only display the player's username
+        public Text spMain; // main SP text (handles the "SP: sp" text)
+        public Text[] sps; // sp texts (handles the "{sp}sp" texts)
+        public Text bigStatsText; // Community panel - All player info
 
         [Header("Parallax")]
-        public Transform logo;
-        public Transform background;
-        public Transform backgroundVideo;
-        public float backgroundParallaxSpeed;
-        public float maxMovementOffset;
-        public float scaleMultiplier;
-        public float edgeMargin;
+        public Transform logo; // Logo parallax
+        public Transform background; // Background parallax
+        public Transform backgroundVideo; // Video background parallax
+        public float backgroundParallaxSpeed; // Parallax speed
+        public float maxMovementOffset; // Maximum offset
+        public float scaleMultiplier; // How much should the image be scaled
+        public float edgeMargin; // Edge margin
 
-        private Vector3 lastMousePosition;
 
-        private Camera mainCamera;
-        private RectTransform canvasRect;
 
-        public Text clock;
-
-        void Start()
+        async void Start()
         {
+            // Instantiate data
             Time.timeScale = 1f;
             AudioManager.Instance.source.pitch = 1f;
             playerData = Account.Instance.LoadData();
             data = SettingsFileHandler.LoadSettingsFromFile();
             Debug.unityLogger.logEnabled = true;
            
-                foreach (GameObject go in disableAccess)
-                {
-                    go.SetActive(true);
-                }
+            // Load levels on edit and play screen
+            LoadLevelsFromFiles(); // Edit screen
 
-            LoadLevelsFromFiles();
-            LoadLevelFromLevels();
             StartCoroutine(SetCountry());
             SetSpectrum();
             LoadRandomBackground(null);
+
+
             string path = Path.Combine(Application.persistentDataPath, "levels", "extracted");
+
+            // If there's zero levels, show the file browser
             if (Directory.GetDirectories(path, "*").Length == 0)
             {
                 FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserCanvas")).GetComponent<FileBrowser>();
@@ -169,13 +171,15 @@ namespace JammerDash.Menus
             }
 
             spMain.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Jams")}: 0" +
-                $"\t\t{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Performance")}: {Mathf.RoundToInt(Difficulty.Calculator.CalculateSP("scores.dat"))}sp" +
-                $"\t\t{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Accuracy")}: {Difficulty.Calculator.CalculateAccuracy("scores.dat"):0.00}%";
+                          $"\t\t{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Performance")}: {Mathf.RoundToInt(Difficulty.Calculator.CalculateSP("scores.dat"))}sp" +
+                          $"\t\t{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Accuracy")}: {Difficulty.Calculator.CalculateAccuracy("scores.dat"):0.00}%";
             foreach (Text sp in sps)
             {
                 sp.text = $"{Difficulty.Calculator.CalculateSP("scores.dat"):0}sp";
             }
+            await LoadLevelFromLevels(); // Play screen
         }
+
         public void SetSpectrum()
         {
             SimpleSpectrum[] spectrums = FindObjectsByType<SimpleSpectrum>(FindObjectsSortMode.None);
@@ -185,16 +189,7 @@ namespace JammerDash.Menus
                 spectrum.audioSource = AudioManager.Instance.source;
             }
         }
-        public string FormatTime(float time)
-        {
-            int minutes = Mathf.FloorToInt(time / 60);
-            int seconds = Mathf.FloorToInt(time % 60);
-
-            // Ensure seconds don't go beyond 59
-            seconds = Mathf.Clamp(seconds, 0, 59);
-
-            return string.Format("{0:00}:{1:00}", minutes, seconds);
-        }
+       
         public string FormatNumber(long number)
         {
             string formattedNumber;
@@ -230,7 +225,8 @@ namespace JammerDash.Menus
                 return formattedNumber;
             }
         }
-        public void LoadLevelFromLevels()
+        
+        public async Task<Task> LoadLevelFromLevels()
         {
             // Clear existing level UI elements
             foreach (Transform child in playlevelInfoParent)
@@ -245,7 +241,6 @@ namespace JammerDash.Menus
             // Ensure the levels and extracted folders exist
             if (!Directory.Exists(levelsPath))
             {
-                UnityEngine.Debug.LogError("The 'levels' folder does not exist.");
                 Directory.CreateDirectory(levelsPath);
             }
 
@@ -363,12 +358,17 @@ namespace JammerDash.Menus
                         DisplayCustomLevelInfo(sceneData, levelInfoPanel.GetComponent<CustomLevelScript>());
                         levelInfoPanel.GetComponent<CustomLevelScript>().SetSceneData(sceneData);
                     }
+
                 }
                 catch (Exception ex)
                 {
                     UnityEngine.Debug.LogError($"Error processing folder {folderPath}: {ex.Message}");
+                    return Task.FromException(ex);
                 }
+
             }
+
+            return Task.CompletedTask;
         }
 
 
@@ -380,7 +380,7 @@ namespace JammerDash.Menus
             FileBrowser.ShowLoadDialog(ImportLevel, null, FileBrowser.PickMode.Files, true, null, null, "Import Level...", "Import");
         }
 
-        void ImportLevel(string[] paths)
+        async void ImportLevel(string[] paths)
         {
             if (paths.Length >= 0)
             {
@@ -390,8 +390,9 @@ namespace JammerDash.Menus
                 }
             }
 
-            LoadLevelFromLevels();
+            await LoadLevelFromLevels();
         }
+
         public void Accounts()
         {
             accPanel.SetActive(!accPanel.activeSelf);
@@ -581,19 +582,13 @@ namespace JammerDash.Menus
 
         public async Task LoadLevelBackgroundAsync(string filePath)
         {
-            // Supported image file types in Unity
-            string[] supportedExtensions = new string[] { "*.png" };
 
             // Gather all files with supported extensions
-            List<string> files = new List<string>();
-            foreach (var extension in supportedExtensions)
-            {
-                files.AddRange(Directory.GetFiles(filePath, extension, SearchOption.AllDirectories));
-            }
-
-            // Choose a random file path
-            string randomFilePath = files[0];
-            await LoadSpriteAsync(randomFilePath);
+            List<string> files = new List<string>(); 
+            files.AddRange(Directory.GetFiles(filePath, "*.png", SearchOption.AllDirectories));
+           
+            string filePath1 = files[0];
+            await LoadSpriteAsync(filePath1);
         }
         private async Task LoadCustomBackgroundAsync()
         {
@@ -790,7 +785,7 @@ namespace JammerDash.Menus
                 songName = songName,
                 artist = artist,
                 creator = mapper,
-                ID = Random.RandomRange(int.MinValue, int.MaxValue)
+                ID = Random.Range(int.MinValue, int.MaxValue)
             };
 
             // Save the new level data to a JSON file
@@ -813,7 +808,7 @@ namespace JammerDash.Menus
             string musicPath = Path.Combine(namepath, $"{sceneData.artist} - {sceneData.songName}.mp3");
             if (Directory.Exists(namepath))
             {
-                songMP3Name.text = "A level with this name currently exists. Try something else or delete the level.";
+                Notifications.instance.Notify("A level with this name currently exists. Try something else or delete the level.", null);
             }
             else
             {
@@ -871,21 +866,7 @@ namespace JammerDash.Menus
             }
         }
 
-        private void InstantiateObjects(SceneData sceneData)
-        {
-            // Instantiate cubes and saws based on sceneData
-            foreach (Vector3 cubePos in sceneData.cubePositions)
-            {
-                Instantiate(cubePrefab, cubePos, Quaternion.identity);
-            }
-
-            foreach (Vector3 sawPos in sceneData.sawPositions)
-            {
-                Instantiate(sawPrefab, sawPos, Quaternion.identity);
-            }
-
-            // Other initialization logic for objects
-        }
+      
 
         // Display level information on UI
         void DisplayLevelInfo(SceneData sceneData, LevelScript level)
@@ -954,7 +935,7 @@ namespace JammerDash.Menus
             {
                 panel.SetActive(!panel.activeSelf);
 
-                if (panel.active)
+                if (panel.activeSelf)
                 {
                     // Turn off all panels
                     mainPanel.SetActive(false);
@@ -969,7 +950,7 @@ namespace JammerDash.Menus
                     multiPanel.SetActive(false);
                    
                 }
-                if (!panel.active)
+                if (!panel.activeSelf)
                 {
                     panel.SetActive(true);
                 }
@@ -1010,7 +991,7 @@ namespace JammerDash.Menus
 
                 if (playPanel.activeSelf)
                 {
-                    ButtonClickHandler[] levels = FindObjectsOfType<ButtonClickHandler>();
+                    ButtonClickHandler[] levels = FindObjectsByType<ButtonClickHandler>(FindObjectsSortMode.None);
 
                     foreach (ButtonClickHandler level in levels)
                     {
@@ -1075,7 +1056,7 @@ namespace JammerDash.Menus
             {
                 UnityEngine.Debug.Log("Loaded object: " + obj.name);
             }
-            FindObjectOfType<AudioSource>().PlayOneShot((AudioClip)clips[Random.Range(0, clips.Length)]);
+            FindFirstObjectByType<AudioSource>().PlayOneShot((AudioClip)clips[Random.Range(0, clips.Length)]);
 
         }
         public void Credits()
@@ -1372,41 +1353,51 @@ namespace JammerDash.Menus
         }
         public void FixedUpdate()
         {
-            if (AudioManager.Instance.shuffle)
-            {
-                shuffleImage.color = Color.HSVToRGB(0.33f, 0.47f, 1);
-            }
-            else
-            {
-                shuffleImage.color = Color.white;
-            }
-            string timeInfo = DateTime.Now.ToString("hh:mm:ss tt") + "\n";
-            if (FindObjectOfType<GameTimer>() != null)
-            {
-                timeInfo += "running " + FormatElapsedTime(GameTimer.GetRunningTime());
-            }
-            clock.text = timeInfo;
+            UpdateShuffleImage();
+            UpdateClockText();
+            UpdateUsernames();
+            UpdateLevelText();
+            UpdateStatsText();
+            HandleQuitPanel();
+            UpdateBackgroundParallax();
+            HandleEscapeInput();
+            UpdateNoLevelError();
+        }
 
+        private void UpdateShuffleImage()
+        {
+            shuffleImage.color = AudioManager.Instance.shuffle ? Color.HSVToRGB(0.33f, 0.47f, 1) : Color.white;
+        }
+
+        private void UpdateClockText()
+        {
+            if (GameTimer.self != null)
+            {
+                string timeInfo = DateTime.Now.ToString("hh:mm:ss tt") + "\n";
+                timeInfo += "running " + FormatElapsedTime(GameTimer.GetRunningTime());
+                clock.text = timeInfo;
+            }
+        }
+
+        private void UpdateUsernames()
+        {
+            string username = string.IsNullOrEmpty(Account.Instance.username) ? "Guest" : Account.Instance.username;
             foreach (Text text in usernames)
             {
-                if (string.IsNullOrEmpty(Account.Instance.username))
-                {
-                    text.text = "Guest";
-                }
-                else
-                {
-                    text.text = Account.Instance.username;
-                }
-
+                text.text = username;
             }
+        }
 
-           
-            
+        private void UpdateLevelText()
+        {
             if (Account.Instance.currentXP >= 0)
             {
-                levelText.text = "Level: " + Account.Instance.level.ToString() + $" (XP: {FormatNumber(Account.Instance.totalXP)})";
-
+                levelText.text = $"Level: {Account.Instance.level} (XP: {FormatNumber(Account.Instance.totalXP)})";
             }
+        }
+
+        private void UpdateStatsText()
+        {
             PlayerStats stats = Calculator.CalculateOtherPlayerInfo("scores.dat");
             bigStatsText.text = $"Playtime: {Account.Instance.ConvertPlaytimeToReadableFormat()}\r\n" +
                 $"Play count: {stats.TotalPlays:N0}\r\n" +
@@ -1416,9 +1407,10 @@ namespace JammerDash.Menus
                 $"A: {stats.RankCounts["A"]:N0}\r\n" +
                 $"Highest combo: {stats.HighestCombo:N0}x\r\n" +
                 $"Accuracy: {Calculator.CalculateAccuracy("scores.dat"):0.00}%";
+        }
 
-
-
+        private void HandleQuitPanel()
+        {
             if (quitPanel.activeSelf)
             {
                 StartCoroutine(FadeLowpass((int)data.lowpassValue));
@@ -1427,163 +1419,211 @@ namespace JammerDash.Menus
             {
                 StartCoroutine(FadeLowpass(22000));
             }
+        }
+
+        private void UpdateBackgroundParallax()
+        {
             data = SettingsFileHandler.LoadSettingsFromFile();
-            if (data.parallax && (Screen.fullScreenMode == FullScreenMode.FullScreenWindow || Screen.fullScreenMode == FullScreenMode.ExclusiveFullScreen || Application.isEditor))
+            if (data.parallax && IsFullscreenMode())
             {
-
-                // Background parallax effect
-                background.localScale = new Vector3(scaleMultiplier, scaleMultiplier, 1);
-                backgroundVideo.localScale = background.localScale;
-
-                Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                Vector3 mouseDelta = new Vector3(-mouseWorldPos.x / 1.5f, -mouseWorldPos.y / 30, 0);
-
-                float cameraMovement = Mathf.Clamp(mouseDelta.x, -maxMovementOffset, maxMovementOffset) * backgroundParallaxSpeed * Time.unscaledDeltaTime;
-                Vector3 backgroundOffset = new Vector3(cameraMovement, 0, 0);
-                background.position = backgroundOffset + new Vector3(mouseDelta.x / 100, mouseDelta.y, mouseDelta.z);
-                backgroundVideo.position = background.position;
+                ApplyParallaxEffect();
             }
             else
             {
-                background.localScale = Vector3.one;
-                background.position = Vector3.zero;
-                logo.position = new Vector3(-4.2f, 0, 0);
-            }  
-           
+                ResetParallaxEffect();
+            }
+        }
+
+        private bool IsFullscreenMode()
+        {
+            return Screen.fullScreenMode == FullScreenMode.FullScreenWindow ||
+                   Screen.fullScreenMode == FullScreenMode.ExclusiveFullScreen ||
+                   Application.isEditor;
+        }
+
+        private void ApplyParallaxEffect()
+        {
+            background.localScale = new Vector3(scaleMultiplier, scaleMultiplier, 1);
+            backgroundVideo.localScale = background.localScale;
+
+            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 mouseDelta = new Vector3(-mouseWorldPos.x / 1.5f, -mouseWorldPos.y / 30, 0);
+
+            float cameraMovement = Mathf.Clamp(mouseDelta.x, -maxMovementOffset, maxMovementOffset) * backgroundParallaxSpeed * Time.unscaledDeltaTime;
+            Vector3 backgroundOffset = new Vector3(cameraMovement, 0, 0);
+            background.position = backgroundOffset + new Vector3(mouseDelta.x / 100, mouseDelta.y, mouseDelta.z);
+            backgroundVideo.position = background.position;
+        }
+
+        private void ResetParallaxEffect()
+        {
+            background.localScale = Vector3.one;
+            background.position = Vector3.zero;
+            logo.position = new Vector3(-4.2f, 0, 0);
+        }
+
+        private void HandleEscapeInput()
+        {
             if (Input.GetKey(KeyCode.Escape))
             {
-
-                // Check if quitTime exceeds quitTimer
-                if (quitTime >= quitTimer && !quitPanel.activeSelf)
-                {
-                    audioMixer.SetFloat("Lowpass", 500);
-                    quitPanel2.color = new Color(quitPanel2.color.r, quitPanel2.color.g, quitPanel2.color.b, 1.0f); // Set color to fully opaque
-                    Application.Quit(); // Quit application
-                }
-                else if (quitTime < quitTimer && !quitPanel.activeSelf)
-                {
-                    UnityEngine.Debug.Log(quitTime);
-                    quitTime += Time.unscaledDeltaTime;
-                    quitPanel2.color = Color.Lerp(new Color(0, 0, 0, 0), new Color(0, 0, 0, 1), quitTime / quitTimer);
-                    float startValue = 22000;
-                    float currentValue = Mathf.Lerp(startValue, 500, quitTime / quitTimer);
-
-                    audioMixer.SetFloat("Lowpass", currentValue);
-
-                }
-
-
+                HandleQuitAction();
             }
             else
             {
-
-                quitTime = 0f;
-                quitPanel2.color = new Color(quitPanel2.color.r, quitPanel2.color.g, quitPanel2.color.b, 0f); // Set color to fully transparent
-                audioMixer.SetFloat("Lowpass", 22000);
+                ResetQuitAction();
             }
 
-            if ((quitTime < quitTimer || quitTime >= quitTimer) && quitPanel.activeSelf)
+            if (quitPanel.activeSelf)
             {
                 audioMixer.SetFloat("Lowpass", data.lowpassValue);
             }
+        }
 
-            if (mainPanel.activeSelf && AudioManager.Instance.source.loop)
+        private void HandleQuitAction()
+        {
+            if (quitTime >= quitTimer && !quitPanel.activeSelf)
             {
-                AudioManager.Instance.source.loop = false;
+                audioMixer.SetFloat("Lowpass", 500);
+                quitPanel2.color = new Color(quitPanel2.color.r, quitPanel2.color.g, quitPanel2.color.b, 1.0f);
+                Application.Quit();
             }
-            if (playlevelInfoParent.childCount == 0)
+            else if (quitTime < quitTimer && !quitPanel.activeSelf)
             {
-                nolevelerror.gameObject.SetActive(true);
-                LoadLevelFromLevels();
-            }
-            else
-            {
-                nolevelerror.gameObject.SetActive(false);
-
+                quitTime += Time.unscaledDeltaTime;
+                quitPanel2.color = Color.Lerp(new Color(0, 0, 0, 0), new Color(0, 0, 0, 1), quitTime / quitTimer);
+                float startValue = 22000;
+                float currentValue = Mathf.Lerp(startValue, 500, quitTime / quitTimer);
+                audioMixer.SetFloat("Lowpass", currentValue);
             }
         }
-      
-        void Update()
+
+        private void ResetQuitAction()
+        {
+            quitTime = 0f;
+            quitPanel2.color = new Color(quitPanel2.color.r, quitPanel2.color.g, quitPanel2.color.b, 0f);
+            audioMixer.SetFloat("Lowpass", 22000);
+        }
+
+        private void UpdateNoLevelError()
+        {
+            nolevelerror.gameObject.SetActive(playlevelInfoParent.childCount == 0);
+        }
+
+        public void Update()
+        {
+            UpdateLevelSlider();
+            HandleBackgroundLoading();
+            HandleIdleState();
+            UpdateTimers();
+            HandleKeyBindings();
+        }
+
+        private void UpdateLevelSlider()
         {
             levelSlider.maxValue = 1;
-            levelSlider.value = (float)Account.Instance.currentXP / (float)Account.Instance.xpRequiredPerLevel[Account.Instance.level];
-            string seconds = System.DateTime.Now.ToLocalTime().ToString("ss");
-            SimpleSpectrum[] spectrums = FindObjectsByType<SimpleSpectrum>(FindObjectsSortMode.None);
-            AudioManager.Instance.levelIndex = levelRow;
-            foreach (SimpleSpectrum spectrum in spectrums)
-            {
-                if (spectrum.audioSource == null)
-                {
-                    SetSpectrum();
-                }
-            }
-           
-            if (Input.GetKeyDown(KeyCode.B) && (EventSystem.current.currentSelectedGameObject == null || EventSystem.current.currentSelectedGameObject.GetComponent<InputField>() == null))
+            levelSlider.value = (float)Account.Instance.currentXP / Account.Instance.xpRequiredPerLevel[Account.Instance.level];
+        }
+
+        private void HandleBackgroundLoading()
+        {
+            if (Input.GetKeyDown(KeyCode.B) && CanLoadBackground())
             {
                 LoadRandomBackground(null);
             }
+        }
 
+        private bool CanLoadBackground()
+        {
+            return EventSystem.current.currentSelectedGameObject == null || EventSystem.current.currentSelectedGameObject.GetComponent<InputField>() == null;
+        }
+
+        private void HandleIdleState()
+        {
             if ((Input.GetAxis("Mouse X") == 0 || Input.GetAxis("Mouse Y") == 0) && mainPanel.activeSelf)
             {
                 afkTime += Time.unscaledDeltaTime;
-
-                if (afkTime > 25f && (!settingsPanel.activeSelf && !accPanel.activeSelf && !additionalPanel.activeSelf))
-                {
-                    if (!hasPlayedIdle)
-                    {
-                        ToggleMenuPanel(mainPanel);
-                        Cursor.visible = false;
-                        idle.PlayInFixedTime("Idle");
-                        hasPlayedIdle = true;
-                    }
-                }
-                if (afkTime > 25f && (settingsPanel.activeSelf || accPanel.activeSelf || additionalPanel.activeSelf))
-                {
-                    Cursor.visible = true;
-                    notIdle.PlayInFixedTime("notIdle");
-                    hasPlayedIdle = false;
-                }
-                else if (afkTime < 25f)
-                {
-                    Cursor.visible = true;
-                }
+                HandleIdleAnimations();
             }
             else
             {
+                ResetIdleState();
+            }
+        }
 
+        private void HandleIdleAnimations()
+        {
+            if (afkTime > 25f && !IsPanelActive(settingsPanel, accPanel, additionalPanel))
+            {
+                if (!hasPlayedIdle)
+                {
+                    ToggleMenuPanel(mainPanel);
+                    Cursor.visible = false;
+                    idle.PlayInFixedTime("Idle");
+                    hasPlayedIdle = true;
+                }
+            }
+            else if (afkTime > 25f && IsPanelActive(settingsPanel, accPanel, additionalPanel))
+            {
                 Cursor.visible = true;
                 notIdle.PlayInFixedTime("notIdle");
                 hasPlayedIdle = false;
-                afkTime = 0f;
-                
             }
+        }
 
+        private void ResetIdleState()
+        {
+            Cursor.visible = true;
+            notIdle.PlayInFixedTime("notIdle");
+            hasPlayedIdle = false;
+            afkTime = 0f;
+        }
 
-                if (seconds != oldSeconds)
+        private void UpdateTimers()
+        {
+            string seconds = DateTime.Now.ToString("ss");
+            if (seconds != oldSeconds)
             {
                 UpdateTimer();
                 oldSeconds = seconds;
-            } 
+            }
+        }
+
+        private void HandleKeyBindings()
+        {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 GetComponent<JammerDash.Options>().ApplySettings();
                 ToggleMenuPanel(mainPanel);
             }
-            
+
             if (Input.GetKeyDown(KeybindingManager.reloadData))
             {
-                LoadLevelFromLevels();
-                LoadLevelsFromFiles();
-                
-                Notifications.instance.Notify($"Level list reloaded. \n{Directory.GetDirectories(Path.Combine(Application.persistentDataPath, "levels", "extracted"), "*").Count()} levels total", null);
-            }
-            if (Input.GetKeyDown(KeybindingManager.debug))
-            {
-                additionalPanel.SetActive(!additionalPanel.active);
+                ReloadLevels();
             }
 
-            
+            if (Input.GetKeyDown(KeybindingManager.debug))
+            {
+                additionalPanel.SetActive(!additionalPanel.activeSelf);
+            }
         }
+
+        private void ReloadLevels()
+        {
+            _ = LoadLevelFromLevels();
+            LoadLevelsFromFiles();
+            int levelCount = Directory.GetDirectories(Path.Combine(Application.persistentDataPath, "levels", "extracted"), "*").Count();
+            Notifications.instance.Notify($"Level list reloaded.\n{levelCount} levels total", null);
+        }
+
+        private bool IsPanelActive(params GameObject[] panels)
+        {
+            foreach (var panel in panels)
+            {
+                if (panel.activeSelf) return true;
+            }
+            return false;
+        }
+
 
         void UpdateTimer()
         {

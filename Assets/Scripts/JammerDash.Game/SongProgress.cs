@@ -92,8 +92,6 @@ namespace JammerDash.Game
                 // Calculate loading progress
                 float progress = operation.progress;
                 Time.timeScale = 0f;
-                // Update loading text
-                GameObject.Find("Canvas/default/loadingText").GetComponent<Text>().text = $"Downloading Song: {Path.GetFileName(filePath)}: {www.downloadedBytes / 1024768} MB ({progress * 100}%)";
 
 
                 yield return null;
@@ -104,7 +102,7 @@ namespace JammerDash.Game
             {
                 Debug.LogError($"Failed to load audio clip: {www.error}");
                 Debug.LogError(filePath);
-                GameObject.Find("Canvas/default/loadingText").GetComponent<Text>().text = "Failed to download the song. Restarting...";
+                Notifications.instance.Notify("This level failed to load due to invalid/missing audio file.", null);
                 SceneManager.LoadSceneAsync(1);
                 Time.timeScale = 1f;
                 CustomLevelDataManager.Instance.sceneLoaded = false;

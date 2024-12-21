@@ -1,3 +1,4 @@
+using JammerDash.Audio;
 using JammerDash.Tech;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +12,6 @@ namespace JammerDash.Game
 
     public class RestartCustom : MonoBehaviour
     {
-        string sceneAddress;
 
         void Start()
         {
@@ -20,12 +20,10 @@ namespace JammerDash.Game
 
         public void LoadScene()
         {
-            AudioSource[] audios = FindObjectsOfType<AudioSource>();
-            foreach (AudioSource audio in audios)
-            {
-                audio.outputAudioMixerGroup.audioMixer.SetFloat("Lowpass", 22000);
-                audio.outputAudioMixerGroup.audioMixer.ClearFloat("Lowpass");
-            }
+            
+            AudioManager.Instance.source.outputAudioMixerGroup.audioMixer.SetFloat("Lowpass", 22000);
+            AudioManager.Instance.source.outputAudioMixerGroup.audioMixer.ClearFloat("Lowpass");
+            
 
 
             if (SceneManager.GetActiveScene().name == "LevelDefault")

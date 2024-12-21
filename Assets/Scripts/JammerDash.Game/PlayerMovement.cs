@@ -134,6 +134,13 @@ namespace JammerDash.Game.Player
                 normalTextPrefab = Resources.Load<GameObject>("RinNormal");
                 badTextPrefab = Resources.Load<GameObject>("RinMiss");
             }
+            else if (data.hitType == 2)
+            {
+                goodTextPrefab = Resources.Load<GameObject>("NumHit");
+                okTextPrefab = Resources.Load<GameObject>("NumOK");
+                normalTextPrefab = Resources.Load<GameObject>("NumNormal");
+                badTextPrefab = Resources.Load<GameObject>("NumMiss");
+            }
             GameObject[] deathObjects = FindObjectsOfType<GameObject>();
             FindObjectOfType<cameraColor>().enabled = true;
             music.time = 0f;

@@ -34,7 +34,7 @@ namespace JammerDash.Game
             song.pitch = 0;
             player.enabled = false;
             StartCoroutine(LateStart());
-            Canvas[] canvases = FindObjectsOfType<Canvas>();
+            Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
             foreach (Canvas canvas in canvases)
             {
                 canvas.renderMode = RenderMode.ScreenSpaceCamera;
