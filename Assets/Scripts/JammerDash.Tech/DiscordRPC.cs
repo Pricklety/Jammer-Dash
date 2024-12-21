@@ -1,5 +1,4 @@
-﻿#if UNITY_STANDALONE_WIN
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Discord;
@@ -59,7 +58,12 @@ namespace JammerDash.Tech
             if (discord != null)
             {
                 discord.RunCallbacks();
-                UpdateDiscordPresence();
+                while (lastUpdateTime >= UpdateInterval)
+                {
+                    lastUpdateTime = 0f;
+                    UpdateDiscordPresence();
+                }
+                lastUpdateTime += Time.time;
             }
                
             
@@ -86,7 +90,7 @@ namespace JammerDash.Tech
                 {
                     if (sceneName == "SampleScene")
                     {
-                        var editorManager = FindObjectOfType<EditorManager>();
+                        var editorManager = FindFirstObjectByType<EditorManager>();
                         presence.Details = $"✎ {editorManager.songArtist.text} - {editorManager.customSongName.text}";
                         presence.State = $"{editorManager.objectCount.text}";
                     }
@@ -131,5 +135,3 @@ namespace JammerDash.Tech
             }
         }
     }
-
-    #endif

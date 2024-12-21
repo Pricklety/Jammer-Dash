@@ -6664,6 +6664,7 @@ MonoBehaviour:
   songLoaded: 0
   devText: {fileID: 828858576}
   source: {fileID: 1287563237}
+  volClickClip: {fileID: 8300000, guid: b5feeef83cc5c23498bbf80535841789, type: 3}
 --- !u!114 &1287563243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7929,6 +7930,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2810003822230129095, guid: 3b85ea57d6ecc9144b964fb6ef498752, type: 3}
+      propertyPath: BypassReverbZones
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2810003822230129095, guid: 3b85ea57d6ecc9144b964fb6ef498752, type: 3}
       propertyPath: OutputAudioMixerGroup
       value: 
       objectReference: {fileID: 24300002, guid: 76ec4ab55b2647249be5e774ca82f6b3, type: 2}
@@ -8041,7 +8046,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 156647891}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cd9e42417444b96439dd7aeff0814d84, type: 3}
   m_Name: 
@@ -8078,9 +8083,9 @@ MonoBehaviour:
   m_UIPopUpClose: {fileID: 8300000, guid: 2f54e98b49b6d854994749fd6facb731, type: 3}
   m_AudioPlayer: {fileID: 1287563237}
   m_SFXPlayer: {fileID: 1287563237}
-  m_Frame: {fileID: 1077354635638745053, guid: eb3c8c5a06a28c5478d57942ce9a7349, type: 3}
-  m_FrameTemplate: {fileID: 3143606824782078380, guid: eb3c8c5a06a28c5478d57942ce9a7349, type: 3}
-  m_TouchBlocker: {fileID: 3143606824782078380, guid: eb3c8c5a06a28c5478d57942ce9a7349, type: 3}
+  m_Frame: {fileID: 0}
+  m_FrameTemplate: {fileID: 0}
+  m_TouchBlocker: {fileID: 0}
   m_DebugOutputLabel: {fileID: 0}
   m_AllowVoiceOverGlobal: 1
   m_DetectVoiceOverAtRuntime: 1

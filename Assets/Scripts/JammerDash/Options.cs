@@ -41,7 +41,7 @@ namespace JammerDash
         public Slider musicSlider;
         private SettingsData settingsData;
         public bool isLoadingMusic = false;
-        public AudioManager audio;
+        public new AudioManager audio;
         public Slider masterVolumeSlider;
         public Dropdown playlist;
         public Toggle hitSounds;
@@ -91,7 +91,7 @@ namespace JammerDash
         {
            
             CheckForUpdate();
-            audio = FindObjectOfType<AudioManager>();
+            audio = AudioManager.Instance;
             if (audio == null)
             {
                 musicText.text = "<color=red><b>Music folder empty, or not found</b></color>";
@@ -433,7 +433,6 @@ namespace JammerDash
             ApplyResolution();
             HitNotes(settingsData.hitNotes);
             SFX(settingsData.sfx);
-            Focus(settingsData.focusVol);
             Vsync(settingsData.vsync);
             Cursor(settingsData.cursorTrail);
             SetLocale(settingsData.language);
@@ -450,14 +449,10 @@ namespace JammerDash
         }
         public void Cursor(bool enabled)
         {
-            FindObjectOfType<CursorTrail>().trailImage.gameObject.SetActive(enabled);
+            FindFirstObjectByType<CursorTrail>().trailImage.gameObject.SetActive(enabled);
             UnityEngine.Cursor.visible = true;
         }
-        public void Focus(bool enabled)
-        {
-            mainMenu menu = GetComponent<mainMenu>();
-            menu.focus = enabled;
-        }
+        
         public void Vsync(bool enabled)
         {
             QualitySettings.vSyncCount = enabled ? 1 : 0;
@@ -473,7 +468,7 @@ namespace JammerDash
         {
             List<Dropdown.OptionData> optionDataList = new List<Dropdown.OptionData>();
             List<string> shuffledSongPaths = audio.songPathsList;
-            FindObjectOfType<AudioManager>().ShuffleSongPathsList();
+            FindFirstObjectByType<AudioManager>().ShuffleSongPathsList();
             playlist.ClearOptions();
             foreach (var musicClipPath in shuffledSongPaths)
             {
@@ -913,7 +908,6 @@ namespace JammerDash
             Account.Instance.level = 0;
             Account.Instance.currentXP = 0;
             Account.Instance.SavePlayerData(Account.Instance.user);
-           FindObjectOfType<mainMenu>().LoadLevelFromLevels();
             confirmation.onClick.RemoveAllListeners();
 
         }
