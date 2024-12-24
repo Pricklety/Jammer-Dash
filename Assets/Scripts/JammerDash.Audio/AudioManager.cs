@@ -60,6 +60,8 @@ namespace JammerDash.Audio
         private int currentSceneIndex = -1;
         PostProcessVolume postProcess;
         mainMenu menu;
+        private FileSystemWatcher fileWatcher; 
+        private HashSet<string> knownFiles = new HashSet<string>();
 
         private void Awake()
         {
@@ -67,7 +69,6 @@ namespace JammerDash.Audio
             {
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
-                StartCoroutine(LoadAudioClipsAsync());
 
             }
             else
@@ -75,10 +76,10 @@ namespace JammerDash.Audio
                 Destroy(gameObject);
             }
             volClickClip = Resources.Load<AudioClip>("Audio/SFX/volClick");
-            QualitySettings.maxQueuedFrames = 0; 
+            QualitySettings.maxQueuedFrames = 3;
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
-        
+
         public void Start()
         {
             InitializeForScene(SceneManager.GetActiveScene().buildIndex);
@@ -86,14 +87,133 @@ namespace JammerDash.Audio
             masterS.onValueChanged.AddListener(OnMasterVolumeChanged);
             source = GetComponent<AudioSource>();
             if (Debug.isDebugBuild)
-            devText.gameObject.SetActive(true);
+                devText.gameObject.SetActive(true);
             else
-            devText.gameObject.SetActive(false);
+                devText.gameObject.SetActive(false);
 
 
             if (isLogoSFX)
                 source.PlayOneShot(sfxShort);
 
+            // Initialize FileSystemWatcher
+            string persistentPath = Application.persistentDataPath;
+            Debug.Log($"Setting up FileSystemWatcher for path: {persistentPath}");
+
+            // Initialize FileSystemWatcher
+            fileWatcher = new FileSystemWatcher
+            {
+                Path = persistentPath,
+                Filter = "*.mp3",
+                IncludeSubdirectories = true,
+                NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite
+            };
+
+            // Subscribe to events
+            fileWatcher.Created += OnNewFileDetected;
+            fileWatcher.Renamed += OnFileRenamed;
+            fileWatcher.Changed += OnNewFileDetected;
+            fileWatcher.Deleted += OnFileDeleted;
+            fileWatcher.Error += OnWatcherError;
+
+            // Enable watcher
+            fileWatcher.EnableRaisingEvents = true;
+            Debug.Log("FileSystemWatcher initialized and active.");
+
+            // Initial load
+            StartCoroutine(LoadAudioClipsAsync());
+
+        }
+
+        private void OnDestroy()
+        {
+            if (fileWatcher != null)
+            {
+                fileWatcher.EnableRaisingEvents = false;
+                fileWatcher.Dispose();
+            }
+        }
+
+        private void OnNewFileDetected(object sender, FileSystemEventArgs e)
+        {
+            Debug.Log($"New file detected: {e.FullPath}");
+            StartCoroutine(HandleFileChange(e.FullPath));
+        }
+
+        private void OnFileRenamed(object sender, RenamedEventArgs e)
+        {
+            Debug.Log($"File renamed or moved: {e.FullPath}");
+            StartCoroutine(HandleFileChange(e.FullPath));
+        }
+
+        private void OnWatcherError(object sender, ErrorEventArgs e)
+        {
+            Debug.LogError($"FileSystemWatcher error: {e.GetException()}");
+            Notifications.instance.Notify("An error happened in the game folder. Restarting may help", null);
+        }
+        private void OnFileDeleted(object sender, FileSystemEventArgs e)
+        {
+            Debug.Log($"File deleted: {e.FullPath}");
+            HandleFileDeletion(e.FullPath);
+        }
+        private void HandleFileDeletion(string filePath)
+        {
+            if (knownFiles.Contains(filePath))
+            {
+                knownFiles.Remove(filePath);
+                songPathsList.Remove(filePath);
+
+                // Notify user
+                LoadAudioClipsAsync();
+                Debug.Log($"File removed from playlist: {filePath}");
+            }
+        }
+        private IEnumerator HandleFileChange(string filePath)
+        {
+            // Ensure the file exists and is valid
+            if (File.Exists(filePath) && Path.GetExtension(filePath) == ".mp3")
+            {
+                if (!knownFiles.Contains(filePath))
+                {
+                    knownFiles.Add(filePath);
+                    yield return LoadAudioClipsAsync(); // Refresh playlist
+                }
+            }
+        }
+
+        public IEnumerator LoadAudioClipsAsync()
+        {
+
+            string persistentPath = Application.persistentDataPath;
+
+            // Collect all audio files
+            string[] mp3Files = Directory.GetFiles(persistentPath, "*.mp3", SearchOption.AllDirectories);
+            string[] wavFiles = Directory.GetFiles(persistentPath, "*.wav", SearchOption.AllDirectories);
+            string[] allAudioFiles = mp3Files.Concat(wavFiles).ToArray();
+
+            Debug.Log($"Found {allAudioFiles.Length} audio files in {persistentPath}");
+
+            bool newFilesAdded = false;
+            foreach (string audioFile in allAudioFiles)
+            {
+                if (!songPathsList.Contains(audioFile))
+                {
+                    songPathsList.Add(audioFile);
+                    newFilesAdded = true;
+                }
+            }
+
+            // Notify user about new files
+            if (newFilesAdded)
+            {
+                ShuffleSongPathsList();
+                Notifications.instance.Notify($"Playlist loaded. {allAudioFiles.Length} songs found.", null);
+            }
+            else
+            {
+                Notifications.instance.Notify($"No new songs found. {songPathsList.Count} songs in the playlist.", null);
+            }
+
+            yield return null;
         }
         private void InitializeForScene(int sceneIndex)
         {
@@ -292,7 +412,7 @@ namespace JammerDash.Audio
                     {
                         audio.enabled = true;
                     }
-                    
+
                 }
             }
         }
@@ -370,7 +490,7 @@ namespace JammerDash.Audio
         {
             source.PlayOneShot(volClickClip, 0.75f);
         }
-         
+
 
         public void SetMasterVolume(float volume)
         {
@@ -410,76 +530,7 @@ namespace JammerDash.Audio
         {
             return loadingProgress;
         }
-        public IEnumerator LoadAudioClipsAsync()
-        {
-            yield return null;
-
-            string persistentPath = Application.persistentDataPath;
-
-            string sourceFolderPath = Path.Combine(Application.streamingAssetsPath, "music");
-
-            if (Directory.Exists(sourceFolderPath))
-            {
-                string[] musicFiles = Directory.GetFiles(sourceFolderPath, "*.mp3", SearchOption.AllDirectories);
-
-                // Use Task to perform file copying in parallel
-                Task[] copyTasks = new Task[musicFiles.Length];
-                for (int i = 0; i < musicFiles.Length; i++)
-                {
-                    string sourceFilePath = musicFiles[i];
-                    string destinationFilePath = Path.Combine(persistentPath, Path.GetFileName(sourceFilePath));
-
-                    copyTasks[i] = Task.Run(() =>
-                    {
-                        File.Copy(sourceFilePath, destinationFilePath, true);
-                        Debug.Log($"Copied: {sourceFilePath} to {destinationFilePath}");
-                    });
-                }
-
-                // Wait for all file copy tasks to complete
-                yield return new WaitUntil(() => copyTasks.All(t => t.IsCompleted));
-            }
-            else
-            {
-                Debug.LogError($"Source folder not found: {sourceFolderPath}");
-            }
-
-            // Get all .mp3 and .wav files from the persistent path
-            string[] mp3Files = Directory.GetFiles(persistentPath, "*.mp3", SearchOption.AllDirectories);
-            string[] wavFiles = Directory.GetFiles(persistentPath, "*.wav", SearchOption.AllDirectories);
-
-            // Get all .mp3 files from the streaming assets path
-            string[] defaultFiles = Directory.GetFiles(Application.streamingAssetsPath, "*.mp3", SearchOption.AllDirectories);
-
-            // Combine all arrays into one
-            string[] copiedFiles = mp3Files.Concat(wavFiles).Concat(defaultFiles).ToArray();
-
-
-            Debug.Log($"Found {copiedFiles.Length} audio files in {persistentPath}");
-
-            bool newFilesAdded = false;
-            foreach (string copiedFile in copiedFiles)
-            {
-                if (!songPathsList.Contains(copiedFile))
-                {
-                    songPathsList.Add(copiedFile);
-                    newFilesAdded = true;
-                }
-            }
-
-          
-
-            // Shuffle the list of song paths only if new files were added
-            if (newFilesAdded)
-            {
-                ShuffleSongPathsList();
-                Notifications.instance.Notify($"Playlist loaded. \n{copiedFiles.Length} songs found.", null); // Display notification
-            }
-            else
-            {
-                Notifications.instance.Notify($"No new songs found. \n{songPathsList.Count} songs in the playlist.", null); // Display notification
-            }
-        }
+      
         public void PlaySource()
         {
 
@@ -490,7 +541,7 @@ namespace JammerDash.Audio
 
         public void Pause()
         {
-           source.Pause();
+            source.Pause();
 
             paused = true;
         }
@@ -707,9 +758,9 @@ namespace JammerDash.Audio
         {
             List<string> songPathsList = new List<string>();
 
-                string[] musicFiles = Directory.GetFiles(Application.persistentDataPath, "*.mp3", SearchOption.AllDirectories);
-                songPathsList.AddRange(musicFiles);
-            
+            string[] musicFiles = Directory.GetFiles(Application.persistentDataPath, "*.mp3", SearchOption.AllDirectories);
+            songPathsList.AddRange(musicFiles);
+
             return songPathsList;
         }
 
@@ -717,7 +768,7 @@ namespace JammerDash.Audio
 
         public int GetTotalNumberOfSongs()
         {
-           
+
             string[] musicFiles = Directory.GetFiles(Application.persistentDataPath, "*.mp3", SearchOption.AllDirectories);
             int numberOfMusicFiles = musicFiles.Length;
             return numberOfMusicFiles;
@@ -728,6 +779,7 @@ namespace JammerDash.Audio
             return loadedSongsCount;
         }
     }
+
     public class WaitForAllTasks : CustomYieldInstruction
     {
         private Task[] tasks;
@@ -743,25 +795,6 @@ namespace JammerDash.Audio
         }
     }
 
-   
-}
 
-namespace JammerDash.Menus
-{
-    public class KeybindPanel
-    {
-        public static void ToggleFunction(string func, string key)
-        {
-            if (EventSystem.current.currentSelectedGameObject == null ||
-                    EventSystem.current.currentSelectedGameObject.GetComponent<InputField>() == null)
-            {
-                AudioManager.Instance.toggleAnim.Rebind();
-                AudioManager.Instance.toggleAnim.Play("keybindFunc", 0, 0);
-                AudioManager.Instance.functionName.text = func;
-                AudioManager.Instance.functionKeybind.text = key;
-            }
-               
-        }
-    }
-}
 
+}

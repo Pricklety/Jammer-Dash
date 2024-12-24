@@ -142,7 +142,6 @@ namespace JammerDash.Game.Player
                 badTextPrefab = Resources.Load<GameObject>("NumMiss");
             }
             GameObject[] deathObjects = FindObjectsOfType<GameObject>();
-            FindObjectOfType<cameraColor>().enabled = true;
             music.time = 0f;
             foreach (GameObject obj in deathObjects)
             {

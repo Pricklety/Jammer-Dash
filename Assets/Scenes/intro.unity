@@ -6136,6 +6136,7 @@ GameObject:
   - component: {fileID: 1177968661}
   - component: {fileID: 1177968662}
   - component: {fileID: 1177968663}
+  - component: {fileID: 1177968664}
   m_Layer: 0
   m_Name: manager
   m_TagString: Untagged
@@ -6260,6 +6261,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93fa513f8053b0245aad1cc2353b2fa0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1177968664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1177968658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ed466a4f3fd91d49965fa0612f65ce5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1227971771
@@ -6665,18 +6678,6 @@ MonoBehaviour:
   devText: {fileID: 828858576}
   source: {fileID: 1287563237}
   volClickClip: {fileID: 8300000, guid: b5feeef83cc5c23498bbf80535841789, type: 3}
---- !u!114 &1287563243
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 156647891}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ed466a4f3fd91d49965fa0612f65ce5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1356364923
 GameObject:
   m_ObjectHideFlags: 0
@@ -7954,9 +7955,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2810003822230129094, guid: 3b85ea57d6ecc9144b964fb6ef498752, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1287563241}
-    - targetCorrespondingSourceObject: {fileID: 2810003822230129094, guid: 3b85ea57d6ecc9144b964fb6ef498752, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1287563243}
     - targetCorrespondingSourceObject: {fileID: 2810003822230129094, guid: 3b85ea57d6ecc9144b964fb6ef498752, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2810003823231954468}

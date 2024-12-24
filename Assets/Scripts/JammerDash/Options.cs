@@ -136,7 +136,6 @@ namespace JammerDash
             Русский,  // Russian
             Español, // Spanish (Latin America)
             Deutsch, // German
-            اردو, // Urdu
             BahasaIndonesia, // Indonesian
             portuguêsBrasil, // Brazilian Portuguese
             Hrvatski, // Croatian
@@ -156,7 +155,6 @@ namespace JammerDash
                 { "Русский", Language.Русский },
                 { "Español (américa latina)", Language.Español },
                 { "Deutsch", Language.Deutsch },
-                { "اردو", Language.اردو },
                 { "bahasa indonesia", Language.BahasaIndonesia },
                 { "português (brasil)", Language.portuguêsBrasil },
                 { "Hrvatski", Language.Hrvatski },
@@ -174,7 +172,6 @@ namespace JammerDash
                 { Language.Русский, ("ru-RU", "ru-RU") },
                 { Language.Español, ("es", "es") },
                 { Language.Deutsch, ("de-DE", "de-DE") },
-                { Language.اردو, ("ur-PK", "ur-PK") },
                 { Language.BahasaIndonesia, ("id-ID", "id-ID") },
                 { Language.portuguêsBrasil, ("pt-BR", "pt-BR") },
                 { Language.Hrvatski, ("hr-HR", "hr-HR") },
@@ -253,19 +250,7 @@ namespace JammerDash
         }
         
 
-        string[] GetSubfolders(string folderPath)
-        {
-            List<string> subfolders = new List<string>();
-            string path = folderPath;
-            GameObject[] folders = Resources.LoadAll<GameObject>(path);
-            foreach (GameObject folder in folders)
-            {
-                // Get the relative path of the subfolder
-                string subfolder = folder.name.Substring(folderPath.Length + 1);
-                subfolders.Add(subfolder);
-            }
-            return subfolders.ToArray();
-        }
+      
         public void SetBackgroundImage()
         {
             string text = backgrounds.captionText.text;
@@ -361,7 +346,6 @@ namespace JammerDash
         "ru-RU", // Russian
         "es", // Spanish (Latin America)
         "de-DE", // German
-        "ur-PK", // Urdu
         "id-ID", // Indonesian
         "pt-BR", // Portuguese (Brazil)
         "hr-HR", // Croatian

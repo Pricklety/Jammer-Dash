@@ -42,46 +42,6 @@ namespace JammerDash.Audio
 
         }
 
-        public int GetDesiredSongIndex(AudioManager audioManager)
-        {
-            // Check if it's December
-            if (System.DateTime.Now.Month == 12)
-            {
-                int index = GetActualIndex(audioManager, christmasClipIndex); // Get index based on Christmas clip
-                audioManager.currentClipIndex = index; // Set AudioManager's currentClipIndex
-                return index;
-            }
-            else
-            {
-                int index = GetActualIndex(audioManager, normalClipIndex); // Get index based on normal clip
-                audioManager.currentClipIndex = index; // Set AudioManager's currentClipIndex
-                return index;
-            }
-        }
 
-
-        private int GetActualIndex(AudioManager audioManager, int desiredIndex)
-        {
-            if (audioManager != null && audioManager.songPathsList != null && audioManager.songPathsList.Count > 0)
-            {
-                // Ensure desiredIndex is within the valid range
-                desiredIndex = Mathf.Clamp(desiredIndex, 0, audioManager.songPathsList.Count - 1);
-
-                // Find the actual index of the desired song in the playlist
-                string clipName = System.DateTime.Now.Month == 12 ? christmasClip.name : normalClip.name; // Get the name of the appropriate clip
-                for (int i = 0; i < audioManager.songPathsList.Count; i++)
-                {
-                    string songPath = audioManager.songPathsList[i];
-                    string fileName = Path.GetFileNameWithoutExtension(songPath);
-                    if (fileName.Contains(clipName))
-                    {
-                        return i; // Return the index if the file name contains the clip name
-                    }
-                }
-            }
-
-            UnityEngine.Debug.LogWarning("Desired song not found in the playlist. Playing the first song.");
-            return desiredIndex;
-        }
     }
 }

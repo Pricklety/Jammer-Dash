@@ -83,7 +83,6 @@ namespace JammerDash.Editor
             }
             if (collision.CompareTag("Beat"))
             {
-                Debug.Log("hit");
                 AudioClip hitSound = Resources.Load<AudioClip>("Audio/SFX/metronome");
                 GameObject.Find("sfx").GetComponent<AudioSource>().PlayOneShot(hitSound, 1);
 
@@ -94,7 +93,6 @@ namespace JammerDash.Editor
         {
             if (collision.CompareTag("LongCube"))
             {
-               Debug.Log("hit");
                sfxS.PlayOneShot(hitSounds[6]);
 
 
@@ -105,8 +103,6 @@ namespace JammerDash.Editor
             // Wait for 0.07 seconds
             yield return new WaitForSeconds(0.07f);
 
-            // Logic after delay
-            Debug.Log("hit");
             switch (collision.gameObject.name)
             {
                 case "hitter01(Clone)":
