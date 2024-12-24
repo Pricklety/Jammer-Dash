@@ -13,10 +13,6 @@ namespace JammerDash
         public AudioClip shutter;
         private bool takeScreenshotOnNextFrame;
 
-        private void Start()
-        {
-
-        }
         private void Update()
         {
             DontDestroyOnLoad(this);

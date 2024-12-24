@@ -13,7 +13,6 @@ namespace JammerDash
         public Text introtext;
         public AudioSource source;
 
-        private bool sceneActivationAllowed = false;
 
         void Start()
         {

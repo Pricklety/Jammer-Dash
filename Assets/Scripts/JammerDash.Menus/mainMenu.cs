@@ -1354,7 +1354,6 @@ namespace JammerDash.Menus
         public void FixedUpdate()
         {
             UpdateShuffleImage();
-            UpdateClockText();
             UpdateUsernames();
             UpdateLevelText();
             UpdateStatsText();
@@ -1369,15 +1368,6 @@ namespace JammerDash.Menus
             shuffleImage.color = AudioManager.Instance.shuffle ? Color.HSVToRGB(0.33f, 0.47f, 1) : Color.white;
         }
 
-        private void UpdateClockText()
-        {
-            if (GameTimer.self != null)
-            {
-                string timeInfo = DateTime.Now.ToString("hh:mm:ss tt") + "\n";
-                timeInfo += "running " + FormatElapsedTime(GameTimer.GetRunningTime());
-                clock.text = timeInfo;
-            }
-        }
 
         private void UpdateUsernames()
         {
@@ -1635,6 +1625,9 @@ namespace JammerDash.Menus
             sec.transform.localRotation = Quaternion.Euler(0, 0, -secInt * 6);
             min.transform.localRotation = Quaternion.Euler(0, 0, -minInt * 6);
             hour.transform.localRotation = Quaternion.Euler(0, 0, -hourInt * 30);
+            clock.text = DateTime.Now.ToString("hh:mm:ss tt") + "\n" + DateTime.Now.ToString("dd.MM.yyyy");
+
+
         }
 
         public void OnPointerClick(PointerEventData eventData)

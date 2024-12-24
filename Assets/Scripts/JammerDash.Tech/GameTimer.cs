@@ -6,12 +6,7 @@ namespace JammerDash.Tech
     public class GameTimer : MonoBehaviour
     {
         private static float gameStartTime;
-        public static GameTimer self;
-
-        private void Start()
-        {
-            self = this;
-        }
+       
         static void FixedUpdate()
         {
             // Set the game start time when the script is loaded

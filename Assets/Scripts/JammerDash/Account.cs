@@ -14,12 +14,13 @@ namespace JammerDash
 
     public class Account : MonoBehaviour
     {
-        [Header("Username")]
+        [Header("Account info")]
         public string username;
         public string user;
         public string email;
         public string cc;
         public string url;
+
         [Header("Level")]
         public int level = 0;
         public long currentXP = 0;
@@ -28,6 +29,7 @@ namespace JammerDash
 
         [Header("Local data")]
         public PlayerData p;
+
         [Header("Internet Check")]
         public GameObject checkInternet;
 
