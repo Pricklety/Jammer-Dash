@@ -57,12 +57,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - Locale
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 583e84b73a50de04693d9dfdbb919816
-    m_Address: Urdu (Pakistan) (ur-PK)
-    m_ReadOnly: 1
-    m_SerializedLabels:
-    - Locale
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a46810f867c578a4d86a4127d2b718de
     m_Address: Japanese (Japan) (ja-JP)
     m_ReadOnly: 1

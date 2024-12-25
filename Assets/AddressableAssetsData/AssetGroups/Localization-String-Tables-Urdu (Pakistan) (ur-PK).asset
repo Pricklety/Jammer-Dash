@@ -14,13 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_GroupName: Localization-String-Tables-Urdu (Pakistan) (ur-PK)
   m_GUID: f2c90b8387ebdff4cb3a42127d1a3907
-  m_SerializeEntries:
-  - m_GUID: 2949d450196bd354ca63c4354a8a08bf
-    m_Address: lang_ur-PK
-    m_ReadOnly: 1
-    m_SerializedLabels:
-    - Locale-ur-PK
-    FlaggedDuringContentUpdateRestriction: 0
+  m_SerializeEntries: []
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: 14e912134fea9504ba3b19a082bc5196, type: 2}
   m_SchemaSet:

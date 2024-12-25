@@ -463,6 +463,10 @@ MonoBehaviour:
     m_Localized: "\u0160empre \xEDna tempra pr\xF3xima! Kv\xEDz \xE9s d\xE9spa re\u0161t\xE1rta?"
     m_Metadata:
       m_Items: []
+  - m_Id: 11238275445010432
+    m_Localized: "\u0160eyder"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
