@@ -23,7 +23,7 @@ namespace JammerDash.Game
             {
                 cubes = GameObject.FindGameObjectsWithTag("Cubes");
             }
-            float destruction = ((float)accCount / FindObjectOfType<PlayerMovement>().Total) * 100;
+            float destruction = ((float)accCount / GetComponent<PlayerMovement>().Total) * 100;
             // Call GetTier and print the returned tier
             GetTier(destruction);
 
@@ -50,51 +50,6 @@ namespace JammerDash.Game
                 return "S";
             }
             else if (destructionPercentage <= maxScore && destructionPercentage >= maxScore * 0.92f)
-            {
-                return "A";
-            }
-            else if (destructionPercentage >= maxScore * 0.86f)
-            {
-                return "B";
-            }
-            else if (destructionPercentage >= maxScore * 0.75f)
-            {
-                return "C";
-            }
-            else if (destructionPercentage >= maxScore * 0.50f)
-            {
-                return "D";
-            }
-            else if (destructionPercentage >= maxScore * 0.25f)
-            {
-                return "F";
-            }
-            else
-            {
-                return "F-";
-            }
-        }
-
-        public string GetNoColorTier(float destructionPercentage)
-        {
-            float maxScore = 100;
-            if (destructionPercentage > maxScore)
-            {
-                return "Invalid";
-            }
-            if (destructionPercentage == maxScore)
-            {
-                return "SS+";
-            }
-            else if (destructionPercentage >= maxScore * 0.99f && FindObjectOfType<PlayerMovement>().misses != 1)
-            {
-                return "SS";
-            }
-            else if (destructionPercentage >= maxScore * 0.95f && FindObjectOfType<PlayerMovement>().misses != 1)
-            {
-                return "S";
-            }
-            else if ((destructionPercentage <= maxScore && destructionPercentage >= maxScore * 0.92f && FindObjectOfType<PlayerMovement>().misses >= 1) || (destructionPercentage <= 0.95f && FindObjectOfType<PlayerMovement>().misses >= 0))
             {
                 return "A";
             }
