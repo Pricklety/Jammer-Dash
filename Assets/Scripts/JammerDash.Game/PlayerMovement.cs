@@ -18,54 +18,48 @@ namespace JammerDash.Game.Player
 {
     public class PlayerMovement : MonoBehaviour 
     {
-
-        private float click = 0.05f;
-        public float moveSpeed = 1f;
-        public Transform cam;
+        [Header("Prefabs")]
         public GameObject goodTextPrefab;
         public GameObject normalTextPrefab;
         public GameObject okTextPrefab;
         public GameObject badTextPrefab;
         public GameObject destroyParticlesPrefab;
+
+        [Header("Scene objects")]
+        public Transform cam;
         public LayerMask cubeLayerMask;
-        public LayerMask longcubeLayerMask;
-        public AudioClip[] hitSounds;
-        public AudioSource sfxS;
-        public AudioClip jump;
-        public AudioClip[] hit;
-        public AudioClip impact;
-        public AudioClip fail;
-        private int hpint;
-        public float health;
-        public float maxHealth;
+        public LayerMask longcubeLayerMask; 
         public Slider hpSlider;
         public CubeCounter counter;
         public Text combotext;
         public Animation cubeanim;
         public Animation movement;
-        private Animation dash;
-        public AudioSource music;
-        public HashSet<GameObject> passedCubes = new HashSet<GameObject>();
-        private HashSet<GameObject> activeCubes = new HashSet<GameObject>();
-        public List<GameObject> cubes = new();
         public Text scoreText;
         public Text keyText;
         public Text debug;
         public Text acc;
         private PostProcessVolume volume;
         private Vignette vignette;
-        private float initialIntensity;
-        public float vignetteStartHealthPercentage = 0.5f;
-        public UnityEngine.Color startColor = UnityEngine.Color.red;
+
+        [Header("Sound effects")]
+        public AudioClip[] hitSounds;
+        public AudioSource sfxS;
+        public AudioClip jump;
+        public AudioClip[] hit;
+        public AudioClip impact;
+        public AudioClip fail;
+        public AudioSource music;
+
+        [Header("Player status")]
+        private int hpint;
+        public float health;
+        public float maxHealth;
+        public HashSet<GameObject> passedCubes = new HashSet<GameObject>();
+        private HashSet<GameObject> activeCubes = new HashSet<GameObject>();
+        public List<GameObject> cubes = new();
         public int k;
         public int l;
-        [Header("Tutorial Stuff")]
-        public AudioClip clip01;
-        public AudioClip clip02;
-        public AudioClip clip03;
-        public AudioClip clip04;
-        public AudioClip clip05;
-        public AudioClip clip06;
+
 
         [Header("UI")]
         public GameObject deathPanel;
@@ -99,6 +93,8 @@ namespace JammerDash.Game.Player
         public int one;
         public int SPInt;
         private bool isBufferRunning = false;
+        public float vignetteStartHealthPercentage = 0.5f;
+        public UnityEngine.Color startColor = UnityEngine.Color.red;
 
         private void Awake()
         {
@@ -106,10 +102,10 @@ namespace JammerDash.Game.Player
         }
         private void Start()
         {
+            music.time = 0f;
             CustomLevelDataManager.Instance.sceneLoaded = false;
-            volume = FindObjectOfType<PostProcessVolume>();
+            volume = Camera.main.GetComponent<PostProcessVolume>();
             volume.profile.TryGetSettings(out vignette);
-            initialIntensity = vignette.intensity.value;
             vignette.color.value = startColor;
            if (CustomLevelDataManager.Instance.playerhp != 0)
             {
@@ -120,39 +116,31 @@ namespace JammerDash.Game.Player
                 maxHealth = 300;
             InputSystem.pollingFrequency = 1000;
             SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-            if (data.hitType == 0)
+
+            switch (data.hitType) 
             {
-                goodTextPrefab = Resources.Load<GameObject>("good");
-                okTextPrefab = Resources.Load<GameObject>("crap");
-                normalTextPrefab = Resources.Load<GameObject>("ok");
-                badTextPrefab = Resources.Load<GameObject>("bad");
-            }
-            else if (data.hitType == 1)
-            {
-                goodTextPrefab = Resources.Load<GameObject>("RinHit");
-                okTextPrefab = Resources.Load<GameObject>("RinOK");
-                normalTextPrefab = Resources.Load<GameObject>("RinNormal");
-                badTextPrefab = Resources.Load<GameObject>("RinMiss");
-            }
-            else if (data.hitType == 2)
-            {
-                goodTextPrefab = Resources.Load<GameObject>("NumHit");
-                okTextPrefab = Resources.Load<GameObject>("NumOK");
-                normalTextPrefab = Resources.Load<GameObject>("NumNormal");
-                badTextPrefab = Resources.Load<GameObject>("NumMiss");
-            }
-            GameObject[] deathObjects = FindObjectsOfType<GameObject>();
-            music.time = 0f;
-            foreach (GameObject obj in deathObjects)
-            {
-                if (obj.name == "death")
-                {
-                    deathPanel = obj;
+                case 1:
+                    goodTextPrefab = Resources.Load<GameObject>("RinHit");
+                    okTextPrefab = Resources.Load<GameObject>("RinOK");
+                    normalTextPrefab = Resources.Load<GameObject>("RinNormal");
+                    badTextPrefab = Resources.Load<GameObject>("RinMiss");
                     break;
-                }
+                case 2:
+                    goodTextPrefab = Resources.Load<GameObject>("NumHit");
+                    okTextPrefab = Resources.Load<GameObject>("NumOK");
+                    normalTextPrefab = Resources.Load<GameObject>("NumNormal");
+                    badTextPrefab = Resources.Load<GameObject>("NumMiss");
+                    break;
+                default:
+                    goodTextPrefab = Resources.Load<GameObject>("good");
+                    okTextPrefab = Resources.Load<GameObject>("crap");
+                    normalTextPrefab = Resources.Load<GameObject>("ok");
+                    badTextPrefab = Resources.Load<GameObject>("bad");
+                    break;
             }
-            acc = GameObject.Find("acc").GetComponent<Text>();
+           
             
+           
             health = maxHealth;
         }
       
@@ -272,7 +260,6 @@ namespace JammerDash.Game.Player
 
 
 
-            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
             if (combo < 0)
             {
                 combo = 0;
@@ -296,7 +283,7 @@ namespace JammerDash.Game.Player
                 health = 0;
             }
             float playerPositionInSeconds = transform.position.x / 7;
-            float finishLinePositionInSeconds = FindObjectOfType<FinishLine>().transform.position.x / 7;
+            float finishLinePositionInSeconds = FindFirstObjectByType<FinishLine>().transform.position.x / 7;
 
             // Calculate time in minutes and seconds
             int playerMinutes = Mathf.FloorToInt(playerPositionInSeconds / 60);
@@ -347,18 +334,18 @@ namespace JammerDash.Game.Player
 
             }
             if (music.isPlaying)
-                transform.position = Vector2.Lerp(transform.position, new Vector2(music.time * 7, transform.position.y), 1); 
+                transform.position = Vector2.Lerp(transform.position, new Vector2(music.time * 7, transform.position.y), 1);
             else
-                transform.Translate(moveSpeed * Time.deltaTime * Vector2.right);
+                transform.Translate(7 * Time.deltaTime * Vector2.right);
 
-            float distanceToFinishLine = Mathf.Abs(cam.transform.position.x - FindObjectOfType<FinishLine>().transform.position.x);
-            if (cam.transform.position.x < FindObjectOfType<FinishLine>().transform.position.x)
+            float distanceToFinishLine = Mathf.Abs(cam.transform.position.x - FindFirstObjectByType<FinishLine>().transform.position.x);
+            if (cam.transform.position.x < FindFirstObjectByType<FinishLine>().transform.position.x)
             {;
 
                 if (distanceToFinishLine < 3)
                 {
                     // Calculate the target position to move the camera
-                    Vector3 targetPos = new Vector3(FindObjectOfType<FinishLine>().transform.position.x, 0.7f, -10);
+                    Vector3 targetPos = new Vector3(FindFirstObjectByType<FinishLine>().transform.position.x, 0.7f, -10);
 
                     // Smoothly move the camera towards the target position
                     Vector3 smoothPosition = Vector3.Lerp(cam.transform.position, targetPos, 10f * Time.deltaTime);
@@ -490,7 +477,6 @@ namespace JammerDash.Game.Player
                 return Vector2.Distance(transform.position, circleCenter) <= radius;
             }
 
-            // Add more collider type checks as needed
 
             return false;
         }
@@ -510,12 +496,7 @@ namespace JammerDash.Game.Player
             StartCoroutine(ChangeTextCombo());
         }
 
-        private float CalculateLevelCompletionTime()
-        {
-            float levelCompletionTime = Mathf.Clamp(0, 0f, FindObjectOfType<FinishLine>().transform.position.x / 7);
-            return levelCompletionTime;
-        }
-
+        
 
         IEnumerator ChangeTextCombo()
         {
@@ -523,7 +504,7 @@ namespace JammerDash.Game.Player
             float lerpTimer = 0f;
             misses++;
             health -= 30;
-            counter.score -= 350;
+            counter.score -= Mathf.RoundToInt(maxScore * 3 / counter.cubes.Length);
             while (lerpTimer < 1f)
             {
                 lerpTimer += Time.fixedDeltaTime * lerpSpeed;
@@ -538,7 +519,7 @@ namespace JammerDash.Game.Player
         public GameObject deviationMarker;
         private List<GameObject> activeMarkers = new List<GameObject>();
         private float maxDeviation = 0.75f;
-        public int maxMarkers = 10; // Limit the number of markers
+        public int maxMarkers = 100; // Limit the number of markers
         public Image averageTimingImage; 
         private List<float> playerDistances = new List<float>();
 
@@ -629,6 +610,7 @@ namespace JammerDash.Game.Player
             UnityEngine.Debug.Log(playerDistance);
 
             // Create a deviation marker
+            if (hit.collider != null)
             CreateDeviationMarker(transform.position, hit.transform.position);
 
             // Handle scoring logic
@@ -667,7 +649,7 @@ namespace JammerDash.Game.Player
             }
 
             counter.destroyedCubes += 50;
-            float formula = (maxScore * factor) / counter.cubes.Length;
+            float formula = maxScore * factor / counter.cubes.Length;
             float newDestroyedCubes = counter.score + formula;
             newDestroyedCubes = Mathf.RoundToInt(newDestroyedCubes);
 
@@ -680,7 +662,7 @@ namespace JammerDash.Game.Player
             {
                 counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
                 elapsedTime += Time.deltaTime;
-                scoreText.text = $"{counter.score}\n<color=lime>(+{formula:0})</color>";
+                scoreText.text = $"{counter.score}";
                 yield return null;
             }
 
@@ -810,8 +792,7 @@ namespace JammerDash.Game.Player
                 {
                     activeCubes.Remove(collision.gameObject);
 
-
-                    health -= 30;
+                   
                     bufferActive = false;
 
                 }
@@ -820,7 +801,8 @@ namespace JammerDash.Game.Player
                     UnityEngine.Debug.Log("hit: " + bufferActive);
                     DestroyCube(collision.gameObject);
                         sfxS.PlayOneShot(hitSounds[6]);
-                        bufferActive = false;
+                    StartCoroutine(ChangeScore(0f, new RaycastHit2D()));
+                    bufferActive = false;
                     health += 20;
                 }
             }
@@ -833,12 +815,6 @@ namespace JammerDash.Game.Player
         {
             if (bufferActive)
             {
-                int formula = 1;
-                int newDestroyedCubes = counter.score + formula;
-                scoreText.text = $"{counter.score}\n<color=lime>(+{formula})</color>";
-                // Ensure the score reaches the final value precisely
-                counter.score = newDestroyedCubes;
-
                 health += 0.075f;
                 yield return null;
             }

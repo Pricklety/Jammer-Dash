@@ -29,14 +29,12 @@ namespace JammerDash.Tech
         // Update is called once per frame
         void FixedUpdate()
         {
-            gui.text = $"Debug v13 - Jammer Dash {Application.version} (Unity {Application.unityVersion})\n\n";
+            gui.text = $"Debug v13 - Jammer Dash {Application.version}\n\n";
 
             DisplayAccountInfo();
             DisplayAudioInfo();
-            DisplayInputInfo();
             DisplaySystemInfo();
             DisplayGraphicsInfo();
-            DisplayVideoInfo();
 
         }
 
@@ -81,26 +79,5 @@ namespace JammerDash.Tech
                 musicSource = AudioManager.Instance.source;
             }
         }
-
-        void DisplayVideoInfo()
-        {
-            gui.text += "\n\nScreen Full Screen: " + Screen.fullScreen +
-                        "\nConnected Displays: " + Display.displays.Length;
-        }
-
-
-        void DisplayInputInfo()
-        {
-            gui.text += "\n\nTouch Support: " + Input.touchSupported +
-                        "\nTouch count: " + Input.touchCount + "\n\n" +
-                        "\nPolling frequency: " + InputSystem.pollingFrequency + "Hz" +
-                        "\nButton press point: " + InputSystem.settings.defaultButtonPressPoint +
-                        "\nInput update mode: " + InputSystem.settings.updateMode +
-                        "\nInput processing time: " + InputSystem.metrics.averageProcessingTimePerEvent.ToString("f5") + " seconds";
-        }
-
-
-        
-
     }
 }
