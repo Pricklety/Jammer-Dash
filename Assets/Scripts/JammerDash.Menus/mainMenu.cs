@@ -126,6 +126,7 @@ namespace JammerDash.Menus
         public Slider levelSlider; // Level display
         public Text levelText; // Level text display
         public Text[] usernames; // Array of texts that only display the player's username
+        public Text nickname; // Text object in the community panel displaying your nickname
         public Text spMain; // main SP text (handles the "SP: sp" text)
         public Text[] sps; // sp texts (handles the "{sp}sp" texts)
         public Text bigStatsText; // Community panel - All player info
@@ -401,6 +402,11 @@ namespace JammerDash.Menus
         public void SaveAcc()
         {
             Account.Instance.Apply(usernameInput.text, password.text, email.text, cc);
+        }
+
+        public void LoadAcc()
+        {
+            StartCoroutine(Account.Instance.ApplyLogin(usernameInput.text, password.text, email.text));
         }
 
         public static string ExtractJSONFromJDL(string jdlFilePath)
@@ -1371,11 +1377,12 @@ namespace JammerDash.Menus
 
         private void UpdateUsernames()
         {
-            string username = string.IsNullOrEmpty(Account.Instance.username) ? "Guest" : Account.Instance.username;
+            string username = string.IsNullOrEmpty(Account.Instance.nickname) ? "Guest" : Account.Instance.nickname;
             foreach (Text text in usernames)
             {
                 text.text = username;
             }
+            nickname.text = $"@{Account.Instance.username}";
         }
 
         private void UpdateLevelText()
@@ -1620,7 +1627,6 @@ namespace JammerDash.Menus
             int secInt = int.Parse(DateTime.UtcNow.ToLocalTime().ToString("ss"));
             int minInt = int.Parse(DateTime.UtcNow.ToLocalTime().ToString("mm"));
             int hourInt = int.Parse(DateTime.UtcNow.ToLocalTime().ToString("hh"));
-            Debug.Log($"{secInt}, {minInt}, {hourInt}");
 
             sec.transform.localRotation = Quaternion.Euler(0, 0, -secInt * 6);
             min.transform.localRotation = Quaternion.Euler(0, 0, -minInt * 6);

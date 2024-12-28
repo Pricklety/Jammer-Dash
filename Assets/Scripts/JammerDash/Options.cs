@@ -891,7 +891,7 @@ namespace JammerDash
             Account.Instance.totalXP = 0;
             Account.Instance.level = 0;
             Account.Instance.currentXP = 0;
-            Account.Instance.SavePlayerData(Account.Instance.user);
+            Account.Instance.SavePlayerData(Account.Instance.user, Account.Instance.email);
             confirmation.onClick.RemoveAllListeners();
 
         }

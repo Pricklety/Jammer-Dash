@@ -665,8 +665,6 @@ namespace JammerDash.Editor
 
 
             bgColorSel.color = cam.backgroundColor;
-            float xPosNormalized = transform.position.x / 1;
-            audio.panStereo = Mathf.Lerp(-1f, 1f, xPosNormalized);
 
             if (Input.GetKey(KeybindingManager.deleteBPM) && Input.GetKey(KeybindingManager.delete))
             {
