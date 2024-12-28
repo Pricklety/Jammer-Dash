@@ -6227,7 +6227,7 @@ MonoBehaviour:
   user: 
   email: 
   cc: 
-  url: http://149.28.160.232:9234/api/register
+  url: https://api.jammerdash.com
   level: 0
   currentXP: 0
   xpRequiredPerLevel: 
@@ -6237,16 +6237,17 @@ MonoBehaviour:
     currentXP: 0
     xpRequiredPerLevel: 
     totalXP: 0
+    playtime: 0
+    sp: 0
+    playCount: 0
     username: 
+    nickname: 
     password: 
     email: 
     country: 
     isLocal: 0
     isOnline: 0
     id: 
-    playtime: 0
-    sp: 0
-    playCount: 0
     token: 
   checkInternet: {fileID: 14404851}
   playtime: 0

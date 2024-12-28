@@ -92,6 +92,7 @@ Play screen is laggy? Delete the levels you don't play. Your scores will still b
 <FUN>: We don't talk about the s**t code in this game. It works, that's all that matters.
 <FUN>: meow~
 <FUN>: Me tása dó anánar an bita ínor.
+<FUN>: Sad to inform you that Jammer dash does NOT include a jar of strawberry jam...
 
 [Undertale references]
 <REF>: Get dunked on.
@@ -131,3 +132,4 @@ Play screen is laggy? Delete the levels you don't play. Your scores will still b
 <QUOTE>: "山田リョウ大好き" -Pricklety, not noticing he's a f*****g simp. (Wait, that means I noticed now, I wrote this myself...)
 <QUOTE>: "Someone help, how does one learn Kanji consistently" -Pricklety
 <QUOTE>: "cvxy cdfsf dsfverqwf vwr7wv10fas4dfv10 qě0č+č1 vdefv1ydxf v1yxcv1xc1v1dfh+dshd-fgh n14bcv52n1445a4ewvr10fdyfg4s f0g74fsh8t0z ěřčtz gdysfg sdfg sdfgb-§.ú)awer478" -mnux
+<QUOTE>: "hop on jammer dash" -themagicanimals
