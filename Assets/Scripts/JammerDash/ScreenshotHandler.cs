@@ -90,7 +90,7 @@ namespace JammerDash
                 Application.platform == RuntimePlatform.WindowsPlayer)
             {
                 // For Windows, use the specific folder path to open the explorer
-                System.Diagnostics.Process.Start("explorer.exe", "/e," + folderPath);
+                System.Diagnostics.Process.Start(folderPath);
             }
             else if (Application.platform == RuntimePlatform.OSXEditor ||
                      Application.platform == RuntimePlatform.OSXPlayer)

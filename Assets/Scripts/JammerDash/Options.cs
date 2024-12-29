@@ -575,7 +575,7 @@ namespace JammerDash
         {
             string arguments = Path.Combine(Application.persistentDataPath, "music");
             if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer)
-                Process.Start("explorer.exe", "/select," + arguments.Replace("/", "\\"));
+                Process.Start(arguments);
             else
                 Process.Start("open", arguments);
         }
