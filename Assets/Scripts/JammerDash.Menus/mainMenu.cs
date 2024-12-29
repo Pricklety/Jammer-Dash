@@ -61,6 +61,7 @@ namespace JammerDash.Menus
         [Header("Classes and Attributes")]
         public SettingsData data; // Settings
         private PlayerData playerData; // Account data
+        private FileSystemWatcher fileWatcher; // Check for a new level
 
         [Header("Account System")]
         public InputField usernameInput; // Username input field
@@ -141,6 +142,7 @@ namespace JammerDash.Menus
         public float edgeMargin; // Edge margin
 
 
+        private HashSet<string> knownFiles = new HashSet<string>();
 
         async void Start()
         {
@@ -178,9 +180,32 @@ namespace JammerDash.Menus
             {
                 sp.text = $"{Difficulty.Calculator.CalculateSP("scores.dat"):0}sp";
             }
-            await LoadLevelFromLevels(); // Play screen
-        }
 
+            // Initialize FileSystemWatcher
+            string persistentPath = Application.persistentDataPath;
+            Debug.Log($"Setting up FileSystemWatcher for path: {persistentPath}");
+
+            // Initialize FileSystemWatcher
+            fileWatcher = new FileSystemWatcher
+            {
+                Path = persistentPath,
+                Filter = "*.jdl",
+                IncludeSubdirectories = true,
+                NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite
+            };
+            fileWatcher.Created += NewLevel;
+            fileWatcher.Renamed += NewLevel;
+            fileWatcher.Changed += NewLevel;
+            fileWatcher.Deleted += NewLevel;
+            fileWatcher.Error += HandleFileWatcherError;
+            await LoadLevelFromLevels(null); // Play screen
+        }
+        private void HandleFileWatcherError(object sender, ErrorEventArgs e)
+        {
+            Exception ex = e.GetException();
+            Debug.LogError($"FileWatcher encountered an error: {ex.Message}");
+            Notifications.instance.Notify("An error happened while importing a level. \nCheck the player logs for more info (click).", () => Process.Start(Path.Combine(Application.persistentDataPath, "Player.log")));
+        }
         public void SetSpectrum()
         {
             SimpleSpectrum[] spectrums = FindObjectsByType<SimpleSpectrum>(FindObjectsSortMode.None);
@@ -226,15 +251,28 @@ namespace JammerDash.Menus
                 return formattedNumber;
             }
         }
-        
-        public async Task<Task> LoadLevelFromLevels()
-        {
-            // Clear existing level UI elements
-            foreach (Transform child in playlevelInfoParent)
-            {
-                Destroy(child.gameObject);
-            }
 
+        private async void NewLevel(object sender, FileSystemEventArgs e)
+        {
+            Debug.Log($"Level file changed: {e.FullPath}");
+            await HandleFileChangeAsync(e.FullPath);
+        }
+
+        private async Task HandleFileChangeAsync(string filePath)
+        {
+            // Ensure the file exists and is valid
+            if (File.Exists(filePath) && Path.GetExtension(filePath) == ".jdl")
+            {
+                if (!knownFiles.Contains(filePath))
+                {
+                    knownFiles.Add(filePath);
+                    await LoadLevelFromLevels(new[] { filePath });
+                }
+            }
+        }
+
+        public async Task LoadLevelFromLevels(string[] specificFiles = null)
+        {
             // Define the levels and extracted folder paths
             string levelsPath = Path.Combine(Application.persistentDataPath, "levels");
             string extractedFolderPath = Path.Combine(levelsPath, "extracted");
@@ -249,13 +287,16 @@ namespace JammerDash.Menus
             {
                 Directory.CreateDirectory(extractedFolderPath);
             }
-
-            // Process .jdl files
-            string[] jdlFiles = Directory.GetFiles(levelsPath, "*.jdl", SearchOption.TopDirectoryOnly);
+            // Clear existing level UI elements
+            foreach (Transform child in playlevelInfoParent)
+            {
+                Destroy(child.gameObject);
+            }
+            // If specific files are provided, process only those
+            string[] jdlFiles = specificFiles ?? Directory.GetFiles(levelsPath, "*.jdl", SearchOption.TopDirectoryOnly);
 
             foreach (string jdlFilePath in jdlFiles)
             {
-                // Create a temporary folder for extracting .jdl contents
                 string tempFolder = Path.Combine(Application.temporaryCachePath, "tempExtractedJson");
                 Directory.CreateDirectory(tempFolder);
 
@@ -292,12 +333,14 @@ namespace JammerDash.Menus
 
                     // Extract other content from the JDL into the extracted folder
                     ExtractOtherFromJDL(jdlFilePath, extractedPath);
+
+                    // Delete the processed JDL file
+                    File.Delete(jdlFilePath);
                 }
                 finally
                 {
-                    // Clean up the temporary folder and delete the processed JDL file
+                    // Clean up the temporary folder
                     Directory.Delete(tempFolder, true);
-                    File.Delete(jdlFilePath);
                 }
             }
 
@@ -307,16 +350,6 @@ namespace JammerDash.Menus
             // Get all folders in the extracted directory
             string[] allFolders = Directory.GetDirectories(extractedFolderPath, "*", SearchOption.TopDirectoryOnly);
 
-            foreach (string folder in allFolders)
-            {
-                // Delete non-matching folders
-                if (!folderNameRegex.IsMatch(Path.GetFileName(folder)))
-                {
-                    Directory.Delete(folder, true);
-                }
-            }
-
-            // Instantiate UI elements for the extracted folders
             HashSet<int> processedIDs = new HashSet<int>();
 
             string[] extractedFolders = allFolders
@@ -359,20 +392,13 @@ namespace JammerDash.Menus
                         DisplayCustomLevelInfo(sceneData, levelInfoPanel.GetComponent<CustomLevelScript>());
                         levelInfoPanel.GetComponent<CustomLevelScript>().SetSceneData(sceneData);
                     }
-
                 }
                 catch (Exception ex)
                 {
                     UnityEngine.Debug.LogError($"Error processing folder {folderPath}: {ex.Message}");
-                    return Task.FromException(ex);
                 }
-
             }
-
-            return Task.CompletedTask;
         }
-
-
         public void Import()
         {
             FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserCanvas")).GetComponent<FileBrowser>();
@@ -391,7 +417,7 @@ namespace JammerDash.Menus
                 }
             }
 
-            await LoadLevelFromLevels();
+            await LoadLevelFromLevels(null);
         }
 
         public void Accounts()
@@ -483,7 +509,8 @@ namespace JammerDash.Menus
                     {
                         string entryFileName = entry.FullName;
 
-                        if (entryFileName.EndsWith(".mp3") || entryFileName.EndsWith(".png"))
+                        if (entryFileName.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase) ||
+                            entryFileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
                         {
                             // Combine the destination directory path with the MP3 filename
                             string destinationFullPath = Path.Combine(destinationFilePath, Path.GetFileName(entryFileName));
@@ -1323,10 +1350,8 @@ namespace JammerDash.Menus
 
         public void SettingsFile()
         {
-            // File path of the player log
             string logFilePath = Application.persistentDataPath + "/settings.json";
 
-            // Open the player log file using the default application associated with its file type
             Process.Start(logFilePath);
         }
 
@@ -1606,7 +1631,7 @@ namespace JammerDash.Menus
 
         private void ReloadLevels()
         {
-            _ = LoadLevelFromLevels();
+            _ = LoadLevelFromLevels(null);
             LoadLevelsFromFiles();
             int levelCount = Directory.GetDirectories(Path.Combine(Application.persistentDataPath, "levels", "extracted"), "*").Count();
             Notifications.instance.Notify($"Level list reloaded.\n{levelCount} levels total", null);

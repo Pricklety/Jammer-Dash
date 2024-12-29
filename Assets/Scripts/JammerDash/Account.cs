@@ -8,6 +8,9 @@ using Newtonsoft.Json.Linq;
 using JammerDash.Difficulty;
 using Newtonsoft.Json;
 using System.Globalization;
+using System.Linq;
+using System.Diagnostics;
+using Debug = UnityEngine.Debug;
 
 namespace JammerDash
 {
@@ -251,7 +254,7 @@ namespace JammerDash
                     {
                         var errorResponse = JObject.Parse(request.downloadHandler.text);
                         var errors = errorResponse["errors"];
-                        Notifications.instance.Notify($"An error occurred: \n{errors}", null);
+                        Notifications.instance.Notify($"{errors.Count()} error(s) occurred. More info in the player logs (click).", () => Process.Start($@"{Path.Combine(Application.persistentDataPath, "Player.log")}"));
                         Debug.LogError(errors);
                     }
                     catch
@@ -346,7 +349,7 @@ namespace JammerDash
                     {
                         var errorResponse = JObject.Parse(request.downloadHandler.text);
                         var errors = errorResponse["errors"];
-                        Notifications.instance.Notify($"An error occurred: {errors}", null);
+                        Notifications.instance.Notify($"{errors.Count()} error(s) occurred. More info in the player logs (click).", () => Process.Start($@"{Path.Combine(Application.persistentDataPath, "Player.log")}"));
                         Debug.LogError(errors);
                     }
                     catch
@@ -401,6 +404,7 @@ namespace JammerDash
             }
             else
             {
+                File.Create(path);
                 Debug.LogError("Login data file not found.");
             }
         }

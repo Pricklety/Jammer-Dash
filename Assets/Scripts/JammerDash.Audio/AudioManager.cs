@@ -108,6 +108,8 @@ namespace JammerDash.Audio
                 NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite
             };
 
+            
+
             // Subscribe to events
             fileWatcher.Created += OnNewFileDetected;
             fileWatcher.Renamed += OnFileRenamed;
@@ -118,7 +120,11 @@ namespace JammerDash.Audio
             // Enable watcher
             fileWatcher.EnableRaisingEvents = true;
             Debug.Log("FileSystemWatcher initialized and active.");
-
+            string path = Path.Combine(Application.persistentDataPath, "music");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
             // Initial load
             StartCoroutine(LoadAudioClipsAsync());
 
@@ -135,20 +141,20 @@ namespace JammerDash.Audio
 
         private void OnNewFileDetected(object sender, FileSystemEventArgs e)
         {
-            Debug.Log($"New file detected: {e.FullPath}");
+            Debug.Log($"New song file detected: {e.FullPath}");
             StartCoroutine(HandleFileChange(e.FullPath));
         }
 
         private void OnFileRenamed(object sender, RenamedEventArgs e)
         {
-            Debug.Log($"File renamed or moved: {e.FullPath}");
+            Debug.Log($"Song file renamed or moved: {e.FullPath}");
             StartCoroutine(HandleFileChange(e.FullPath));
         }
 
         private void OnWatcherError(object sender, ErrorEventArgs e)
         {
             Debug.LogError($"FileSystemWatcher error: {e.GetException()}");
-            Notifications.instance.Notify("An error happened in the game folder. Restarting may help", null);
+            Notifications.instance.Notify("An error happened in the file watcher system. \nIf you imported a song anywhere, try re-importing it.", null);
         }
         private void OnFileDeleted(object sender, FileSystemEventArgs e)
         {
@@ -206,12 +212,9 @@ namespace JammerDash.Audio
             if (newFilesAdded)
             {
                 ShuffleSongPathsList();
-                Notifications.instance.Notify($"Playlist loaded. {allAudioFiles.Length} songs found.", null);
+                Debug.Log($"Some ({allAudioFiles.Length})new mp3/wav files found. Reshuffling the playlist...");
             }
-            else
-            {
-                Notifications.instance.Notify($"No new songs found. {songPathsList.Count} songs in the playlist.", null);
-            }
+            
 
             yield return null;
         }
