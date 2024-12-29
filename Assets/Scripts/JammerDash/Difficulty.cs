@@ -175,75 +175,90 @@ namespace JammerDash.Difficulty
             }
         }
 
-
-        public static async Task<float> CalculateDifficultyAsync(
-         List<GameObject> cubes,
-         List<GameObject> saws,
-         List<GameObject> longCubes,
-         Slider hp,
-         Slider size,
-         Vector2[] cubePositions,
-         float bpm,
-         Action<string> updateLoadingText)
+  public static Transform FindFarthestObjectInX(GameObject[] objects)
         {
-            try
+            Transform farthestObject = null;
+            float maxX = float.MinValue;
+
+            foreach (GameObject obj in objects)
             {
-                float difficulty = 0f;
-
-                updateLoadingText("Starting section-based difficulty calculation...");
-                Debug.Log("Starting section-based difficulty calculation...");
-                List<float> sectionDifficulties = new List<float>();
-
-                // Split the level into sections based on X axis (or other factors if needed)
-                float sectionLength = 70f;
-                int totalSections = Mathf.CeilToInt(cubes.Count / sectionLength);
-
-                for (int sectionIndex = 0; sectionIndex < totalSections; sectionIndex++)
+                float x = obj.transform.position.x;
+                if (x > maxX)
                 {
-                    updateLoadingText($"Calculating difficulty for section {sectionIndex + 1} of {totalSections}...");
-                    Debug.Log($"Calculating difficulty for section {sectionIndex + 1} of {totalSections}...");
-
-                    float sectionDifficulty = CalculateSectionDifficulty(
-                        cubes,
-                        saws,
-                        longCubes,
-                        cubePositions,
-                        bpm,
-                        sectionIndex,
-                        sectionLength
-                    );
-
-                    sectionDifficulties.Add(sectionDifficulty);
-                    Debug.Log($"Section {sectionIndex} difficulty: {sectionDifficulty}");
+                    maxX = x;
+                    farthestObject = obj.transform;
                 }
-
-                foreach (var section in sectionDifficulties)
-                {
-                    difficulty += section;
-                }
-                // Apply additional impacts
-                difficulty += CalculateHealthImpact(hp);
-                difficulty += CalculateSizeImpact(size);
-
-                // Scale difficulty based on BPM
-                difficulty *= Mathf.Clamp(bpm * 0.1f, 1f, 5f); // Adjust the scale with BPM for reasonable results
-
-
-
-                Debug.Log($"Final difficulties: {difficulty} / 683: {difficulty / 683}");
-                // Apply final scaling to match desired difficulty progression
-                if (difficulty < 0f) difficulty = 0.01f;
-
-                return difficulty / 683;
             }
-            catch (Exception e)
-            {
-                Debug.LogError(e);
-                return 0f;
-            }
+
+            return farthestObject;
+        }
+       public static async Task<float> CalculateDifficultyAsync(
+    List<GameObject> cubes,
+    List<GameObject> saws,
+    List<GameObject> longCubes,
+    Slider hp,
+    Slider size,
+    Vector2[] cubePositions,
+    float bpm,
+    Action<string> updateLoadingText)
+{
+    try
+    {
+        float difficulty = 0f;
+
+        updateLoadingText("Starting section-based difficulty calculation...");
+        Debug.Log("Starting section-based difficulty calculation...");
+        List<float> sectionDifficulties = new List<float>();
+
+        // Split the level into sections based on X axis (or other factors if needed)
+        float sectionLength = 70f;
+        int totalSections = Mathf.CeilToInt(cubes.Count / sectionLength);
+
+        for (int sectionIndex = 0; sectionIndex < totalSections; sectionIndex++)
+        {
+            updateLoadingText($"Calculating difficulty for section {sectionIndex + 1} of {totalSections}...");
+            Debug.Log($"Calculating difficulty for section {sectionIndex + 1} of {totalSections}...");
+
+            float sectionDifficulty = CalculateSectionDifficulty(
+                cubes,
+                saws,
+                longCubes,
+                cubePositions,
+                bpm,
+                sectionIndex,
+                sectionLength
+            );
+
+            sectionDifficulties.Add(sectionDifficulty);
+            Debug.Log($"Section {sectionIndex} difficulty: {sectionDifficulty}");
         }
 
-        public static float CalculateSectionDifficulty(
+        foreach (var section in sectionDifficulties)
+        {
+            difficulty += section;
+        }
+
+        // Apply additional impacts
+        difficulty += CalculateHealthImpact(hp);
+        difficulty += CalculateSizeImpact(size);
+
+        // Scale difficulty based on BPM
+        difficulty *= Mathf.Clamp(bpm * 0.1f, 1f, 5f); // Adjust the scale with BPM for reasonable results
+
+        Debug.Log($"Final difficulties: {difficulty} / 30: {difficulty / 30}");
+
+        // Apply final scaling to match desired difficulty progression
+        if (difficulty < 0.01f) difficulty = 0.01f;
+
+        return difficulty / 30;
+    }
+    catch (Exception e)
+    {
+        Debug.LogError(e);
+        return 0f;
+    }
+}
+ public static float CalculateSectionDifficulty(
             List<GameObject> cubes,
             List<GameObject> saws,
             List<GameObject> longCubes,
@@ -266,13 +281,11 @@ namespace JammerDash.Difficulty
             List<GameObject> sectionLongCubes = longCubes.Where(longCube => IsObjectInSection(longCube.transform.position, sectionIndex, sectionLength)).ToList();
             sectionDifficulty += CalculateLongCubeImpact(sectionLongCubes);
 
-            // Account for the BPM by scaling the section difficulty
-            sectionDifficulty *= Mathf.Clamp(bpm * 0.1f, 1f, 3f); // Adjust based on BPM (lower for easier and higher for harder)
+           
 
             return sectionDifficulty;
         }
-
-        public static bool IsCubeInSection(Vector3 position, int sectionIndex, float sectionLength)
+  public static bool IsCubeInSection(Vector3 position, int sectionIndex, float sectionLength)
         {
             return position.x >= sectionIndex * sectionLength && position.x < (sectionIndex + 1) * sectionLength;
         }
@@ -281,98 +294,97 @@ namespace JammerDash.Difficulty
         {
             return position.x >= sectionIndex * sectionLength && position.x < (sectionIndex + 1) * sectionLength;
         }
+public static float CalculateCubeDensity(GameObject[] sectionCubes, Vector2[] cubePositions)
+{
+    float density = 0f;
 
-        public static float CalculateCubeDensity(GameObject[] sectionCubes, Vector2[] cubePositions)
+    // First, calculate the X-axis proximity and Y-axis activity
+    List<float> xDistances = new List<float>();  // Store distances between cubes on the X-axis
+    List<float> yDifferences = new List<float>(); // Store Y differences between cubes
+
+    // Collect all X and Y distances between cubes
+    for (int i = 0; i < sectionCubes.Length; i++)
+    {
+        for (int j = i + 1; j < sectionCubes.Length; j++)
         {
-            float density = 0f;
+            // Calculate horizontal distance (X-axis)
+            float xDistance = Mathf.Abs(sectionCubes[i].transform.position.x - sectionCubes[j].transform.position.x);
+            xDistances.Add(xDistance);
 
-            // Calculate the density of cubes in the section (closer cubes increase density)
-            foreach (var cube in sectionCubes)
-            {
-                foreach (var position in cubePositions)
-                {
-                    if (Mathf.Abs(cube.transform.position.x - position.x) < 2f && Mathf.Abs(cube.transform.position.y - position.y) < 2f)
-                    {
-                        density += 0.5f; // Each nearby cube adds density to the section
-                    }
-                }
-            }
-
-            return density;
+            // Calculate vertical distance (Y-axis)
+            float yDifference = Mathf.Abs(sectionCubes[i].transform.position.y - sectionCubes[j].transform.position.y);
+            yDifferences.Add(yDifference);
         }
+    }
 
-        public static float CalculateSawImpact(List<GameObject> sectionSaws)
-        {
-            float sawImpact = 0f;
-            int sawCount = sectionSaws.Count;
+    // Calculate proximity weight based on X-axis distances
+    float averageXDistance = xDistances.Count > 0 ? xDistances.Average() : 1f; // Avoid division by zero
+    float proximityWeight = Mathf.Clamp(1f - (averageXDistance / 2f), 0f, 1f); // Closer cubes, higher weight
 
-            if (sawCount < 2) return sawImpact;
+    // Calculate Y-axis activity
+    float averageYDifference = yDifferences.Count > 0 ? yDifferences.Average() : 0f;
+    float yActivityWeight = Mathf.Clamp(averageYDifference / 10f, 0f, 1f); // More Y variation, higher weight
 
-            float totalYDistance = 0f;
-            int pairCount = 0;
+    // Combine proximity and Y-axis activity into the density calculation
+    density += proximityWeight * (1f + yActivityWeight); // Higher density with both smaller X distances and larger Y differences
 
-            // Calculate the average Y-distance between saws
-            for (int i = 0; i < sawCount; i++)
-            {
-                for (int j = i + 1; j < sawCount; j++)
-                {
-                    float yDistance = Mathf.Abs(sectionSaws[i].transform.position.y - sectionSaws[j].transform.position.y);
-                    totalYDistance += yDistance;
-                    pairCount++;
-                }
-            }
+    // Return the final density
+    return density;
+}
 
-            float averageYDistance = totalYDistance / pairCount;
 
-            // The more spaced out the saws are, the higher the difficulty
-            sawImpact = Mathf.Clamp(1 / (averageYDistance + 0.1f), 0f, 5f);
+public static float CalculateSawImpact(List<GameObject> sectionSaws)
+{
+    float sawImpact = 0f;
+    int sawCount = sectionSaws.Count;
 
-            return sawImpact;
-        }
+    if (sawCount < 2) return sawImpact;
 
-        public static float CalculateLongCubeImpact(List<GameObject> sectionLongCubes)
-        {
-            float longCubeImpact = 0f;
+    float totalYDistance = 0f;
+    int pairCount = 0;
 
-            // Long cubes add more difficulty to the section
-            foreach (GameObject longCube in sectionLongCubes)
-            {
-                longCubeImpact += 1f; // Adjust this number based on the impact you want
-            }
+    // Calculate the average Y-distance between saws
+    sectionSaws.Sort((a, b) => a.transform.position.y.CompareTo(b.transform.position.y)); // Sort by Y
 
-            return longCubeImpact;
-        }
+    for (int i = 0; i < sawCount - 1; i++)
+    {
+        float yDistance = Mathf.Abs(sectionSaws[i].transform.position.y - sectionSaws[i + 1].transform.position.y);
+        totalYDistance += yDistance;
+        pairCount++;
+    }
 
-        public static float CalculateHealthImpact(Slider hp)
-        {
-            // Health impact increases as the slider moves towards 0
-            return 1 / (hp.value + 1) * 5f; // Arbitrary scaling factor
-        }
+    float averageYDistance = totalYDistance / pairCount;
 
-        public static float CalculateSizeImpact(Slider size)
-        {
-            // Size impact is exponential, more impact as the size increases
-            return Mathf.Exp(0.05f * (1f - size.value) * 2f); // Exponential scaling for difficulty
-        }
+    // The more spaced out the saws are, the higher the difficulty
+    sawImpact = Mathf.Clamp(1 / (averageYDistance + 0.1f), 0f, 5f);
 
-        public static Transform FindFarthestObjectInX(GameObject[] objects)
-        {
-            Transform farthestObject = null;
-            float maxX = float.MinValue;
+    return sawImpact;
+}
 
-            foreach (GameObject obj in objects)
-            {
-                float x = obj.transform.position.x;
-                if (x > maxX)
-                {
-                    maxX = x;
-                    farthestObject = obj.transform;
-                }
-            }
+public static float CalculateLongCubeImpact(List<GameObject> sectionLongCubes)
+{
+    float longCubeImpact = 0f;
 
-            return farthestObject;
-        }
+    // Long cubes add more difficulty to the section
+    foreach (GameObject longCube in sectionLongCubes)
+    {
+        longCubeImpact += 1f; // Adjust this number based on the impact you want
+    }
 
+    return longCubeImpact;
+}
+
+public static float CalculateHealthImpact(Slider hp)
+{
+    // Health impact increases as the slider moves towards 0
+    return 1 / (hp.value + 1) * 5f; // Arbitrary scaling factor
+}
+
+public static float CalculateSizeImpact(Slider size)
+{
+    // Size impact is exponential, more impact as the size increases
+    return Mathf.Exp(0.05f * (1f - size.value) * 2f); // Exponential scaling for difficulty
+}
     }
 
        
@@ -405,8 +417,7 @@ namespace JammerDash.Difficulty
             return await tcs.Task;
         }
     }
-
-    public class ShinePerformance
+ public class ShinePerformance
     {
         private float _precision;
         private float _sequenceEfficiency;
@@ -454,12 +465,34 @@ namespace JammerDash.Difficulty
         {
             _sequenceEfficiency = _bestCombo != 0 ? Clamp((float)_currentCombo / _bestCombo + 1, 0, 1) : 0;
         }
-
+        private float GetDifficultyExponent()
+        {
+            if (_gameDifficulty <= 1)  // Lower difficulties (0*, 1*)
+            {
+                return 0.3f;
+            }
+            else if (_gameDifficulty <= 3)  // Medium difficulties (2*, 3*)
+            {
+                return 0.5f; 
+            }
+            else  // Higher difficulties (4*+)
+            {
+                return 0.8f;
+            }
+        }
         // Calculate versatility based on hit types and missed hits
         private void CalculateVersatility()
         {
-            _versatility = _perfectHits * (MathF.Exp(_gameDifficulty * 0.3f) - 1) * 0.41f + _greatHits * (MathF.Exp(_gameDifficulty * 0.3f) - 1) * -0.1f + _goodHits * (MathF.Exp(_gameDifficulty * 0.3f) - 1) * -0.54f + _missedHits * (MathF.Exp(_gameDifficulty * 0.3f) - 1) *  -4.45f;
+            // Calculate the exponential adjustment based on difficulty, clamped to avoid too small values
+             float expAdjustment = Mathf.Exp(_gameDifficulty * GetDifficultyExponent()) - 1;
+           
+
+            _versatility = _perfectHits * expAdjustment * 0.41f +
+                   _greatHits * expAdjustment * -0.1f +
+                   _goodHits * expAdjustment * -0.54f +
+                   _missedHits * expAdjustment * -4.45f;
         }
+
 
         // Exponential function for accuracy scaling
         private float CalculateAccuracyMultiplier(float accuracy)
@@ -489,8 +522,8 @@ namespace JammerDash.Difficulty
       (MathF.Pow(_precision, 2) * 0.98f +  
       _sequenceEfficiency * 10 +
       _versatility * 5 +
-      (levelLengthAdjustment) +
-      (MathF.Exp(_gameDifficulty * 0.3f) - 1) * 3f +  
+      levelLengthAdjustment +
+      (MathF.Exp(_gameDifficulty * GetDifficultyExponent()) - 1) * 3f +  
       (_cubeCount % 150)
       ) * bpmScaling, 0f);  // Apply BPM scaling
 
@@ -504,8 +537,7 @@ namespace JammerDash.Difficulty
         {
             return Math.Max(min, Math.Min(max, value));
         }
-    }
-
+    } 
 }
 namespace JammerDash
 {

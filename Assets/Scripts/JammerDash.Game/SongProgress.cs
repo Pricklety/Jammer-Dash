@@ -30,7 +30,6 @@ namespace JammerDash.Game
 
                 string levelsFolderPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", levelName);
                 string levelJsonFilePath = Path.Combine(levelsFolderPath, $"{jsonName}.json");
-                string sceneJsonFilePath = Path.Combine(Application.persistentDataPath, "scenes", levelName, $"{jsonName}.json");
 
                 if (File.Exists(levelJsonFilePath) && !string.IsNullOrEmpty(CustomLevelDataManager.Instance.levelName))
                 {
@@ -49,6 +48,11 @@ namespace JammerDash.Game
             {
                 progressSlider = GameObject.Find("11").GetComponent<Slider>();
                 progressText = GameObject.Find("progressText").GetComponent<Text>();
+            }
+            
+            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+            if (data.canvasOff) {
+                Notifications.instance.Notify("Go back to the menu, and click Left Shift + " + KeybindingManager.toggleUI.ToString() + " to re-toggle the gameplay UI", null);
             }
         }
         private void Update()
@@ -69,11 +73,8 @@ namespace JammerDash.Game
             // Update the slider value with the current progress
             progressSlider.value = currentProgress;
             SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-               canvas.SetActive(!data.canvasOff);
             
-           
-            
-
+            canvas.SetActive(!data.canvasOff);
         }
 
         private IEnumerator LoadAudioClip(string filePath)
@@ -101,7 +102,6 @@ namespace JammerDash.Game
             if (www.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError($"Failed to load audio clip: {www.error}");
-                Debug.LogError(filePath);
                 Notifications.instance.Notify("This level failed to load due to invalid/missing audio file.", null);
                 SceneManager.LoadSceneAsync(1);
                 Time.timeScale = 1f;
@@ -117,7 +117,7 @@ namespace JammerDash.Game
             Time.timeScale = 1f;
 
             // Update loading text to indicate completion
-            GameObject.Find("Canvas/default/loadingText").GetComponent<Text>().text = $"";
+            GameObject.Find("Canvas/loadingText").GetComponent<Text>().text = $"";
 
             // Yield return the loaded audio clip
             yield return loadedAudioClip;

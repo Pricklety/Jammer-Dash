@@ -41,17 +41,7 @@ namespace JammerDash.Game
            
         }
 
-        public IEnumerator CheckUI()
-        {
-            SettingsData sd = SettingsFileHandler.LoadSettingsFromFile();
-            if (sd.canvasOff)
-            {
-                canvas.SetActive(false);
-                Notifications.instance.Notify($"Playfield UI is off.\nClick Shift+{KeybindingManager.toggleUI} to turn it back on.", null);
-                yield return null;
-            }
-        }
-
+      
       
         string FormatTime(float time)
         {
@@ -66,15 +56,10 @@ namespace JammerDash.Game
             if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>() != null)
                 music = AudioManager.Instance.source;
 
-            SettingsData sd = SettingsFileHandler.LoadSettingsFromFile();
-            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeybindingManager.toggleUI))
-            {
-                sd.canvasOff = true;
-                SettingsFileHandler.SaveSettingsToFile(sd);
-                CheckUI();
-            }
+
+            
             image.color = new(image.color.r, image.color.g, image.color.b, dim.value);
-            if (Input.GetKeyDown(KeyCode.Escape) && canvas.activeSelf && GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindObjectOfType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
+            if (Input.GetKeyDown(KeyCode.Escape) && GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindObjectOfType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
             {
 
                 PlayerPrefs.SetInt("attempts", attint);
@@ -103,14 +88,14 @@ namespace JammerDash.Game
                 }
 
             }
-           
+          
             bool focus = Application.isFocused;
             if (!focus)
             {
                 OnApplicationFocus(focus);
             }
 
-            if (Time.timeScale > 0f && !sd.canvasOff)
+            if (Time.timeScale > 0f)
             {
                 GameObject.Find("loadingText").GetComponent<Text>().text = "";
             }
@@ -158,7 +143,6 @@ namespace JammerDash.Game
             player.GetComponent<PlayerMovement>().enabled = true;
             music.pitch = 1f;
             Time.timeScale = 1f;
-            music.volume = 1f;
 
 
 

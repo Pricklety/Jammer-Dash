@@ -156,8 +156,8 @@ namespace JammerDash.Menus
             // Load levels on edit and play screen
             LoadLevelsFromFiles(); // Edit screen
 
-            StartCoroutine(SetCountry());
             SetSpectrum();
+            StartCoroutine(SetCountry());
             LoadRandomBackground(null);
 
 
@@ -306,7 +306,6 @@ namespace JammerDash.Menus
                     string jsonFilePath = ExtractJSONFromJDL(jdlFilePath);
                     if (jsonFilePath == null)
                     {
-                        UnityEngine.Debug.LogError($"Failed to extract JSON from JDL: {jdlFilePath}");
                         continue;
                     }
 
@@ -364,7 +363,6 @@ namespace JammerDash.Menus
                     string[] jsonFiles = Directory.GetFiles(folderPath, "*.json", SearchOption.TopDirectoryOnly);
                     if (jsonFiles.Length == 0)
                     {
-                        UnityEngine.Debug.LogWarning($"No JSON files found in folder: {folderPath}");
                         continue;
                     }
 
@@ -445,12 +443,10 @@ namespace JammerDash.Menus
                     return null;
                 }
 
-                UnityEngine.Debug.Log("Attempting to open JDL file: " + jdlFilePath);
-                UnityEngine.Debug.Log("File size: " + new FileInfo(jdlFilePath).Length + " bytes");
+                UnityEngine.Debug.Log("Attempting to open JDL file: " + jdlFilePath + " (" + new FileInfo(jdlFilePath).Length + " bytes)");
 
                 if (!IsZipFile(jdlFilePath))
                 {
-                    UnityEngine.Debug.LogError("The file is not a valid ZIP archive: " + jdlFilePath);
                     return null;
                 }
 
@@ -787,7 +783,6 @@ namespace JammerDash.Menus
 
         private void OnVideoPrepareCompleted(VideoPlayer vp)
         {
-            Debug.Log("Video prepared. Starting playback.");
             vp.Play();
         }
 
@@ -863,7 +858,6 @@ namespace JammerDash.Menus
 
             if (!Directory.Exists(levelsPath))
             {
-                UnityEngine.Debug.LogError("The 'scenes' folder does not exist in persistentDataPath.");
                 Directory.CreateDirectory(levelsPath);
                 return;
             }
@@ -1085,10 +1079,7 @@ namespace JammerDash.Menus
         public void PlayRandomSFX()
         {
             UnityEngine.Object[] clips = Resources.LoadAll("Audio/SFX");
-            foreach (var obj in clips)
-            {
-                UnityEngine.Debug.Log("Loaded object: " + obj.name);
-            }
+           
             FindFirstObjectByType<AudioSource>().PlayOneShot((AudioClip)clips[Random.Range(0, clips.Length)]);
 
         }
@@ -1239,14 +1230,12 @@ namespace JammerDash.Menus
         {
             quittingAllowed = true;
             Application.Quit();
-            UnityEngine.Debug.Log("Quitting the application");
         }
 
         public void CancelQuitting()
         {
             quittingAllowed = false;
             HideQuit();
-            UnityEngine.Debug.Log("User canceled quitting");
             StartCoroutine(FadeLowpass(22000));
         }
 
