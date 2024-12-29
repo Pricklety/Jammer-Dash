@@ -201,7 +201,7 @@ namespace JammerDash
                 level++;
                 LevelUp();
             }
-            Debug.Log("Level Up! You are now level " + level);
+            Notifications.instance.Notify($"Level up! ({level - 1} -> {level})", null);
         }
 
         public void Apply(string username, string user, string email, string cc)
@@ -242,7 +242,6 @@ namespace JammerDash
                 // Ensure HTTPS
                 if (!url.StartsWith("https"))
                 {
-                    Debug.LogError("Insecure connection detected. HTTPS is required.");
                     Notifications.instance.Notify("Login failed: insecure connection.", null);
                     yield break;
                 }
@@ -284,7 +283,7 @@ namespace JammerDash
                     catch (Exception ex)
                     {
                         Debug.LogError($"Error parsing success response: {ex}");
-                        Notifications.instance.Notify("Login succeeded, but a response error occurred. Try to log in again", null);
+                        Notifications.instance.Notify("Login succeeded, but a response error occurred.", null);
                         SaveLocalData();
                     }
                 }
@@ -412,6 +411,10 @@ namespace JammerDash
         public PlayerData LoadData()
         {
             string path = Application.persistentDataPath + "/playerData.dat";
+            string playtime = Application.persistentDataPath + "/playtime.dat";
+
+            string play = File.ReadAllText(playtime);
+            this.playtime = float.Parse(play);
             if (File.Exists(path))
             {
                 XmlSerializer formatter = new XmlSerializer(typeof(PlayerData));
@@ -430,6 +433,8 @@ namespace JammerDash
                 
                 return null;
             }
+
+            
         }
 
         void Update()

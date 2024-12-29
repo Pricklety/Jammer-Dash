@@ -39,6 +39,8 @@ namespace JammerDash
         public GameObject snowObj;
         public Text musicText;
         public Slider musicSlider;
+        public Slider musicVolSlider;
+        public Slider sfxSlider;
         private SettingsData settingsData;
         public bool isLoadingMusic = false;
         public new AudioManager audio;
@@ -89,7 +91,8 @@ namespace JammerDash
         public Button update;
         public void Start()
         {
-           
+           SetLocale("en-US");
+        
             CheckForUpdate();
             audio = AudioManager.Instance;
             if (audio == null)
@@ -99,12 +102,6 @@ namespace JammerDash
             // Load or initialize settingsData
             settingsData = SettingsFileHandler.LoadSettingsFromFile();
             PopulateDropdowns();
-
-            // Log statements for debugging
-            UnityEngine.Debug.Log($"audio is {(audio != null ? "not null" : "null")}");
-            UnityEngine.Debug.Log($"settingsData is {(settingsData != null ? "not null" : "null")}");
-            
-
             LoadSettings(); // Load settings at the start
             ApplySettings();
 
@@ -214,7 +211,6 @@ namespace JammerDash
             }
             else
             {
-                Debug.LogWarning($"Locale with code {localeCode} not found!");
                 SetLocale("en-US");
                 language = "en-US";
             }
@@ -260,43 +256,27 @@ namespace JammerDash
             customBG = text == "Custom image";
 
         }
-        public void LoadMasterVolume()
-        {
-            float savedMasterVolume = PlayerPrefs.GetFloat("MasterVolume", 1.0f);
-            masterVolumeSlider.value = savedMasterVolume;
 
-            // Apply the loaded master volume
-            SetMasterVolume(savedMasterVolume);
+      public void OnVolumeChanged(Slider slider)
+    {
+        // Call HandleVolumeChange based on the slider that was changed
+        if (slider == masterVolumeSlider)
+        {
+            audio.HandleVolumeChange(audio.masterS, "Master", 0f);
+            audio.HandleVolumeChange(slider, "Master", 0f);
+        }
+        else if (slider == musicVolSlider)
+        {
+            audio.HandleVolumeChange(audio.musicSlider, "Music", 0f);
+            audio.HandleVolumeChange(slider, "Music", 0f);
+        }
+        else if (slider == sfxSlider)
+        {
+            audio.HandleVolumeChange(audio.sfxSlider, "SFX", 0f);
+            audio.HandleVolumeChange(slider, "SFX", 0f);
         }
 
-        public void OnMasterVolumeChanged(float volume)
-        {
-            volume = masterVolumeSlider.value;
-            SetMasterVolume(volume);
-
-            // Save master volume setting
-            PlayerPrefs.SetFloat("MasterVolume", volume);
-        }
-
-        public void SetMasterVolume(float volume)
-        {
-            // Update AudioManager with the new master volume
-            if (audio != null)
-            {
-                audio.SetMasterVolume(volume);
-                audio.masterS.value = volume;
-                if (increaseVol.isOn)
-                {
-                    float intVol = Mathf.InverseLerp(-80f, 20f, volume) * 120f;
-                    audio.masterS.GetComponentInChildren<Text>().text = "Master: " + intVol.ToString("f0");
-                }
-                else
-                {
-                    float intVol = Mathf.InverseLerp(-80f, 0f, volume) * 100f;
-                    audio.masterS.GetComponentInChildren<Text>().text = "Master: " + intVol.ToString("f0");
-                }
-            }
-        }
+    }
 
 
         public void PlaySelectedAudio(int index)
@@ -312,6 +292,11 @@ namespace JammerDash
             fpsInputField.text = settingsData.selectedFPS.ToString();
             resolutionDropdown.value = settingsData.resolutionValue;
             masterVolumeSlider.value = settingsData.volume;
+            musicVolSlider.value =  settingsData.musicVol;
+            sfxSlider.value = settingsData.sfxVol;
+            audio.masterS.value = settingsData.volume;
+            audio.musicSlider.value =  settingsData.musicVol;
+            audio.sfxSlider.value = settingsData.sfxVol;
             backgrounds.value = settingsData.backgroundType;
             sfx.isOn = settingsData.sfx;
             hitSounds.isOn = settingsData.hitNotes;
@@ -365,13 +350,10 @@ namespace JammerDash
                 {
                     languageDropdown.value = i;
                     languageDropdown.RefreshShownValue();
-                    Debug.Log($"Dropdown value set to match settingsData.language: {currentLanguage} (index {i})");
                     return;
                 }
             }
 
-            // Fallback if no matching language is found
-            Debug.LogWarning($"Language '{currentLanguage}' not found in locale codes, defaulting to English.");
             languageDropdown.value = 0;
             languageDropdown.RefreshShownValue();
         }
@@ -387,7 +369,9 @@ namespace JammerDash
         public void ApplySettings()
         {
             settingsData.selectedFPS = int.TryParse(fpsInputField.text, out int fpsCap) ? Mathf.Clamp(fpsCap, 1, 9999) : 60;
-            settingsData.volume = masterVolumeSlider.value;
+            settingsData.volume = audio.masterS.value;
+            settingsData.musicVol = audio.musicSlider.value;
+            settingsData.sfxVol = audio.sfxSlider.value;
             settingsData.backgroundType = backgrounds.value;
             settingsData.hitNotes = hitSounds.isOn;
             settingsData.sfx = sfx.isOn;
@@ -412,7 +396,6 @@ namespace JammerDash
             settingsData.discordPlay = discordPlay.isOn;
             settingsData.discordEdit = discordEdit.isOn;
             settingsData.shaders = shaders.isOn;
-            ApplyMasterVolume(settingsData.volume);
             ApplyFPSCap(settingsData.selectedFPS);
             ApplyResolution();
             HitNotes(settingsData.hitNotes);
@@ -492,8 +475,6 @@ namespace JammerDash
             {
                 audio.SetMasterVolume(volume);
             }
-            // Apply the loaded master volume
-            SetMasterVolume(volume);
         }
 
 
@@ -505,7 +486,9 @@ namespace JammerDash
                 language = language,
                 selectedFPS = int.TryParse(fpsInputField.text, out int fpsCap) ? Mathf.Clamp(fpsCap, 1, 9999) : 60,
                 vsync = vsync.isOn,
-                volume = masterVolumeSlider.value,
+                volume = audio.masterS.value,
+                musicVol = audio.musicSlider.value,
+                sfxVol = audio.sfxSlider.value,
                 resolutionValue = resolutionDropdown.value,
                 backgroundType = backgrounds.value,
                 sfx = sfx.isOn,
@@ -565,7 +548,6 @@ namespace JammerDash
             
             // Master Volume
             masterVolumeSlider.value = 1.0f;
-            OnMasterVolumeChanged(1.0f);
 
             // Apply the changes
             ApplyOptions();
@@ -605,8 +587,7 @@ namespace JammerDash
             }
             else
             {
-                // Handle the case when audio clips are not loaded yet
-                UnityEngine.Debug.LogWarning("Audio clips are not loaded. Make sure AudioManager is initialized.");
+                Notifications.instance.Notify("This game instance is corrupted. Please restart the game (Click to close)", () => Application.Quit());
             }
         }
 
@@ -630,9 +611,6 @@ namespace JammerDash
                 string uploadDate = release["published_at"].ToString();
                 string releaseNotes = release["body"].ToString();
 
-                Debug.Log($"Latest version: {latestVersion}");
-                Debug.Log("Release Notes:");
-                Debug.Log(releaseNotes);
 
                 // Compare the latest version with the current version and notify if there's a new update available
                 if (IsNewVersionAvailable(latestVersion))
@@ -643,7 +621,7 @@ namespace JammerDash
                     this.update.onClick.AddListener(update);
                     changelogs.text = releaseNotes;
                     updateName.text = $"{latestVersion}\n<size=6>{uploadDate}</size>";
-                    Notifications.instance.Notify($"There's a new update available! ({latestVersion}).\nClick to open changelogs and update.", updateAction);
+                    Notifications.instance.Notify($"There's a new update available! Version: {latestVersion}.\nClick to open changelogs and update.", updateAction);
                 }
             }
             catch (HttpRequestException e)
@@ -697,7 +675,7 @@ namespace JammerDash
             }
             else
             {
-                UnityEngine.Debug.LogWarning("Current audio clip is null. Check AudioManager logic.");
+                // nothing
             }
         }
 
@@ -816,14 +794,35 @@ namespace JammerDash
 
 
             }
-            if (EventSystem.current.currentSelectedGameObject == masterVolumeSlider.gameObject)
-            {
-                audio.masterS.gameObject.SetActive(true);
-            }
-            else if (EventSystem.current.currentSelectedGameObject != masterVolumeSlider.gameObject && audio.timer > 2f)
-            {
-                audio.masterS.gameObject.SetActive(false);
-            }
+             // Check if master volume slider is selected
+    if (EventSystem.current.currentSelectedGameObject == masterVolumeSlider.gameObject)
+    {
+        audio.masterS.gameObject.SetActive(true);
+    }
+    else if (EventSystem.current.currentSelectedGameObject != masterVolumeSlider.gameObject && audio.timer > 2f)
+    {
+        audio.masterS.gameObject.SetActive(false);
+    }
+
+    // Check if music volume slider is selected
+    if (EventSystem.current.currentSelectedGameObject == musicVolSlider.gameObject)
+    {
+        audio.musicSlider.gameObject.SetActive(true);
+    }
+    else if (EventSystem.current.currentSelectedGameObject != musicVolSlider.gameObject && audio.timer > 2f)
+    {
+        audio.musicSlider.gameObject.SetActive(false);
+    }
+
+    // Check if SFX volume slider is selected
+    if (EventSystem.current.currentSelectedGameObject == sfxSlider.gameObject)
+    {
+        audio.sfxSlider.gameObject.SetActive(true);
+    }
+    else if (EventSystem.current.currentSelectedGameObject != sfxSlider.gameObject && audio.timer > 2f)
+    {
+        audio.sfxSlider.gameObject.SetActive(false);
+    }
 
           
 
@@ -930,6 +929,8 @@ namespace JammerDash
         {
             trailFadeText.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Trail fade")} ({trailFade.value:0.00}s)";
             dim.GetComponentInChildren<Text>().text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Background visibility")} ({dim.value}%)";
+
+
         }
     }
 }

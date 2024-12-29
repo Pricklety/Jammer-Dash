@@ -156,7 +156,6 @@ namespace JammerDash.Game
             {
                 string json = File.ReadAllText(Path.Combine(levelsPath, levelName + ".json"));
                 SceneData sceneData = SceneData.FromJson(json);
-                Debug.Log(sceneData.levelName);
                 data = sceneData;
                 SaveLevelDataDef(sceneData.ID, scores.GetTier(actualdest), player0._performanceScore, actualdest, "scores", destruction, player0.five, player0.three, player0.one, player0.misses, Account.Instance.username, player0.highestCombo);
             }
@@ -213,8 +212,6 @@ namespace JammerDash.Game
                         {
                             float actualdest = float.Parse(data[3]);
                             destruction = int.Parse(data[4]);
-                            // Process the loaded data as needed
-                            Debug.LogError(destruction);
                             return destruction;
                         }
                     }
@@ -302,8 +299,6 @@ namespace JammerDash.Game
 
             SaveLevelData(actualdest, destruction);
 
-            AudioSource[] audios = FindObjectsOfType<AudioSource>();
-            Debug.Log(audios);
             finishMenu.SetActive(true);
 
             // Update score breakdown
@@ -322,7 +317,7 @@ namespace JammerDash.Game
             float elapsedTime = 0f;
 
             // Play the long SFX
-            AudioManager.Instance.source.PlayOneShot(Resources.Load<AudioClip>("Audio/SFX/progress"));
+            AudioManager.Instance.sfxS.PlayOneShot(Resources.Load<AudioClip>("Audio/SFX/progress"));
 
             // Gradually update the progress slider value
             while (progress < targetAccuracy)
@@ -338,7 +333,7 @@ namespace JammerDash.Game
 
 
             // Play rank SFX after progress completes
-            AudioManager.Instance.source.PlayOneShot(Resources.Load<AudioClip>($"Audio/SFX/ranking/{player0.counter.GetTier(targetAccuracy * 100)} Rank"));
+            AudioManager.Instance.sfxS.PlayOneShot(Resources.Load<AudioClip>($"Audio/SFX/ranking/{player0.counter.GetTier(targetAccuracy * 100)} Rank"));
         }
 
 

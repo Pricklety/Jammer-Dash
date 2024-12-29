@@ -50,7 +50,6 @@ namespace JammerDash.Menus.Play
             }
             else
             {
-                Debug.LogError("levelNameText is not assigned in the inspector.");
                 levelNameText.text = "Unknown";
             }
         }
@@ -63,7 +62,6 @@ namespace JammerDash.Menus.Play
             }
             else
             {
-                Debug.LogError("songNameText is not assigned in the inspector.");
                 songNameText.text = "No song assigned";
             }
         }
@@ -104,20 +102,10 @@ namespace JammerDash.Menus.Play
             }
             else
             {
-                Debug.LogError("difficultyText is not assigned in the inspector.");
+                difficultyText.text = "N/A";
             }
         }
-        public void SetCustomDifficulty(string difficulty)
-        {
-            if (difficultyText != null)
-            {
-                difficultyText.text = difficulty;
-            }
-            else
-            {
-                Debug.LogError("difficultyText is not assigned in the inspector.");
-            }
-        }
+      
         public static string ExtractJSONFromJDL(string jdlFilePath)
         {
             try
@@ -167,25 +155,11 @@ namespace JammerDash.Menus.Play
             }
             else
             {
-                Notifications.instance.Notify("Error (ID: J1)\nThis level does not exist.", null);
+                Notifications.instance.Notify("Error: This level does not exist.", null);
             }
         }
 
-        private void LoadSceneAddressable(string sceneKey, System.Action onComplete)
-        {
-            AsyncOperationHandle<SceneInstance> loadOperation = Addressables.LoadSceneAsync(sceneKey, LoadSceneMode.Additive);
-            loadOperation.Completed += operation =>
-            {
-                if (operation.Status == AsyncOperationStatus.Succeeded)
-                {
-                    onComplete?.Invoke();
-                }
-                else
-                {
-                    Debug.LogError($"Failed to load scene '{sceneKey}': {operation.OperationException}");
-                }
-            };
-        }
+       
 
         public void OpenEditor()
         {

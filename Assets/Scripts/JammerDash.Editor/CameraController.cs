@@ -49,8 +49,6 @@ namespace JammerDash.Editor
                 Vector3 newPosition = transform.position + new Vector3(horizontalInput, 0, 0);
                 transform.position = newPosition;
 
-                // Debugging: Print out raw mouse input
-                Debug.Log("Horizontal Input: " + horizontalInput);
             }
 
             // Display mouse position

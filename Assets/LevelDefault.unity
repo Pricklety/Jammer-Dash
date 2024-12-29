@@ -1705,7 +1705,6 @@ RectTransform:
   - {fileID: 1546942900}
   - {fileID: 1367395839}
   - {fileID: 1679761410}
-  - {fileID: 1862840209}
   - {fileID: 465815419}
   - {fileID: 231233251}
   m_Father: {fileID: 353979860}
@@ -11142,7 +11141,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdeafc6e7637bac4384c96d19e9ace12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  duration: 1
   player: {fileID: 1467467703}
   song: {fileID: 0}
   player0: {fileID: 1467467701}
@@ -12717,6 +12715,7 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1862840209}
   - {fileID: 73053372}
   - {fileID: 190240777}
   - {fileID: 1543582164}
@@ -50470,19 +50469,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5b2b8ac38268a84ab019af96bec62c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 7
-  cam: {fileID: 289273051}
   goodTextPrefab: {fileID: 5240017745283604475, guid: 886e50300e5ed344d9c9d58e3e5571eb, type: 3}
   normalTextPrefab: {fileID: 5152394820148545469, guid: 8fd1e221359b8ff4aaf40efcedcf512c, type: 3}
   okTextPrefab: {fileID: 4715613946602201652, guid: 58047b9658f742240a577d09937e6118, type: 3}
   badTextPrefab: {fileID: 5356604695208268096, guid: 40535a70c21fbc746a190034b6d1d501, type: 3}
   destroyParticlesPrefab: {fileID: 4785624881480759614, guid: 31cf40341b1dff7419be5d8bd2134f7f, type: 3}
+  cam: {fileID: 289273051}
   cubeLayerMask:
     serializedVersion: 2
     m_Bits: 8
   longcubeLayerMask:
     serializedVersion: 2
     m_Bits: 8
+  hpSlider: {fileID: 2044217697}
+  counter: {fileID: 1467467704}
+  combotext: {fileID: 465815421}
+  cubeanim: {fileID: 2854668884622228783, guid: 65027b124e056534dbf5cc3ff5bd9dea, type: 3}
+  movement: {fileID: 0}
+  scoreText: {fileID: 1472683292}
+  keyText: {fileID: 1679761411}
+  debug: {fileID: 664772127}
+  acc: {fileID: 1546942901}
   hitSounds:
   - {fileID: 8300000, guid: 0ba08b04b381ead449009a90f14d17fa, type: 3}
   - {fileID: 8300000, guid: 6312eeecac40a9f4d805f9d731fcfa3a, type: 3}
@@ -50500,30 +50507,12 @@ MonoBehaviour:
   - {fileID: 0}
   impact: {fileID: 8300000, guid: 29b7f5d749adb6c4db0ecb298ef17983, type: 3}
   fail: {fileID: 8300000, guid: 56c9e2054b4ac0d49be86780aa9e8594, type: 3}
+  music: {fileID: 0}
   health: 300
   maxHealth: 0
-  hpSlider: {fileID: 2044217697}
-  counter: {fileID: 1467467704}
-  combotext: {fileID: 465815421}
-  cubeanim: {fileID: 2854668884622228783, guid: 65027b124e056534dbf5cc3ff5bd9dea, type: 3}
-  movement: {fileID: 0}
-  music: {fileID: 0}
   cubes: []
-  scoreText: {fileID: 1472683292}
-  keyText: {fileID: 1679761411}
-  debug: {fileID: 664772127}
-  acc: {fileID: 1546942901}
-  volume: {fileID: 0}
-  vignetteStartHealthPercentage: 0.5
-  startColor: {r: 1, g: 0, b: 0, a: 1}
   k: 0
   l: 0
-  clip01: {fileID: 0}
-  clip02: {fileID: 0}
-  clip03: {fileID: 0}
-  clip04: {fileID: 0}
-  clip05: {fileID: 0}
-  clip06: {fileID: 0}
   deathPanel: {fileID: 2054880465}
   accuracyWeight: 3.56
   comboWeight: 1.65
@@ -50542,8 +50531,8 @@ MonoBehaviour:
   three: 0
   one: 0
   SPInt: 0
-  finish: {fileID: 870020732}
-  camCol: {fileID: 289273055}
+  vignetteStartHealthPercentage: 0.5
+  startColor: {r: 1, g: 0, b: 0, a: 1}
   accuracyBar: {fileID: 1367395839}
   deviationMarker: {fileID: 3143606824782078380, guid: eb3c8c5a06a28c5478d57942ce9a7349, type: 3}
   maxMarkers: 100
@@ -56671,19 +56660,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5b2b8ac38268a84ab019af96bec62c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 7
-  cam: {fileID: 289273051}
   goodTextPrefab: {fileID: 5240017745283604475, guid: 886e50300e5ed344d9c9d58e3e5571eb, type: 3}
   normalTextPrefab: {fileID: 5152394820148545469, guid: 8fd1e221359b8ff4aaf40efcedcf512c, type: 3}
   okTextPrefab: {fileID: 4715613946602201652, guid: 58047b9658f742240a577d09937e6118, type: 3}
   badTextPrefab: {fileID: 5356604695208268096, guid: 40535a70c21fbc746a190034b6d1d501, type: 3}
   destroyParticlesPrefab: {fileID: 4785624881480759614, guid: 31cf40341b1dff7419be5d8bd2134f7f, type: 3}
+  cam: {fileID: 289273051}
   cubeLayerMask:
     serializedVersion: 2
     m_Bits: 8
   longcubeLayerMask:
     serializedVersion: 2
     m_Bits: 8
+  hpSlider: {fileID: 2044217697}
+  counter: {fileID: 1765330803}
+  combotext: {fileID: 465815421}
+  cubeanim: {fileID: 2854668884622228783, guid: 65027b124e056534dbf5cc3ff5bd9dea, type: 3}
+  movement: {fileID: 0}
+  scoreText: {fileID: 1472683292}
+  keyText: {fileID: 1679761411}
+  debug: {fileID: 664772127}
+  acc: {fileID: 1546942901}
   hitSounds:
   - {fileID: 8300000, guid: 0ba08b04b381ead449009a90f14d17fa, type: 3}
   - {fileID: 8300000, guid: 6312eeecac40a9f4d805f9d731fcfa3a, type: 3}
@@ -56701,30 +56698,12 @@ MonoBehaviour:
   - {fileID: 0}
   impact: {fileID: 8300000, guid: 29b7f5d749adb6c4db0ecb298ef17983, type: 3}
   fail: {fileID: 8300000, guid: 56c9e2054b4ac0d49be86780aa9e8594, type: 3}
+  music: {fileID: 0}
   health: 300
   maxHealth: 0
-  hpSlider: {fileID: 2044217697}
-  counter: {fileID: 1765330803}
-  combotext: {fileID: 465815421}
-  cubeanim: {fileID: 2854668884622228783, guid: 65027b124e056534dbf5cc3ff5bd9dea, type: 3}
-  movement: {fileID: 0}
-  music: {fileID: 0}
   cubes: []
-  scoreText: {fileID: 1472683292}
-  keyText: {fileID: 1679761411}
-  debug: {fileID: 664772127}
-  acc: {fileID: 1546942901}
-  volume: {fileID: 0}
-  vignetteStartHealthPercentage: 0.5
-  startColor: {r: 1, g: 0, b: 0, a: 1}
   k: 0
   l: 0
-  clip01: {fileID: 0}
-  clip02: {fileID: 0}
-  clip03: {fileID: 0}
-  clip04: {fileID: 0}
-  clip05: {fileID: 0}
-  clip06: {fileID: 0}
   deathPanel: {fileID: 2054880465}
   accuracyWeight: 3.56
   comboWeight: 1.65
@@ -56743,8 +56722,8 @@ MonoBehaviour:
   three: 0
   one: 0
   SPInt: 0
-  finish: {fileID: 870020732}
-  camCol: {fileID: 289273055}
+  vignetteStartHealthPercentage: 0.5
+  startColor: {r: 1, g: 0, b: 0, a: 1}
   accuracyBar: {fileID: 1367395839}
   deviationMarker: {fileID: 3143606824782078380, guid: eb3c8c5a06a28c5478d57942ce9a7349, type: 3}
   maxMarkers: 100
@@ -58392,12 +58371,12 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1862840208}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 73053372}
+  m_Father: {fileID: 353979860}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
@@ -58426,11 +58405,11 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 7c0b515b83a842543b4707fb23261b5c, type: 3}
-    m_FontSize: 24
+    m_FontSize: 2
     m_FontStyle: 0
     m_BestFit: 1
     m_MinSize: 0
-    m_MaxSize: 40
+    m_MaxSize: 24
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1

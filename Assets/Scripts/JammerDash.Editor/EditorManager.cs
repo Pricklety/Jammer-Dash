@@ -163,7 +163,7 @@ namespace JammerDash.Editor
             }
             else
             {
-                UnityEngine.Debug.LogError("Post-Processing Volume or its profile is not properly set up.");
+                Notifications.instance.Notify("Client error: Shaders are not initialized.", null);
             }
             MeasureTimeToReachDistance();
             Time.timeScale = playback.value;
@@ -177,14 +177,13 @@ namespace JammerDash.Editor
             // Check if the audio clip is assigned
             if (audio.clip == null)
             {
-                UnityEngine.Debug.LogError("Audio clip is not assigned.");
                 return;
             }
 
             // Parse BPM value from text
             if (!int.TryParse(bpm.text, out int parsedBPM))
             {
-                UnityEngine.Debug.LogError("Failed to parse BPM value.");
+                Notifications.instance.Notify("Failed to parse BPM value. Try again.", null);
                 return;
             }
             parsedBPM *= (int)bpmMultiplier.value;
@@ -233,7 +232,6 @@ namespace JammerDash.Editor
                 // Check if the target is already behind the starting point
                 if (distance <= 0)
                 {
-                    UnityEngine.Debug.LogWarning("The target is already behind the starting point.");
                     levelLength.text = "Invalid distance.";
                     return;
                 }
@@ -264,7 +262,6 @@ namespace JammerDash.Editor
             // Encode the file path to ensure proper URL encoding
             string encodedPath = EncodeFilePath(filePath);
             string fileUri = "file://" + encodedPath;
-            UnityEngine.Debug.LogError(encodedPath);
 
             // Use UnityWebRequest to load the audio clip
             using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(fileUri, AudioType.UNKNOWN))
@@ -286,7 +283,7 @@ namespace JammerDash.Editor
                     {
                         // Set the audio source clip
                         audioClip.name = Path.GetFileName(filePath);
-                        UnityEngine.Debug.Log(filePath);
+
                         nameText.text = audioClip.name;
                         audio.clip = audioClip;
                         lineController.audioClip = audioClip;
@@ -378,7 +375,6 @@ namespace JammerDash.Editor
                         {
                             GameObject cube = Instantiate(cubePrefab[mappedIndex], cubePos, Quaternion.identity, parentTransform);
                             cubes.Add(cube);
-                            Debug.Log($"{mappedIndex}, {cubeTypeName}");
                         }
                         else
                         {
@@ -427,8 +423,6 @@ namespace JammerDash.Editor
                     longCubes.Add(longCubeObject);
                 }
                 StartCoroutine(LoadImageCoroutine(Path.Combine(Application.persistentDataPath, "scenes", $"{scene.ID} - {scene.sceneName}", "bgImage.png")));
-                UnityEngine.Debug.Log("File Path: " + sceneData.songName);
-                UnityEngine.Debug.Log("Objects and UI loaded successfully");
                 bpm.text = sceneData.bpm.ToString();
                 color1.startingColor = sceneData.defBGColor;
                 StartCoroutine(LoadAudioClip(Path.Combine(Application.persistentDataPath, "scenes", $"{scene.ID} - {scene.sceneName}", $"{sceneData.artist} - {sceneData.songName}.mp3")));
@@ -499,7 +493,7 @@ namespace JammerDash.Editor
             // Parse BPM value from text
             if (!int.TryParse(bpm.text, out int parsedBPM))
             {
-                UnityEngine.Debug.LogError("Failed to parse BPM value.");
+                Notifications.instance.Notify("Failed to parse BPM value. Try again.", null);
                 return;
             }
 
@@ -540,13 +534,7 @@ namespace JammerDash.Editor
         private Vector3[] originalPositions;
 
 
-        bool IsCursorOnRightSide()
-        {
-            UnityEngine.Debug.Log("test");
-            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 objectPosition = selectedObject.transform.position;
-            return mousePosition.x >= objectPosition.x;
-        }
+       
         public string FormatTime(float time)
         {
             int minutes = Mathf.FloorToInt(time / 60);
@@ -831,11 +819,7 @@ namespace JammerDash.Editor
                         spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 0.7f);
                     }
                 }
-                else
-                {
-                    // Handle the case where the hit.collider is null
-                    UnityEngine.Debug.LogWarning("Raycast hit nothing with a collider.");
-                }
+               
             }
 
             if (Input.GetKeyDown(KeybindingManager.playMode) && !Input.GetKey(KeybindingManager.songMode))
@@ -1088,7 +1072,7 @@ namespace JammerDash.Editor
             if (!Input.GetKey(KeyCode.LeftShift))
             {
 
-                await SaveSceneData().ContinueWith(task =>
+                await SaveLevelData().ContinueWith(task =>
                 {
                     if (task.IsFaulted)
                     {
@@ -1101,20 +1085,6 @@ namespace JammerDash.Editor
             Time.timeScale = 1f;
         }
 
-
-
-        private void CopyFileDirectly(string sourcePath, string destinationPath)
-        {
-            try
-            {
-                File.Copy(sourcePath, destinationPath, true);
-                UnityEngine.Debug.Log("Copied file to " + destinationPath);
-            }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogError("Failed to copy file: " + e.Message);
-            }
-        }
         private void SaveBackgroundImageTexture(string sceneDataPath)
         {
             // Ensure that the directory for the scene data exists
@@ -1141,7 +1111,6 @@ namespace JammerDash.Editor
             // Write the encoded bytes to the image file
             File.WriteAllBytes(bgImagePath, bytes);
 
-            UnityEngine.Debug.Log("Background image saved successfully: " + bgImagePath);
 
             // Clean up resources
             RenderTexture.active = null;
@@ -1159,20 +1128,7 @@ namespace JammerDash.Editor
             return filePath;
         }
 
-        IEnumerator AddObjectPositions<T>(IEnumerable<GameObject> objects, List<Vector2> positions, string type)
-        {
-            foreach (GameObject obj in objects)
-            {
-                positions.Add(obj.transform.position);
-
-                if (positions.Count % 50 == 0) // Yield every 50 objects for smoother performance
-                {
-                    yield return null; // Wait for the next frame
-                }
-            }
-            UnityEngine.Debug.Log($"{type} positions added successfully.");
-        }
-
+      
         public void OpenBGSel()
         {
             bgSel.SetActive(true);
@@ -1366,6 +1322,7 @@ namespace JammerDash.Editor
                 catch (Exception e)
                 {
                     Debug.LogError($"Error reading JSON file: {e.Message}");
+                    Notifications.instance.Notify("An error occured. Try restarting the game or editor.", null);
                     data = new SceneData(); // Create a default instance if needed
                 }
             }
@@ -1389,7 +1346,6 @@ namespace JammerDash.Editor
             GameObject[] cubes = await GetCubesOnMainThread(loadingPanel);
             if (cubes == null)
             {
-                Debug.LogError("Cubes array is null.");
                 loadingScreen.HideLoadingScreen(); // Hide loading screen
                 return null;
             }
@@ -1406,8 +1362,6 @@ namespace JammerDash.Editor
                 // This block will run once the farthest object has been found
                 float distance = targetObject != null ? targetObject.position.x + additionalDistance : 0;
                 distance1 = distance;
-                // Continue processing with the obtained distance
-                Debug.Log($"Calculated distance: {distance}");
             });
 
             await Task.Delay(500);
@@ -1502,7 +1456,6 @@ namespace JammerDash.Editor
             GameObject[] cubes = await GetCubesOnMainThread(loadingPanel);
             if (cubes == null)
             {
-                Debug.LogError("Cubes array is null.");
                 loadingScreen.HideLoadingScreen(); // Hide loading screen
                 return null;
             }
@@ -1519,8 +1472,6 @@ namespace JammerDash.Editor
                 // This block will run once the farthest object has been found
                 float distance = targetObject != null ? targetObject.position.x + additionalDistance : 0;
                 distance1 = distance;
-                // Continue processing with the obtained distance
-                Debug.Log($"Calculated distance: {distance}");
             });
 
             await Task.Delay(500);
@@ -1602,7 +1553,6 @@ namespace JammerDash.Editor
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error copying files: {ex.Message}");
                 loadingScreen.HideLoadingScreen(); // Hide loading screen
                 return null;
             }
@@ -1647,7 +1597,7 @@ namespace JammerDash.Editor
             // Check if cubes is null or empty
             if (cubes == null || cubes.Length == 0)
             {
-                Debug.LogError("Cubes array is null or empty.");
+
                 callback(null); // Call the callback with null
                 return; // Early return if no cubes are provided
             }
@@ -1658,15 +1608,6 @@ namespace JammerDash.Editor
                 // Run the FindFarthestObjectInX method on the main thread
                 Transform result = Calculator.FindFarthestObjectInX(cubes);
 
-                // Check if result is null
-                if (result == null)
-                {
-                    Debug.LogError("No farthest object found.");
-                }
-                else
-                {
-                    Debug.Log($"Farthest object found: {result.name} at position {result.position}");
-                }
 
                 // Call the callback with the result
                 callback(result);

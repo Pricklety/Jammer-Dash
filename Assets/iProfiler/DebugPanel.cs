@@ -73,8 +73,7 @@ namespace JammerDash.Tech
                 if (www.result == UnityWebRequest.Result.Success)
                 {
                     float endTime = Time.time;
-                    pingTime = (endTime - startTime) * 1000f;  // Convert to milliseconds
-                    Debug.Log("API Response: " + www.downloadHandler.text);
+                    pingTime = (endTime - startTime) * 1000f;
                     var r = JObject.Parse(www.downloadHandler.text);
                     Account.Instance.nickname = r["nickname"].ToString();
                 }

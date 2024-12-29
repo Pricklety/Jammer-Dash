@@ -505,6 +505,8 @@ namespace JammerDash.Game.Player
             misses++;
             health -= 30;
             counter.score -= Mathf.RoundToInt(maxScore * 3 / counter.cubes.Length);
+            if (counter.score < 0)
+            counter.score = 0;
             while (lerpTimer < 1f)
             {
                 lerpTimer += Time.fixedDeltaTime * lerpSpeed;
@@ -607,7 +609,7 @@ namespace JammerDash.Game.Player
 
         IEnumerator ChangeScore(float playerDistance, RaycastHit2D hit)
         {
-            UnityEngine.Debug.Log(playerDistance);
+           
 
             // Create a deviation marker
             if (hit.collider != null)
@@ -753,7 +755,6 @@ namespace JammerDash.Game.Player
             if (collision.tag == "Cubes" || collision.gameObject.name.Contains("hitter02"))
             {
                 activeCubes.Add(collision.gameObject);
-                UnityEngine.Debug.Log(collision.gameObject);
             }
             if (collision.tag == "LongCube" && collision.transform.position.y == transform.position.y)
             {
@@ -798,7 +799,6 @@ namespace JammerDash.Game.Player
                 }
                 else if (bufferActive)
                 {
-                    UnityEngine.Debug.Log("hit: " + bufferActive);
                     DestroyCube(collision.gameObject);
                         sfxS.PlayOneShot(hitSounds[6]);
                     StartCoroutine(ChangeScore(0f, new RaycastHit2D()));
@@ -841,7 +841,6 @@ namespace JammerDash.Game.Player
 
                     float distance = Vector2.Distance(collision.transform.position, transform.position);
                     float middle = Mathf.Abs(collision.offset.x);
-                    Debug.Log(distance);
                     if (distance < 1)
                     {
                         combo++;

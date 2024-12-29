@@ -384,8 +384,7 @@ namespace JammerDash.Menus.Play
                 else
                 {
                     // Handle case where no match was found
-                    UnityEngine.Debug.LogError("Clip path not found in songPathsList!");
-                    Debug.LogError(clipPath);
+                    UnityEngine.Debug.LogError(clipPath + " not found in songPathsList!");
                 }
             }
             int selectedLevelIndex = Array.FindIndex(levels, level => level.isSelected);

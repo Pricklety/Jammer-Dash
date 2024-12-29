@@ -37,7 +37,6 @@ namespace JammerDash.Menus.Play
             // Check if the file exists
             if (!File.Exists(filePath))
             {
-                Debug.LogWarning("Rank data file does not exist.");
                 return;
             }
 
@@ -87,11 +86,6 @@ namespace JammerDash.Menus.Play
                 // Displaying the highest rank data in the UI
                 string[] highestRankDataArray = highestRankData.Split(',');
                 rankText.sprite = Resources.Load<Sprite>($"ranking/{highestRankDataArray[1]}"); // Assuming the rank tier is in the second position
-            }
-            else
-            {
-                // If the level data is not found
-                Debug.LogWarning("Rank data not found for level: " + levelName);
             }
         }
 
