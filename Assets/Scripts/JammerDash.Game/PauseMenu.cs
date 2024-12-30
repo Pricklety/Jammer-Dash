@@ -59,7 +59,7 @@ namespace JammerDash.Game
 
             
             image.color = new(image.color.r, image.color.g, image.color.b, dim.value);
-            if (Input.GetKeyDown(KeyCode.Escape) && GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindObjectOfType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
+            if (Input.GetKeyDown(KeyCode.Escape) && GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindFirstObjectByType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
             {
 
                 PlayerPrefs.SetInt("attempts", attint);
@@ -74,14 +74,14 @@ namespace JammerDash.Game
                     panel.SetActive(false);
                 }
 
-                if (panel.active && Time.timeScale == 1f)
+                if (panel.activeSelf && Time.timeScale == 1f)
                 {
 
                     music.Pause();
                     Time.timeScale = 0;
                     GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().enabled = false;
                 }
-                else if (!panel.active)
+                else if (!panel.activeSelf)
                 {
                     Resume();
 
@@ -105,7 +105,7 @@ namespace JammerDash.Game
         {
             if (!focus && canvas.activeSelf && GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().FindNearestCubeDistance() < 21) // Only execute when focus is lost
             {
-                if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindObjectOfType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
+                if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindFirstObjectByType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
                 {
 
                     panel.SetActive(true);

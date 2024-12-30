@@ -408,7 +408,27 @@ namespace JammerDash
             }
         }
 
-        public PlayerData LoadData()
+       public void Logout()
+{
+    StartCoroutine(CallLogout(url));
+}
+
+private IEnumerator CallLogout(string url)
+{
+    UnityWebRequest request = new UnityWebRequest(url, "POST");
+    yield return request.SendWebRequest();
+
+    if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+    {
+        Debug.Log("Logged out.");
+        Notifications.instance.Notify("Logged out.", null);
+        loggedIn = false;
+    }
+    else
+    {
+        Debug.LogError("Error logging out: " + request.error);
+    }
+}        public PlayerData LoadData()
         {
             string path = Application.persistentDataPath + "/playerData.dat";
             string playtime = Application.persistentDataPath + "/playtime.dat";
