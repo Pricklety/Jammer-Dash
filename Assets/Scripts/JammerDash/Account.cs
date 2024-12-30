@@ -27,6 +27,11 @@ namespace JammerDash
         public string cc;
         public string url;
         string token;
+        public string ip;
+
+        public bool isBanned;
+
+        public string role;
 
         [Header("Level")]
         public int level = 0;
@@ -285,10 +290,17 @@ public static String sha256_hash(String value) {
                     {
                         var successResponse = JObject.Parse(request.downloadHandler.text);
                         Notifications.instance.Notify($"Successfully logged in as {loginData.username}", null);
+                        #if UNITY_EDITOR
+                        Debug.Log(successResponse);
+                        #endif
                         string token = successResponse["token"].ToString();
                         string uuid = successResponse["user"]["id"].ToString();
                         this.uuid = uuid;
                         this.token = token;
+                        this.ip = successResponse["user"]["signup_ip"].ToString();
+                        this.role = successResponse["user"]["role_perms"].ToString();
+                        this.isBanned = successResponse["user"]["is_suspended"].ToObject<bool>();
+                        
                        
 
                             
@@ -302,6 +314,7 @@ public static String sha256_hash(String value) {
                         Debug.LogError($"Error parsing success response: {ex}");
                         Notifications.instance.Notify("Login succeeded, but a response error occurred.", null);
                         SaveLocalData();
+                        loggedIn = true;
                     }
                 }
             };
@@ -570,7 +583,13 @@ private IEnumerator CallLogout(string url)
         public string email;
         public string password;
         public string token;
+
+        public string role_perms;
+
+        public bool is_suspended;
         public string hardware_id;
+
+        public string signup_ip;
     }
 
 }
