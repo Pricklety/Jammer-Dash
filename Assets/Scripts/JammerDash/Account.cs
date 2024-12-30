@@ -27,6 +27,11 @@ namespace JammerDash
         public string cc;
         public string url;
         string token;
+        public string ip;
+
+        public bool isBanned;
+
+        public string role;
 
         [Header("Level")]
         public int level = 0;
@@ -289,6 +294,10 @@ public static String sha256_hash(String value) {
                         string uuid = successResponse["user"]["id"].ToString();
                         this.uuid = uuid;
                         this.token = token;
+                        this.ip = successResponse["user"]["signup_ip"].ToString();
+                        this.role = successResponse["user"]["role_perms"].ToString();
+                        this.isBanned = successResponse["user"]["is_suspended"].ToObject<bool>();
+                        
                        
 
                             
@@ -570,7 +579,13 @@ private IEnumerator CallLogout(string url)
         public string email;
         public string password;
         public string token;
+
+        public string role_perms;
+
+        public bool is_suspended;
         public string hardware_id;
+
+        public string signup_ip;
     }
 
 }

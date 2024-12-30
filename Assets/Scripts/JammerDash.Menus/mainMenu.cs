@@ -688,15 +688,13 @@ namespace JammerDash.Menus
        public Text fullCountryName;
 
        string ccName;
-       string region;
 
        string fullcc;
         public IEnumerator SetCountry()
         {
 
             
-    string ip = new System.Net.WebClient().DownloadString("https://api.ipify.org");
-    string uri = $"https://ipapi.co/{ip}/json/";
+    string uri = $"https://ipapi.co/{Account.Instance.ip}/json/";
 
     using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
     {
@@ -710,7 +708,6 @@ namespace JammerDash.Menus
                 cc = ipApiData.country.ToLower();
                 countryIMG.sprite = Resources.Load<Sprite>("icons/countries/" + cc);
 
-        region = ipApiData.region;
         ccName = ipApiData.country_name;
                 fullcc = data.region ? $"{ipApiData.country_name} / {ipApiData.region}" : ipApiData.country_name;
         
