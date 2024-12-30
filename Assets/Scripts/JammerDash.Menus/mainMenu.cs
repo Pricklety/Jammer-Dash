@@ -64,6 +64,7 @@ namespace JammerDash.Menus
         private FileSystemWatcher fileWatcher; // Check for a new level
 
         [Header("Account System")]
+        public InputField nicknameInput; // Nickname input field
         public InputField usernameInput; // Username input field
         public InputField password; // Password input field
         public InputField email; // Mail input field
@@ -438,12 +439,15 @@ namespace JammerDash.Menus
 
         public void SaveAcc()
         {
-            Account.Instance.Apply(usernameInput.text, password.text, email.text, cc);
+            Account.Instance.Apply(nicknameInput.text, usernameInput.text, password.text, email.text, cc);
         }
 
         public void LoadAcc()
         {
-            StartCoroutine(Account.Instance.ApplyLogin(usernameInput.text, password.text, email.text));
+            string pass;
+            pass = Account.sha256_hash(password.text);
+            Debug.Log(pass);
+            StartCoroutine(Account.Instance.ApplyLogin(nicknameInput.text, usernameInput.text, pass, email.text));
         }
 
         public void Logout() {
