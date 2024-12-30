@@ -752,15 +752,10 @@ namespace JammerDash.Game.Player
                 collision.GetComponent<Animation>().Play();
             }
 
-            if (collision.tag == "Cubes" || collision.gameObject.name.Contains("hitter02"))
+            // tweaking cat gif
+            if ((collision.tag == "Cubes" || collision.gameObject.name.Contains("hitter02")) && collision.transform.position.y == transform.position.y)
             {
                 activeCubes.Add(collision.gameObject);
-            }
-            if (collision.tag == "LongCube" && collision.transform.position.y == transform.position.y)
-            {
-                activeCubes.Add(collision.gameObject);
-               
-
             }
         }
 
@@ -838,6 +833,8 @@ namespace JammerDash.Game.Player
                         sfxS.PlayOneShot(hitSounds[1]);
                     }
                     bufferActive = true;
+
+                    Debug.Log("!!!ATTENTION!!!\n\n\nLONG CUBE LONG CUBE LONG CUBE\n\n\n!!!ATTENTION!!!");
 
                     float distance = Vector2.Distance(collision.transform.position, transform.position);
                     float middle = Mathf.Abs(collision.offset.x);
