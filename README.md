@@ -3,6 +3,11 @@
   <img width="500" height="500" src="https://github.com/Pricklety/Jammer-Dash/blob/master/Assets/Resources/discordLogo.png">
 </p>
 
+# WARNING
+This repo is currently broken and will not run/build properly unless certain packages are installed and an unknown change is made to the assets folder.
+This is not intentional, we are working on fixing it eventually but until then this warning will stay on here.
+The source code is completely untouched by this circumstance, however.
+
 # Jammer Dash
 Jammer Dash is a 2D Rhythm game made with Unity, with hopes of the best user experience and the best community ever.
 
