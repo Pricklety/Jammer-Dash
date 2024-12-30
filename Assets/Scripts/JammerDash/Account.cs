@@ -290,6 +290,9 @@ public static String sha256_hash(String value) {
                     {
                         var successResponse = JObject.Parse(request.downloadHandler.text);
                         Notifications.instance.Notify($"Successfully logged in as {loginData.username}", null);
+                        #if UNITY_EDITOR
+                        Debug.Log(successResponse);
+                        #endif
                         string token = successResponse["token"].ToString();
                         string uuid = successResponse["user"]["id"].ToString();
                         this.uuid = uuid;
@@ -311,6 +314,7 @@ public static String sha256_hash(String value) {
                         Debug.LogError($"Error parsing success response: {ex}");
                         Notifications.instance.Notify("Login succeeded, but a response error occurred.", null);
                         SaveLocalData();
+                        loggedIn = true;
                     }
                 }
             };
