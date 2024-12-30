@@ -69,6 +69,7 @@ namespace JammerDash.Menus
         public InputField email; // Mail input field
         public Image countryIMG; // Community Penel - Country Display
         string cc; // Country code based on IP
+        
 
         [Header("Clock")]
         public GameObject hour; // Clock handle - hour
@@ -87,6 +88,7 @@ namespace JammerDash.Menus
         public GameObject musicPanel; // Playlist
         public GameObject changelogs; // Changelogs
         public GameObject accPanel; // Account creation Panel
+        public GameObject logOutPanel;
         public GameObject multiPanel; // Multiplayer
 
         [Header("Editor Panel")]
@@ -140,6 +142,9 @@ namespace JammerDash.Menus
         public float maxMovementOffset; // Maximum offset
         public float scaleMultiplier; // How much should the image be scaled
         public float edgeMargin; // Edge margin
+
+
+
 
 
         private HashSet<string> knownFiles = new HashSet<string>();
@@ -420,7 +425,15 @@ namespace JammerDash.Menus
 
         public void Accounts()
         {
-            accPanel.SetActive(!accPanel.activeSelf);
+            if (!Account.Instance.loggedIn)
+            {
+                accPanel.SetActive(!accPanel.activeSelf);
+            }
+            else
+            {
+                logOutPanel.SetActive(!logOutPanel.activeSelf);   
+            }
+            
         }
 
         public void SaveAcc()
@@ -431,6 +444,10 @@ namespace JammerDash.Menus
         public void LoadAcc()
         {
             StartCoroutine(Account.Instance.ApplyLogin(usernameInput.text, password.text, email.text));
+        }
+
+        public void Logout() {
+           Account.Instance.Logout();
         }
 
         public static string ExtractJSONFromJDL(string jdlFilePath)
@@ -664,48 +681,39 @@ namespace JammerDash.Menus
                 SetBackgroundSprite(sprite);
             }
         }
-       
+       public Text fullCountryName;
+
+       string ccName;
+       string region;
+
+       string fullcc;
         public IEnumerator SetCountry()
         {
-            string path = Application.persistentDataPath + "/playerData.dat";
 
-            if (File.Exists(path))
-            {
-                XmlSerializer formatter = new XmlSerializer(typeof(PlayerData));
-                FileStream stream = new FileStream(path, FileMode.Open);
+            
+    string ip = new System.Net.WebClient().DownloadString("https://api.ipify.org");
+    string uri = $"https://ipapi.co/{ip}/json/";
 
-                PlayerData data = formatter.Deserialize(stream) as PlayerData;
-                stream.Close();
+    using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
+    {
+        yield return webRequest.SendWebRequest();
 
-                
-                cc = data.country;
-            }
-            if (cc == null)
-            {
+                string[] pages = uri.Split('/');
+                int page = pages.Length - 1;
 
-                string ip = new System.Net.WebClient().DownloadString("https://api.ipify.org");
-                string uri = $"https://ipapi.co/{ip}/json/";
-
-
-                using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
-                {
-                    yield return webRequest.SendWebRequest();
-
-                    string[] pages = uri.Split('/');
-                    int page = pages.Length - 1;
-
-                    IpApiData ipApiData = IpApiData.CreateFromJSON(webRequest.downloadHandler.text);
-
-                    cc = ipApiData.country.ToLower();
-                    countryIMG.sprite = Resources.Load<Sprite>("icons/countries/" + cc);
-
-                }
-            }
-            else
-            {
-                cc = Account.Instance.cc;
+                IpApiData ipApiData = IpApiData.CreateFromJSON(webRequest.downloadHandler.text);
+                SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+                cc = ipApiData.country.ToLower();
                 countryIMG.sprite = Resources.Load<Sprite>("icons/countries/" + cc);
+
+        region = ipApiData.region;
+        ccName = ipApiData.country_name;
+                fullcc = data.region ? $"{ipApiData.country_name} / {ipApiData.region}" : ipApiData.country_name;
+        
+        
+    
             }
+          
         }
         private void SetBackgroundSprite(Sprite sprite)
         {
@@ -1371,17 +1379,25 @@ namespace JammerDash.Menus
         {
             AudioManager.Instance.shuffle = !AudioManager.Instance.shuffle;
         }
-        public void FixedUpdate()
-        {
-            UpdateShuffleImage();
-            UpdateUsernames();
-            UpdateLevelText();
-            UpdateStatsText();
-            HandleQuitPanel();
-            UpdateBackgroundParallax();
-            HandleEscapeInput();
-            UpdateNoLevelError();
-        }
+        private float updateInterval = 0.5f; // Update interval in seconds
+private float nextUpdateTime = 0f;
+
+public void FixedUpdate()
+{
+    if (Time.time >= nextUpdateTime)
+    {
+        UpdateShuffleImage();
+        UpdateUsernames();
+        UpdateLevelText();
+        UpdateStatsText();
+        nextUpdateTime = Time.time + updateInterval;
+    }
+
+    HandleQuitPanel();
+    UpdateBackgroundParallax();
+    HandleEscapeInput();
+    UpdateNoLevelError();
+}
 
         private void UpdateShuffleImage()
         {
@@ -1527,11 +1543,11 @@ namespace JammerDash.Menus
             HandleIdleState();
             UpdateTimers();
             HandleKeyBindings();
+            fullCountryName.text = data.region ? fullcc : ccName;
         }
 
         private void UpdateLevelSlider()
         {
-            levelSlider.maxValue = 1;
             levelSlider.value = (float)Account.Instance.currentXP / Account.Instance.xpRequiredPerLevel[Account.Instance.level];
         }
 
@@ -1666,6 +1682,8 @@ namespace JammerDash.Menus
     public class IpApiData
     {
         public string country;
+        public string country_name;
+        public string region;
 
         public static IpApiData CreateFromJSON(string jsonString)
         {

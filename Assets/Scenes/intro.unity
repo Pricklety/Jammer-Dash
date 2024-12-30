@@ -6124,7 +6124,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -6688,7 +6688,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -8873,7 +8873,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trailColor: {r: 1, g: 1, b: 1, a: 1}
   distanceFromCamera: 5
-  trailImage: {fileID: 0}
+  trailImage: {fileID: 1983049505}
 --- !u!114 &2810003823231954469
 MonoBehaviour:
   m_ObjectHideFlags: 0

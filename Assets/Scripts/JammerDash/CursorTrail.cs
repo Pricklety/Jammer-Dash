@@ -12,9 +12,11 @@ namespace JammerDash
         public Image trailImage; // Reference to the trail image component
         Camera mainCamera; // Reference to the main camera
         bool hasClicked = false;
+
+        ParticleSystem particleSystem;
         void Start()
         {
-
+particleSystem = trailImage.GetComponentInChildren<ParticleSystem>();
             // Find the canvas in the hierarchy
             Canvas canvas = GetComponentInChildren<Canvas>();
             if (canvas != null)
@@ -42,19 +44,19 @@ namespace JammerDash
             SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
             if (Input.GetKey(KeyCode.M) && !Input.GetKeyUp(KeyCode.M))
             {
-                trailImage.GetComponentInChildren<ParticleSystem>().startLifetime = 5f;
-                trailImage.GetComponentInChildren<ParticleSystem>().maxParticles = 3000;
+               particleSystem.startLifetime = 5f;
+                particleSystem.maxParticles = 3000;
 
-                trailImage.GetComponentInChildren<ParticleSystem>().emissionRate = 2500;
+                particleSystem.emissionRate = 2500;
             }
             else
             {
 
-                trailImage.GetComponentInChildren<ParticleSystem>().startLifetime = data.cursorFade;
+               particleSystem.startLifetime = data.cursorFade;
 
-                trailImage.GetComponentInChildren<ParticleSystem>().maxParticles = 2000;
+                particleSystem.maxParticles = 2000;
 
-                trailImage.GetComponentInChildren<ParticleSystem>().emissionRate = data.mouseParticles;
+                particleSystem.emissionRate = data.mouseParticles;
             }
             mainCamera = Camera.main;
             // Move the trail object to the cursor position 

@@ -63,7 +63,7 @@ namespace JammerDash.Game
             itemUnused farthestItem = null;
 
             // Iterate over all itemUnused objects in the scene
-            foreach (itemUnused currentItem in FindObjectsOfType<itemUnused>())
+            foreach (itemUnused currentItem in FindObjectsByType<itemUnused>(FindObjectsSortMode.None))
             {
                 float distance = currentItem.transform.position.x - transform.position.x;
 
@@ -268,8 +268,8 @@ namespace JammerDash.Game
                 anim.Play("finish");
             }
 
-            PlayerMovement objectOfType = FindObjectOfType<PlayerMovement>();
-            long destruction = objectOfType.counter.score;
+            
+            long destruction = player0.counter.score;
             float actualdest = (float)player0.counter.destructionPercentage;
             Account.Instance.GainXP(destruction);
 
@@ -295,7 +295,7 @@ namespace JammerDash.Game
             }
 
             player.transform.localScale = Vector3.zero;
-            objectOfType.enabled = false;
+            player0.enabled = false;
 
             SaveLevelData(actualdest, destruction);
 

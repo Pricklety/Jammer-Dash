@@ -192,7 +192,7 @@ namespace JammerDash.Difficulty
 
             return farthestObject;
         }
-       public static async Task<float> CalculateDifficultyAsync(
+       public static Task<float> CalculateDifficultyAsync(
     List<GameObject> cubes,
     List<GameObject> saws,
     List<GameObject> longCubes,
@@ -250,12 +250,12 @@ namespace JammerDash.Difficulty
         // Apply final scaling to match desired difficulty progression
         if (difficulty < 0.01f) difficulty = 0.01f;
 
-        return difficulty / 30;
+        return Task.FromResult(difficulty / 30);
     }
     catch (Exception e)
     {
         Debug.LogError(e);
-        return 0f;
+        return Task.FromResult(0f);
     }
 }
  public static float CalculateSectionDifficulty(

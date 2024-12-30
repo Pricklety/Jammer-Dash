@@ -467,6 +467,10 @@ MonoBehaviour:
     m_Localized: Shadery
     m_Metadata:
       m_Items: []
+  - m_Id: 13013787829972992
+    m_Localized: Ustawienia konta
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

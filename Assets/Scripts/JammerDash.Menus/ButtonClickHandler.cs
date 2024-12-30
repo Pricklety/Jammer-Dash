@@ -119,11 +119,7 @@ namespace JammerDash.Menus.Play
                 string acc = string.Format("5: {0}\n3: {1}\n1: {2}\n0: {3}\n{4}sp", scoreData[3], scoreData[4], scoreData[5], scoreData[6], Mathf.RoundToInt(float.Parse(scoreData[8])).ToString()); // Accuracy breakdown (Five, Three, One, Miss)
                 string user = scoreData[7]; // Username
 
-                // Debug logs to ensure data is correct
-                Debug.Log("Rank: " + rankText);
-                Debug.Log("Score: " + displayText);
-                Debug.Log("Accuracy breakdown: " + acc);
-                Debug.Log("Username: " + user);
+               
 
                 scorePanel.rankText.sprite = Resources.Load<Sprite>($"ranking/{rankText}");
                 scorePanel.scoreText.text = displayText;
@@ -209,7 +205,7 @@ namespace JammerDash.Menus.Play
 
         public IEnumerator PlayAudioOnlyMode()
         {
-            ButtonClickHandler[] levels = FindObjectsOfType<ButtonClickHandler>();
+            ButtonClickHandler[] levels = FindObjectsByType<ButtonClickHandler>(FindObjectsSortMode.InstanceID);
             var customLevel = GetComponent<CustomLevelScript>();
             if (customLevel != null)
             {
@@ -237,7 +233,7 @@ namespace JammerDash.Menus.Play
             }
 
             // Reset other buttons' selection
-            DeselectOtherButtons();
+            StartCoroutine(DeselectOtherButtons());
 
             isSelected = true;
             yield return StartCoroutine(Move(5));
@@ -276,7 +272,6 @@ namespace JammerDash.Menus.Play
                     yield return StartCoroutine(AudioManager.Instance.LoadAudioClip(clipPath));
                     yield return new WaitUntil(() => AudioManager.Instance.songLoaded);
                     yield return new WaitForEndOfFrame();
-                    UnityEngine.Debug.LogWarning("hi2");
                     AudioManager.Instance.source.loop = true;
                     AudioManager.Instance.source.time = UnityEngine.Random.Range(AudioManager.Instance.source.clip.length * 0f, AudioManager.Instance.source.clip.length * 0.5f);
 
@@ -312,7 +307,7 @@ namespace JammerDash.Menus.Play
         public IEnumerator HandleButtonClick()
         {
             var customLevel = GetComponent<CustomLevelScript>();
-            ButtonClickHandler[] levels = FindObjectsOfType<ButtonClickHandler>();
+            ButtonClickHandler[] levels = FindObjectsByType<ButtonClickHandler>(FindObjectsSortMode.InstanceID);
             if (customLevel != null)
             {
 
@@ -340,7 +335,7 @@ namespace JammerDash.Menus.Play
 
             yield return StartCoroutine(LerpButtonSize(buttonRectTransform, new Vector3(850f, 120f, 0f)));
             // Reset other buttons' selection
-            DeselectOtherButtons();
+            StartCoroutine(DeselectOtherButtons());
 
             isSelected = true;
             yield return StartCoroutine(Move(0));
@@ -376,7 +371,6 @@ namespace JammerDash.Menus.Play
                     yield return StartCoroutine(AudioManager.Instance.LoadAudioClip(clipPath));
                     yield return new WaitUntil(() => AudioManager.Instance.songLoaded);
                     yield return new WaitForEndOfFrame();
-                    UnityEngine.Debug.LogWarning("hi2");
                     AudioManager.Instance.source.loop = true;
                     AudioManager.Instance.source.time = UnityEngine.Random.Range(AudioManager.Instance.source.clip.length * 0f, AudioManager.Instance.source.clip.length * 0.5f);
 
@@ -430,8 +424,9 @@ namespace JammerDash.Menus.Play
         }
 
         // Deselect other buttons in the scroll rect content
-        private void DeselectOtherButtons()
+        private IEnumerator DeselectOtherButtons()
         {
+            yield return new WaitForEndOfFrame();
             ButtonClickHandler[] buttons = scrollRect.content.GetComponentsInChildren<ButtonClickHandler>();
             foreach (ButtonClickHandler otherButton in buttons)
             {
@@ -476,7 +471,6 @@ namespace JammerDash.Menus.Play
                     // Create a Sprite from the downloaded texture and set it to the Image component
                     Texture2D texture = DownloadHandlerTexture.GetContent(www);
                     Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
-                    UnityEngine.Debug.Log(url);
                     levelImage.sprite = sprite;
                     new WaitForEndOfFrame();
                     StartCoroutine(AudioManager.Instance.ChangeSprite(url));

@@ -79,7 +79,7 @@ namespace JammerDash.Audio
                 Destroy(gameObject);
             }
             volClickClip = Resources.Load<AudioClip>("Audio/SFX/volClick");
-            QualitySettings.maxQueuedFrames = 3;
+            QualitySettings.maxQueuedFrames = 0;
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
@@ -297,7 +297,10 @@ namespace JammerDash.Audio
             SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
             if (SceneManager.GetActiveScene().buildIndex == 1)
             {
-
+                if (menu == null)
+                    menu = FindFirstObjectByType<mainMenu>();
+                if (options == null)
+                options = FindFirstObjectByType<Options>();
                 if (menu.mainPanel.activeSelf)
                 {
                     bgtimer += Time.deltaTime;
@@ -521,6 +524,8 @@ namespace JammerDash.Audio
                 break;
         }
 
+        
+
 
     }
 
@@ -534,7 +539,9 @@ namespace JammerDash.Audio
             data.volume = newVolume;
             data.musicVol = musicSlider.value;
             data.sfxVol = sfxSlider.value;
-            slider.gameObject.SetActive(false); // Hide slider after 2 seconds of inactivity
+            slider.gameObject.SetActive(false);
+            
+                SettingsFileHandler.SaveSettingsToFile(data);
         }
     }
 

@@ -468,6 +468,10 @@ MonoBehaviour:
     m_Localized: Shaderi
     m_Metadata:
       m_Items: []
+  - m_Id: 13013787829972992
+    m_Localized: "Postavke ra\u010Duna"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

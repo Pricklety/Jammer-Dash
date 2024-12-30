@@ -84,6 +84,10 @@ namespace JammerDash
         public Toggle discordPlay;
         public Toggle discordEdit;
 
+        public Toggle regionDisplay;
+
+        public Text logInOut;
+
         [Header("Next Update")]
         public GameObject nextChangelogs;
         public TMP_Text changelogs;
@@ -321,6 +325,7 @@ namespace JammerDash
             discordPlay.isOn = settingsData.discordPlay;
             discordEdit.isOn = settingsData.discordEdit;
             discordAFK.isOn = settingsData.discordAFK;
+            regionDisplay.isOn = settingsData.region;
             SetDropdownValueFromSettings();
             
         }
@@ -396,6 +401,7 @@ namespace JammerDash
             settingsData.discordPlay = discordPlay.isOn;
             settingsData.discordEdit = discordEdit.isOn;
             settingsData.shaders = shaders.isOn;
+            settingsData.region = regionDisplay.isOn;
             ApplyFPSCap(settingsData.selectedFPS);
             ApplyResolution();
             HitNotes(settingsData.hitNotes);
@@ -513,6 +519,7 @@ namespace JammerDash
                 discordAFK = discordAFK.isOn,
                 discordPlay = discordPlay.isOn,
                 discordEdit = discordEdit.isOn,
+                region = regionDisplay.isOn,
                 saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                 gameVersion = Application.version
             };
@@ -753,10 +760,11 @@ namespace JammerDash
             }
         }
        
-       
+       public InputField username;
         public void Update()
         {
-           
+            username.text = $"{Account.Instance.nickname} (@{Account.Instance.username})";
+           logInOut.text = Account.Instance.loggedIn ? "Log out" : "Log in";
             if (audio != null)
             {
                 DisplayMusicInfo(audio.source.clip, audio.source.time);
