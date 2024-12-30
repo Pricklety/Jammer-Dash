@@ -134,7 +134,6 @@ namespace JammerDash
                     string loginDataPath = Path.Combine(Application.persistentDataPath, "loginData.dat");
                     if (!IsFileInUse(loginDataPath))
                     {
-                        user = sha256_hash(user);
                         LoginData login = new LoginData
                         {
                             uuid = uuid,
@@ -207,8 +206,9 @@ namespace JammerDash
             Notifications.instance.Notify($"Level up! ({level - 1} -> {level})", null);
         }
 
-        public void Apply(string username, string user, string email, string cc)
+        public void Apply(string nickname, string username, string user, string email, string cc)
         {
+            this.nickname = nickname;
             this.username = username;
             this.user = user;
             this.cc = cc;
@@ -228,13 +228,15 @@ public static String sha256_hash(String value) {
 
   return Sb.ToString();
 }
-        public IEnumerator ApplyLogin(string username, string user, string email)
+        public IEnumerator ApplyLogin(string nickname, string username, string user, string email)
         {
+            this.nickname = nickname;
             this.username = username;
             this.user = user;
             SaveLocalData();
             LoginData loginData = new LoginData
             {
+                nickname = nickname,
                 username = username.ToLower(),
                 password = user,
                 hardware_id = SystemInfo.deviceUniqueIdentifier
@@ -381,7 +383,7 @@ public static String sha256_hash(String value) {
                         Notifications.instance.Notify($"Successfully registered as {bodyJsonObject.username}", null);
 
                         // Safely pass the password for immediate login if needed
-                        StartCoroutine(ApplyLogin(bodyJsonObject.username, inputPassword, bodyJsonObject.email));
+                        StartCoroutine(ApplyLogin(bodyJsonObject.nickname, bodyJsonObject.username, inputPassword, bodyJsonObject.email));
 
                         // Mark user as logged in
                         loggedIn = true;
@@ -412,8 +414,8 @@ public static String sha256_hash(String value) {
 
                     // Apply login data and avoid calling login multiple times
                     if (!loggedIn)
-                    {
-                        StartCoroutine(ApplyLogin(login.username, login.password, login.email));
+                    {Debug.Log($"Deserialized password: {login.password}");
+                        StartCoroutine(ApplyLogin(login.nickname, login.username, login.password, login.email));
                     }
                 }
             }
