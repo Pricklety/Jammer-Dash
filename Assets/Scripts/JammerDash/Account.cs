@@ -9,8 +9,10 @@ using JammerDash.Difficulty;
 using Newtonsoft.Json;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
+using System.Security.Cryptography;
 
 namespace JammerDash
 {
@@ -112,7 +114,7 @@ namespace JammerDash
                     {
                         PlayerData data = new PlayerData
                         {
-                            username = username,
+                            username = username.ToLower(),
                             level = level,
                             currentXP = currentXP,
                             country = cc,
@@ -132,10 +134,11 @@ namespace JammerDash
                     string loginDataPath = Path.Combine(Application.persistentDataPath, "loginData.dat");
                     if (!IsFileInUse(loginDataPath))
                     {
+                        user = sha256_hash(user);
                         LoginData login = new LoginData
                         {
                             uuid = uuid,
-                            username = username,
+                            username = username.ToLower(),
                             nickname = nickname,
                             password = user,
                             token = token,
@@ -212,7 +215,19 @@ namespace JammerDash
             this.email = email;
             SavePlayerData(user, email);
         }
+public static String sha256_hash(String value) {
+  StringBuilder Sb = new StringBuilder();
 
+  using (SHA256 hash = SHA256Managed.Create()) {
+    Encoding enc = Encoding.UTF8;
+    Byte[] result = hash.ComputeHash(enc.GetBytes(value));
+
+    foreach (Byte b in result)
+      Sb.Append(b.ToString("x2"));
+  }
+
+  return Sb.ToString();
+}
         public IEnumerator ApplyLogin(string username, string user, string email)
         {
             this.username = username;
@@ -220,7 +235,7 @@ namespace JammerDash
             SaveLocalData();
             LoginData loginData = new LoginData
             {
-                username = username,
+                username = username.ToLower(),
                 password = user,
                 hardware_id = SystemInfo.deviceUniqueIdentifier
             };
@@ -305,10 +320,11 @@ namespace JammerDash
 
         public void SavePlayerData(string pass, string email)
         {
+                        pass = sha256_hash(pass);
             LoginData loginData = new LoginData
             {
                 nickname = username,
-                username = username,
+                username = username.ToLower(),
                 email = email,
                 password = pass,
                 hardware_id = SystemInfo.deviceUniqueIdentifier
