@@ -472,6 +472,22 @@ MonoBehaviour:
     m_Localized: Account settings
     m_Metadata:
       m_Items: []
+  - m_Id: 13369743621337088
+    m_Localized: Log in
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13370845557272576
+    m_Localized: Log out
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13371624351444992
+    m_Localized: Display country region
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13374434543513600
+    m_Localized: Logged in as
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

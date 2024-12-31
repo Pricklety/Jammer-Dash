@@ -498,7 +498,7 @@ namespace JammerDash.Audio
             case "Master":
                 foreach (AudioSource audio in audios)
                 {
-                    audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", newVolume);
+                    audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", newVolume - value);
                     slider.GetComponentInChildren<Text>().text = $"{category}: {newVolume}dB";
                 } 
                 break;

@@ -472,6 +472,22 @@ MonoBehaviour:
     m_Localized: Kontoeinstellungen
     m_Metadata:
       m_Items: []
+  - m_Id: 13369743621337088
+    m_Localized: Einloggen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13370845557272576
+    m_Localized: Ausloggen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13371624351444992
+    m_Localized: "L\xE4ndereinteilungen anzeigen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13374434543513600
+    m_Localized: "\rAngemeldet als"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
