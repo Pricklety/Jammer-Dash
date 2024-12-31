@@ -20,6 +20,7 @@ using Debug = UnityEngine.Debug;
 using TMPro;
 using UnityEngine.Localization.Settings;
 using UnityEngine.Localization.Tables;
+using UnityEngine.SocialPlatforms;
 
 namespace JammerDash
 {
@@ -266,17 +267,20 @@ namespace JammerDash
         // Call HandleVolumeChange based on the slider that was changed
         if (slider == masterVolumeSlider)
         {
-            audio.HandleVolumeChange(audio.masterS, "Master", 0f);
+            audio.masterS.value = slider.value;
+            audio.masterS.GetComponentInChildren<Text>().text = $"Master: {Mathf.Round(Mathf.Clamp(slider.value, -80f, 20f))}dB";
             audio.HandleVolumeChange(slider, "Master", 0f);
         }
         else if (slider == musicVolSlider)
         {
-            audio.HandleVolumeChange(audio.musicSlider, "Music", 0f);
+            audio.musicSlider.value = slider.value;
+            audio.musicSlider.GetComponentInChildren<Text>().text = $"Music: {Mathf.Round(slider.value * 100)}";
             audio.HandleVolumeChange(slider, "Music", 0f);
         }
         else if (slider == sfxSlider)
         {
-            audio.HandleVolumeChange(audio.sfxSlider, "SFX", 0f);
+            audio.sfxSlider.value = slider.value;
+            audio.sfxSlider.GetComponentInChildren<Text>().text = $"SFX: {Mathf.Round(slider.value * 100)}";
             audio.HandleVolumeChange(slider, "SFX", 0f);
         }
 
@@ -764,7 +768,7 @@ namespace JammerDash
         public void Update()
         {
             username.text = $"{Account.Instance.nickname} (@{Account.Instance.username})";
-           logInOut.text = Account.Instance.loggedIn ? "Log out" : "Log in";
+           logInOut.text = Account.Instance.loggedIn ? LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Log out") : LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Log in");
             if (audio != null)
             {
                 DisplayMusicInfo(audio.source.clip, audio.source.time);

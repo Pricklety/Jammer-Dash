@@ -471,6 +471,22 @@ MonoBehaviour:
     m_Localized: "Skeyt\xE1r kont\xE1"
     m_Metadata:
       m_Items: []
+  - m_Id: 13369743621337088
+    m_Localized: Log in
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13370845557272576
+    m_Localized: Log off
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13371624351444992
+    m_Localized: "M\xF3stra prov\xEDntar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13374434543513600
+    m_Localized: "Log\xF3r as"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

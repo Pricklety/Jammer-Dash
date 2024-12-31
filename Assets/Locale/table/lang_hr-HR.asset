@@ -472,6 +472,22 @@ MonoBehaviour:
     m_Localized: "Postavke ra\u010Duna"
     m_Metadata:
       m_Items: []
+  - m_Id: 13369743621337088
+    m_Localized: Prijavi se
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13370845557272576
+    m_Localized: Odjavi se
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13371624351444992
+    m_Localized: "Poka\u017Ei \u017Eupanije"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13374434543513600
+    m_Localized: Ulogiran kao
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

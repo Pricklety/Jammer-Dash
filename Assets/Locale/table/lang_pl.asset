@@ -471,6 +471,22 @@ MonoBehaviour:
     m_Localized: Ustawienia konta
     m_Metadata:
       m_Items: []
+  - m_Id: 13369743621337088
+    m_Localized: "Zaloguj si\u0119"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13370845557272576
+    m_Localized: "Wylogowa\u0107 si\u0119"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13371624351444992
+    m_Localized: "Wy\u015Bwietl wojew\xF3dztwa"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13374434543513600
+    m_Localized: Zalogowano jako
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
