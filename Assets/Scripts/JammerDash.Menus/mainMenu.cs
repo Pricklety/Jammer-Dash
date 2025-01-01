@@ -687,7 +687,13 @@ switch (data.backgroundType)
             await LoadSpriteAsync(randomFilePath);
         }
 
+        public void EditProfile() {
+            Application.OpenURL("https://game.jammerdash.com/settings");
+        }
 
+        public void OpenProfile() {
+            Application.OpenURL("https://game.jammerdash.com/user/" + Account.Instance.username);
+        }
         private async Task LoadSpriteAsync(string filePath)
         {
             using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture("file://" + filePath))

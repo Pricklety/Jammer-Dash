@@ -6820,6 +6820,9 @@ MonoBehaviour:
   email: 
   cc: 
   url: https://api.jammerdash.com
+  ip: 
+  isBanned: 0
+  role: 
   level: 0
   currentXP: 0
   xpRequiredPerLevel: 

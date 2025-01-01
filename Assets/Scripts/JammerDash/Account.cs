@@ -14,6 +14,7 @@ using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 using System.Security.Cryptography;
 using System.Net.Http;
+using System.Net;
 
 namespace JammerDash
 {
@@ -359,10 +360,15 @@ for (int i = 0; i < words.Length; i++)
         // Capitalize the word
         words[i] = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(words[i]);
     }
+
+    if (words[i].Equals("Hizuru") && words[i].Equals("Chan"))
+    {
+        words[i] = "ひずるちゃん";
+}
 }
 
 role = string.Join(" ", words);
-                
+
                 // Save local data and mark user as logged in
                 SaveLocalData();
                 loggedIn = true;
@@ -393,13 +399,15 @@ role = string.Join(" ", words);
         public void SavePlayerData(string pass, string email)
         {
                         pass = sha256_hash(pass);
+                        ip = new WebClient().DownloadString("http://ipv4.icanhazip.com");
             LoginData loginData = new LoginData
             {
                 nickname = username,
                 username = username.ToLower(),
                 email = email,
                 password = pass,
-                hardware_id = SystemInfo.deviceUniqueIdentifier
+                hardware_id = SystemInfo.deviceUniqueIdentifier,
+                signup_ip = ip
             };
 
             // Register player

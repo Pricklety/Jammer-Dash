@@ -11,7 +11,6 @@ using JammerDash.Audio;
 using JammerDash.Menus.Play.Score;
 using JammerDash.Tech;
 using UnityEngine.Localization.Settings;
-using UnityEditor.Localization.Plugins.XLIFF.V12;
 
 namespace JammerDash.Menus.Play
 {
