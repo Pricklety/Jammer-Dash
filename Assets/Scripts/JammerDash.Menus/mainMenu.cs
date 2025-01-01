@@ -164,7 +164,6 @@ namespace JammerDash.Menus
 
             SetSpectrum();
             StartCoroutine(SetCountry());
-            LoadRandomBackground(null);
 
 
             string path = Path.Combine(Application.persistentDataPath, "levels", "extracted");
@@ -205,6 +204,8 @@ namespace JammerDash.Menus
             fileWatcher.Deleted += NewLevel;
             fileWatcher.Error += HandleFileWatcherError;
             await LoadLevelFromLevels(null); // Play screen
+            
+            LoadRandomBackground(null);
         }
         private void HandleFileWatcherError(object sender, ErrorEventArgs e)
         {
@@ -550,11 +551,14 @@ namespace JammerDash.Menus
         {
             Application.OpenURL(url);
         }
-        public void LoadRandomBackground(string filePath)
+        public void LoadRandomBackground(Sprite sprite1)
         {
             UnityEngine.Debug.Log(data);
+bg.color = Color.white;
+        if (sprite1 == null) 
+        {
 
-            switch (data.backgroundType)
+switch (data.backgroundType)
             {
                 case 1:
                     sprite = Resources.LoadAll<Sprite>("backgrounds/default");
@@ -617,12 +621,12 @@ namespace JammerDash.Menus
                     }
                     break;
             }
-
-            bg.color = Color.white;
-            if (sprite.Length > 0 && filePath == null)
-            {
-                int randomIndex = (sprite.Length == 1) ? 0 : Random.Range(0, sprite.Length);
+             int randomIndex = (sprite.Length == 1) ? 0 : Random.Range(0, sprite.Length);
                 bg.sprite = sprite[randomIndex];
+        }
+        else
+            {
+                bg.sprite = sprite1;
             }
            
            
@@ -632,13 +636,8 @@ namespace JammerDash.Menus
 
         public async Task LoadLevelBackgroundAsync(string filePath)
         {
-
-            // Gather all files with supported extensions
-            List<string> files = new List<string>(); 
-            files.AddRange(Directory.GetFiles(filePath, "*.png", SearchOption.AllDirectories));
-           
-            string filePath1 = files[0];
-            await LoadSpriteAsync(filePath1);
+            Debug.Log("Loading level background: " + filePath);
+            await LoadSpriteAsync(filePath);
         }
         private async Task LoadCustomBackgroundAsync()
         {
@@ -680,9 +679,10 @@ namespace JammerDash.Menus
 
                 Texture2D texture = DownloadHandlerTexture.GetContent(uwr);
                 Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                
 
                 // Set the loaded sprite
-                SetBackgroundSprite(sprite);
+                LoadRandomBackground(sprite);
             }
         }
        public Text fullCountryName;
@@ -723,7 +723,7 @@ namespace JammerDash.Menus
                 videoPlayerObject.SetActive(false);
                 videoImage.SetActive(false);
             }
-
+            Debug.Log("Setting background sprite: " + sprite.name);
             this.sprite = new Sprite[1];
             this.sprite[0] = sprite;
             Resources.UnloadUnusedAssets();
@@ -1025,45 +1025,11 @@ namespace JammerDash.Menus
                     AudioManager.Instance.source.loop = false;
                 }
 
-                if (playPanel.activeSelf)
-                {
-                    ButtonClickHandler[] levels = FindObjectsByType<ButtonClickHandler>(FindObjectsSortMode.None);
-
-                    foreach (ButtonClickHandler level in levels)
-                    {
-                        if (level.isSelected)
-                        {
-                            levelRow = Array.IndexOf(levels, level);
-                            level.Change();
-                            AudioManager.Instance.source.loop = true;
-                        }
-                        else
-                        {
-                            AudioManager.Instance.source.loop = true;
-                            if (levelRow == -1)
-                            {
-                                int randomIndex = Random.Range(0, levels.Length);
-                                levelRow = randomIndex;
-                                new WaitUntil(() => levels[randomIndex].GetComponent<leaderboard>().panelContainer != null);
-                                StartCoroutine(levels[randomIndex].PlayAudioOnlyMode());
-                                levels[randomIndex].Change();
-                                
-                            }
-                            else
-                            {
-                                new WaitUntil(() => levels[levelRow].GetComponent<leaderboard>().panelContainer != null);
-                                levels[levelRow].Change();
-                                StartCoroutine(levels[levelRow].Move(1));
-                                if (AudioManager.Instance.source.clip.name != $"{levels[levelRow].GetComponent<CustomLevelScript>().sceneData.artist} - {levels[levelRow].GetComponent<CustomLevelScript>().sceneData.songName}")
-                                    StartCoroutine(levels[levelRow].PlayAudioOnlyMode());
-                            }
-                        }
-                    }
-                }
-                else
-                {
-
-                }
+        // Play panel logic
+        if (playPanel.activeSelf)
+        {
+            HandlePlayPanelLogic();
+        }
             }
         }
 
@@ -1260,6 +1226,7 @@ namespace JammerDash.Menus
             community.SetActive(false);
             mainPanel.SetActive(true);
             multiPanel.SetActive(false);
+            LoadRandomBackground(null);
         }
 
 
@@ -1544,8 +1511,84 @@ public void FixedUpdate()
             HandleIdleState();
             UpdateTimers();
             HandleKeyBindings();
+            if (fullcc != null)
             fullCountryName.text = data.region ? fullcc : ccName;
+
+            
+ if (Input.GetKeyDown(KeyCode.F2) && playPanel.activeSelf)
+        {
+            Debug.Log("F2 key pressed.");
+            SelectRandomLevel();
         }
+        }
+          private void SelectRandomLevel()
+    {
+        ButtonClickHandler[] levels = FindObjectsByType<ButtonClickHandler>(FindObjectsSortMode.None);
+
+        if (levels.Length == 0)
+        {
+            Debug.LogWarning("No levels found!");
+            return;
+        }
+
+        // Select a random level
+        int randomIndex = Random.Range(0, levels.Length);
+        levelRow = randomIndex;
+
+        Debug.Log($"Random level selected: {levels[randomIndex].name}");
+
+        // Change the level and play audio
+        if (levels[randomIndex].GetComponent<leaderboard>().panelContainer != null)
+        {
+            StartCoroutine(levels[randomIndex].PlayAudioOnlyMode());
+        }
+        levels[randomIndex].Change();
+    }
+
+    private void HandlePlayPanelLogic()
+    {
+        ButtonClickHandler[] levels = FindObjectsByType<ButtonClickHandler>(FindObjectsSortMode.None);
+        bool updatedLevelRow = false;
+
+        foreach (ButtonClickHandler level in levels)
+        {
+            if (level.isSelected)
+            {
+                // Update levelRow if not already updated
+                if (!updatedLevelRow)
+                {
+                    levelRow = Array.IndexOf(levels, level);
+                    updatedLevelRow = true;
+                }
+                level.Change();
+                AudioManager.Instance.source.loop = true;
+            }
+        }
+
+        if (!updatedLevelRow)
+        {
+            AudioManager.Instance.source.loop = true;
+
+            if (levelRow == -1)
+            {
+                // Handle the case where no level is selected
+                SelectRandomLevel();
+            }
+            else
+            {
+                // Handle previously selected level
+                if (levels[levelRow].GetComponent<leaderboard>().panelContainer != null)
+                {
+                    levels[levelRow].Change();
+                    StartCoroutine(levels[levelRow].Move(1));
+                    if (AudioManager.Instance.source.clip.name != $"{levels[levelRow].GetComponent<CustomLevelScript>().sceneData.artist} - {levels[levelRow].GetComponent<CustomLevelScript>().sceneData.songName}")
+                    {
+                        StartCoroutine(levels[levelRow].PlayAudioOnlyMode());
+                    }
+                }
+            }
+        }
+    }
 
         private void UpdateLevelSlider()
         {
@@ -1629,7 +1672,7 @@ public void FixedUpdate()
                 ReloadLevels();
             }
 
-            if (Input.GetKeyDown(KeybindingManager.debug))
+            if (Input.GetKeyDown(KeybindingManager.debug) && mainPanel.activeSelf)
             {
                 additionalPanel.SetActive(!additionalPanel.activeSelf);
             }

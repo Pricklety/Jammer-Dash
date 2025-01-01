@@ -66,9 +66,9 @@ namespace JammerDash
 
         private void Start()
         {
-            CalculateXPRequirements();
             LoadData();
             StartCoroutine(SavePlaytimeEverySecond());
+            CalculateXPRequirements();
             LoginData(); // Try to load login data only once at the start
         }
 
