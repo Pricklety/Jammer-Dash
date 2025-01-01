@@ -64,10 +64,13 @@ namespace JammerDash.Menus
         private FileSystemWatcher fileWatcher; // Check for a new level
 
         [Header("Account System")]
-        public InputField nicknameInput; // Nickname input field
-        public InputField usernameInput; // Username input field
-        public InputField password; // Password input field
-        public InputField email; // Mail input field
+        public InputField nicknameInput; // Nickname input field (register)
+        public InputField usernameInput; // Username input field (register)
+        public InputField password; // Password input field (register)
+        public InputField email; // Mail input field (register)
+
+        public InputField usernameInput1; // Username input field (login)
+        public InputField password1; // Password input field (login)
         public Image countryIMG; // Community Penel - Country Display
         string cc; // Country code based on IP
         
@@ -91,6 +94,8 @@ namespace JammerDash.Menus
         public GameObject accPanel; // Account creation Panel
         public GameObject logOutPanel;
         public GameObject multiPanel; // Multiplayer
+
+        public GameObject loginPage; // Login page
 
         [Header("Editor Panel")]
         public GameObject levelInfoPanelPrefab; // Level prefab for editor
@@ -133,7 +138,8 @@ namespace JammerDash.Menus
         public Text nickname; // Text object in the community panel displaying your nickname
         public Text spMain; // main SP text (handles the "SP: sp" text)
         public Text[] sps; // sp texts (handles the "{sp}sp" texts)
-        public Text bigStatsText; // Community panel - All player info
+        public Text[] bigStatsText; // Community panel - All player infos
+        public Text roleText;
 
         [Header("Parallax")]
         public Transform logo; // Logo parallax
@@ -205,7 +211,7 @@ namespace JammerDash.Menus
             fileWatcher.Error += HandleFileWatcherError;
             await LoadLevelFromLevels(null); // Play screen
             
-            LoadRandomBackground(null);
+            StartCoroutine(LoadRandomBackground(null));
         }
         private void HandleFileWatcherError(object sender, ErrorEventArgs e)
         {
@@ -446,13 +452,15 @@ namespace JammerDash.Menus
         public void LoadAcc()
         {
             string pass;
-            pass = Account.sha256_hash(password.text);
+            pass = Account.sha256_hash(password1.text);
             Debug.Log(pass);
-            StartCoroutine(Account.Instance.ApplyLogin(nicknameInput.text, usernameInput.text, pass, email.text));
+            StartCoroutine(Account.Instance.ApplyLogin(usernameInput1.text, pass));
+            loginPage.SetActive(false);
         }
 
         public void Logout() {
            Account.Instance.Logout();
+           logOutPanel.SetActive(false);
         }
 
         public static string ExtractJSONFromJDL(string jdlFilePath)
@@ -551,11 +559,23 @@ namespace JammerDash.Menus
         {
             Application.OpenURL(url);
         }
-        public void LoadRandomBackground(Sprite sprite1)
+        public IEnumerator LoadRandomBackground(Sprite sprite1)
         {
             UnityEngine.Debug.Log(data);
 bg.color = Color.white;
-        if (sprite1 == null) 
+ float duration = 0.2f;
+        float elapsedTime = 0f;
+
+        Image imageComponent = bg;
+
+        Color startColor = imageComponent.color;
+        Color targetColor = new(startColor.r, startColor.g, startColor.b, 0f);
+
+        while (elapsedTime < duration)
+        {
+            imageComponent.color = Color.Lerp(startColor, targetColor, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+             if (sprite1 == null) 
         {
 
 switch (data.backgroundType)
@@ -628,10 +648,13 @@ switch (data.backgroundType)
             {
                 bg.sprite = sprite1;
             }
-           
-           
+            yield return null;
+        }
 
-
+        startColor = imageComponent.color;
+        targetColor = Color.white;
+        imageComponent.color = Color.Lerp(startColor, targetColor, 1f);
+       Resources.UnloadUnusedAssets();
         }
 
         public async Task LoadLevelBackgroundAsync(string filePath)
@@ -682,7 +705,7 @@ switch (data.backgroundType)
                 
 
                 // Set the loaded sprite
-                LoadRandomBackground(sprite);
+                StartCoroutine(LoadRandomBackground(sprite));
             }
         }
        public Text fullCountryName;
@@ -1021,7 +1044,7 @@ switch (data.backgroundType)
                 else if (!playPanel.activeSelf || !creditsPanel.activeSelf || !settingsPanel.activeSelf)
                 {
                     mainPanel.SetActive(true);
-                    LoadRandomBackground(null);
+                    StartCoroutine(LoadRandomBackground(null));
                     AudioManager.Instance.source.loop = false;
                 }
 
@@ -1226,7 +1249,7 @@ switch (data.backgroundType)
             community.SetActive(false);
             mainPanel.SetActive(true);
             multiPanel.SetActive(false);
-            LoadRandomBackground(null);
+            StartCoroutine(LoadRandomBackground(null));
         }
 
 
@@ -1372,6 +1395,10 @@ public void FixedUpdate()
             shuffleImage.color = AudioManager.Instance.shuffle ? Color.HSVToRGB(0.33f, 0.47f, 1) : Color.white;
         }
 
+        public void LoginPage() {
+            loginPage.SetActive(true);
+            accPanel.SetActive(false);   
+        }
 
         private void UpdateUsernames()
         {
@@ -1381,6 +1408,7 @@ public void FixedUpdate()
                 text.text = username;
             }
             nickname.text = $"@{Account.Instance.username}";
+            roleText.text = Account.Instance.role;
         }
 
         private void UpdateLevelText()
@@ -1394,14 +1422,17 @@ public void FixedUpdate()
         private void UpdateStatsText()
         {
             PlayerStats stats = Calculator.CalculateOtherPlayerInfo("scores.dat");
-            bigStatsText.text = $"Playtime: {Account.Instance.ConvertPlaytimeToReadableFormat()}\r\n" +
-                $"Play count: {stats.TotalPlays:N0}\r\n" +
-                $"SS+: {stats.RankCounts["SS+"]:N0}\r\n" +
-                $"SS: {stats.RankCounts["SS"]:N0}\r\n" +
-                $"S: {stats.RankCounts["S"]:N0}\r\n" +
-                $"A: {stats.RankCounts["A"]:N0}\r\n" +
-                $"Highest combo: {stats.HighestCombo:N0}x\r\n" +
-                $"Accuracy: {Calculator.CalculateAccuracy("scores.dat"):0.00}%";
+            bigStatsText[0].text = $"{Account.Instance.ConvertPlaytimeToReadableFormat()}";
+            bigStatsText[1].text = $"{stats.TotalPlays:N0}";
+            bigStatsText[2].text = $"{stats.RankCounts["SS+"]:N0}";
+            bigStatsText[3].text = $"{stats.RankCounts["SS"]:N0}";
+            bigStatsText[4].text = $"{stats.RankCounts["S"]:N0}";
+            bigStatsText[5].text = $"{stats.RankCounts["A"]:N0}";
+            bigStatsText[6].text = $"{stats.HighestCombo:N0}x";
+            bigStatsText[7].text = $"{Calculator.CalculateAccuracy("scores.dat"):0.00}%";
+            bigStatsText[8].text = $"UUID: {Account.Instance.uuid}";
+            bigStatsText[9].text = $"<size=17>{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Jams"):N0}</size>\n<size=12>0</size>";
+            bigStatsText[10].text = $"<size=17>{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Performance"):N0}</size>\n<size=12>{Calculator.CalculateSP("scores.dat"):N0}</size>";
         }
 
         private void HandleQuitPanel()
@@ -1599,7 +1630,7 @@ public void FixedUpdate()
         {
             if (Input.GetKeyDown(KeyCode.B) && CanLoadBackground())
             {
-                LoadRandomBackground(null);
+                StartCoroutine(LoadRandomBackground(null));
             }
         }
 

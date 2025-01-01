@@ -13,6 +13,7 @@ using System.Text;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 using System.Security.Cryptography;
+using System.Net.Http;
 
 namespace JammerDash
 {
@@ -233,92 +234,148 @@ public static String sha256_hash(String value) {
 
   return Sb.ToString();
 }
-        public IEnumerator ApplyLogin(string nickname, string username, string user, string email)
+public IEnumerator ApplyLogin(string username, string user)
+{
+    this.username = username;
+    this.user = user;
+    SaveLocalData();
+
+    LoginData loginData = new LoginData
+    {
+        username = username.ToLower(),
+        password = user
+    };
+
+    string json = JsonConvert.SerializeObject(loginData, Formatting.None, new JsonSerializerSettings
+    {
+        NullValueHandling = NullValueHandling.Ignore,
+        DefaultValueHandling = DefaultValueHandling.Ignore
+    });
+
+    using (UnityWebRequest request = new UnityWebRequest(url + "/v1/account/login", "POST"))
+    {
+        request.SetRequestHeader("content-type", "application/json");
+
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        // Ensure HTTPS
+        if (!url.StartsWith("https"))
         {
-            this.nickname = nickname;
-            this.username = username;
-            this.user = user;
-            SaveLocalData();
-            LoginData loginData = new LoginData
-            {
-                nickname = nickname,
-                username = username.ToLower(),
-                password = user,
-                hardware_id = SystemInfo.deviceUniqueIdentifier
-            };
-
-            string json = JsonConvert.SerializeObject(loginData, Formatting.None, new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                DefaultValueHandling = DefaultValueHandling.Ignore
-            });
-            using (UnityWebRequest request = new UnityWebRequest(url + "/v1/account/login", "POST"))
-            {
-
-                request.SetRequestHeader("content-type", "application/json");
-
-                byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
-                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                request.downloadHandler = new DownloadHandlerBuffer();
-
-                // Ensure HTTPS
-                if (!url.StartsWith("https"))
-                {
-                    Notifications.instance.Notify("Login failed: insecure connection.", null);
-                    yield break;
-                }
-                yield return request.SendWebRequest();
-
-                if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
-                {
-                    try
-                    {
-                        var errorResponse = JObject.Parse(request.downloadHandler.text);
-                        var errors = errorResponse["errors"];
-                        Notifications.instance.Notify($"{errors.Count()} error(s) occurred. More info in the player logs (click).", () => Process.Start($@"{Path.Combine(Application.persistentDataPath, "Player.log")}"));
-                        Debug.LogError(errors);
-                    }
-                    catch
-                    {
-                        Notifications.instance.Notify("An unknown error occurred. Please try again.", null);
-                    }
-                }
-                else
-                {
-
-                    try
-                    {
-                        var successResponse = JObject.Parse(request.downloadHandler.text);
-                        Notifications.instance.Notify($"Successfully logged in as {loginData.username}", null);
-                        #if UNITY_EDITOR
-                        Debug.Log(successResponse);
-                        #endif
-                        string token = successResponse["token"].ToString();
-                        string uuid = successResponse["user"]["id"].ToString();
-                        this.uuid = uuid;
-                        this.token = token;
-                        this.ip = successResponse["user"]["signup_ip"].ToString();
-                        this.role = successResponse["user"]["role_perms"].ToString();
-                        this.isBanned = successResponse["user"]["is_suspended"].ToObject<bool>();
-                        
-                       
-
-                            
-                        SaveLocalData();
-
-                        // Mark user as logged in
-                        loggedIn = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogError($"Error parsing success response: {ex}");
-                        Notifications.instance.Notify("Login succeeded, but a response error occurred.", null);
-                        SaveLocalData();
-                        loggedIn = true;
-                    }
-                }
-            };
+            Notifications.instance.Notify("Login failed: insecure connection.", null);
+            yield break;
         }
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+        {
+            HandleErrorResponse(request);
+        }
+        else
+        {
+            try
+            {
+                var successResponse = JObject.Parse(request.downloadHandler.text);
+                Notifications.instance.Notify($"Successfully logged in as {loginData.username}", null);
+
+                // Extract basic information
+                string token = successResponse["token"].ToString();
+                string uuid = successResponse["user"]["id"].ToString();
+                this.uuid = uuid;
+                this.token = token;
+
+                // Fetch additional user details using the UUID
+                StartCoroutine(FetchUserDetails(uuid, token));
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error parsing success response or fetching additional data: {ex}");
+                Notifications.instance.Notify("Login succeeded, but an error occurred while fetching additional data.", null);
+                SaveLocalData();
+                loggedIn = true;
+            }
+        }
+    }
+}
+
+private void HandleErrorResponse(UnityWebRequest request)
+{
+    try
+    {
+        var errorResponse = JObject.Parse(request.downloadHandler.text);
+        var errors = errorResponse["error"];
+        if (errors != null && errors.Count() > 0)
+        {
+            Notifications.instance.Notify($"{errors.Count()} error(s) occurred. More info in the player logs (click).", 
+                () => Process.Start($@"{Path.Combine(Application.persistentDataPath, "Player.log")}"));
+        }
+        else
+        {
+            Notifications.instance.Notify("Unknown error occurred during login.", null);
+        }
+    }
+    catch (Exception ex)
+    {
+        Notifications.instance.Notify($"An unknown error occurred: {ex.Message}", null);
+    }
+}
+
+private IEnumerator FetchUserDetails(string uuid, string token)
+{
+    string apiUrl = $"https://api.jammerdash.com/v1/account/{uuid}";
+    using (UnityWebRequest userRequest = UnityWebRequest.Get(apiUrl))
+    {
+        userRequest.SetRequestHeader("Authorization", $"Bearer {token}");
+        yield return userRequest.SendWebRequest();
+
+        if (userRequest.result == UnityWebRequest.Result.ConnectionError || userRequest.result == UnityWebRequest.Result.ProtocolError)
+        {
+            Notifications.instance.Notify("Failed to fetch user details.", null);
+        }
+        else
+        {
+            try
+            {
+                var accountData = JObject.Parse(userRequest.downloadHandler.text);
+
+                // Assign the fetched details
+                this.nickname = accountData["display_name"]?.ToString();
+                this.ip = accountData["signup_ip"]?.ToString();
+                this.role = accountData["role_perms"]?.ToString();
+
+               string[] words = role.Split('_');
+
+for (int i = 0; i < words.Length; i++)
+{
+    // Check if the word contains "jd", "Jd", or "JD"
+    if (words[i].Equals("jd", StringComparison.OrdinalIgnoreCase) || words[i].Equals("Jd", StringComparison.OrdinalIgnoreCase))
+    {
+        words[i] = "JD";
+    }
+    else
+    {
+        // Capitalize the word
+        words[i] = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(words[i]);
+    }
+}
+
+role = string.Join(" ", words);
+                
+                // Save local data and mark user as logged in
+                SaveLocalData();
+                loggedIn = true;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error parsing additional user data: {ex}");
+                Notifications.instance.Notify("Error processing user data. Please try again later.", null);
+            }
+        }
+    }
+}
+
 
         public void CalculateXPRequirements()
         {
@@ -396,7 +453,7 @@ public static String sha256_hash(String value) {
                         Notifications.instance.Notify($"Successfully registered as {bodyJsonObject.username}", null);
 
                         // Safely pass the password for immediate login if needed
-                        StartCoroutine(ApplyLogin(bodyJsonObject.nickname, bodyJsonObject.username, inputPassword, bodyJsonObject.email));
+                        StartCoroutine(ApplyLogin(bodyJsonObject.username, inputPassword));
 
                         // Mark user as logged in
                         loggedIn = true;
@@ -428,7 +485,7 @@ public static String sha256_hash(String value) {
                     // Apply login data and avoid calling login multiple times
                     if (!loggedIn)
                     {Debug.Log($"Deserialized password: {login.password}");
-                        StartCoroutine(ApplyLogin(login.nickname, login.username, login.password, login.email));
+                        StartCoroutine(ApplyLogin(login.username, login.password));
                     }
                 }
             }

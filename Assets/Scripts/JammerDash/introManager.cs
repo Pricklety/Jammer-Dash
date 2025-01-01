@@ -40,7 +40,7 @@ namespace JammerDash
 
             while (elapsedTime < 17f)
             {
-                if (Input.GetKeyDown(KeyCode.Escape))
+                if (Input.GetKeyDown(KeyCode.Escape) && Account.Instance.loggedIn)
                 {
                     operation.allowSceneActivation = true;
                     yield break; 
