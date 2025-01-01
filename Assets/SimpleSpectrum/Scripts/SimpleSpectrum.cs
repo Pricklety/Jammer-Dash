@@ -428,7 +428,7 @@ public class SimpleSpectrum : MonoBehaviour {
                 }
                 else
                 {
-                    audioSource.GetSpectrumData(spectrum, 0, windowUsed); //get the spectrum data
+                    AudioManager.Instance.source.GetSpectrumData(spectrum, 0, windowUsed); //get the spectrum data
                 }
             }
 

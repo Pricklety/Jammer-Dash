@@ -447,6 +447,11 @@ namespace JammerDash.Audio
                 KeybindPanel.ToggleFunction("Toggle gameplay interface", $"Shift + {KeybindingManager.toggleUI}");
             }
 
+            if (Input.GetKey(KeyCode.F2) && menu.playPanel.activeSelf) 
+            {
+                KeybindPanel.ToggleFunction("Random level", "F2");
+            }
+
             bool gain = master.audioMixer.GetFloat("Gain", value: out float a);
             if (a != data.bassgain)
             {
@@ -651,7 +656,7 @@ namespace JammerDash.Audio
                 PlayCurrentSong();
                 new WaitForSecondsRealtime(1f);
                 SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-                if (data.bgTime == 0)
+                if (data.bgTime == 0 && menu.mainPanel.activeSelf)
                     StartCoroutine(ChangeSprite(null));
             }
         }
@@ -673,7 +678,7 @@ namespace JammerDash.Audio
                 UnityEngine.Debug.Log($"Currently playing song index: {currentClipIndex}");
                 new WaitForSecondsRealtime(1f);
                 SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-                if (data.bgTime == 0)
+                if (data.bgTime == 0 && menu.mainPanel.activeSelf)
                     StartCoroutine(ChangeSprite(null));
 
                 PlayCurrentSong();
@@ -682,40 +687,42 @@ namespace JammerDash.Audio
 
 
 
-        public IEnumerator ChangeSprite(string filePath)
+       public IEnumerator ChangeSprite(string filePath)
+{
+    mainMenu menu = options.GetComponent<mainMenu>();
+
+    // Ensure there are sprites available
+    if (menu.sprite.Length > 0 && 
+        menu.data.backgroundType >= 1 && 
+        menu.data.backgroundType <= 3 && 
+        string.IsNullOrEmpty(filePath))
+    {
+        float duration = 0.2f;
+        float elapsedTime = 0f;
+
+        Image imageComponent = menu.bg;
+
+        Color startColor = imageComponent.color;
+        Color targetColor = new(startColor.r, startColor.g, startColor.b, 0f);
+
+        while (elapsedTime < duration)
         {
-            mainMenu menu = options.GetComponent<mainMenu>();
-
-            // Ensure there are sprites available
-            if (menu.sprite.Length > 0 && (menu.data.backgroundType >= 1 || menu.data.backgroundType <= 3) && filePath == null)
-            {
-
-                // Set the new sprite gradually over a specified duration
-                float duration = 0.2f; // Adjust the duration as needed
-                float elapsedTime = 0f;
-
-                Image imageComponent = menu.bg; // Assuming menu.bg is of type Image
-
-                Color startColor = imageComponent.color;
-                Color targetColor = new(startColor.r, startColor.g, startColor.b, 0f);
-
-                while (elapsedTime < duration)
-                {
-                    imageComponent.color = Color.Lerp(startColor, targetColor, elapsedTime / duration);
-                    elapsedTime += Time.deltaTime;
-                    yield return null;
-                }
-                startColor = imageComponent.color;
-                targetColor = Color.white;
-                imageComponent.color = Color.Lerp(startColor, targetColor, 1f);
-                menu.LoadRandomBackground(null);
-            }
-            else
-            {
-                _ = menu.LoadLevelBackgroundAsync(filePath);
-            }
-
+            imageComponent.color = Color.Lerp(startColor, targetColor, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
         }
+
+        startColor = imageComponent.color;
+        targetColor = Color.white;
+        imageComponent.color = Color.Lerp(startColor, targetColor, 1f);
+        menu.LoadRandomBackground(null);
+    }
+    else if (!string.IsNullOrEmpty(filePath))
+    {
+        // Load the background specified by the filePath
+        yield return menu.LoadLevelBackgroundAsync(filePath);
+    }
+}
         public void PlayCurrentSong()
         {
             if (songPathsList != null && songPathsList.Count > 0)

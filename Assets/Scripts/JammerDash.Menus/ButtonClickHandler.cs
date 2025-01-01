@@ -11,6 +11,7 @@ using JammerDash.Audio;
 using JammerDash.Menus.Play.Score;
 using JammerDash.Tech;
 using UnityEngine.Localization.Settings;
+using UnityEditor.Localization.Plugins.XLIFF.V12;
 
 namespace JammerDash.Menus.Play
 {
@@ -462,7 +463,7 @@ namespace JammerDash.Menus.Play
         // Coroutine to load image from URL
         IEnumerator LoadImage(string url)
         {
-            using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))
+            using (UnityWebRequest www = UnityWebRequestTexture.GetTexture("file://" + url))
             {
                 yield return www.SendWebRequest();
 
@@ -477,7 +478,8 @@ namespace JammerDash.Menus.Play
                 }
                 else
                 {
-                    StartCoroutine(AudioManager.Instance.ChangeSprite(null)); levelImage.sprite = null;
+                    FindFirstObjectByType<mainMenu>().LoadRandomBackground(null); 
+                    levelImage.sprite = null;
                     Debug.LogError(www.error);
                 }
             }
