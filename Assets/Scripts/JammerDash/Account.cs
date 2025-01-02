@@ -58,6 +58,7 @@ namespace JammerDash
             if (Instance == null)
             {
                 Instance = this;
+                Debug.Log("Account instance found.");
             }
             else
             {
@@ -237,8 +238,6 @@ public static String sha256_hash(String value) {
 }
 public IEnumerator ApplyLogin(string username, string user)
 {
-    this.username = username;
-    this.user = user;
     SaveLocalData();
 
     LoginData loginData = new LoginData
@@ -256,6 +255,9 @@ public IEnumerator ApplyLogin(string username, string user)
     using (UnityWebRequest request = new UnityWebRequest(url + "/v1/account/login", "POST"))
     {
         request.SetRequestHeader("content-type", "application/json");
+        request.SetRequestHeader("User-Agent", Secret.UserAgent);
+        request.SetRequestHeader("Referer", "https://api.jammerdash.com");
+        request.SetRequestHeader("Authorization", $"Bearer {token}");
 
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -286,6 +288,8 @@ public IEnumerator ApplyLogin(string username, string user)
                 string uuid = successResponse["user"]["id"].ToString();
                 this.uuid = uuid;
                 this.token = token;
+                this.username = username;
+                this.user = user;
 
                 // Fetch additional user details using the UUID
                 StartCoroutine(FetchUserDetails(uuid, token));
@@ -305,6 +309,11 @@ private void HandleErrorResponse(UnityWebRequest request)
 {
     try
     {
+        #if UNITY_EDITOR
+        Debug.LogError($"Request Error: {request.error}");
+    Debug.LogError($"Response Code: {request.responseCode}");
+    Debug.LogError($"SSL/TLS Handshake Error: {request.downloadHandler.text}");
+        #endif
         var errorResponse = JObject.Parse(request.downloadHandler.text);
         var errors = errorResponse["error"];
         if (errors != null && errors.Count() > 0)
@@ -329,6 +338,8 @@ private IEnumerator FetchUserDetails(string uuid, string token)
     using (UnityWebRequest userRequest = UnityWebRequest.Get(apiUrl))
     {
         userRequest.SetRequestHeader("Authorization", $"Bearer {token}");
+        userRequest.SetRequestHeader("User-Agent", Secret.UserAgent);
+        userRequest.SetRequestHeader("Referer", "https://api.jammerdash.com");
         yield return userRequest.SendWebRequest();
 
         if (userRequest.result == UnityWebRequest.Result.ConnectionError || userRequest.result == UnityWebRequest.Result.ProtocolError)
@@ -421,6 +432,8 @@ role = string.Join(" ", words);
             {
                 request.SetRequestHeader("content-type", "application/json");
 
+                request.SetRequestHeader("Authorization", $"Bearer {token}");
+                request.SetRequestHeader("User-Agent", Secret.UserAgent);
                 byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(bodyJsonString);
                 request.uploadHandler = new UploadHandlerRaw(bodyRaw);
                 request.downloadHandler = new DownloadHandlerBuffer();
