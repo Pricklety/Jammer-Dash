@@ -657,7 +657,7 @@ namespace JammerDash.Audio
                 new WaitForSecondsRealtime(1f);
                 SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
                 if (data.bgTime == 0 && menu.mainPanel.activeSelf)
-                    StartCoroutine(ChangeSprite(null));
+                   StartCoroutine(menu.LoadRandomBackground(null));
             }
         }
 
@@ -679,7 +679,7 @@ namespace JammerDash.Audio
                 new WaitForSecondsRealtime(1f);
                 SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
                 if (data.bgTime == 0 && menu.mainPanel.activeSelf)
-                    StartCoroutine(ChangeSprite(null));
+                    StartCoroutine(menu.LoadRandomBackground(null));
 
                 PlayCurrentSong();
             }
@@ -694,28 +694,10 @@ namespace JammerDash.Audio
     // Ensure there are sprites available
     if (menu.sprite.Length > 0 && 
         menu.data.backgroundType >= 1 && 
-        menu.data.backgroundType <= 3 && 
-        string.IsNullOrEmpty(filePath))
+        menu.data.backgroundType <= 3)
     {
-        float duration = 0.2f;
-        float elapsedTime = 0f;
-
-        Image imageComponent = menu.bg;
-
-        Color startColor = imageComponent.color;
-        Color targetColor = new(startColor.r, startColor.g, startColor.b, 0f);
-
-        while (elapsedTime < duration)
-        {
-            imageComponent.color = Color.Lerp(startColor, targetColor, elapsedTime / duration);
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        startColor = imageComponent.color;
-        targetColor = Color.white;
-        imageComponent.color = Color.Lerp(startColor, targetColor, 1f);
-        menu.LoadRandomBackground(null);
+       
+        StartCoroutine(menu.LoadRandomBackground(null));
     }
     else if (!string.IsNullOrEmpty(filePath))
     {

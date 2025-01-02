@@ -6727,6 +6727,7 @@ GameObject:
   - component: {fileID: 1177968662}
   - component: {fileID: 1177968663}
   - component: {fileID: 1177968664}
+  - component: {fileID: 1177968665}
   m_Layer: 0
   m_Name: manager
   m_TagString: Untagged
@@ -6820,6 +6821,9 @@ MonoBehaviour:
   email: 
   cc: 
   url: https://api.jammerdash.com
+  ip: 
+  isBanned: 0
+  role: 
   level: 0
   currentXP: 0
   xpRequiredPerLevel: 
@@ -6867,6 +6871,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3ed466a4f3fd91d49965fa0612f65ce5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1177968665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1177968658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b4bce3ea04ff874f88fe06055487024, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1227971771
