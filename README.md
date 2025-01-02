@@ -1,9 +1,15 @@
 
 <p align="center">
-  <img width="750" height="300" src="https://github.com/Pricklety/Jammer-Dash/blob/master/Assets/Resources/logos/logo.png">
+  <img width="700" height="300" src="https://github.com/Pricklety/Jammer-Dash/blob/master/Assets/Resources/logos/logo.png">
 </p>
 
 # What is Jammer Dash?
+## !! WARNING !!
+This repo is currently broken and will not run/build properly unless certain packages are installed and an unknown change is made to the assets folder.
+This is not intentional, we are working on fixing it eventually but until then this warning will stay on here.
+The source code is completely untouched by this circumstance, however.
+
+# Jammer Dash
 Jammer Dash is a 2D Rhythm game made with Unity, with hopes of the best user experience and the best community ever.
 
 # Why is Jammer Dash open source?
