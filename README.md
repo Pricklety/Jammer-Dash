@@ -1,19 +1,19 @@
 
 <p align="center">
-  <img width="500" height="500" src="https://github.com/Pricklety/Jammer-Dash/blob/master/Assets/Resources/discordLogo.png">
+  <img width="500" height="500" src="https://github.com/Pricklety/Jammer-Dash/blob/master/Assets/Resources/logos/logo.png">
 </p>
 
-# Jammer Dash
+# What is Jammer Dash?
 Jammer Dash is a 2D Rhythm game made with Unity, with hopes of the best user experience and the best community ever.
 
-## Why is Jammer Dash open source?
+# Why is Jammer Dash open source?
 Jammer Dash originally never was planned to be open source. But because we want to show the community how Jammer Dash runs, and to also make the community find bugs and issues to help improve, we made the game open source.
 
-## Is there Mac, Linux support?
+# Is there Mac, Linux support?
 Sadly no, but we hope to be able to allow support in the future.
 
-## Running JD
-### Minimum Requirements
+# Running JD
+## Minimum Requirements
 
 | Specification        | Details                               |
 |----------------------|---------------------------------------|
@@ -27,7 +27,7 @@ Sadly no, but we hope to be able to allow support in the future.
 
 ---
 
-### Recommended Requirements
+## Recommended Requirements
 
 | Specification        | Details                               |
 |----------------------|---------------------------------------|
@@ -41,7 +41,7 @@ Sadly no, but we hope to be able to allow support in the future.
 
 ---
 
-### Observed Performance (VSync at 60 FPS)
+## Observed Performance (VSync at 60 FPS)
 
 **Test System:**
 - **CPU**: Intel Core i5-3350P (3.1GHz, 4 cores)
@@ -56,6 +56,6 @@ Sadly no, but we hope to be able to allow support in the future.
 
 ---
 
-## How can I help improve Jammer Dash?
-It's easy. You can pull the code using `git pull` if you have Git installed and everything set up. You can change the code and then make a pull request for us to check the code. If it's good, we'll get it locally and push the changes.
+# How can I help improve Jammer Dash?
+It's easy. You can pull the code using `git fetch` and `git pull` if you have Git installed and everything set up. You can change the code and then make a pull request for us to check the code. If it's good, we'll get it locally and push the changes.
 
