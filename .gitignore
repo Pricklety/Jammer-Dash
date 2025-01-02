@@ -9,6 +9,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+Assets/secret.cs
 
 # Library folder
 Library/
