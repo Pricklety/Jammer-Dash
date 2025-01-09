@@ -132,8 +132,6 @@ namespace JammerDash.Menus
 
 
         [Header("Profile")]
-        public Slider levelSlider; // Level display
-        public Text levelText; // Level text display
         public Text[] usernames; // Array of texts that only display the player's username
         public Text nickname; // Text object in the community panel displaying your nickname
         public Text spMain; // main SP text (handles the "SP: sp" text)
@@ -169,20 +167,15 @@ namespace JammerDash.Menus
             LoadLevelsFromFiles(); // Edit screen
 
             SetSpectrum();
+            if (Account.Instance.loggedIn)
             StartCoroutine(SetCountry());
 
 
             string path = Path.Combine(Application.persistentDataPath, "levels", "extracted");
 
-            // If there's zero levels, show the file browser
-            if (Directory.GetDirectories(path, "*").Length == 0)
-            {
-                FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserCanvas")).GetComponent<FileBrowser>();
-                FileBrowser.SetFilters(false, new FileBrowser.Filter("Jammer Dash Level", ".jdl"));
-                FileBrowser.SetDefaultFilter("Levels");
-                FileBrowser.SetDefaultFilter("Levels");
-                FileBrowser.ShowLoadDialog(ImportLevel, null, FileBrowser.PickMode.Files, true, Path.Combine(Application.streamingAssetsPath, "levels"), null, "Import Level...", $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Select")}");
-            }
+           
+
+           
 
             spMain.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Jams")}: 0" +
                           $"\t\t{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Performance")}: {Mathf.RoundToInt(Difficulty.Calculator.CalculateSP("scores.dat"))}sp" +
@@ -208,7 +201,15 @@ namespace JammerDash.Menus
             fileWatcher.Renamed += NewLevel;
             fileWatcher.Changed += NewLevel;
             fileWatcher.Deleted += NewLevel;
-            fileWatcher.Error += HandleFileWatcherError;
+            fileWatcher.Error += HandleFileWatcherError; if (Directory.GetDirectories(path, "*").Length == 0)
+            {
+                Debug.Log("No levels found. Opening file browser.");
+                FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserCanvas")).GetComponent<FileBrowser>();
+                FileBrowser.SetFilters(false, new FileBrowser.Filter("Jammer Dash Level", ".jdl"));
+                FileBrowser.SetDefaultFilter("Levels");
+                FileBrowser.SetDefaultFilter("Levels");
+                FileBrowser.ShowLoadDialog(ImportLevel, null, FileBrowser.PickMode.Files, true, Path.Combine(Application.streamingAssetsPath, "levels"), null, "Import Level...", $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Select")}");
+            }
             await LoadLevelFromLevels(null); // Play screen
             
             StartCoroutine(LoadRandomBackground(null));
@@ -425,6 +426,8 @@ namespace JammerDash.Menus
                 foreach (string path in paths)
                 {
                     File.Move(path, Path.Combine(Application.persistentDataPath, "levels", Path.GetFileName(path)));
+                    
+                    Notifications.instance.Notify($"Importing {Path.GetFileName(path)}...", null);
                 }
             }
 
@@ -529,28 +532,26 @@ namespace JammerDash.Menus
         {
             try
             {
-                using (ZipArchive archive = ZipFile.OpenRead(jdlFilePath))
+            using (ZipArchive archive = ZipFile.OpenRead(jdlFilePath))
+            {
+                foreach (ZipArchiveEntry entry in archive.Entries)
                 {
-                    foreach (ZipArchiveEntry entry in archive.Entries)
-                    {
-                        string entryFileName = entry.FullName;
+                string entryFileName = entry.FullName;
 
-                        if (entryFileName.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase) ||
-                            entryFileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
-                        {
-                            // Combine the destination directory path with the MP3 filename
-                            string destinationFullPath = Path.Combine(destinationFilePath, Path.GetFileName(entryFileName));
+                // Combine the destination directory path with the entry filename
+                string destinationFullPath = Path.Combine(destinationFilePath, entryFileName);
 
-                            // Extract the MP3 file to the specified destination file path
-                            entry.ExtractToFile(destinationFullPath, overwrite: true);
-                            return; // Exit the method after extracting the MP3 file
-                        }
-                    }
+                // Ensure the directory exists
+                Directory.CreateDirectory(Path.GetDirectoryName(destinationFullPath));
+
+                // Extract the file to the specified destination file path
+                entry.ExtractToFile(destinationFullPath, overwrite: true);
                 }
+            }
             }
             catch (Exception e)
             {
-                UnityEngine.Debug.LogError("Error extracting Audio from JDL: " + e.Message);
+            UnityEngine.Debug.LogError("Error extracting files from JDL: " + e.Message);
             }
         }
 
@@ -1385,7 +1386,6 @@ public void FixedUpdate()
     {
         UpdateShuffleImage();
         UpdateUsernames();
-        UpdateLevelText();
         UpdateStatsText();
         nextUpdateTime = Time.time + updateInterval;
     }
@@ -1417,16 +1417,15 @@ public void FixedUpdate()
             roleText.text = Account.Instance.role;
         }
 
-        private void UpdateLevelText()
-        {
-            if (Account.Instance.currentXP >= 0)
-            {
-                levelText.text = $"Level: {Account.Instance.level} (XP: {FormatNumber(Account.Instance.totalXP)})";
-            }
-        }
+      
 
         private void UpdateStatsText()
         {
+            if (!File.Exists("scores.dat"))
+            {
+                return;
+            }
+            else {
             PlayerStats stats = Calculator.CalculateOtherPlayerInfo("scores.dat");
             bigStatsText[0].text = $"{Account.Instance.ConvertPlaytimeToReadableFormat()}";
             bigStatsText[1].text = $"{stats.TotalPlays:N0}";
@@ -1439,6 +1438,8 @@ public void FixedUpdate()
             bigStatsText[8].text = $"UUID: {Account.Instance.uuid}";
             bigStatsText[9].text = $"<size=17>{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Jams"):N0}</size>\n<size=12>0</size>";
             bigStatsText[10].text = $"<size=17>{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Performance"):N0}</size>\n<size=12>{Calculator.CalculateSP("scores.dat"):N0}</size>";
+            }
+           
         }
 
         private void HandleQuitPanel()
@@ -1543,7 +1544,7 @@ public void FixedUpdate()
 
         public void Update()
         {
-            UpdateLevelSlider();
+           
             HandleBackgroundLoading();
             HandleIdleState();
             UpdateTimers();
@@ -1565,6 +1566,7 @@ public void FixedUpdate()
         if (levels.Length == 0)
         {
             Debug.LogWarning("No levels found!");
+            ImportLevel(Directory.GetFiles(Application.streamingAssetsPath + "/levels"));
             return;
         }
 
@@ -1627,10 +1629,6 @@ public void FixedUpdate()
         }
     }
 
-        private void UpdateLevelSlider()
-        {
-            levelSlider.value = (float)Account.Instance.currentXP / Account.Instance.xpRequiredPerLevel[Account.Instance.level];
-        }
 
         private void HandleBackgroundLoading()
         {

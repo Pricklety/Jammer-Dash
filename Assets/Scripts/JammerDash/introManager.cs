@@ -16,9 +16,22 @@ namespace JammerDash
 
         void Start()
         {
+
             if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "backgrounds")))
             {
                 Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "backgrounds"));
+            }
+            if (!File.Exists(Path.Combine(Application.persistentDataPath, "scores.dat"))) {
+                File.Create(Path.Combine(Application.persistentDataPath, "scores.dat")).Dispose();
+            }
+            if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "scenes")))
+            {
+                Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "scenes"));
+            }
+            if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "levels")))
+            {
+                Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "levels"));
+                Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "levels", "extracted"));
             }
             if (!PlayerPrefs.HasKey("bootSafe031"))
             {
@@ -34,13 +47,13 @@ namespace JammerDash
            
             AsyncOperation operation = SceneManager.LoadSceneAsync(1);
             operation.allowSceneActivation = false;
-
+            AudioManager.Instance.source.Play();
            
             float elapsedTime = 0f;
 
-            while (elapsedTime < 17f)
+            while (elapsedTime < 6f)
             {
-                if (Input.GetKeyDown(KeyCode.Escape) && Account.Instance.loggedIn)
+                if (Input.GetKeyDown(KeyCode.Escape) && (Account.Instance.loggedIn || Application.isEditor))
                 {
                     operation.allowSceneActivation = true;
                     yield break; 

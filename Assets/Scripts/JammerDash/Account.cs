@@ -113,10 +113,35 @@ namespace JammerDash
         private static readonly object fileLock = new object();
         private void SaveLocalData()
         {
+            if (!File.Exists(Path.Combine(Application.persistentDataPath, "loginData.dat"))) {
+                File.Create(Path.Combine(Application.persistentDataPath, "loginData.dat"));
+            }
+
+            if (!File.Exists(Path.Combine(Application.persistentDataPath, "playerData.dat"))) {
+                File.Create(Path.Combine(Application.persistentDataPath, "playerData.dat"));
+            }
             lock (fileLock) // Ensure thread safety
             {
                 try
-                {
+                {  string loginDataPath = Path.Combine(Application.persistentDataPath, "loginData.dat");
+                    if (!IsFileInUse(loginDataPath))
+                    {
+                        LoginData login = new LoginData
+                        {
+                            uuid = uuid,
+                            username = username.ToLower(),
+                            nickname = nickname,
+                            password = user,
+                            token = token,
+                            hardware_id = SystemInfo.deviceUniqueIdentifier
+                        };
+
+                        XmlSerializer formatter1 = new XmlSerializer(typeof(LoginData));
+                        using (FileStream stream1 = new FileStream(loginDataPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                        {
+                            formatter1.Serialize(stream1, login);
+                        }
+                    }
                     string playerDataPath = Path.Combine(Application.persistentDataPath, "playerData.dat");
                     if (!IsFileInUse(playerDataPath))
                     {
@@ -139,25 +164,7 @@ namespace JammerDash
                         }
                     }
 
-                    string loginDataPath = Path.Combine(Application.persistentDataPath, "loginData.dat");
-                    if (!IsFileInUse(loginDataPath))
-                    {
-                        LoginData login = new LoginData
-                        {
-                            uuid = uuid,
-                            username = username.ToLower(),
-                            nickname = nickname,
-                            password = user,
-                            token = token,
-                            hardware_id = SystemInfo.deviceUniqueIdentifier
-                        };
-
-                        XmlSerializer formatter1 = new XmlSerializer(typeof(LoginData));
-                        using (FileStream stream1 = new FileStream(loginDataPath, FileMode.Create, FileAccess.Write, FileShare.None))
-                        {
-                            formatter1.Serialize(stream1, login);
-                        }
-                    }
+                  
                 }
                 catch (IOException ex)
                 {
