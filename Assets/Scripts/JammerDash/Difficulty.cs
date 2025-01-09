@@ -54,7 +54,6 @@ namespace JammerDash.Difficulty
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error reading or processing file: {ex.Message}");
                 return 0;
             }
         }
@@ -112,7 +111,7 @@ namespace JammerDash.Difficulty
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error reading or processing file: {ex.Message}");
+                return new PlayerStats();
             }
 
             return stats;

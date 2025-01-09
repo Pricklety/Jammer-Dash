@@ -56,7 +56,8 @@ namespace JammerDash.Game.Player
         public float maxHealth;
         public HashSet<GameObject> passedCubes = new HashSet<GameObject>();
         private HashSet<GameObject> activeCubes = new HashSet<GameObject>();
-        public List<GameObject> cubes = new();
+        public GameObject[] cubes;
+        public GameObject[] longCubes;
         public int k;
         public int l;
 
@@ -102,6 +103,8 @@ namespace JammerDash.Game.Player
         }
         private void Start()
         {
+            cubes = GameObject.FindGameObjectsWithTag("Cubes");
+            longCubes = GameObject.FindGameObjectsWithTag("LongCube");
             music.time = 0f;
             CustomLevelDataManager.Instance.sceneLoaded = false;
             volume = Camera.main.GetComponent<PostProcessVolume>();
@@ -651,7 +654,9 @@ namespace JammerDash.Game.Player
             }
 
             counter.destroyedCubes += 50;
-            float formula = maxScore * factor / counter.cubes.Length;
+            float formula = (maxScore * factor / cubes.Length + longCubes.Length / 2) * Mathf.Pow(counter.accCount / Total, 3) * combo / highestCombo;
+            if (Application.isEditor)
+            Debug.Log(formula);
             float newDestroyedCubes = counter.score + formula;
             newDestroyedCubes = Mathf.RoundToInt(newDestroyedCubes);
 

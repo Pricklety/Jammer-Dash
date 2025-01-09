@@ -286,11 +286,14 @@ namespace JammerDash
 
     }
 
-
+        private bool isUserInteraction = false;
         public void PlaySelectedAudio(int index)
         {
-            audio.Play(index);
-            StartCoroutine(audio.ChangeSprite(null));
+            if (isUserInteraction)
+            {
+                audio.Play(index);
+                StartCoroutine(audio.ChangeSprite(null));
+            }
         }
 
 
@@ -598,6 +601,8 @@ namespace JammerDash
             }
             else
             {
+                AudioManager.Instance.LoadAudioClipsAsync();
+                if (AudioManager.Instance == null)
                 Notifications.instance.Notify("This game instance is corrupted. Please restart the game (Click to close)", () => Application.Quit());
             }
         }
@@ -721,7 +726,7 @@ namespace JammerDash
         }
         public void Play()
         {
-            audio.PlaySource();
+            audio.source.Play();
         }
 
         public void Pause()
@@ -758,8 +763,10 @@ namespace JammerDash
                 // Check if the index is valid
                 if (currentIndex >= 0 && currentIndex <= playlist.options.Count)
                 {
+                    isUserInteraction = false;
                     // Set the dropdown value to the index of the currently playing audio clip
                     playlist.value = currentIndex;
+                    isUserInteraction = true;
                 }
             }
         }
@@ -774,7 +781,9 @@ namespace JammerDash
                 DisplayMusicInfo(audio.source.clip, audio.source.time);
                 musicSlider.maxValue = (int)audio.source.clip.length;
                 UpdateDropdownSelection();
+                isUserInteraction = false;
                 playlist.value = audio.currentClipIndex;
+                isUserInteraction = true;
 
 
               
