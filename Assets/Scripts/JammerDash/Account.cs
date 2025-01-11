@@ -83,7 +83,7 @@ namespace JammerDash
             totalXP = CalculateTotalXPFromFile();
 
             // Check if the player has enough XP to level up
-            if (currentXP >= xpRequiredPerLevel[level])
+            if (currentXP >= xpRequiredPerLevel[level + 1])
             {
                 LevelUp();
                 SaveLocalData();

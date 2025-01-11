@@ -11,6 +11,7 @@ using JammerDash.Audio;
 using JammerDash.Menus.Play.Score;
 using JammerDash.Tech;
 using UnityEngine.Localization.Settings;
+using System.Data.Common;
 
 namespace JammerDash.Menus.Play
 {
@@ -32,6 +33,7 @@ namespace JammerDash.Menus.Play
         public Text size;
         public Text bonus;  
         public leaderboard lb;
+        public Slider slider;
         void Start()
         {
             new WaitForEndOfFrame();
@@ -202,7 +204,40 @@ namespace JammerDash.Menus.Play
             }
         }
         int selectedLevelIndex = -1;
+        private Color easyColor = Color.green;
+    private Color mediumColor = new Color(1f, 0.6f, 0.6f); // Light red
+    private Color hardColor = new Color(0.8f, 0f, 0f); // Dark red
+    private Color insaneColor = new Color(0.5f, 0f, 0.5f); // Purple
+    private Color extremeColor = Color.black;
+ public void UpdateDifficultyColor(float difficulty)
+    {
+        // Smoothly interpolate between colors based on difficulty
+        Color color;
 
+        if (difficulty < 2)
+        {
+            color = Color.Lerp(easyColor, mediumColor, difficulty / 2f);
+        }
+        else if (difficulty < 4)
+        {
+            color = Color.Lerp(mediumColor, hardColor, (difficulty - 2f) / 2f);
+        }
+        else if (difficulty < 6)
+        {
+            color = Color.Lerp(hardColor, insaneColor, (difficulty - 4f) / 2f);
+        }
+        else if (difficulty < 9)
+        {
+            color = Color.Lerp(insaneColor, extremeColor, (difficulty - 6f) / 3f);
+        }
+        else
+        {
+            color = extremeColor;
+        }
+
+        // Apply the interpolated color to the fill image
+        slider.fillRect.GetComponent<Image>().color = color;
+    }
         public IEnumerator PlayAudioOnlyMode()
         {
             ButtonClickHandler[] levels = FindObjectsByType<ButtonClickHandler>(FindObjectsSortMode.InstanceID);
@@ -218,6 +253,7 @@ namespace JammerDash.Menus.Play
                 hp = GameObject.Find("health").GetComponent<Text>();
                 size = GameObject.Find("cubeSize").GetComponent<Text>();
                 bonus = GameObject.Find("levelbonusinfoi").GetComponent<Text>();
+                slider = GameObject.Find("sliderDiff").GetComponent<Slider>();
 
                 // Find the selected level's index
                
@@ -230,6 +266,12 @@ namespace JammerDash.Menus.Play
 
                 // Display formatted save time
                 bonus.text = GetFormattedBonusInfo(customLevel.sceneData);
+                    float duration = 0.1f; // Duration for the lerp
+        float elapsedTime = 0f;
+        float startValue = slider.value;
+        float targetValue = customLevel.sceneData.calculatedDifficulty;
+
+        StartCoroutine(UpdateDifficultySlider(customLevel));
             }
 
             // Reset other buttons' selection
@@ -303,7 +345,21 @@ namespace JammerDash.Menus.Play
             rectTransform.sizeDelta = sizeChange;
         }
 
-
+        public IEnumerator UpdateDifficultySlider(CustomLevelScript customLevel) {
+            
+               float duration = 0.1f; // Duration for the lerp
+        float elapsedTime = 0f;
+        float startValue = slider.value;
+        float targetValue = customLevel.sceneData.calculatedDifficulty;
+             while (elapsedTime < duration)
+        {
+            slider.value = Mathf.Lerp(startValue, targetValue, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }slider.value = targetValue;
+        
+                UpdateDifficultyColor(slider.value);
+        }
         public IEnumerator HandleButtonClick()
         {
             var customLevel = GetComponent<CustomLevelScript>();
@@ -318,6 +374,7 @@ namespace JammerDash.Menus.Play
                 hp = GameObject.Find("health").GetComponent<Text>();
                 size = GameObject.Find("cubeSize").GetComponent<Text>();
                 bonus = GameObject.Find("levelbonusinfoi").GetComponent<Text>();
+                slider = GameObject.Find("sliderDiff").GetComponent<Slider>();
                 new WaitUntil(() => GetComponent<leaderboard>().panelContainer != null);
                 DestroyLeaderboard();
                 DisplayLB(customLevel.sceneData.ID.ToString());
@@ -326,6 +383,8 @@ namespace JammerDash.Menus.Play
 
                 // Display formatted save time
                 bonus.text = GetFormattedBonusInfo(customLevel.sceneData);
+
+                StartCoroutine(UpdateDifficultySlider(customLevel));
             }
 
             if (isSelected)
@@ -406,7 +465,7 @@ namespace JammerDash.Menus.Play
             long unixTime = Convert.ToInt64(data.saveTime);
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(unixTime).ToUniversalTime();
             DateTimeOffset EUTime = TimeZoneInfo.ConvertTime(dateTimeOffset, TimeZoneInfo.Local);
-            return $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "mapper")}: {data.creator}, {LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Local ID")}: {data.ID}, {LocalizationSettings.StringDatabase.GetLocalizedString("lang", "last saved on")} {EUTime:yyyy-MM-dd hh:MM:ss}";
+            return $"<size=18>{data.artist} - {data.songName}</size>\n{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "mapped by")} {data.creator}\n{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Local ID")}: {data.ID}, {LocalizationSettings.StringDatabase.GetLocalizedString("lang", "last saved on")} {EUTime:yyyy-MM-dd hh:MM:ss}";
         }
 
         // Handle playing the SFX or custom level audio
@@ -477,7 +536,7 @@ namespace JammerDash.Menus.Play
                 }
                 else
                 {
-                    FindFirstObjectByType<mainMenu>().LoadRandomBackground(null); 
+                    StartCoroutine(FindFirstObjectByType<mainMenu>().LoadRandomBackground(null)); 
                     levelImage.sprite = null;
                     Debug.LogError(www.error);
                 }

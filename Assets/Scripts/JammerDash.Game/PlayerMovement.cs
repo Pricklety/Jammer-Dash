@@ -398,7 +398,6 @@ namespace JammerDash.Game.Player
 
         void HandleHit(RaycastHit2D hit)
         {
-            bufferActive = true;
 
             if (hit.transform.position.y == transform.position.y)
             {
@@ -723,7 +722,6 @@ namespace JammerDash.Game.Player
             {
                 Instantiate(badTextPrefab, transform.position, Quaternion.identity);
 
-                Total += 5;
 
             }
 
@@ -758,7 +756,7 @@ namespace JammerDash.Game.Player
             }
 
             // tweaking cat gif
-            if ((collision.tag == "Cubes" || collision.gameObject.name.Contains("hitter02")) && collision.transform.position.y == transform.position.y)
+            if (collision.tag == "Cubes" || collision.gameObject.name.Contains("hitter02"))
             {
                 activeCubes.Add(collision.gameObject);
             }
@@ -787,24 +785,38 @@ namespace JammerDash.Game.Player
 
 
             }
-            if (collision.gameObject.name.Contains("hitter02"))
-            {
-                if (!bufferActive)
+            if (collision.gameObject.name.Contains("hitter02") && activeCubes.Contains(collision.gameObject))
+            {   if (bufferActive)
                 {
                     activeCubes.Remove(collision.gameObject);
-
-                   
-                    bufferActive = false;
-
-                }
-                else if (bufferActive)
-                {
                     DestroyCube(collision.gameObject);
-                        sfxS.PlayOneShot(hitSounds[6]);
+                    sfxS.PlayOneShot(hitSounds[6]);
                     StartCoroutine(ChangeScore(0f, new RaycastHit2D()));
-                    bufferActive = false;
                     health += 20;
+                    new WaitForEndOfFrame();
+                    
+                    bufferActive = false;
                 }
+                else if (!bufferActive)
+                {
+                    if (!passedCubes.Contains(collision.gameObject))
+                {
+                    if (AudioManager.Instance != null)
+                    {
+                        if (AudioManager.Instance.hits)
+                        {
+                            ShowBadText();
+                        }
+                    }
+
+                    health -= 30;
+                    Total += 5;
+                    activeCubes.Remove(collision.gameObject);
+                }
+                    bufferActive = false;
+
+                }
+                
             }
 
 
