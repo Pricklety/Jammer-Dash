@@ -271,7 +271,6 @@ namespace JammerDash.Game
             
             long destruction = player0.counter.score;
             float actualdest = (float)player0.counter.destructionPercentage;
-            Account.Instance.GainXP(destruction);
 
             score.text = $"Level: {Account.Instance.level}\n" +
                 $"XP: {FormatNumber(Account.Instance.totalXP)}\n" +
@@ -289,6 +288,7 @@ namespace JammerDash.Game
                 $"Jams: \n" +
                 $"Level shines: \n";
 
+            finishMenu.SetActive(true);
             if (scoreRank != null)
             {
                 scoreRank.sprite = Resources.Load<Sprite>($"ranking/{player0.counter.GetTier(player0.counter.accCount / player0.Total * 100)}");
@@ -299,7 +299,6 @@ namespace JammerDash.Game
 
             SaveLevelData(actualdest, destruction);
 
-            finishMenu.SetActive(true);
 
             // Update score breakdown
             five.text = $"{player0.five}";
@@ -334,6 +333,8 @@ namespace JammerDash.Game
 
             // Play rank SFX after progress completes
             AudioManager.Instance.sfxS.PlayOneShot(Resources.Load<AudioClip>($"Audio/SFX/ranking/{player0.counter.GetTier(targetAccuracy * 100)} Rank"));
+
+            Account.Instance.GainXP(destruction);
         }
 
 
