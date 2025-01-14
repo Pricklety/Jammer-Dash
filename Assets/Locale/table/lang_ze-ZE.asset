@@ -227,7 +227,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2246076816535552
-    m_Localized: "Skeyt\xE1r"
+    m_Localized: "skeyt\xE1r"
     m_Metadata:
       m_Items: []
   - m_Id: 2246175391068160
@@ -388,11 +388,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2501106243190784
     m_Localized: Otvarar settings.json
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2501130867949568
-    m_Localized: "Ezta \xE9s \xFAna rel\xEDza tempr\xE1. Ezta versij\xF3na p\xF3dar
-      kont\xE9nar buga"
     m_Metadata:
       m_Items: []
   - m_Id: 2501183821037568

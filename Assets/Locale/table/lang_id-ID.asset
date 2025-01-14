@@ -227,7 +227,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2246076816535552
-    m_Localized: Opsi
+    m_Localized: opsi
     m_Metadata:
       m_Items: []
   - m_Id: 2246175391068160
@@ -388,10 +388,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2501106243190784
     m_Localized: Buka settings.json
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2501130867949568
-    m_Localized: Ini adalah rilis awal. Versi ini mungkin mengandung bug.
     m_Metadata:
       m_Items: []
   - m_Id: 2501183821037568
