@@ -228,7 +228,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2246076816535552
-    m_Localized: Einstellungen
+    m_Localized: einstellungen
     m_Metadata:
       m_Items: []
   - m_Id: 2246175391068160
@@ -389,11 +389,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2501106243190784
     m_Localized: "\xD6ffne die settings.json"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2501130867949568
-    m_Localized: "Dies ist eine fr\xFChe Ver\xF6ffentlichung. Diese Version k\xF6nnte
-      bugs haben."
     m_Metadata:
       m_Items: []
   - m_Id: 2501209586647040

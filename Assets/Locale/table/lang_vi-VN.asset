@@ -228,7 +228,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2246076816535552
-    m_Localized: "C\xE0i \u0111\u1EB7t"
+    m_Localized: "c\xE0i \u0111\u1EB7t"
     m_Metadata:
       m_Items: []
   - m_Id: 2246175391068160
@@ -390,11 +390,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2501106243190784
     m_Localized: "M\u1EDF file c\xE0i \u0111\u1EB7t"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2501130867949568
-    m_Localized: "\u0110\xE2y l\xE0 phi\xEAn b\u1EA3n th\u1EED nghi\u1EC7m, c\xF3
-      th\u1EC3 ch\u01B0a l\u1ED7i."
     m_Metadata:
       m_Items: []
   - m_Id: 2501183821037568

@@ -389,10 +389,6 @@ MonoBehaviour:
     m_Key: Open the settings.json
     m_Metadata:
       m_Items: []
-  - m_Id: 2501130867949568
-    m_Key: This is an early release. This version may contain bugs
-    m_Metadata:
-      m_Items: []
   - m_Id: 2501183821037568
     m_Key: Jams
     m_Metadata:

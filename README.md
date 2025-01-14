@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img width="600" height="300" src="https://github.com/Pricklety/Jammer-Dash/blob/master/Assets/Resources/logos/logo.png">
+  <img width="580" height="300" src="https://github.com/Pricklety/Jammer-Dash/blob/master/Assets/Resources/logos/logo.png">
 </p>
 
 # What is Jammer Dash?

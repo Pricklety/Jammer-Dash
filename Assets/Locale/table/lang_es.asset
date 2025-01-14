@@ -19,7 +19,7 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 2246076816535552
-    m_Localized: Opciones
+    m_Localized: opciones
     m_Metadata:
       m_Items: []
   - m_Id: 2246175391068160
@@ -389,11 +389,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2501106243190784
     m_Localized: Abrir el settings.json
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2501130867949568
-    m_Localized: "Este es un lanzamiento anticipado. Esta versi\xF3n puede contener
-      bugs y fallos."
     m_Metadata:
       m_Items: []
   - m_Id: 2501183821037568

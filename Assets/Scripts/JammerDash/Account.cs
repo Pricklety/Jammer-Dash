@@ -15,6 +15,7 @@ using Debug = UnityEngine.Debug;
 using System.Security.Cryptography;
 using System.Net.Http;
 using System.Net;
+using UnityEditor.Localization.Plugins.XLIFF.V12;
 
 namespace JammerDash
 {
@@ -265,6 +266,7 @@ public IEnumerator ApplyLogin(string username, string user)
         request.SetRequestHeader("User-Agent", Secret.UserAgent);
         request.SetRequestHeader("Referer", "https://api.jammerdash.com");
         request.SetRequestHeader("Authorization", $"Bearer {token}");
+                request.SetRequestHeader("x-client", "Jammer-Dash");
 
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -335,7 +337,11 @@ private void HandleErrorResponse(UnityWebRequest request)
     }
     catch (Exception ex)
     {
-        Notifications.instance.Notify($"An unknown error occurred: {ex.Message}", null);
+        Notifications.instance.Notify($"An unknown error occurred: {ex.Message}", null); 
+        Debug.LogError($"Request Error: {request.error}");
+        Debug.LogError($"Response Code: {request.responseCode}");
+        Debug.LogError($"SSL/TLS Handshake Error: {request.downloadHandler.text}");
+        Debug.LogError($"{ex.Message}");
     }
 }
 
@@ -438,7 +444,7 @@ role = string.Join(" ", words);
             using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
             {
                 request.SetRequestHeader("content-type", "application/json");
-
+                request.SetRequestHeader("Referer", "https://api.jammerdash.com");
                 request.SetRequestHeader("Authorization", $"Bearer {token}");
                 request.SetRequestHeader("User-Agent", Secret.UserAgent);
                 byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(bodyJsonString);
@@ -467,9 +473,13 @@ role = string.Join(" ", words);
                         Notifications.instance.Notify($"{errors.Count()} error(s) occurred. More info in the player logs (click).", () => Process.Start($@"{Path.Combine(Application.persistentDataPath, "Player.log")}"));
                         Debug.LogError(errors);
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         Notifications.instance.Notify("An unknown error occurred. Please try again.", null);
+                        Debug.LogError($"Request Error: {request.error}");
+                        Debug.LogError($"Response Code: {request.responseCode}");
+                        Debug.LogError($"SSL/TLS Handshake Error: {request.downloadHandler.text}");
+                        Debug.LogError(ex.Message);
                     }
                 }
                 else

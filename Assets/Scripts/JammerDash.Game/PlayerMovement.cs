@@ -618,7 +618,7 @@ namespace JammerDash.Game.Player
             CreateDeviationMarker(transform.position, hit.transform.position);
 
             // Handle scoring logic
-            if (playerDistance <= 0.2f)
+            if (playerDistance <= 0.25f)
             {
                 factor = 1f;
                 five++;
@@ -629,7 +629,7 @@ namespace JammerDash.Game.Player
                     Instantiate(goodTextPrefab, transform.position, Quaternion.identity);
                 }
             }
-            else if (playerDistance <= 0.38f && playerDistance > 0.2f)
+            else if (playerDistance <= 0.38f && playerDistance > 0.25f)
             {
                 factor = 1f / 3f;
                 three++;
@@ -777,7 +777,7 @@ namespace JammerDash.Game.Player
                             ShowBadText();
                         }
                     }
-
+                    ChangeTextCombo();
                     health -= 30;
                     Total += 5;
                     activeCubes.Remove(collision.gameObject);
@@ -808,7 +808,7 @@ namespace JammerDash.Game.Player
                             ShowBadText();
                         }
                     }
-
+                    ChangeTextCombo();
                     health -= 30;
                     Total += 5;
                     activeCubes.Remove(collision.gameObject);

@@ -1,12 +1,9 @@
 [Tips]
-You can use WASD together with arrow keys as movement inputs (Space has no alt key)
-Disable hit notes in Settings!
+These notes when you click are annoying? Disable hit notes in Settings!
 Being banned only lets you play the game offline. Your scores won't be uploaded online.
-Click on your profile to enter "Community Tab"! There, you can chat with others and see the latest news!
-Use /play [ID] to play a level without searching for it! (effective once Jammy gets online and in-game connection is established)
+Click on your profile to enter "Community Tab"! There, you can chat with others, check your basic player stats and see the latest news!
 Follow players to be notified of their new top plays, new levels uploaded and new rates!
-Time speed changes your Cursor trail speed.
-Become a supporter and get access to early features!
+Become a supporter and get access to some awesome features!
 Click H to change this text :D
 The editor guide has a lot of useful things. Make sure to check it out!
 Shift + left click changes the long cube width in the editor.
@@ -14,16 +11,16 @@ To get a perfect score, destroy each box with as little mistakes as possible.
 Switch between fullscreen and windowed with "Alt+Enter"!
 Take occassional breaks. Jammer Dash isn't going to go away.
 Grinding to be the best isn't the goal. The goal is to have fun!
-Check out the latest news in the Discord!
 Are you a fan of snow? Enable the snow option in the options to have snow falling in the menu!!
 Imported new levels? Click F5 to refresh your play screen!
-Playing ranked-only levels will give you a massive disadvantage in score. Play Approved, Checked and Reviewed maps as well. They give out score to your level too!
-Regularly check your notifications. Randomly we give out a chance to win supporter to free users (MONTHLY)!
+Playing ranked-only levels will give you a massive disadvantage in total player score. Play Approved, Checked and Reviewed maps as well. They give out score to your level too!
 If there's spam parts in levels you play, switch between keys (by default it's K and L, but you can change it in options).
-If you don't like the default game keybind layout, feel free to change it in the Options (Works in versions v0.4.1 and newer)
-You think you're better than your friends? Challenge them to a head-to-head match using "Multiplayer Mode" (versions  v1.0 and newer)
-If you ever get notified of a new update, download it. Something new just dropped :eyes:
-Play screen is laggy? Delete the levels you don't play. Your scores will still be saved online (This game can support up to 500 levels in one screen)!
+If you don't like the default game keybind layout, feel free to change it in the Options
+If you ever get notified of a new update, download it. Something new just dropped!!
+Play screen is laggy? Delete the levels you don't play, your scores will still be saved online!
+Love custom things? Change your background in settings! (Upload background and toggle "Custom image" in Background Type in Settings)
+Found a bug? Report it in the Discord server!
+Hold Shift in the editor when going back to the menu to leave without saving changes!
 
 [old humor]
 <FUN>: Made in Austria!
@@ -93,6 +90,7 @@ Play screen is laggy? Delete the levels you don't play. Your scores will still b
 <FUN>: meow~
 <FUN>: Me tása dó anánar an bita ínor.
 <FUN>: Sad to inform you that Jammer dash does NOT include a jar of strawberry jam...
+<FUN>: googoo gaagaa
 
 [Undertale references]
 <REF>: Get dunked on.
@@ -110,7 +108,7 @@ Play screen is laggy? Delete the levels you don't play. Your scores will still b
 <REF>: Zoltraak.
 
 [Bocchi the Rock! references]
-<REF>: "Abandoning your uniqueness is the equivalent of dying" -Ryou Yamada
+<REF>: "Abandoning your uniqueness is the equivalent of dying" -Ryo Yamada
 <REF>: mumumumumumumumumumumumumumumumumu
 <REF>: Dorito-shaped hair drummer...
 <REF>: 逃げたギター!!!!!
@@ -127,10 +125,8 @@ Play screen is laggy? Delete the levels you don't play. Your scores will still b
 <QUOTE>: "im gladnkynkom died brook" -konro
 <QUOTE>: "if you hit that subscribe button down below i will PERSONALLY send you 1000 TONS of COCAINE!!" -konro
 <QUOTE>: "call me harry hong the way i use a left well :33" -konro
-<QUOTE>: "Why fail once when you can fail spectacularly?" -ChatGPT
 <QUOTE>: "山田リョウ大好き" -Pricklety, not noticing he's a f*****g simp. (Wait, that means I noticed now, I wrote this myself...)
-<QUOTE>: "Someone help, how does one learn Kanji consistently" -Pricklety
-<QUOTE>: "cvxy cdfsf dsfverqwf vwr7wv10fas4dfv10 qě0č+č1 vdefv1ydxf v1yxcv1xc1v1dfh+dshd-fgh n14bcv52n1445a4ewvr10fdyfg4s f0g74fsh8t0z ěřčtz gdysfg sdfg sdfgb-§.ú)awer478" -mnux
+<QUOTE>: "Someone help, how does one become the one of the one" -Pricklety
 <QUOTE>: "hop on jammer dash" -themagicanimals
 <QUOTE>: "prickle works for 2 days, loses 3 days of progress" -dimi and EbenAP
 <QUOTE>: "I have two cats inside of me" -dimi
