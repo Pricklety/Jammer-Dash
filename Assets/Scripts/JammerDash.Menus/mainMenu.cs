@@ -27,6 +27,7 @@ using System.Xml.Serialization;
 using UnityEngine.Localization.Settings;
 using JammerDash.Difficulty;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace JammerDash.Menus
 {
@@ -96,6 +97,20 @@ namespace JammerDash.Menus
         public GameObject multiPanel; // Multiplayer
 
         public GameObject loginPage; // Login page
+        public GameObject admin; // Admin panel
+
+        [Header("Admin panel")]
+        public InputField adminUsername;
+        public InputField adminUUID; 
+        public InputField adminDisplayName;
+        public InputField adminPassword;
+        public InputField adminEmail;
+        public InputField adminRole;
+        public InputField is_Staff;
+        public InputField is_suspended;
+        public InputField country;
+        public InputField region;
+        public InputField admincc;
 
         [Header("Editor Panel")]
         public GameObject levelInfoPanelPrefab; // Level prefab for editor
@@ -138,6 +153,20 @@ namespace JammerDash.Menus
         public Text[] sps; // sp texts (handles the "{sp}sp" texts)
         public Text[] bigStatsText; // Community panel - All player infos
         public Text roleText;
+        public GameObject adminButton;
+
+        // Lookup
+        public InputField lookup;
+        public Button lookupButton;
+
+        public Text lookupUser;
+        public Text lookupRole;
+        public Text lookupCountry;
+        public Text lookupNickname;
+        public Image lookupFlag;
+        public Text lookupJoin;
+        public Text lookupUUID;
+        public Text totalText;
 
         [Header("Parallax")]
         public Transform logo; // Logo parallax
@@ -168,8 +197,7 @@ namespace JammerDash.Menus
 
             SetSpectrum();
             if (Account.Instance.loggedIn)
-            StartCoroutine(SetCountry());
-
+            SetCountry();
 
             string path = Path.Combine(Application.persistentDataPath, "levels", "extracted");
 
@@ -229,7 +257,128 @@ namespace JammerDash.Menus
                 spectrum.audioSource = AudioManager.Instance.source;
             }
         }
-       
+
+
+
+    public void OnLookupButtonClicked()
+    {
+        string username = lookup.text.ToLower();
+       if (!string.IsNullOrEmpty(username))
+        {
+            StartCoroutine(FetchUserDetails(username));
+        }
+        else
+        {
+            Debug.LogError("Username is required for lookup.");
+            Notifications.instance.Notify("Username is required for lookup.", null);
+        }
+    }
+     private IEnumerator FetchUserDetails(string username)
+    {
+        string apiUrl = "https://api.jammerdash.com/v1/account/users";
+        using (UnityWebRequest www = UnityWebRequest.Get(apiUrl))
+        {
+            www.SetRequestHeader("User-Agent", Secret.UserAgent);
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Error fetching user data: {www.error}");
+                Notifications.instance.Notify("Failed to fetch user data. Please try again.", null);
+            }
+            else
+            {
+                var jsonResponse = www.downloadHandler.text;
+
+                UserDataResponse data;
+                try
+                {
+                    data = JsonConvert.DeserializeObject<UserDataResponse>(jsonResponse);
+                }
+                catch (JsonException ex)
+                {
+                    Debug.LogError($"Failed to deserialize user data: {ex.Message}");
+                    Notifications.instance.Notify("Failed to fetch user data. Please try again.", null);
+                    yield break;
+                }
+
+                if (data == null || data.users == null)
+                {
+                    Debug.LogError("Failed to deserialize user data.");
+                    Notifications.instance.Notify("Failed to fetch user data. Please try again.", null);
+                    yield break;
+                }
+                totalText.text = $"{data.users.Count} users registered.";
+                var user = data.users.Find(u => u.username.ToLower() == username.ToLower());
+
+                if (user == null)
+                {
+                    Notifications.instance.Notify($"User with username \"{username}\" not found.", null);
+                }
+                else
+                {
+                    UpdateUserProfile(user);
+                }
+            }
+        }
+    }
+     private void UpdateUserProfile(User user)
+    {
+        lookupNickname.text = user.display_name ?? "None";
+        lookupCountry.text = $"{user.country} // {user.region}";
+        lookupFlag.sprite = Resources.Load<Sprite>("icons/countries/" + user.country_code);
+        lookupUser.text = "@" + user.username;
+        lookupRole.text = user.role ?? "No role assigned";
+        lookupJoin.text = $"Joined at {user.joined}";
+        lookupUUID.text = $"UUID: {user.uuid}";
+    }
+    public void SetAdmin()
+    {
+        StartCoroutine(EditUserCoroutine());
+    }
+
+    private IEnumerator EditUserCoroutine()
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("nickname", adminDisplayName.text);
+        form.AddField("username", adminUsername.text);
+        form.AddField("email", adminEmail.text);
+        form.AddField("display_name", adminDisplayName.text);
+        form.AddField("password", adminPassword.text);
+        form.AddField("role", adminRole.text);
+        form.AddField("is_staff", is_Staff.text);
+        form.AddField("is_suspended", is_suspended.text);
+        form.AddField("country", country.text);
+        form.AddField("region", region.text);
+        form.AddField("country_code", admincc.text);
+
+        using (UnityWebRequest www = UnityWebRequest.Post($"https://api.jammerdash.com/v1/account/{adminUUID.text}/edit-user", form))
+        {
+            www.SetRequestHeader("Authorization", "Bearer " + GetAuthToken()); // Add your auth token here
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Error updating user: {www.error}");
+                Notifications.instance.Notify("Failed to update user info. Please try again.", null);
+            }
+            else
+            {
+                Debug.Log("User updated successfully");
+                Notifications.instance.Notify("User info updated successfully.", null);
+            }
+        }
+    }
+    private string GetAuthToken()
+    {
+        return Account.Instance.token;
+    }
+    
+
+        public void QuitAdmin()
+        {
+            admin.SetActive(false);
+        }
         public string FormatNumber(long number)
         {
             string formattedNumber;
@@ -691,6 +840,9 @@ switch (data.backgroundType)
         public void EditProfile() {
             Application.OpenURL("https://game.jammerdash.com/settings");
         }
+        public void EditOther() {
+            admin.SetActive(true);
+        }
 
         public void OpenProfile() {
             Application.OpenURL("https://game.jammerdash.com/user/" + Account.Instance.username);
@@ -720,31 +872,14 @@ switch (data.backgroundType)
        string ccName;
 
        string fullcc;
-        public IEnumerator SetCountry()
+        public void SetCountry()
         {
+            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+            countryIMG.sprite = Resources.Load<Sprite>("icons/countries/" + Account.Instance.cc);
 
-            
-    string uri = $"https://ipapi.co/{Account.Instance.ip}/json/";
-
-    using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
-    {
-        yield return webRequest.SendWebRequest();
-
-                string[] pages = uri.Split('/');
-                int page = pages.Length - 1;
-
-                IpApiData ipApiData = IpApiData.CreateFromJSON(webRequest.downloadHandler.text);
-                SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-                cc = ipApiData.country.ToLower();
-                countryIMG.sprite = Resources.Load<Sprite>("icons/countries/" + cc);
-
-        ccName = ipApiData.country_name;
-                fullcc = data.region ? $"{ipApiData.country_name} / {ipApiData.region}" : ipApiData.country_name;
-        
-        
-    
-            }
-          
+            ccName = Account.Instance.country_name;
+            fullcc = data.region ? $"{Account.Instance.country_name} / {Account.Instance.region}" : Account.Instance.country_name;
+       
         }
         private void SetBackgroundSprite(Sprite sprite)
         {
@@ -1394,6 +1529,9 @@ public void FixedUpdate()
     UpdateBackgroundParallax();
     HandleEscapeInput();
     UpdateNoLevelError();
+
+    string role = Account.Instance.role;
+    adminButton.SetActive(role.Contains("Developer"));
 }
 
         private void UpdateShuffleImage()
@@ -1421,7 +1559,7 @@ public void FixedUpdate()
 
         private void UpdateStatsText()
         {
-            if (!File.Exists("scores.dat"))
+            if (!File.Exists(Application.persistentDataPath + "/scores.dat"))
             {
                 return;
             }
@@ -1770,5 +1908,23 @@ public void FixedUpdate()
         }
     }
 
+    public class User
+    {
+        public string username;
+        public string display_name;
+        public string role;
+        public bool staff;
+        public bool suspended;
+        public string country;
+        public string region;
+        public string country_code;
+        public string joined;
+        public string uuid;
+    }
 
+    [System.Serializable]
+    public class UserDataResponse
+    {
+        public List<User> users;
+    }
 }

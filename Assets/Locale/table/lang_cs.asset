@@ -1,0 +1,489 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: lang_cs
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: cs
+  m_SharedData: {fileID: 11400000, guid: cf72037e39558674484c2c22edf2e151, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 42645680128
+    m_Localized: "hr\xE1t"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 714870976512
+    m_Localized: multiplayer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2991782457344
+    m_Localized: upravit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3021977251840
+    m_Localized: "zav\u0159\xEDt"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3082442338304
+    m_Localized: "Pohn\u011Bte my\u0161 k aktivaci menu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6902991908864
+    m_Localized: "Obecn\xE9 nastaven\xED"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7116955938816
+    m_Localized: "Zm\u011Bnit hern\xED tla\u010D\xEDtka"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7659258474496
+    m_Localized: Stopa kurzoru
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7936682323968
+    m_Localized: "Mihnut\xED stopy"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16284794318848
+    m_Localized: "Po\u010Det \u010D\xE1stic na stop\u011B"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16739842748416
+    m_Localized: "Uv\u011Bznit my\u0161"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17375896367104
+    m_Localized: "Hlasitost na kole\u010Dku my\u0161i"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17977820934144
+    m_Localized: "N\xE1hodn\xE1 hudba p\u0159i spu\u0161t\u011Bn\xED"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18405602193408
+    m_Localized: Jazyk
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25210185150464
+    m_Localized: "Nastaven\xED v\xFDkonu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25549747613696
+    m_Localized: "Rozli\u0161en\xED"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25997023997952
+    m_Localized: Max FPS (0-999)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26351287496704
+    m_Localized: Ukazovat FPS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26584625016832
+    m_Localized: VSync
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28874199101440
+    m_Localized: "Nastaven\xED zvuku"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29060447170560
+    m_Localized: "<color=red>(HLASIT\xC9!)</color> Zv\u011Bt\u0161it maxim\xE1ln\xED
+      hlasitost o 20"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29990836072448
+    m_Localized: "Hlavn\xED hlasitost"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30263662964736
+    m_Localized: Hodnota efektu lowpassu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30665745723392
+    m_Localized: "Zam\xEDchat playlist"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31021686943744
+    m_Localized: "Otev\u0159\xEDt slo\u017Eku playlistu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 32798117294080
+    m_Localized: "Nastaven\xED hry"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33307360325632
+    m_Localized: "Viditelnost pozad\xED"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33955585814528
+    m_Localized: Noty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34381060206592
+    m_Localized: "Zvukov\xE9 efekty"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34707171536896
+    m_Localized: Typ postavy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35511366414336
+    m_Localized: Textury pro noty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35901868699648
+    m_Localized: "Nastaven\xED menu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36120773619712
+    m_Localized: "Typ pozad\xED"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37224538271744
+    m_Localized: "Kdy zm\u011Bnit pozad\xED"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37605414629376
+    m_Localized: Paralaxa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37869047607296
+    m_Localized: "Sn\xEDh"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38131267104768
+    m_Localized: "Nahr\xE1t pozad\xED (Fotka nebo video)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40729747484672
+    m_Localized: "Z\xE1bavn\xE9 nastaven\xED"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40986791211008
+    m_Localized: "Zesilova\u010D basu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41289854840832
+    m_Localized: Zisk basu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41482788630528
+    m_Localized: "\xDAdr\u017Eba"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42188836794368
+    m_Localized: "Vymazat v\u0161echny mapy"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42379153338368
+    m_Localized: "Resetovat v\u0161echny data hr\xE1\u010De"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42804887777280
+    m_Localized: Zkontrolovat aktualizace
+    m_Metadata:
+      m_Items: []
+  - m_Id: 43039567474688
+    m_Localized: Objekty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44204417970176
+    m_Localized: "\u017Divot hr\xE1\u010De"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44553841242112
+    m_Localized: Velikost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44862596542464
+    m_Localized: "\u017DEB\u0158\xCD\u010CEK"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 45690346631168
+    m_Localized: "Va\u0161e levely"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46491345448960
+    m_Localized: "Nov\xFD"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46977377202176
+    m_Localized: "Vytvo\u0159it nov\xFD level"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 47223498960896
+    m_Localized: Vybrat hudbu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246076816535552
+    m_Localized: "nastaven\xED"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246175391068160
+    m_Localized: "Zm\u011Bnit jak v\xE1\u0161 level funguje"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246360406011904
+    m_Localized: "Nastaven\xED levelu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246385106268160
+    m_Localized: "Jm\xE9no levelu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246414898409472
+    m_Localized: "Tv\u016Frce levelu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246431407190016
+    m_Localized: "Tv\u016Frce levelu (Romanizov\xE1no)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246453452451840
+    m_Localized: "Vypo\u010D\xEDtat BPM p\xEDsn\u011B"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246468149293056
+    m_Localized: "Vytvo\u0159it BPM zna\u010Dky"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246745174683648
+    m_Localized: Fotka
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247211304464384
+    m_Localized: Zem
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247231307100160
+    m_Localized: "N\xE1hled pozad\xED"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247244460437504
+    m_Localized: "Nastaven\xED obt\xED\u017Enosti"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247283312275456
+    m_Localized: Velikost kostky
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247300961906688
+    m_Localized: "Nastaven\xED hudby"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247321564327936
+    m_Localized: "Autor p\xEDsn\u011B"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247342401630208
+    m_Localized: "Autor p\xEDsn\u011B (Romanizov\xE1no)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247355554967552
+    m_Localized: "N\xE1zev p\xEDsn\u011B"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247369245175808
+    m_Localized: "N\xE1zev p\xEDsn\u011B (Romanizov\xE1no)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247383707136000
+    m_Localized: "BPM p\xEDsn\u011B (\u010D\xEDslo)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247408503861248
+    m_Localized: "Posun zna\u010Dek (ms)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247442930708480
+    m_Localized: "P\u0159ehr\xE1v\xE1n\xED"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247458533519360
+    m_Localized: "N\xE1sobitel zna\u010Dek"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247473800785920
+    m_Localized: Vybrat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247490611556352
+    m_Localized: "zru\u0161it"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247512019283968
+    m_Localized: "Ukazovat schovan\xE9 soubory"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247524937740288
+    m_Localized: Hledat...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500536736399360
+    m_Localized: "Slep\xFD m\xF3d"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500561184997376
+    m_Localized: "Skr\xFDt hern\xED status"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500577794441216
+    m_Localized: "Skr\xFDt aktu\xE1ln\u011B hran\xFD level"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500606051467264
+    m_Localized: "Skr\xFDt AFK m\xF3d"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500635977826304
+    m_Localized: "kr\xFDt aktu\xE1ln\u011B upravovan\xFD level"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500697919307776
+    m_Localized: charter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500710737100800
+    m_Localized: "chartov\xE1no"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500722212716544
+    m_Localized: "Mistn\xED ID"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500748318064640
+    m_Localized: "Posledn\u011B ulo\u017Een\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500982360227840
+    m_Localized: "Pod\u011Bkov\xE1n\xED"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500992455917568
+    m_Localized: "V\xFDvoj\xE1\u0159i a person\xE1l"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501015948214272
+    m_Localized: "\xDA\u010Dinkuj\xEDc\xED um\u011Blci"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501050471530496
+    m_Localized: "Programy pou\u017Eit\xE9 k vytvo\u0159en\xED hry Jammer Dash"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501076245528576
+    m_Localized: "Otev\u0159\xEDt log hr\xE1\u010De"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501106243190784
+    m_Localized: "Otev\u0159\xEDt settings.json"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501183821037568
+    m_Localized: "Jam\u016F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501209586647040
+    m_Localized: "V\xFDkon"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501230793048064
+    m_Localized: "P\u0159esnost"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501241060704256
+    m_Localized: "Barva pozad\xED"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501271393910784
+    m_Localized: "Zm\u011Bnit barvu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501289848848384
+    m_Localized: "Vlo\u017Ete HEX k\xF3d"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501322803494912
+    m_Localized: to expand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573297709166592
+    m_Localized: "\u017Eivoty"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573474192896000
+    m_Localized: "sk\xF3re"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573727289782272
+    m_Localized: combo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574255201660928
+    m_Localized: "Pokra\u010Dovat"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574294158356480
+    m_Localized: Restartovat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574306774822912
+    m_Localized: "Zp\u011Bt do menu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574527961444352
+    m_Localized: Failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575739440017408
+    m_Localized: "V\u017Edy m\xE1te dal\u0161\xED \u0161anci! Mo\u017En\xE1 to zkuste
+      je\u0161t\u011B jednou?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575789129936896
+    m_Localized: "Level dokon\u010Den!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575999075823616
+    m_Localized: "Hr\xE1no hr\xE1\u010Dem"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11238275445010432
+    m_Localized: Shadery
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13013787829972992
+    m_Localized: "Nastaven\xED \xFA\u010Dtu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13369743621337088
+    m_Localized: "P\u0159ihlaste se"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13370845557272576
+    m_Localized: Odhlaste se
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13371624351444992
+    m_Localized: "Zobrazit oblast zem\u011B"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13374434543513600
+    m_Localized: Logged in as
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

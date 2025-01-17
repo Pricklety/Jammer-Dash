@@ -63,6 +63,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - Locale
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b935a6725b879bc468851bb0398fdab2
+    m_Address: Italian (it)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d12b1ba6ba80cb44eaa74979a5daba34
     m_Address: Croatian (Croatia) (hr-HR)
     m_ReadOnly: 1
@@ -89,6 +95,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f71b2505cce302c448f3f0e32351fb7b
     m_Address: Russian (Russia) (ru-RU)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fb25a2f10972e8649a63b2e7c4583dc7
+    m_Address: Czech (cs)
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale

@@ -74,6 +74,7 @@ namespace JammerDash
         public Slider dim;
         public Dropdown languageDropdown;
         string language;
+        public Toggle randomSong;
         bool artBG = false;
         bool customBG = false;
         bool seasonBG = false;
@@ -140,6 +141,8 @@ namespace JammerDash
             Deutsch, // German
             BahasaIndonesia, // Indonesian
             portuguêsBrasil, // Brazilian Portuguese
+            Italiano, // Italian
+            čeština, // Czech
             Hrvatski, // Croatian
             Српски,  // Serbian Cyrillic
             Polski, // Polish
@@ -159,6 +162,8 @@ namespace JammerDash
                 { "Deutsch", Language.Deutsch },
                 { "bahasa indonesia", Language.BahasaIndonesia },
                 { "português (brasil)", Language.portuguêsBrasil },
+                { "italiano", Language.Italiano },
+                { "čeština", Language.čeština },
                 { "Hrvatski", Language.Hrvatski },
                 { "Српски", Language.Српски },
                 { "Polski", Language.Polski },
@@ -176,6 +181,8 @@ namespace JammerDash
                 { Language.Deutsch, ("de-DE", "de-DE") },
                 { Language.BahasaIndonesia, ("id-ID", "id-ID") },
                 { Language.portuguêsBrasil, ("pt-BR", "pt-BR") },
+                { Language.Italiano, ("it", "it")},
+                { Language.čeština, ("cs", "cs") },
                 { Language.Hrvatski, ("hr-HR", "hr-HR") },
                 { Language.Српски, ("sr-Cyrl-RS", "sr-Cyrl-RS") },
                 { Language.Polski, ("pl", "pl") },
@@ -333,6 +340,7 @@ namespace JammerDash
             discordEdit.isOn = settingsData.discordEdit;
             discordAFK.isOn = settingsData.discordAFK;
             regionDisplay.isOn = settingsData.region;
+            randomSong.isOn = settingsData.randomSong;
             SetDropdownValueFromSettings();
             
         }
@@ -409,6 +417,7 @@ namespace JammerDash
             settingsData.discordEdit = discordEdit.isOn;
             settingsData.shaders = shaders.isOn;
             settingsData.region = regionDisplay.isOn;
+            settingsData.randomSong = randomSong.isOn;
             ApplyFPSCap(settingsData.selectedFPS);
             ApplyResolution();
             HitNotes(settingsData.hitNotes);
@@ -527,6 +536,7 @@ namespace JammerDash
                 discordPlay = discordPlay.isOn,
                 discordEdit = discordEdit.isOn,
                 region = regionDisplay.isOn,
+                randomSong = randomSong.isOn,
                 saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                 gameVersion = Application.version
             };

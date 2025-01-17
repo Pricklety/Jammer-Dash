@@ -88,6 +88,7 @@ namespace JammerDash
         public bool discordEdit = false;
 
         public bool region = true;
+        public bool randomSong = false;
         public string language = SettingsFileHandler.GetLanguageName();
         public string gameVersion = Application.version;
         public string saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();

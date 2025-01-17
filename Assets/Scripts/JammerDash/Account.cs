@@ -15,7 +15,6 @@ using Debug = UnityEngine.Debug;
 using System.Security.Cryptography;
 using System.Net.Http;
 using System.Net;
-using UnityEditor.Localization.Plugins.XLIFF.V12;
 
 namespace JammerDash
 {
@@ -29,12 +28,15 @@ namespace JammerDash
         public string email;
         public string cc;
         public string url;
-        string token;
+        public string token;
         public string ip;
 
         public bool isBanned;
 
         public string role;
+        public string country_name;
+        public string region;
+    
 
         [Header("Level")]
         public int level = 0;
@@ -291,15 +293,22 @@ public IEnumerator ApplyLogin(string username, string user)
             {
                 var successResponse = JObject.Parse(request.downloadHandler.text);
                 Notifications.instance.Notify($"Successfully logged in as {loginData.username}", null);
-
+                #if UNITY_EDITOR
+                Debug.Log(successResponse);
+                #endif
                 // Extract basic information
                 string token = successResponse["token"].ToString();
                 string uuid = successResponse["user"]["id"].ToString();
+                string cc = successResponse["user"]["cc"]?.ToString();
+                string cn = successResponse["user"]["country"]?.ToString();
+                string rg = successResponse["user"]["region"]?.ToString();
                 this.uuid = uuid;
                 this.token = token;
                 this.username = username;
                 this.user = user;
-
+                this.cc = cc;
+                this.country_name = cn;
+                this.region = rg;
                 // Fetch additional user details using the UUID
                 StartCoroutine(FetchUserDetails(uuid, token));
             }
@@ -367,7 +376,6 @@ private IEnumerator FetchUserDetails(string uuid, string token)
 
                 // Assign the fetched details
                 this.nickname = accountData["display_name"]?.ToString();
-                this.ip = accountData["signup_ip"]?.ToString();
                 this.role = accountData["role_perms"]?.ToString();
 
                string[] words = role.Split('_');
@@ -423,7 +431,7 @@ role = string.Join(" ", words);
         public void SavePlayerData(string pass, string email)
         {
                         pass = sha256_hash(pass);
-                        ip = new WebClient().DownloadString("http://ipv4.icanhazip.com");
+                       string ip = new WebClient().DownloadString("http://ipv4.icanhazip.com");
             LoginData loginData = new LoginData
             {
                 nickname = username,
@@ -570,7 +578,6 @@ private IEnumerator CallLogout(string url)
                 stream.Close();
 
                 username = data.username;
-                cc = data.country;
                 level = data.level;
                 return data;
             }

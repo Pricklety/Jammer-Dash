@@ -19,55 +19,55 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 42645680128
-    m_Localized: "Let\u2019z go!"
+    m_Localized: let's meow!
     m_Metadata:
       m_Items: []
   - m_Id: 714870976512
-    m_Localized: Meez with friendsz!
+    m_Localized: meowers
     m_Metadata:
       m_Items: []
   - m_Id: 2991782457344
-    m_Localized: Changez stuffz!
+    m_Localized: nya edit
     m_Metadata:
       m_Items: []
   - m_Id: 3021977251840
-    m_Localized: No moar playz!
+    m_Localized: grr >:(
     m_Metadata:
       m_Items: []
   - m_Id: 3082442338304
-    m_Localized: Movez mousie to openz menuz!
+    m_Localized: Move the meow mouse to meow the menu!!
     m_Metadata:
       m_Items: []
   - m_Id: 6902991908864
-    m_Localized: Generalz settingsz!
+    m_Localized: General meows!
     m_Metadata:
       m_Items: []
   - m_Id: 7116955938816
-    m_Localized: Changez keyz! Play betterz!
+    m_Localized: Meow nya the mwos
     m_Metadata:
       m_Items: []
   - m_Id: 7659258474496
-    m_Localized: Cursor trailz, meez followz!
+    m_Localized: mows trail
     m_Metadata:
       m_Items: []
   - m_Id: 7936682323968
-    m_Localized: Trail fadez, so nicez!
+    m_Localized: mows trail nyas!
     m_Metadata:
       m_Items: []
   - m_Id: 16284794318848
-    m_Localized: Trailz particles countz!!
+    m_Localized: trail meows!
     m_Metadata:
       m_Items: []
   - m_Id: 16739842748416
-    m_Localized: stayz in boxz!
+    m_Localized: stay in meow box
     m_Metadata:
       m_Items: []
   - m_Id: 17375896367104
-    m_Localized: Mouse wheel volumez!
+    m_Localized: Mow wheel loud!
     m_Metadata:
       m_Items: []
   - m_Id: 17977820934144
-    m_Localized: Random songz at startz, surprisez!
+    m_Localized: Random meows!
     m_Metadata:
       m_Items: []
   - m_Id: 18405602193408
@@ -75,27 +75,27 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 25210185150464
-    m_Localized: Perfomance settingz
+    m_Localized: Perfomance meows
     m_Metadata:
       m_Items: []
   - m_Id: 25549747613696
-    m_Localized: Clearz picturez!
+    m_Localized: meow the res
     m_Metadata:
       m_Items: []
   - m_Id: 25997023997952
-    m_Localized: Makez smoothz playz! (0-999)
+    m_Localized: smooth meows
     m_Metadata:
       m_Items: []
   - m_Id: 26351287496704
-    m_Localized: Showz FPS counterz
+    m_Localized: show smooths
     m_Metadata:
       m_Items: []
   - m_Id: 26584625016832
-    m_Localized: Smoothz movez!
+    m_Localized: vsync :3
     m_Metadata:
       m_Items: []
   - m_Id: 29060447170560
-    m_Localized: <color=red>LOUDZ!</color> Increase max volz by 20!
+    m_Localized: <color=red>LOUD!</color> Upmeow max meows by 20!
     m_Metadata:
       m_Items: []
   - m_Id: 28874199101440
@@ -103,71 +103,71 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 29990836072448
-    m_Localized: Master volz!
+    m_Localized: Master meows
     m_Metadata:
       m_Items: []
   - m_Id: 30263662964736
-    m_Localized: Lowpass effectz!
+    m_Localized: Mreow lowpsas
     m_Metadata:
       m_Items: []
   - m_Id: 30665745723392
-    m_Localized: New tunez!
+    m_Localized: shuffle meows the mweow
     m_Metadata:
       m_Items: []
   - m_Id: 31021686943744
-    m_Localized: Wherez songs?
+    m_Localized: mrrp?
     m_Metadata:
       m_Items: []
   - m_Id: 32798117294080
-    m_Localized: Game settingz!
+    m_Localized: Game meows!
     m_Metadata:
       m_Items: []
   - m_Id: 33307360325632
-    m_Localized: seez everything!
+    m_Localized: see meow bg!
     m_Metadata:
       m_Items: []
   - m_Id: 33955585814528
-    m_Localized: Boomz!
+    m_Localized: booom
     m_Metadata:
       m_Items: []
   - m_Id: 34381060206592
-    m_Localized: make noisez!
+    m_Localized: noise meow??!
     m_Metadata:
       m_Items: []
   - m_Id: 34707171536896
-    m_Localized: meez pickz onez!
+    m_Localized: new meow!!
     m_Metadata:
       m_Items: []
   - m_Id: 35511366414336
-    m_Localized: Hit notez texturez!
+    m_Localized: texture of merow
     m_Metadata:
       m_Items: []
   - m_Id: 36120773619712
-    m_Localized: ackgrounz typez
+    m_Localized: Meow types?!
     m_Metadata:
       m_Items: []
   - m_Id: 35901868699648
-    m_Localized: Menuz settingz!!
+    m_Localized: Menu meows!
     m_Metadata:
       m_Items: []
   - m_Id: 37224538271744
-    m_Localized: Backgroun changez time
+    m_Localized: Meow change time
     m_Metadata:
       m_Items: []
   - m_Id: 37605414629376
-    m_Localized: Parallaxy effectz
+    m_Localized: Meowss effect
     m_Metadata:
       m_Items: []
   - m_Id: 37869047607296
-    m_Localized: Snowz, coldz and prettyz!
+    m_Localized: brrrrrrrrr
     m_Metadata:
       m_Items: []
   - m_Id: 38131267104768
-    m_Localized: Uploadz backgroun imag or vidz!
+    m_Localized: cat photos? YAY
     m_Metadata:
       m_Items: []
   - m_Id: 40986791211008
-    m_Localized: Bass beatz!
+    m_Localized: Bass boom boom!
     m_Metadata:
       m_Items: []
   - m_Id: 40729747484672
@@ -175,7 +175,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 41289854840832
-    m_Localized: louder pawz!
+    m_Localized: louder meows!
     m_Metadata:
       m_Items: []
   - m_Id: 41482788630528
@@ -183,15 +183,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 42188836794368
-    m_Localized: No moarz!
+    m_Localized: bye maps!
     m_Metadata:
       m_Items: []
   - m_Id: 42379153338368
-    m_Localized: startz fresh!
+    m_Localized: start fresh!
     m_Metadata:
       m_Items: []
   - m_Id: 42804887777280
-    m_Localized: New thingz?
+    m_Localized: New thing?
     m_Metadata:
       m_Items: []
   - m_Id: 43039567474688
@@ -199,7 +199,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 44204417970176
-    m_Localized: howz healthz
+    m_Localized: how nmeow
     m_Metadata:
       m_Items: []
   - m_Id: 44553841242112
@@ -219,7 +219,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 47223498960896
-    m_Localized: Selectz songz
+    m_Localized: Meow song
     m_Metadata:
       m_Items: []
   - m_Id: 46977377202176
@@ -227,11 +227,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2246076816535552
-    m_Localized: choosiez stuffz!
+    m_Localized: change meow!
     m_Metadata:
       m_Items: []
   - m_Id: 2246175391068160
-    m_Localized: Changz how level meows!
+    m_Localized: change how level meopws
     m_Metadata:
       m_Items: []
   - m_Id: 2246360406011904
@@ -239,63 +239,63 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2246385106268160
-    m_Localized: What callz it?
+    m_Localized: meow name?
     m_Metadata:
       m_Items: []
   - m_Id: 2246414898409472
-    m_Localized: Who makz?
+    m_Localized: meow maker?
     m_Metadata:
       m_Items: []
   - m_Id: 2246431407190016
-    m_Localized: Who makz in Romanizedz namez!?
+    m_Localized: meow maker roman?
     m_Metadata:
       m_Items: []
   - m_Id: 2246453452451840
-    m_Localized: Countz the beatz!
+    m_Localized: meow bpm
     m_Metadata:
       m_Items: []
   - m_Id: 2246468149293056
-    m_Localized: Plopz markerz!
+    m_Localized: meow bpm spawn
     m_Metadata:
       m_Items: []
   - m_Id: 2246745174683648
-    m_Localized: Imag!
+    m_Localized: uwu
     m_Metadata:
       m_Items: []
   - m_Id: 2247211304464384
-    m_Localized: Where pawz goez!
+    m_Localized: owo
     m_Metadata:
       m_Items: []
   - m_Id: 2247231307100160
-    m_Localized: Seez befores!
+    m_Localized: meow previews
     m_Metadata:
       m_Items: []
   - m_Id: 2247244460437504
-    m_Localized: little or big meow??!
+    m_Localized: hard meow,,,
     m_Metadata:
       m_Items: []
   - m_Id: 2247283312275456
-    m_Localized: Bigz or smallz?
+    m_Localized: big or small nya~
     m_Metadata:
       m_Items: []
   - m_Id: 2247300961906688
-    m_Localized: Tweakz the tunez!
+    m_Localized: tweak song meow
     m_Metadata:
       m_Items: []
   - m_Id: 2247321564327936
-    m_Localized: Who singz?
+    m_Localized: who meows?
     m_Metadata:
       m_Items: []
   - m_Id: 2247342401630208
-    m_Localized: Who singz in Romanizedz namez!?
+    m_Localized: who meows roman?
     m_Metadata:
       m_Items: []
   - m_Id: 2247355554967552
-    m_Localized: "What\u2019z the title"
+    m_Localized: song meow name
     m_Metadata:
       m_Items: []
   - m_Id: 2247369245175808
-    m_Localized: "What\u2019z the titlez in Romanizedz titlez!?"
+    m_Localized: song meow name roman
     m_Metadata:
       m_Items: []
   - m_Id: 2247383707136000
@@ -303,19 +303,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2247408503861248
-    m_Localized: Markerz offsetz (mew-secondz)!
+    m_Localized: meowww offset
     m_Metadata:
       m_Items: []
   - m_Id: 2247442930708480
-    m_Localized: Playbackz!
+    m_Localized: pureibakku meow
     m_Metadata:
       m_Items: []
   - m_Id: 2247458533519360
-    m_Localized: More markerz!
+    m_Localized: mawkaw
     m_Metadata:
       m_Items: []
   - m_Id: 2247473800785920
-    m_Localized: Meow!!
+    m_Localized: sewekt
     m_Metadata:
       m_Items: []
   - m_Id: 2247490611556352
@@ -327,35 +327,35 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2247524937740288
-    m_Localized: Whatz lookin forz?...
+    m_Localized: what r u meowing for?
     m_Metadata:
       m_Items: []
   - m_Id: 2500536736399360
-    m_Localized: 'Blind Modez! '
+    m_Localized: invisible meroew
     m_Metadata:
       m_Items: []
   - m_Id: 2500561184997376
-    m_Localized: Secretz playz!
+    m_Localized: secret play!
     m_Metadata:
       m_Items: []
   - m_Id: 2500577794441216
-    m_Localized: Hidez currnt level!
+    m_Localized: secret player
     m_Metadata:
       m_Items: []
   - m_Id: 2500606051467264
-    m_Localized: Hidez AFK Modez!
+    m_Localized: secret afk
     m_Metadata:
       m_Items: []
   - m_Id: 2500635977826304
-    m_Localized: Hidez edeet levelz!
+    m_Localized: secret editor
     m_Metadata:
       m_Items: []
   - m_Id: 2500697919307776
-    m_Localized: makerz
+    m_Localized: meower
     m_Metadata:
       m_Items: []
   - m_Id: 2500710737100800
-    m_Localized: 'Kitty whoz?:'
+    m_Localized: meowed by
     m_Metadata:
       m_Items: []
   - m_Id: 2500722212716544
@@ -367,27 +367,27 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2500982360227840
-    m_Localized: Who helpz?
+    m_Localized: who meows!
     m_Metadata:
       m_Items: []
   - m_Id: 2500992455917568
-    m_Localized: Purrfectionz!
+    m_Localized: Purrfections!
     m_Metadata:
       m_Items: []
   - m_Id: 2501015948214272
-    m_Localized: Songz and pawz artz!
+    m_Localized: meows and mrrps!
     m_Metadata:
       m_Items: []
   - m_Id: 2501050471530496
-    m_Localized: Kitty toolz!
+    m_Localized: tools :3
     m_Metadata:
       m_Items: []
   - m_Id: 2501076245528576
-    m_Localized: Lookz insidez!
+    m_Localized: wogs
     m_Metadata:
       m_Items: []
   - m_Id: 2501106243190784
-    m_Localized: Confiz filez!
+    m_Localized: fiws
     m_Metadata:
       m_Items: []
   - m_Id: 2501183821037568
@@ -399,19 +399,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2501230793048064
-    m_Localized: hitz!!
+    m_Localized: happy!
     m_Metadata:
       m_Items: []
   - m_Id: 2501241060704256
-    m_Localized: Background Colorz pick!!
+    m_Localized: bg cowors!!
     m_Metadata:
       m_Items: []
   - m_Id: 2501271393910784
-    m_Localized: New lookz!
+    m_Localized: change cowor
     m_Metadata:
       m_Items: []
   - m_Id: 2501289848848384
-    m_Localized: Fancy numberz!
+    m_Localized: scary 6 numbers,,,
     m_Metadata:
       m_Items: []
   - m_Id: 2501322803494912
@@ -419,11 +419,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2574255201660928
-    m_Localized: Keepz going!
+    m_Localized: go
     m_Metadata:
       m_Items: []
   - m_Id: 2574294158356480
-    m_Localized: Meow again!
+    m_Localized: repeat
     m_Metadata:
       m_Items: []
   - m_Id: 2574306774822912
@@ -435,7 +435,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2575739440017408
-    m_Localized: Alwaysz next timez! Restartz and tryz againz!
+    m_Localized: soon beat dw!!!
     m_Metadata:
       m_Items: []
   - m_Id: 2575999075823616
@@ -443,7 +443,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2575789129936896
-    m_Localized: Good jobz!!!!!!!!!
+    m_Localized: gg!!!!!!!!!!!!!!!!!!!
     m_Metadata:
       m_Items: []
   - m_Id: 2573297709166592
@@ -451,11 +451,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2573474192896000
-    m_Localized: scorzzz!
+    m_Localized: scor!
     m_Metadata:
       m_Items: []
   - m_Id: 2573727289782272
-    m_Localized: hitz!
+    m_Localized: combooooooooooo! mewo!
     m_Metadata:
       m_Items: []
   - m_Id: 11238275445010432
