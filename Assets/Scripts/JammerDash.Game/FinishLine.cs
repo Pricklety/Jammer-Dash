@@ -10,6 +10,10 @@ using JammerDash.Editor.Basics;
 using JammerDash.Audio;
 using UnityEngine.Localization.Settings;
 using JammerDash.Difficulty;
+using UnityEngine.Networking;
+using System.Text;
+using Newtonsoft.Json;
+using UnityEngine.Video;
 
 namespace JammerDash.Game
 {
@@ -262,6 +266,12 @@ namespace JammerDash.Game
         private IEnumerator End()
         {
             StartCoroutine(CustomLevelDataManager.Instance.LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "bgImage.png"), img));
+            if (File.Exists(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "backgroundVideo.mp4")))
+            {
+                img.texture = FindAnyObjectByType<VideoPlayer>().targetTexture;
+                
+            }
+            
             // Play the animation if available
             if (anim != null)
             {
@@ -330,15 +340,70 @@ namespace JammerDash.Game
             }
 
 
-
             // Play rank SFX after progress completes
             AudioManager.Instance.sfxS.PlayOneShot(Resources.Load<AudioClip>($"Audio/SFX/ranking/{player0.counter.GetTier(targetAccuracy * 100)} Rank"));
-
+            
+            if (Account.Instance.loggedIn) {
+                OnFinishLineCrossed();
+            }
             Account.Instance.GainXP(destruction);
         }
+   private IEnumerator UpdateUserScore(long score)
+    {
+        string userId = Account.Instance.uuid;
+        string apiUrl = $"https://api.jammerdash.com/v1/account/{userId}/stats/score";
+       
 
+    string json = JsonConvert.SerializeObject( new { totalscore = score}, Formatting.None, new JsonSerializerSettings
+    {
+        NullValueHandling = NullValueHandling.Ignore,
+        DefaultValueHandling = DefaultValueHandling.Ignore
+    });
+       
 
+        using var www = new UnityWebRequest(apiUrl, "POST");
+        {
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+            www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Content-Type", "application/json");
+            www.SetRequestHeader("Authorization", "Bearer " + Account.Instance.token);
+            www.SetRequestHeader("User-Agent", Secret.UserAgent);
+            www.SetRequestHeader("Referer", "https://api.jammerdash.com");
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Request Error: {www.error}");
+                Debug.LogError($"Response Code: {www.responseCode}");
+                Debug.LogError($"SSL/TLS Handshake Error: {www.downloadHandler.text}");
+                Notifications.instance.Notify("Failed to update score. Please try again.", null);
+            }
+            else
+            {
+                Debug.Log("Score updated successfully");
+            }
+        }
     }
 
+    private void OnFinishLineCrossed()
+    {
+        if (Account.Instance.loggedIn)
+        {
+            long score = player0.counter.score;
+            if (score > 0 && (!CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.auto) || CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.noSpikes)))
+            {
+                StartCoroutine(UpdateUserScore(score));
+            }
+            else
+            {
+                Debug.LogError("Score is invalid or zero.");
+                Notifications.instance.Notify("Score is invalid or zero.", null);
+            }
+        }
+    }
 
+    }
 }
+
+

@@ -1,5 +1,4 @@
 using JammerDash.Game;
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,9 +6,9 @@ namespace JammerDash.Menus.Play
 {
     public class SetMod : MonoBehaviour
     {
-        public string modName;
+        public ModType modName;
 
-        public void SetMods()
+        public void Start()
         {
             if (Mods.instance == null)
             {
@@ -17,18 +16,51 @@ namespace JammerDash.Menus.Play
                 return;
             }
 
-            ModType mod;
-            if (string.IsNullOrEmpty(modName))
+            Toggle toggle = GetComponent<Toggle>();
+            if (toggle != null)
             {
-                mod = ModType.None;
+                toggle.isOn = Mods.instance.modStates.ContainsKey(modName) && Mods.instance.modStates[modName];
             }
-            else if (!Enum.TryParse(modName, out mod))
+        }
+
+        public void Update()
+        {
+            if (Mods.instance == null)
             {
-                Debug.LogError($"Invalid mod name: {modName}");
+                Debug.LogError("Mods.instance is not initialized.");
                 return;
             }
 
-            Mods.instance.SetMod(mod, GetComponent<Toggle>().isOn);
+        }
+
+        public void SetMods(bool value)
+        {
+            if (Mods.instance == null)
+            {
+                Debug.LogError("Mods.instance is not initialized.");
+                return;
+            }
+
+            Debug.Log("Setting mod " + modName + " to " + value);
+
+            Mods.instance.SetMod(modName, value);
+
+            if (modName == ModType.random)
+            {
+                var random = new System.Random();
+                GameObject.Find("randomInput").GetComponent<InputField>().text = random.Next(int.MaxValue).ToString();
+            }
+        }
+
+        public void DisableAllMods()
+        {
+            if (Mods.instance == null)
+            {
+                Debug.LogError("Mods.instance is not initialized.");
+                return;
+            }
+
+            Mods.instance.DisableAllMods();
         }
     }
 }

@@ -57,8 +57,8 @@ namespace JammerDash
         public int selectedFPS = 60;
         public bool vsync = true;
         public float volume = 0;
-        public float musicVol = 0.75f;
-        public float sfxVol = 1;
+        public float musicVol = 0.40f;
+        public float sfxVol = 0.60f;
         public int backgroundType = 0;
         public bool sfx = true;
         public bool hitNotes = true;
@@ -88,6 +88,7 @@ namespace JammerDash
         public bool discordEdit = false;
 
         public bool region = true;
+        public bool randomSong = false;
         public string language = SettingsFileHandler.GetLanguageName();
         public string gameVersion = Application.version;
         public string saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();

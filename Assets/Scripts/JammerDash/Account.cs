@@ -15,7 +15,6 @@ using Debug = UnityEngine.Debug;
 using System.Security.Cryptography;
 using System.Net.Http;
 using System.Net;
-using UnityEditor.Localization.Plugins.XLIFF.V12;
 
 namespace JammerDash
 {
@@ -29,12 +28,15 @@ namespace JammerDash
         public string email;
         public string cc;
         public string url;
-        string token;
+        public string token;
         public string ip;
-
+        public Texture pfp;
         public bool isBanned;
 
         public string role;
+        public string country_name;
+        public string region;
+    
 
         [Header("Level")]
         public int level = 0;
@@ -60,6 +62,7 @@ namespace JammerDash
             {
                 Instance = this;
                 Debug.Log("Account instance found.");
+                
             }
             else
             {
@@ -110,7 +113,22 @@ namespace JammerDash
                 return true;
             }
         }
-
+        private IEnumerator DownloadProfilePicture(string url)
+                {
+                    using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
+                    {
+                        yield return request.SendWebRequest();
+        
+                        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+                        {
+                            Debug.LogError($"Error downloading profile picture: {request.error}");
+                        }
+                        else
+                        {
+                            pfp = ((DownloadHandlerTexture)request.downloadHandler).texture;
+                        }
+                    }
+                }
         private static readonly object fileLock = new object();
         private void SaveLocalData()
         {
@@ -291,15 +309,102 @@ public IEnumerator ApplyLogin(string username, string user)
             {
                 var successResponse = JObject.Parse(request.downloadHandler.text);
                 Notifications.instance.Notify($"Successfully logged in as {loginData.username}", null);
+                string[] welcomeMessages = new string[]
+                {
+                    "Welcome back, {0}!",
+                    "Hey there, {0}!",
+                    "Successfully logged in as {0}!",
+                    "{0} has joined the game.",
+                    "こんにちは、{0}さん！"
+                };
 
+                System.Random random = new System.Random();
+                int index = random.Next(welcomeMessages.Length);
+                string welcomeMessage = string.Format(welcomeMessages[index], loginData.username);
+                Notifications.instance.Notify(welcomeMessage, null);
+                #if UNITY_EDITOR
+                Debug.Log(successResponse);
+                #endif
                 // Extract basic information
                 string token = successResponse["token"].ToString();
                 string uuid = successResponse["user"]["id"].ToString();
+                string cc = successResponse["user"]["cc"]?.ToString();
+                string cn = successResponse["user"]["country"]?.ToString();
+                string rg = successResponse["user"]["region"]?.ToString();
                 this.uuid = uuid;
                 this.token = token;
                 this.username = username;
                 this.user = user;
+                this.cc = cc;
+                this.country_name = cn;
+                this.region = rg;
+                // Fetch additional user details using the UUID
+                StartCoroutine(FetchUserDetails(uuid, token));
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error parsing success response or fetching additional data: {ex}");
+                Notifications.instance.Notify("Login succeeded, but an error occurred while fetching additional data.", null);
+                SaveLocalData();
+                loggedIn = true;
+            }
+        }
+    }
+}
 
+public IEnumerator EditUser(string username, string mail, string nickname, string pfpLink) {
+   
+    LoginData loginData = new LoginData
+    {
+        uuid = uuid,
+        username = username,
+        email = mail,
+        nickname = nickname,
+        profile_picture = pfpLink
+    };
+
+    string json = JsonConvert.SerializeObject(loginData, Formatting.None, new JsonSerializerSettings
+    {
+        NullValueHandling = NullValueHandling.Ignore,
+        DefaultValueHandling = DefaultValueHandling.Ignore
+    });
+
+    using (UnityWebRequest request = new UnityWebRequest(url + $"/v1/account/{uuid}/edit-user", "POST"))
+    {
+        request.SetRequestHeader("content-type", "application/json");
+        request.SetRequestHeader("User-Agent", Secret.UserAgent);
+        request.SetRequestHeader("Referer", "https://api.jammerdash.com");
+        request.SetRequestHeader("Authorization", $"Bearer {token}");
+                request.SetRequestHeader("x-client", "Jammer-Dash");
+
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        // Ensure HTTPS
+        if (!url.StartsWith("https"))
+        {
+            Notifications.instance.Notify("Login failed: insecure connection.", null);
+            yield break;
+        }
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+        {
+            HandleErrorResponse(request);
+        }
+        else
+        {
+            try
+            {
+                var successResponse = JObject.Parse(request.downloadHandler.text);
+                Notifications.instance.Notify($"Successfully edited {loginData.username}! Welcome back!", null);
+                #if UNITY_EDITOR
+                Debug.Log(successResponse);
+                #endif
+                // Extract basic information
+                this.username = username;
                 // Fetch additional user details using the UUID
                 StartCoroutine(FetchUserDetails(uuid, token));
             }
@@ -367,8 +472,15 @@ private IEnumerator FetchUserDetails(string uuid, string token)
 
                 // Assign the fetched details
                 this.nickname = accountData["display_name"]?.ToString();
-                this.ip = accountData["signup_ip"]?.ToString();
                 this.role = accountData["role_perms"]?.ToString();
+                if (!string.IsNullOrEmpty(accountData["pfp_link"]?.ToString()))
+                {
+                    string pfpLink = accountData["pfp_link"].ToString();
+                    StartCoroutine(DownloadProfilePicture(pfpLink));
+                }
+                else {
+                    this.pfp = Resources.Load<Texture>("defaultPFP");
+                }
 
                string[] words = role.Split('_');
 
@@ -423,7 +535,7 @@ role = string.Join(" ", words);
         public void SavePlayerData(string pass, string email)
         {
                         pass = sha256_hash(pass);
-                        ip = new WebClient().DownloadString("http://ipv4.icanhazip.com");
+                       string ip = new WebClient().DownloadString("http://ipv4.icanhazip.com");
             LoginData loginData = new LoginData
             {
                 nickname = username,
@@ -570,7 +682,6 @@ private IEnumerator CallLogout(string url)
                 stream.Close();
 
                 username = data.username;
-                cc = data.country;
                 level = data.level;
                 return data;
             }
@@ -685,6 +796,8 @@ private IEnumerator CallLogout(string url)
         public string hardware_id;
 
         public string signup_ip;
+
+        public string profile_picture;
     }
 
 }

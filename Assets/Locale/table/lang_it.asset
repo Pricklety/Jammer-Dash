@@ -1,0 +1,483 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: lang_it
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: it
+  m_SharedData: {fileID: 11400000, guid: cf72037e39558674484c2c22edf2e151, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 2574294158356480
+    m_Localized: Ricomincia
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574306774822912
+    m_Localized: Torna al menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574527961444352
+    m_Localized: Fallito
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575739440017408
+    m_Localized: "C'\xE8 sempre un altro momento! Forse \xE8 dopo che hai riavviato?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575789129936896
+    m_Localized: Livello completato!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575999075823616
+    m_Localized: interpretato da
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11238275445010432
+    m_Localized: Shaders
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13013787829972992
+    m_Localized: Impostazioni dell'account
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13369743621337088
+    m_Localized: Login
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13371624351444992
+    m_Localized: Visualizza la regione del paese
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13374434543513600
+    m_Localized: Accedi come
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42645680128
+    m_Localized: giocare
+    m_Metadata:
+      m_Items: []
+  - m_Id: 714870976512
+    m_Localized: multigiocatore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2991782457344
+    m_Localized: modificare
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3021977251840
+    m_Localized: uscita
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3082442338304
+    m_Localized: Sposta il mouse per abilitare il menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6902991908864
+    m_Localized: Impostazioni generali
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7116955938816
+    m_Localized: Cambia i tasti di scelta rapida del gioco
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7659258474496
+    m_Localized: Traccia del cursore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7936682323968
+    m_Localized: Dissolvenza della scia
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16284794318848
+    m_Localized: Conteggio delle particelle di traccia del topo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16739842748416
+    m_Localized: Limita il cursore del mouse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17375896367104
+    m_Localized: Scorciatoia del volume della rotellina del mouse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17977820934144
+    m_Localized: Canzone casuale all'avvio
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18405602193408
+    m_Localized: Lingua
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25210185150464
+    m_Localized: Impostazioni delle prestazioni
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25549747613696
+    m_Localized: Risoluzione
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25997023997952
+    m_Localized: FPS massimi (0-999)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26351287496704
+    m_Localized: Mostra contatore FPS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26584625016832
+    m_Localized: Sincronizzazione verticale
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28874199101440
+    m_Localized: Impostazioni audio
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29060447170560
+    m_Localized: <color=red>(FORTE!)</color> Aumenta il volume massimo di 20
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29990836072448
+    m_Localized: Volume principale
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30263662964736
+    m_Localized: Valore dell'effetto passa-basso
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30665745723392
+    m_Localized: Riproduzione casuale della playlist musicale
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31021686943744
+    m_Localized: Apri cartella playlist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 32798117294080
+    m_Localized: Impostazioni di gioco
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33307360325632
+    m_Localized: "Visibilit\xE0 dello sfondo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33955585814528
+    m_Localized: Note di successo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34381060206592
+    m_Localized: Effetti sonori
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34707171536896
+    m_Localized: Tipo di carattere
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35511366414336
+    m_Localized: Texture delle note di successo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35901868699648
+    m_Localized: Impostazioni del menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36120773619712
+    m_Localized: Tipo di sfondo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37224538271744
+    m_Localized: Tempo di modifica dello sfondo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37605414629376
+    m_Localized: Parallasse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37869047607296
+    m_Localized: Nevicare
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38131267104768
+    m_Localized: Carica sfondo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40729747484672
+    m_Localized: Impostazioni divertenti
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40986791211008
+    m_Localized: Basso
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41289854840832
+    m_Localized: Guadagno dei bassi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41482788630528
+    m_Localized: Manutenzione
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42188836794368
+    m_Localized: Rimuovi tutte le mappe personalizzate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42379153338368
+    m_Localized: Reimposta tutti i tuoi dati
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42804887777280
+    m_Localized: Controlla gli aggiornamenti
+    m_Metadata:
+      m_Items: []
+  - m_Id: 43039567474688
+    m_Localized: Oggetti
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44204417970176
+    m_Localized: Giocatore HP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44553841242112
+    m_Localized: Dimensioni dell'oggetto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44862596542464
+    m_Localized: CLASSIFICA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 45690346631168
+    m_Localized: I tuoi livelli
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46491345448960
+    m_Localized: Nuovo livello
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46977377202176
+    m_Localized: Crea nuovo livello
+    m_Metadata:
+      m_Items: []
+  - m_Id: 47223498960896
+    m_Localized: Seleziona brano
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246076816535552
+    m_Localized: impostazioni
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246175391068160
+    m_Localized: Cambia il modo in cui funziona il tuo livello
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246360406011904
+    m_Localized: Impostazioni di livello
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246385106268160
+    m_Localized: Nome del livello
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246414898409472
+    m_Localized: Creatore di livelli
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246431407190016
+    m_Localized: Creatore di livelli (romanizzato)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246453452451840
+    m_Localized: Calcola BPM della canzone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246468149293056
+    m_Localized: Genera marcatori BPM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246745174683648
+    m_Localized: Sfondo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247211304464384
+    m_Localized: Terra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247231307100160
+    m_Localized: Anteprima dello sfondo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247244460437504
+    m_Localized: "Impostazioni di difficolt\xE0"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247283312275456
+    m_Localized: Dimensione del cubo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247300961906688
+    m_Localized: Impostazioni della canzone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247321564327936
+    m_Localized: Artista della canzone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247342401630208
+    m_Localized: Artista della canzone (romanizzato)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247355554967552
+    m_Localized: Nome della canzone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247369245175808
+    m_Localized: Nome della canzone (romanizzato)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247383707136000
+    m_Localized: BPM della canzone (numero)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247408503861248
+    m_Localized: Spostamento del marcatore (ms)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247442930708480
+    m_Localized: Riproduzione
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247458533519360
+    m_Localized: Moltiplicatore di marcatori
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247473800785920
+    m_Localized: Selezionare
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247490611556352
+    m_Localized: Cancellare
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247512019283968
+    m_Localized: Mostra file nascosti
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247524937740288
+    m_Localized: Ricerca...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500536736399360
+    m_Localized: "Modalit\xE0 cieca"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500561184997376
+    m_Localized: Nascondi stato di riproduzione
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500577794441216
+    m_Localized: Nascondi il livello in riproduzione
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500606051467264
+    m_Localized: "Nascondi modalit\xE0 AFK"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500635977826304
+    m_Localized: Nascondi il livello di modifica attuale
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500697919307776
+    m_Localized: mappatore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500710737100800
+    m_Localized: mappato da
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500722212716544
+    m_Localized: ID locale
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500748318064640
+    m_Localized: ultimo salvataggio il
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500982360227840
+    m_Localized: Crediti
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500992455917568
+    m_Localized: Sviluppatori e personale
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501015948214272
+    m_Localized: Artisti in evidenza
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501050471530496
+    m_Localized: Programmi utilizzati per realizzare Jammer Dash
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501106243190784
+    m_Localized: Apri il file settings.json
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501076245528576
+    m_Localized: Aprire i registri del giocatore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501183821037568
+    m_Localized: Marmellate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501209586647040
+    m_Localized: Prestazione
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501230793048064
+    m_Localized: Precisione
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501241060704256
+    m_Localized: Colore di sfondo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501271393910784
+    m_Localized: Cambiare colore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501289848848384
+    m_Localized: Inserisci codice HEX
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501322803494912
+    m_Localized: espandere
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573297709166592
+    m_Localized: salute
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573474192896000
+    m_Localized: punto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573727289782272
+    m_Localized: combinazione
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574255201660928
+    m_Localized: Continuare
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

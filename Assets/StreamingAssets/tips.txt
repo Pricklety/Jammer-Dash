@@ -91,6 +91,7 @@ Hold Shift in the editor when going back to the menu to leave without saving cha
 <FUN>: Me tása dó anánar an bita ínor.
 <FUN>: Sad to inform you that Jammer dash does NOT include a jar of strawberry jam...
 <FUN>: googoo gaagaa
+<FUN>: Jammer Hash
 
 [Undertale references]
 <REF>: Get dunked on.

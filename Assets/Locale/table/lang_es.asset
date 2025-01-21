@@ -51,7 +51,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2246745174683648
-    m_Localized: Imagen
+    m_Localized: Fondo
     m_Metadata:
       m_Items: []
   - m_Id: 2247211304464384
@@ -469,10 +469,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 13369743621337088
     m_Localized: Acceso
-    m_Metadata:
-      m_Items: []
-  - m_Id: 13370845557272576
-    m_Localized: "Cerrar sesi\xF3n"
     m_Metadata:
       m_Items: []
   - m_Id: 13371624351444992

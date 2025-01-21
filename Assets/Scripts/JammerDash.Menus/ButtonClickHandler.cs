@@ -12,6 +12,7 @@ using JammerDash.Menus.Play.Score;
 using JammerDash.Tech;
 using UnityEngine.Localization.Settings;
 using System.Data.Common;
+using JammerDash.Game;
 
 namespace JammerDash.Menus.Play
 {
@@ -267,9 +268,11 @@ namespace JammerDash.Menus.Play
                 // Display formatted save time
                 bonus.text = GetFormattedBonusInfo(customLevel.sceneData);
                     float duration = 0.1f; // Duration for the lerp
+                    float masterPitch;
+            Mods.instance.master.GetFloat("MasterPitch", out masterPitch);
         float elapsedTime = 0f;
-        float startValue = slider.value;
-        float targetValue = customLevel.sceneData.calculatedDifficulty;
+        float startValue = slider.value * CustomLevelDataManager.Instance.scoreMultiplier * masterPitch;
+        float targetValue = customLevel.sceneData.calculatedDifficulty * CustomLevelDataManager.Instance.scoreMultiplier * masterPitch;
 
         StartCoroutine(UpdateDifficultySlider(customLevel));
             }
@@ -348,9 +351,11 @@ namespace JammerDash.Menus.Play
         public IEnumerator UpdateDifficultySlider(CustomLevelScript customLevel) {
             
                float duration = 0.1f; // Duration for the lerp
+                float masterPitch;
+            Mods.instance.master.GetFloat("MasterPitch", out masterPitch);
         float elapsedTime = 0f;
-        float startValue = slider.value;
-        float targetValue = customLevel.sceneData.calculatedDifficulty;
+        float startValue = slider.value * CustomLevelDataManager.Instance.scoreMultiplier * masterPitch;
+        float targetValue = customLevel.sceneData.calculatedDifficulty * CustomLevelDataManager.Instance.scoreMultiplier * masterPitch;
              while (elapsedTime < duration)
         {
             slider.value = Mathf.Lerp(startValue, targetValue, elapsedTime / duration);
@@ -452,8 +457,10 @@ namespace JammerDash.Menus.Play
         private void UpdateUIWithLevelData(SceneData data)
         {
             levelLength.text = $"{FormatTime(data.songLength):N0}";
-            levelBPM.text = $"{data.bpm}";
-            diff.text = $"{data.calculatedDifficulty:F2}";
+            float masterPitch;
+            Mods.instance.master.GetFloat("MasterPitch", out masterPitch);
+            levelBPM.text = $"{data.bpm * masterPitch:F0} ({data.bpm:F0})";
+            diff.text = $"{data.calculatedDifficulty * CustomLevelDataManager.Instance.scoreMultiplier * masterPitch:F2} ({data.calculatedDifficulty:F2})";
             levelObj.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Objects")}: {(data.cubePositions.Count + data.sawPositions.Count + data.longCubePositions.Count):N0} ({data.cubePositions.Count}, {data.sawPositions.Count}, {data.longCubePositions.Count})";
             hp.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Player HP")}: {data.playerHP}";
             size.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Object size")}: {data.boxSize}";
