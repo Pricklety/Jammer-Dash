@@ -14,6 +14,7 @@ using JammerDash.Game.Player;
 using UnityEngine.InputSystem.Controls;
 using JammerDash.Difficulty;
 using System.Linq;
+using UnityEngine.Video;
 namespace JammerDash.Game.Player
 {
     public class PlayerMovement : MonoBehaviour 
@@ -56,10 +57,12 @@ namespace JammerDash.Game.Player
         public float maxHealth;
         public HashSet<GameObject> passedCubes = new HashSet<GameObject>();
         private HashSet<GameObject> activeCubes = new HashSet<GameObject>();
-        public GameObject[] cubes;
-        public GameObject[] longCubes;
+        private HashSet<GameObject> missedCubes = new HashSet<GameObject>();
+        public List<GameObject> cubes = new List<GameObject>();
+        public List<GameObject> longCubes = new List<GameObject>();
         public int k;
         public int l;
+        public float scoreMultiplier = 1f;
 
 
         [Header("UI")]
@@ -97,14 +100,19 @@ namespace JammerDash.Game.Player
         public float vignetteStartHealthPercentage = 0.5f;
         public UnityEngine.Color startColor = UnityEngine.Color.red;
 
+        public GameObject flashlightOverlay;
+        public float rememberDuration = 2f;
+        public float rememberTimer = 0f;
+        private List<GameObject> notes = new List<GameObject>();
+
         private void Awake()
         {
             music = AudioManager.Instance.source;
         }
         private void Start()
         {
-            cubes = GameObject.FindGameObjectsWithTag("Cubes");
-            longCubes = GameObject.FindGameObjectsWithTag("LongCube");
+            cubes = GameObject.FindGameObjectsWithTag("Cubes").ToList();
+            longCubes = GameObject.FindGameObjectsWithTag("LongCube").ToList();
             music.time = 0f;
             CustomLevelDataManager.Instance.sceneLoaded = false;
             volume = Camera.main.GetComponent<PostProcessVolume>();
@@ -143,7 +151,7 @@ namespace JammerDash.Game.Player
             }
            
             
-           
+            scoreMultiplier = CustomLevelDataManager.Instance.scoreMultiplier;
             health = maxHealth;
         }
       
@@ -269,11 +277,12 @@ namespace JammerDash.Game.Player
             }
                 scoreText.text = $"{counter.score}";
            
-
+        if (!CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.noDeath)) {
             if (health <= 0 && Time.timeScale > 0)
             {
                 Time.timeScale -= 0.05f;
                 music.pitch = Time.timeScale;
+                FindFirstObjectByType<VideoPlayer>().playbackSpeed = Time.timeScale;
                 health = 0;
                 isDying = true;
 
@@ -285,6 +294,8 @@ namespace JammerDash.Game.Player
                 Time.timeScale = 0f;
                 health = 0;
             }
+        }
+            
             float playerPositionInSeconds = transform.position.x / 7;
             float finishLinePositionInSeconds = FindFirstObjectByType<FinishLine>().transform.position.x / 7;
 
@@ -307,126 +318,251 @@ namespace JammerDash.Game.Player
         {
             if (!isDying)
             {
+                 // Enable or disable flashlight effect based on mod state
+        if (Mods.instance.modStates.ContainsKey(ModType.flashlight))
+        {
+            flashlightOverlay.SetActive(true);
+        }
+        else
+        {
+            flashlightOverlay.SetActive(false);
+        }
+
+         // Enable or disable flashlight effect based on mod state
+        if (Mods.instance.modStates.ContainsKey(ModType.flashlight))
+        {
+            flashlightOverlay.SetActive(true);
+        }
+        else
+        {
+            flashlightOverlay.SetActive(false);
+        }
+
+        
+
+            if (CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.autoMove) || CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.auto))
+            {
+                MoveToNextCube();
+            }
+            else
+            {
                 if (Input.GetKeyDown(KeybindingManager.up))
                 {
-                    OnJump();
+                OnJump();
                 }
                 if (Input.GetKeyDown(KeybindingManager.down))
                 {
-                    OnCrouch();
+                OnCrouch();
                 }
                 if (Input.GetKeyDown(KeybindingManager.boost))
                 {
-                    OnBoost();
+                OnBoost();
                 }
                 if (Input.GetKeyDown(KeybindingManager.ground))
                 {
-                    OnResetPosition();
+                OnResetPosition();
                 }
                 if (Input.GetKeyDown(KeybindingManager.hit1) || Input.GetKeyDown(KeybindingManager.hit2))
                 {
                     OnHit();
                 }
             }
+
+            if (CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.auto))
+            {
+                AutoHit();
+            }
             
+            }
+
             if (Input.GetKeyDown(KeyCode.F5))
             {
-                var parentGameObject = debug.transform.parent.gameObject;
-                parentGameObject.SetActive(!parentGameObject.activeSelf);
-
-
+            var parentGameObject = debug.transform.parent.gameObject;
+            parentGameObject.SetActive(!parentGameObject.activeSelf);
             }
-            if (music.isPlaying)
+
+            if (music.isPlaying) {
+                if (!CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.easy))
                 transform.position = Vector2.Lerp(transform.position, new Vector2(music.time * 7, transform.position.y), 1);
-            else
+                else if (CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.easy))
+                transform.position = Vector2.Lerp(transform.position, new Vector2(music.time * 5, transform.position.y), 0.5f);
+            }
+            else {
+                 if (!CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.easy))
                 transform.Translate(7 * Time.deltaTime * Vector2.right);
+                else if (CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.easy))
+                transform.Translate(5 * Time.deltaTime * Vector2.right);
+            }
 
             float distanceToFinishLine = Mathf.Abs(cam.transform.position.x - FindFirstObjectByType<FinishLine>().transform.position.x);
             if (cam.transform.position.x < FindFirstObjectByType<FinishLine>().transform.position.x)
-            {;
+            {
+            if (distanceToFinishLine < 3)
+            {
+                Vector3 targetPos = new Vector3(FindFirstObjectByType<FinishLine>().transform.position.x, 0.7f, -10);
+                Vector3 smoothPosition = Vector3.Lerp(cam.transform.position, targetPos, 10f * Time.deltaTime);
+                cam.transform.position = smoothPosition;
+            }
+            else
+            {
+                Vector3 targetPosition = new Vector3(transform.position.x + 6, 0.7f, -10);
+                Vector3 smoothedPosition = Vector3.Lerp(cam.transform.position, targetPosition, 1000f * Time.deltaTime);
+                cam.transform.position = smoothedPosition;
+            }
+            }
 
-                if (distanceToFinishLine < 3)
-                {
-                    // Calculate the target position to move the camera
-                    Vector3 targetPos = new Vector3(FindFirstObjectByType<FinishLine>().transform.position.x, 0.7f, -10);
-
-                    // Smoothly move the camera towards the target position
-                    Vector3 smoothPosition = Vector3.Lerp(cam.transform.position, targetPos, 10f * Time.deltaTime);
-
-                    // Update the camera's position
-                    cam.transform.position = smoothPosition;
-                }
-                else
-                {
-                    Vector3 targetPosition = new Vector3(transform.position.x + 6, 0.7f, -10);
-                    Vector3 smoothedPosition = Vector3.Lerp(cam.transform.position, targetPosition, 1000f * Time.deltaTime);
-                    cam.transform.position = smoothedPosition;
-
-                }
-            }   
-           
-
-            // Calculate skill performance point
             ShinePerformance calc = new ShinePerformance(five, three, one, misses, combo, highestCombo, CustomLevelDataManager.Instance.diff, CustomLevelDataManager.Instance.data.levelLength, CustomLevelDataManager.Instance.data.cubePositions.Count + CustomLevelDataManager.Instance.data.longCubePositions.Count, CustomLevelDataManager.Instance.data.sawPositions.Count, CustomLevelDataManager.Instance.data.bpm, (float)counter.accCount / Total * 100);
             _performanceScore = calc.PerformanceScore;
             SPInt = Mathf.RoundToInt(_performanceScore);
             if (Total > 0)
             {
-                
-                float acc = (float)counter.accCount / Total * 100;
-                if (float.IsNaN(acc))
-                {
-                    acc = 0;
-                }
-                else if (float.IsNaN(_performanceScore))
-                {
-                    _performanceScore = 0;
-                }
-                this.acc.text = $"{acc:F2}% | {counter.GetTier(acc)} | {~~SPInt:F0} sp";
+            float acc = (float)counter.accCount / Total * 100;
+            if (float.IsNaN(acc))
+            {
+                acc = 0;
+            }
+            else if (float.IsNaN(_performanceScore))
+            {
+                _performanceScore = 0;
+            }
+            this.acc.text = $"{acc:F2}% | {counter.GetTier(acc)} | {~~SPInt:F0} sp";
             }
             else
             {
-                acc.text = $"";
+            acc.text = $""; 
             }
-
 
             if (FindNearestCubeDistance() > 21)
             {
-                keyText.text = "Break!";
+            keyText.text = "Break!";
             }
+        }
+    
+        private void MoveToNextCube()
+        {
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 10, cubeLayerMask);
+            if (colliders.Length > 0)
+            {
+            Collider2D nearestCube = colliders
+                .Where(c => !IsSawAboveOrBelow(c))
+                .OrderBy(c => Vector2.Distance(transform.position, c.transform.position))
+                .FirstOrDefault();
+
+            if (nearestCube != null)
+            {
+                transform.position = new Vector3(transform.position.x, nearestCube.transform.position.y, transform.position.z);
+            }
+            else {
+                EvadeSaws();
+            }
+            }
+        }
+
+        private bool IsSawAboveOrBelow(Collider2D cube)
+        {
+            float cubeY = cube.transform.position.y;
+
+            Collider2D[] saws = Physics2D.OverlapCircleAll(cube.transform.position, 1, LayerMask.GetMask("Saw"));
+            foreach (var saw in saws)
+            {
+            float sawY = saw.transform.position.y;
+            if ((sawY > cubeY) || (sawY < cubeY))
+            {
+                return true;
+            }
+            }
+            return false;
+        }
+
+        private void EvadeSaws()
+        {
+            Collider2D[] sawsInFront = Physics2D.OverlapCircleAll(transform.position + Vector3.right * 2, 1, LayerMask.GetMask("Saw"));
+            Collider2D[] sawsAbove = Physics2D.OverlapCircleAll(transform.position + Vector3.up * 1, 1, LayerMask.GetMask("Saw"));
+            Collider2D[] sawsBelow = Physics2D.OverlapCircleAll(transform.position + Vector3.down * 1, 1, LayerMask.GetMask("Saw"));
+
+            if (sawsInFront.Length > 0)
+            {
+            if (sawsAbove.Length == 0 && transform.position.y < maxY)
+            {
+                OnJump();
+            }
+            else if (sawsBelow.Length == 0 && transform.position.y > minY)
+            {
+                OnCrouch();
+            }
+            else
+            {
+                MoveToFreeYLevel();
+            }
+            }
+        }
+        private void MoveToFreeYLevel()
+        {
+            for (float y = minY; y <= maxY; y += 1f)
+            {
+            Collider2D[] sawsAtY = Physics2D.OverlapCircleAll(new Vector2(transform.position.x, y), 1, LayerMask.GetMask("Saw"));
+            if (sawsAtY.Length == 0)
+            {
+                transform.position = new Vector3(transform.position.x, y, transform.position.z);
+                break;
+            }
+            }
+        }
+        private void AutoHit()
+        {
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1f, cubeLayerMask);
+            if (hit.collider != null && CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.auto))
+            {
+            StartCoroutine(WaitAndHandleHit(hit));
+            k++;
+            }
+        }
+
+        private IEnumerator WaitAndHandleHit(RaycastHit2D hit)
+        {
+            while (Vector2.Distance(transform.position, hit.transform.position) > 0.25f)
+            {
+            yield return null;
+            }
+            HandleHit(hit);
         }
 
         void HandleHit(RaycastHit2D hit)
         {
-
             if (hit.transform.position.y == transform.position.y)
             {
-                if (!hit.transform.name.Contains("hitter02"))
+            if (!hit.transform.name.Contains("hitter02"))
+            {
+                passedCubes.Add(hit.collider.gameObject);
+                DestroyCube(hit.collider.gameObject);
+
+                Animation anim = combotext.GetComponent<Animation>();
+                if (highestCombo <= combo)
                 {
-                    passedCubes.Add(hit.collider.gameObject);
-                    DestroyCube(hit.collider.gameObject);
-
-                    Animation anim = combotext.GetComponent<Animation>();
-                    if (highestCombo <= combo)
-                    {
-                        highestCombo++;
-                    }
-                    combo++;
-
-                    StartCoroutine(ChangeScore(Vector3.Distance(hit.collider.transform.position, transform.position), hit));
-
-                    anim.Stop("comboanim");
-                    anim.Play("comboanim");
+                highestCombo++;
                 }
+                combo++;
+
+                StartCoroutine(ChangeScore(Vector3.Distance(hit.collider.transform.position, transform.position), hit));
+
+                anim.Stop("comboanim");
+                anim.Play("comboanim");
+            }
             }
             else if (passedCubes.Count > 0 && FindNearestCubeDistance() < 2)
             {
+            GameObject nearestCube = hit.collider.gameObject;
+            if (!missedCubes.Contains(nearestCube))
+            {
+                missedCubes.Add(nearestCube);
                 HandleBadHit();
+            }
             }
         }
 
         void HandleMiss()
         {
+            
             float nearestDistance = FindNearestCubeDistance();
 
             if (passedCubes.Count > 0 && nearestDistance < 2)
@@ -490,7 +626,10 @@ namespace JammerDash.Game.Player
             {
                 ShowBadText();
             }
-
+            if (CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.suddenDeath) || CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.perfect))
+            {
+               health -= int.MaxValue;
+            }
             counter.destroyedCubes -= 100 - combo;
             sfxS.PlayOneShot(fail);
 
@@ -505,7 +644,7 @@ namespace JammerDash.Game.Player
             float lerpSpeed = 1f;
             float lerpTimer = 0f;
             misses++;
-            health -= 30;
+            health -= 20;
             counter.score -= Mathf.RoundToInt(maxScore * 3 / counter.cubes.Length);
             if (counter.score < 0)
             counter.score = 0;
@@ -631,6 +770,11 @@ namespace JammerDash.Game.Player
             }
             else if (playerDistance <= 0.38f && playerDistance > 0.25f)
             {
+                
+            if (CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.perfect))
+            {
+               health -= int.MaxValue;
+            }
                 factor = 1f / 3f;
                 three++;
                 counter.accCount += 3;
@@ -642,6 +786,10 @@ namespace JammerDash.Game.Player
             }
             else
             {
+                if (CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.perfect))
+            {
+               health -= int.MaxValue;
+            }
                 factor = 1f / 5f;
                 one++;
                 counter.accCount += 1;
@@ -653,9 +801,8 @@ namespace JammerDash.Game.Player
             }
 
             counter.destroyedCubes += 50;
-            float formula = (maxScore * factor / cubes.Length + longCubes.Length / 2) * Mathf.Pow(counter.accCount / Total, 3) * combo / highestCombo;
-            if (Application.isEditor)
-            Debug.Log(formula);
+            float formula = ((maxScore * factor / cubes.Count + longCubes.Count / 2) * Mathf.Pow(counter.accCount / Total, 3) * combo / highestCombo) * scoreMultiplier;
+            
             float newDestroyedCubes = counter.score + formula;
             newDestroyedCubes = Mathf.RoundToInt(newDestroyedCubes);
 
@@ -747,22 +894,52 @@ namespace JammerDash.Game.Player
                     sfxS.PlayOneShot(hitSounds[7]);
                     health -= int.MaxValue;
                 }
-            }
-
-
-            if (collision.tag == "Cubes" && collision.gameObject.name.Contains("hitter01"))
+                if (collision.tag == "Cubes" && collision.gameObject.name.Contains("hitter01"))
             {
-                collision.GetComponent<Animation>().Play();
+            collision.GetComponent<Animation>().Play();
             }
 
-            // tweaking cat gif
             if (collision.tag == "Cubes" || collision.gameObject.name.Contains("hitter02"))
             {
-                activeCubes.Add(collision.gameObject);
+                if (collision.tag == "Cubes")
+                    activeCubes.Add(collision.gameObject);
+
+            if (collision.gameObject.name.Contains("hitter02") && CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.auto))
+            {
+                if (!bufferActive)
+                {
+                bufferActive = true;
+                sfxS.PlayOneShot(hitSounds[1]);
+                }
+
+
+                float distance = Vector2.Distance(collision.transform.position, transform.position);
+                float middle = Mathf.Abs(collision.offset.x);
+
+                combo++;
+                if (highestCombo < combo)
+                {
+                highestCombo++;
+                }
+
+                StartCoroutine(ChangeScore(0f, new RaycastHit2D()));
+                if (AudioManager.Instance != null && AudioManager.Instance.hits)
+                {
+                Instantiate(goodTextPrefab, transform.position, Quaternion.identity);
+                }
+                sfxS.PlayOneShot(hitSounds[1]);
+                Animation anim = combotext.GetComponent<Animation>();
+
+                anim.Stop("comboanim");
+                anim.Play("comboanim");
             }
+            }
+            }
+
+            
         }
 
-        private void OnTriggerExit2D(Collider2D collision)
+       private void OnTriggerExit2D(Collider2D collision)
         {
             if (collision.tag == "Cubes" && activeCubes.Contains(collision.gameObject) && health > 0)
             {
@@ -777,29 +954,61 @@ namespace JammerDash.Game.Player
                             ShowBadText();
                         }
                     }
-                    ChangeTextCombo();
                     health -= 30;
                     Total += 5;
-                    activeCubes.Remove(collision.gameObject);
+                    misses++;
                 }
 
 
             }
+
+                if (collision.tag == "Cubes" && collision.transform.position.y != transform.position.y && !activeCubes.Contains(collision.gameObject)) {
+              
+                    if (AudioManager.Instance != null)
+                    {
+                        if (AudioManager.Instance.hits)
+                        {
+                            ShowBadText();
+                        }
+                    }
+                    health -= 30;
+                    Total += 5;
+                    if (!missedCubes.Contains(collision.gameObject))
+                    {
+                        misses++;
+                    }
+                }
+                if (collision.gameObject.name.Contains("hitter02") && collision.transform.position.y != transform.position.y && !activeCubes.Contains(collision.gameObject)) {
+                    if (AudioManager.Instance != null)
+                    {
+                        if (AudioManager.Instance.hits)
+                        {
+                            ShowBadText();
+                        }
+                    }      health -= 30;
+                    Total += 5;             
+                }
+            
             if (collision.gameObject.name.Contains("hitter02") && activeCubes.Contains(collision.gameObject))
-            {   if (bufferActive)
+            {   if (bufferActive && collision.transform.position.y == transform.position.y)
                 {
                     activeCubes.Remove(collision.gameObject);
                     DestroyCube(collision.gameObject);
                     sfxS.PlayOneShot(hitSounds[6]);
                     StartCoroutine(ChangeScore(0f, new RaycastHit2D()));
                     health += 20;
+                    combo++;
+                    if (highestCombo < combo)
+                    {
+                        highestCombo++;
+                    }
                     new WaitForEndOfFrame();
                     
                     bufferActive = false;
                 }
                 else if (!bufferActive)
                 {
-                    if (!passedCubes.Contains(collision.gameObject))
+                    if (!passedCubes.Contains(collision.gameObject) || collision.transform.position.y != transform.position.y)
                 {
                     if (AudioManager.Instance != null)
                     {
@@ -808,19 +1017,19 @@ namespace JammerDash.Game.Player
                             ShowBadText();
                         }
                     }
-                    ChangeTextCombo();
                     health -= 30;
                     Total += 5;
+                    misses++;
                     activeCubes.Remove(collision.gameObject);
                 }
                     bufferActive = false;
 
                 }
-                
             }
-
-
+            
         }
+
+
 
 
         private IEnumerator OnTriggerEnter2DBuffer()
@@ -836,90 +1045,84 @@ namespace JammerDash.Game.Player
         }
 
 
-
         private void OnTriggerStay2D(Collider2D collision)
         {
             if (collision.gameObject.name.Contains("hitter02") && collision.transform.position.y == transform.position.y)
             {
+            float distance = Vector2.Distance(collision.transform.position, transform.position);
+            float middle = Mathf.Abs(collision.offset.x);
 
-                if ((Input.GetKeyDown(KeybindingManager.hit1) || Input.GetKeyDown(KeybindingManager.hit2)) && !isDying)
+            
+
+            if ((Input.GetKeyDown(KeybindingManager.hit1) || Input.GetKeyDown(KeybindingManager.hit2)) && !isDying && !activeCubes.Contains(collision.gameObject))
+            {
+                bufferActive = false; // Reset bufferActive flag
+                if (!bufferActive)
                 {
-                    if (!bufferActive)
+                sfxS.PlayOneShot(hitSounds[1]);
+                bufferActive = true;
+
+
+                if (distance < 1)
+                {
+                    combo++;
+                    if (highestCombo < combo)
                     {
-
-                        sfxS.PlayOneShot(hitSounds[1]);
-                    }
-                    bufferActive = true;
-
-                    Debug.Log("!!!ATTENTION!!!\n\n\nLONG CUBE LONG CUBE LONG CUBE\n\n\n!!!ATTENTION!!!");
-
-                    float distance = Vector2.Distance(collision.transform.position, transform.position);
-                    float middle = Mathf.Abs(collision.offset.x);
-                    if (distance < 1)
-                    {
-                        combo++;
-                        if (highestCombo < combo)
-                        {
-                            highestCombo++;
-                        }
-
-                        StartCoroutine(ChangeScore(0f, new RaycastHit2D()));
-                        if (AudioManager.Instance != null && AudioManager.Instance.hits)
-                        {
-                            Instantiate(goodTextPrefab, transform.position, Quaternion.identity);
-                        }
-                        sfxS.PlayOneShot(hitSounds[1]);
-                        Animation anim = combotext.GetComponent<Animation>();
-
-                        anim.Stop("comboanim");
-                        anim.Play("comboanim");
-                    }
-                    else if (distance < middle && distance >= 1)
-                    {
-                        sfxS.PlayOneShot(hitSounds[1]);
-                        StartCoroutine(ChangeScore(0.30f, new RaycastHit2D()));
-                        if (AudioManager.Instance != null && AudioManager.Instance.hits)
-                        {
-                            Instantiate(normalTextPrefab, transform.position, Quaternion.identity);
-                        }
-                    }
-                    else if (distance >= middle)
-                    {
-                        sfxS.PlayOneShot(hitSounds[1]);
-                        health -= 35;
-                        combo = 0;
-                        StartCoroutine(ChangeScore(0.48f, new RaycastHit2D()));
-                        if (AudioManager.Instance != null && AudioManager.Instance.hits)
-                        {
-                            Instantiate(okTextPrefab, transform.position, Quaternion.identity);
-                        }
+                    highestCombo++;
                     }
 
+                    StartCoroutine(ChangeScore(0f, new RaycastHit2D()));
+                    if (AudioManager.Instance != null && AudioManager.Instance.hits)
+                    {
+                    Instantiate(goodTextPrefab, transform.position, Quaternion.identity);
+                    }
+                    sfxS.PlayOneShot(hitSounds[1]);
+                    Animation anim = combotext.GetComponent<Animation>();
+
+                    anim.Stop("comboanim");
+                    anim.Play("comboanim");
                 }
-                
-                if ((Input.GetKey(KeybindingManager.hit1) || Input.GetKey(KeybindingManager.hit2)) && !isDying)
+                else if (distance < middle && distance >= 1)
                 {
-                    if (!isBufferRunning && bufferActive)
+                    sfxS.PlayOneShot(hitSounds[1]);
+                    StartCoroutine(ChangeScore(0.30f, new RaycastHit2D()));
+                    if (AudioManager.Instance != null && AudioManager.Instance.hits)
                     {
-                        StartCoroutine(OnTriggerEnter2DBufferLoop());
-                    }
-                    else
-                    {
-                        isBufferRunning = false;
+                    Instantiate(normalTextPrefab, transform.position, Quaternion.identity);
                     }
                 }
-
-                else if (!(Input.GetKey(KeybindingManager.hit1) || Input.GetKey(KeybindingManager.hit2)) && !isDying)
+                else if (distance >= middle)
                 {
-                    bufferActive = false;
+                    sfxS.PlayOneShot(hitSounds[1]);
+                    health -= 15;
+                    combo = 0;
+                    StartCoroutine(ChangeScore(0.48f, new RaycastHit2D()));
+                    if (AudioManager.Instance != null && AudioManager.Instance.hits)
+                    {
+                    Instantiate(okTextPrefab, transform.position, Quaternion.identity);
+                    }
                 }
-                
+                activeCubes.Add(collision.gameObject); // Mark the cube as passed
+                }
             }
 
+            if (!isBufferRunning && bufferActive)
+            {
+                StartCoroutine(OnTriggerEnter2DBufferLoop());
+            }
+            else
+            {
+                isBufferRunning = false;
+            }
+            }
+            else if (!(Input.GetKey(KeybindingManager.hit1) || Input.GetKey(KeybindingManager.hit2)) && !isDying)
+            {
+            bufferActive = false;
+            }
 
             if (collision.name == "finishline")
             {
-                health -= 0f;
+            health -= 0f;
             }
         }
 

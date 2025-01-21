@@ -44,7 +44,7 @@ Physics2DSettings:
     serializedVersion: 2
     m_Bits: 4294967295
   m_MaxSubStepCount: 4
-  m_MinSubStepFPS: 240
+  m_MinSubStepFPS: 120
   m_UseSubStepping: 0
   m_UseSubStepContacts: 0
   m_QueriesHitTriggers: 1

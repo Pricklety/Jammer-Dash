@@ -785,7 +785,7 @@ namespace JammerDash
         public void Update()
         {
             username.text = $"{Account.Instance.nickname} (@{Account.Instance.username})";
-           logInOut.text = Account.Instance.loggedIn ? LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Log out") : LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Log in");
+           logInOut.text = Account.Instance.loggedIn ? LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Account settings") : LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Log in");
             if (audio != null)
             {
                 DisplayMusicInfo(audio.source.clip, audio.source.time);
@@ -858,7 +858,7 @@ namespace JammerDash
           
 
             
-            snowObj.SetActive(snow.isOn);
+            snowObj.SetActive(settingsData.snow);
 
             if (increaseVol.isOn)
             {

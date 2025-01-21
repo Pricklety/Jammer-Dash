@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using JammerDash.Tech;
 using TMPro;
 using JammerDash.Audio;
+using UnityEngine.Video;
 
 namespace JammerDash.Game
 {
@@ -17,6 +18,7 @@ namespace JammerDash.Game
 
         public PlayerMovement player;
         public AudioSource song;
+        public VideoPlayer video;
         public GameObject player0;
         public GameObject player1;
         bool started = false;
@@ -78,6 +80,13 @@ namespace JammerDash.Game
             song.pitch = 1f;
             song.volume = 1f;
             song.Play(); 
+            if (File.Exists(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "backgroundVideo.mp4")))
+            {
+                image.gameObject.SetActive(true);
+                image.texture = video.targetTexture;
+                video.url = Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "backgroundVideo.mp4");
+                video.Play();
+            }
             infotext.text = $"{CustomLevelDataManager.Instance.data.artist} - {CustomLevelDataManager.Instance.data.songName}";
 
 

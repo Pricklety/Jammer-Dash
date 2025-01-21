@@ -4,6 +4,8 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using JammerDash.Game;
+using JammerDash.Tech;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -505,7 +507,8 @@ public static float CalculateSizeImpact(Slider size)
         private void CalculatePerformanceScore()
         {
            
-
+float masterPitch;
+            Mods.instance.master.GetFloat("MasterPitch", out masterPitch);
             // BPM scaling (considered inversely)
             float bpmScaling = 1 / _bpm;
 
@@ -524,10 +527,10 @@ public static float CalculateSizeImpact(Slider size)
       levelLengthAdjustment +
       (MathF.Exp(_gameDifficulty * GetDifficultyExponent()) - 1) * 3f +  
       (_cubeCount % 150)
-      ) * bpmScaling, 0f);  // Apply BPM scaling
+      ) * bpmScaling, 0f) * CustomLevelDataManager.Instance.scoreMultiplier * masterPitch;  // Apply BPM scaling
 
         }
-
+ 
         // Property to get the final performance score
         public float PerformanceScore => _performanceScore;
 

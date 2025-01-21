@@ -11,6 +11,7 @@ using JammerDash.Tech;
 using JammerDash.Game.Player;
 using JammerDash.Audio;
 using UnityEngine.Localization.Settings;
+using UnityEngine.Video;
 
 namespace JammerDash.Game
 {
@@ -24,6 +25,7 @@ namespace JammerDash.Game
         public int attint;
         public GameObject canvas;
         public AudioSource music;
+        public VideoPlayer video;
         public Slider dim;
         public RawImage image;
         // Start is called before the first frame update
@@ -38,7 +40,7 @@ namespace JammerDash.Game
                 this.creator.text = creator;
                 song.text = levelName;
             
-           
+           video = FindFirstObjectByType<VideoPlayer>();
         }
 
       
@@ -78,6 +80,7 @@ namespace JammerDash.Game
                 {
 
                     music.Pause();
+                    video.Pause();
                     Time.timeScale = 0;
                     GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().enabled = false;
                 }
@@ -113,6 +116,7 @@ namespace JammerDash.Game
                     music.Pause();
                     Time.timeScale = 0;
                     GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().enabled = false;
+                    video.Pause();
 
                 }
             }
@@ -140,9 +144,12 @@ namespace JammerDash.Game
             // Check if the player exists and is not at the starting position
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             music.UnPause();
+            video.Play();
             player.GetComponent<PlayerMovement>().enabled = true;
-            music.pitch = 1f;
             Time.timeScale = 1f;
+            music.pitch = Time.timeScale;
+            video.playbackSpeed = Time.timeScale;
+            
 
 
 

@@ -11,6 +11,8 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using JammerDash.Game;
+using UnityEngine.Video;
 
 namespace JammerDash.Tech
 {
@@ -27,6 +29,10 @@ namespace JammerDash.Tech
         public float cubesize;
         public bool sceneLoaded = false;
         public SceneData data;
+        public float scoreMultiplier = 1f;
+        public int seed;
+        public Dictionary<ModType, bool> modStates;
+        public float speed;
 
         private void Awake()
         {
@@ -35,6 +41,7 @@ namespace JammerDash.Tech
             {
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
+                modStates = new Dictionary<ModType, bool>();
             }
             else
             {
@@ -58,7 +65,6 @@ namespace JammerDash.Tech
             if (File.Exists(filePath))
             {
                 string json = File.ReadAllText(filePath);
-                Debug.LogWarning(filePath);
                 SceneData sceneData = SceneData.FromJson(json);
                 levelName = sceneData.sceneName;
                 creator = sceneData.creator;
@@ -128,28 +134,52 @@ namespace JammerDash.Tech
 
             return null;
         }
-        public IEnumerator LoadImage(string url, RawImage rawImage)
+        public IEnumerator LoadImage(string url, RawImage rawImage, bool isVideo = false)
         {
+            if (isVideo)
+            {
+            using (UnityWebRequest www = UnityWebRequest.Get(url))
+            {
+                yield return www.SendWebRequest();
+
+                if (www.result == UnityWebRequest.Result.Success)
+                {
+                VideoPlayer videoPlayer = rawImage.gameObject.AddComponent<VideoPlayer>();
+                videoPlayer.url = url;
+                videoPlayer.renderMode = VideoRenderMode.RenderTexture;
+                videoPlayer.targetTexture = new RenderTexture((int)rawImage.rectTransform.rect.width, (int)rawImage.rectTransform.rect.height, 0);
+                rawImage.texture = videoPlayer.targetTexture;
+                videoPlayer.Play();
+                }
+                else
+                {
+                Debug.Log("Failed to load video: " + www.error);
+                }
+            }
+            }
+            else
+            {
             using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))
             {
                 yield return www.SendWebRequest();
 
                 if (rawImage == null)
                 {
-                    rawImage = FindInactiveObjectOfType<RawImage>();
+                rawImage = FindInactiveObjectOfType<RawImage>();
                 }
                 if (www.result == UnityWebRequest.Result.Success)
                 {
-                    if (rawImage != null)
-                    {
-                        rawImage.gameObject.SetActive(true);
-                        rawImage.texture = DownloadHandlerTexture.GetContent(www);
-                    }
+                if (rawImage != null)
+                {
+                    rawImage.gameObject.SetActive(true);
+                    rawImage.texture = DownloadHandlerTexture.GetContent(www);
+                }
                 }
                 else
                 {
-                    Debug.Log("Failed to load image: " + www.error);
+                Debug.Log("Failed to load image: " + www.error);
                 }
+            }
             }
         }
 
@@ -175,101 +205,222 @@ namespace JammerDash.Tech
             }
         }
         Dictionary<string, int> cubeTypeMapping = new Dictionary<string, int>
-{
-    { "hitter01", 1 },
-    { "hitter03", 3 },
-    { "hitter04", 4 },
-    { "hitter05", 5 },
-    { "hitter06", 6 },
-};
-        private IEnumerator ProcessAfterSceneLoaded()
-        {
-            yield return new WaitForEndOfFrame();
-            string filePath = Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{ID} - {levelName}", $"{levelName}.json");
-            Debug.Log(filePath);
-            string json = File.ReadAllText(filePath);
-            SceneData sceneData = SceneData.FromJson(json);
-            Debug.Log(sceneData.levelName);
-            data = sceneData;
-            Debug.Log(sceneData.cubePositions.Count);
+    {
+        { "hitter01", 1 },
+        { "hitter03", 3 },
+        { "hitter04", 4 },
+        { "hitter05", 5 },
+        { "hitter06", 6 },
+    };
 
-            itemUnused[] obj = FindObjectsOfType<itemUnused>();
-            foreach (itemUnused gobject in obj)
+    private IEnumerator ProcessAfterSceneLoaded()
+    {
+        yield return new WaitForEndOfFrame();
+        string filePath = Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{ID} - {levelName}", $"{levelName}.json");
+        Debug.Log(filePath);
+        string json = File.ReadAllText(filePath);
+        SceneData sceneData = SceneData.FromJson(json);
+        Debug.Log(sceneData.levelName);
+        data = sceneData;
+        Debug.Log(sceneData.cubePositions.Count);
+
+        itemUnused[] obj = FindObjectsOfType<itemUnused>();
+        foreach (itemUnused gobject in obj)
+        {
+            Destroy(gobject.gameObject);
+        }
+
+        System.Random random = new System.Random(); // Seed with scene ID for reproducibility
+
+        // Define allowed y positions
+        float[] allowedYPositions = { -1, 0, 1, 2, 3 };
+
+        // Group cube positions by x value
+        var cubeGroups = GroupByX(sceneData.cubePositions);
+
+        foreach (var group in cubeGroups)
+        {
+            float yPosition = allowedYPositions[random.Next(allowedYPositions.Length)];
+
+            for (int i = 0; i < group.Value.Count; i++)
             {
-                Destroy(gobject.gameObject);
-            }
-            for (int i = 0; i < sceneData.cubePositions.Count; i++)
+                Vector3 modifiedCubePos = group.Value[i];
+
+                if (modStates.ContainsKey(ModType.yMirror) && modStates[ModType.yMirror])
                 {
-                    Vector3 cubePos = sceneData.cubePositions[i];
+                    modifiedCubePos.y = 3 - modifiedCubePos.y;
+                }
+                if (modStates.ContainsKey(ModType.oneLine) && modStates[ModType.oneLine])
+                {
+                    modifiedCubePos.y = -1;
+                }
+                if (modStates.ContainsKey(ModType.random) && modStates[ModType.random])
+                {
+                    modifiedCubePos.y = yPosition;
+                }
+                if (modStates.ContainsKey(ModType.easy) && modStates[ModType.easy])
+                {
+                    modifiedCubePos.x = modifiedCubePos.x / 7 * 5;
+                }
+               
+
                 int originalCubeType;
-                if (sceneData.cubeType == null || sceneData.cubeType.Count <= i)
+                if (sceneData.cubeType == null || sceneData.cubeType.Count <= sceneData.cubePositions.IndexOf(group.Value[i]))
                 {
                     originalCubeType = 1;
                 }
                 else
                 {
-                    originalCubeType = sceneData.cubeType[i];
+                    originalCubeType = sceneData.cubeType[sceneData.cubePositions.IndexOf(group.Value[i])];
                 }
 
                 // Format the name of the cube type based on the index
                 string cubeTypeName = $"hitter{originalCubeType:D2}"; // Format: hitter01, hitter03, etc.
 
-                    // Look up the mapped index
-                    if (cubeTypeMapping.TryGetValue(cubeTypeName, out int mappedIndex))
+                // Look up the mapped index
+                if (cubeTypeMapping.TryGetValue(cubeTypeName, out int mappedIndex))
+                {
+                    // Validate mappedIndex within cubePrefab array bounds
+                    if (mappedIndex >= 0 && mappedIndex <= 6)
                     {
-                        // Validate mappedIndex within cubePrefab array bounds
-                        if (mappedIndex >= 0 && mappedIndex <= 6)
-                        {
-                            Instantiate(Resources.Load<GameObject>(cubeTypeName), cubePos, Quaternion.identity);
-                        }
-                        else
-                        {
-                            Debug.LogWarning($"Mapped index {mappedIndex} is out of bounds for cubePrefab.");
-                        }
+                        Instantiate(Resources.Load<GameObject>(cubeTypeName), modifiedCubePos, Quaternion.identity);
                     }
                     else
                     {
-                        Debug.LogWarning($"Cube type name '{cubeTypeName}' not found in mapping. Skipping instantiation.");
+                        Debug.LogWarning($"Mapped index {mappedIndex} is out of bounds for cubePrefab.");
                     }
                 }
-
-            foreach (Vector3 sawPos in sceneData.sawPositions)
-            {
-                Instantiate(Resources.Load<GameObject>("Saws and Spikes/rotateSaw01"), sawPos, Quaternion.identity);
+                else
+                {
+                    Debug.LogWarning($"Cube type name '{cubeTypeName}' not found in mapping. Skipping instantiation.");
+                }
             }
+        }
 
-            for (int i = 0; i < sceneData.longCubePositions.Count; i++)
+        // Group saw positions by x value
+        var sawGroups = GroupByX(sceneData.sawPositions);
+
+        foreach (var group in sawGroups)
+        {
+            float yPosition = allowedYPositions[random.Next(allowedYPositions.Length)];
+
+            foreach (var sawPos in group.Value)
             {
-                Vector3 longCubePos = sceneData.longCubePositions[i];
-                float width = sceneData.longCubeWidth[i];
-                GameObject longCubeObject = Instantiate(Resources.Load<GameObject>("hitter02"), longCubePos, Quaternion.identity);
+                Vector3 modifiedSawPos = sawPos;
+
+                if (modStates.ContainsKey(ModType.noSpikes) && modStates[ModType.noSpikes] || modStates.ContainsKey(ModType.oneLine) && modStates[ModType.oneLine])
+                {
+                    // nothing
+                }
+                else
+                {
+                    if (modStates.ContainsKey(ModType.yMirror) && modStates[ModType.yMirror])
+                    {
+                        modifiedSawPos.y = 3 - modifiedSawPos.y;
+                    }
+                    if (modStates.ContainsKey(ModType.oneLine) && modStates[ModType.oneLine])
+                    {
+                        modifiedSawPos.y = -1;
+                    }
+                    if (modStates.ContainsKey(ModType.random) && modStates[ModType.random])
+                    {
+                        modifiedSawPos.y = yPosition;
+                    }
+                    if (modStates.ContainsKey(ModType.easy) && modStates[ModType.easy])
+                    {
+                        modifiedSawPos.x = modifiedSawPos.x / 7 * 5;
+                    }
+                    // Ensure saws are not too close to cubes or at the same y and x values
+                    bool conflict = false;
+                    foreach (var cubePos in sceneData.cubePositions)
+                    {
+                        if (Vector3.Distance(modifiedSawPos, cubePos) < 1.0f)
+                        {
+                            conflict = true;
+                            break;
+                        }
+                    }
+
+                    if (!conflict)
+                    {
+                        Instantiate(Resources.Load<GameObject>("Saws and Spikes/rotateSaw01"), modifiedSawPos, Quaternion.identity);
+                    }
+                }
+            }
+        }
+
+        // Group long cube positions by x value
+        var longCubeGroups = GroupByX(sceneData.longCubePositions);
+
+        foreach (var group in longCubeGroups)
+        {
+            float yPosition = allowedYPositions[random.Next(allowedYPositions.Length)];
+
+            foreach (var longCubePos in group.Value)
+            {
+                Vector3 modifiedLongCubePos = longCubePos;
+
+                if (modStates.ContainsKey(ModType.yMirror) && modStates[ModType.yMirror])
+                {
+                    modifiedLongCubePos.y = 3 - modifiedLongCubePos.y;
+                }
+                if (modStates.ContainsKey(ModType.oneLine) && modStates[ModType.oneLine])
+                {
+                    modifiedLongCubePos.y = -1;
+                }
+                if (modStates.ContainsKey(ModType.random) && modStates[ModType.random])
+                {
+                    modifiedLongCubePos.y = yPosition;
+                }
+                if (modStates.ContainsKey(ModType.easy) && modStates[ModType.easy])
+                {
+                    modifiedLongCubePos.x = modifiedLongCubePos.x / 7 * 5;
+                }
+                float width = sceneData.longCubeWidth[sceneData.longCubePositions.IndexOf(longCubePos)];
+                GameObject longCubeObject = Instantiate(Resources.Load<GameObject>("hitter02"), modifiedLongCubePos, Quaternion.identity);
                 SpriteRenderer longCubeRenderer = longCubeObject.GetComponent<SpriteRenderer>();
                 BoxCollider2D collider = longCubeObject.GetComponent<BoxCollider2D>();
 
+                if (modStates.ContainsKey(ModType.easy) && modStates[ModType.easy])
+                {
+                    longCubeRenderer.size = new Vector2(width / 7 * 5, 1);
+                    collider.size = new Vector2((width / 7 * 5) + 0.25f, 0.75f);
+                    collider.offset = new Vector2(width / 1.965f / 7 * 5, 0f);
+                    Debug.Log("Instantiated long cube");
+                }
+                else {
                 longCubeRenderer.size = new Vector2(width, 1);
                 collider.size = new Vector2(width + 0.5f, 0.75f);
                 collider.offset = new Vector2(width / 1.965f, 0f);
+                }
+                
                 Debug.Log("Instantiated long cube");
             }
-
-                StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{ID} - {levelName}", "bgImage.png"), null));
-            
-
-            Camera[] cams = FindObjectsOfType<Camera>();
-            foreach (Camera cam in cams)
-            {
-                cam.backgroundColor = sceneData.defBGColor;
-            }
-
-            levelName = sceneData.sceneName;
-            artist = sceneData.artist;
-            creator = sceneData.creator;
-            diff = (int)sceneData.calculatedDifficulty;
-            ID = sceneData.ID;
-            GameObject.Find("Cube").SetActive(sceneData.ground);
-
-            FindObjectOfType<Camera>().backgroundColor = sceneData.defBGColor;
-            yield return null;
         }
+
+        StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{ID} - {levelName}", "bgImage.png"), null));
+
+        Camera[] cams = FindObjectsOfType<Camera>();
+        foreach (Camera cam in cams)
+        {
+            cam.backgroundColor = sceneData.defBGColor;
+        }
+    }
+
+    private Dictionary<float, List<Vector3>> GroupByX(List<Vector3> positions)
+    {
+        var groups = new Dictionary<float, List<Vector3>>();
+
+        foreach (var pos in positions)
+        {
+            if (!groups.ContainsKey(pos.x))
+            {
+                groups[pos.x] = new List<Vector3>();
+            }
+            groups[pos.x].Add(pos);
+        }
+
+        return groups;
+    }
     }
 }

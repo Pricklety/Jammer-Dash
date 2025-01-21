@@ -26,6 +26,7 @@ using System.Threading.Tasks;
 using JammerDash.Editor.Screens;
 using UnityEngine.Localization.Settings;
 using System.Diagnostics;
+using UnityEngine.Video;
 
 namespace JammerDash.Editor
 {
@@ -57,8 +58,9 @@ namespace JammerDash.Editor
         public GameObject bgimgblur;
         public GameObject bgSelector;
         public RawImage bgPreview;
-        public Image camBG;
+        public RawImage camBG;
         public GameObject camBG1;
+        public VideoPlayer videoPlayer;
         public GameObject bgSel;
         public Toggle groundToggle;
         public InputField sceneNameInput;
@@ -440,7 +442,115 @@ namespace JammerDash.Editor
         }
         private IEnumerator LoadImageCoroutine(string url)
         {
+            string extension = Path.GetExtension(url).ToLower();
+
+             if (extension == ".mp4")
+    {
+        // Check if the VideoPlayer component is already attached, otherwise add it
+        if (videoPlayer == null)
+        {
+            videoPlayer = camBG.gameObject.AddComponent<VideoPlayer>();
+        }
+
+        // Set the video URL
+        videoPlayer.url = url;
+
+        // Set VideoPlayer properties
+        videoPlayer.isLooping = false;
+        videoPlayer.audioOutputMode = VideoAudioOutputMode.None;
+        
+        // Prepare the video before playing
+        videoPlayer.prepareCompleted += OnVideoPrepared;
+
+        // Prepare the video (loads the video into memory asynchronously)
+        videoPlayer.Prepare();
+
+        // Show loading notification or loading animation here if needed
+        Notifications.instance.Notify("Loading video...", null);
+
+        // Wait until video preparation is complete
+        while (!videoPlayer.isPrepared)
+        {
+            yield return null; // Yield until preparation is complete
+        }
+
+        // Once the video is prepared, we can assign it to the texture and play it
+        bgPreview.gameObject.SetActive(true); // Show RawImage
+        bgImage.isOn = true;
+        bgPreview.texture = videoPlayer.targetTexture;
+        camBG.texture = videoPlayer.targetTexture;
+
+        // Play the video after it's prepared
+        videoPlayer.Play();
+    }
+            else
+            {
+            // Handle image loading
             using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))
+            {
+                yield return www.SendWebRequest();
+
+                if (www.result == UnityWebRequest.Result.Success)
+                {
+                // Enable the GameObject with the RawImage component
+                bgPreview.gameObject.SetActive(true);
+                bgImage.isOn = true;
+
+                // Set the texture to the RawImage component
+                bgPreview.texture = DownloadHandlerTexture.GetContent(www);
+
+                // Create a Sprite from the downloaded texture and set it to the Image component
+                Texture2D texture = DownloadHandlerTexture.GetContent(www);
+                camBG.texture = texture;
+                }
+                else
+                {
+                UnityEngine.Debug.Log("Failed to load image: " + www.error);
+                }
+            }
+            }
+        
+         if (extension == ".mp4")
+    {
+        // Check if the VideoPlayer component is already attached, otherwise add it
+        if (videoPlayer == null)
+        {
+            videoPlayer = camBG.gameObject.AddComponent<VideoPlayer>();
+        }
+
+        // Set the video URL
+        videoPlayer.url = url;
+
+        // Set VideoPlayer properties
+        videoPlayer.isLooping = false;
+        videoPlayer.audioOutputMode = VideoAudioOutputMode.None;
+        
+        // Prepare the video before playing
+        videoPlayer.prepareCompleted += OnVideoPrepared;
+
+        // Prepare the video (loads the video into memory asynchronously)
+        videoPlayer.Prepare();
+
+        Notifications.instance.Notify("Loading video...", null);
+
+        // Wait until video preparation is complete
+        while (!videoPlayer.isPrepared)
+        {
+            yield return null; // Yield until preparation is complete
+        }
+
+        // Once the video is prepared, we can assign it to the texture and play it
+        bgPreview.gameObject.SetActive(true); // Show RawImage
+        bgImage.isOn = true;
+        bgPreview.texture = videoPlayer.targetTexture;
+        camBG.texture = videoPlayer.targetTexture;
+
+        // Play the video after it's prepared
+        videoPlayer.Play();
+    }
+    else
+    {
+       using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(url))
             {
                 yield return www.SendWebRequest();
 
@@ -455,16 +565,22 @@ namespace JammerDash.Editor
 
                     // Create a Sprite from the downloaded texture and set it to the Image component
                     Texture2D texture = DownloadHandlerTexture.GetContent(www);
-                    Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
-                    camBG.sprite = sprite;
+                    camBG.texture = texture;
                 }
                 else
                 {
                     UnityEngine.Debug.Log("Failed to load image: " + www.error);
                 }
             }
+    }
         }
+private void OnVideoPrepared(VideoPlayer source)
+{
+    Debug.Log("Video successfully prepared and loaded.");
 
+    // You can notify the user that the video is ready
+    Notifications.instance.Notify("Video loaded and ready to play!", null);
+}
         public async Task SaveLevelData()
         {
             try
@@ -648,6 +764,7 @@ namespace JammerDash.Editor
             playbackText.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Playback")} ({Time.timeScale:0.00}x)";
             audio = AudioManager.Instance.source;
             audio.pitch = Time.timeScale;
+            videoPlayer.playbackSpeed = Time.timeScale;
             PlayerEditorMovement player = GameObject.FindObjectOfType<PlayerEditorMovement>();
 
 
@@ -1002,11 +1119,14 @@ namespace JammerDash.Editor
             if (!audio.isPlaying && !player.enabled)
             {
                 audio.Play();
+                videoPlayer.Play();
             }
             else if (audio.isPlaying && player.enabled)
             {
                 audio.Stop();
                 audio.time = 0f;
+                videoPlayer.Stop();
+                videoPlayer.time = 0f;
             }
             player.enabled = !player.enabled;
             CameraController cam = GameObject.FindObjectOfType<CameraController>();
@@ -1142,7 +1262,7 @@ namespace JammerDash.Editor
         public void OpenImageDialog()
         {
             FileBrowser.m_instance = Instantiate(Resources.Load<GameObject>("SimpleFileBrowserCanvas")).GetComponent<FileBrowser>();
-            FileBrowser.SetFilters(true, new FileBrowser.Filter("Images", ".png", ".jpg", ".jpeg"));
+            FileBrowser.SetFilters(true, new FileBrowser.Filter("Background", ".png", ".jpg", ".jpeg", ".mp4"));
             FileBrowser.SetDefaultFilter(".png");
             FileBrowser.ShowLoadDialog(OnFileSelected, null, FileBrowser.PickMode.Files);
         }
@@ -1169,7 +1289,7 @@ namespace JammerDash.Editor
 
         public void RemoveIMG()
         {
-            camBG.sprite = null;
+            camBG.texture = null;
             bgPreview.texture = null;
         }
 
@@ -1177,25 +1297,48 @@ namespace JammerDash.Editor
         {
             if (File.Exists(path))
             {
+            string extension = Path.GetExtension(path).ToLower();
+
+            if (extension == ".mp4")
+            {videoPlayer.Prepare();
+                // Handle video loading
+                if (videoPlayer == null)
+                {
+                videoPlayer = camBG.gameObject.AddComponent<VideoPlayer>();
+                }
+
+                videoPlayer.url = path;
+                videoPlayer.isLooping = true;
+
+                // Enable the GameObject with the RawImage component
+                bgPreview.gameObject.SetActive(true);
+                bgImage.isOn = true;
+                bgPreview.texture = videoPlayer.targetTexture;
+                camBG.texture = videoPlayer.targetTexture;
+                videoPlayer.audioOutputMode = VideoAudioOutputMode.None;
+            }
+            else
+            {
+                // Handle image loading
                 byte[] fileData = File.ReadAllBytes(path);
                 Texture2D texture = new(2, 2);
 
                 if (texture.LoadImage(fileData))
                 {
-                    bgPreview.texture = texture;
-                    yield return null;
+                bgPreview.texture = texture;
+                yield return null;
 
-                    Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
-                    camBG.sprite = sprite;
+                camBG.texture = texture;
                 }
                 else
                 {
                     UnityEngine.Debug.LogError("Failed to load the image: " + path);
                 }
             }
+            }
             else
             {
-                UnityEngine.Debug.LogError("File does not exist: " + path);
+            UnityEngine.Debug.LogError("File does not exist: " + path);
             }
         }
         public void SaveSceneButton()
@@ -1338,303 +1481,347 @@ namespace JammerDash.Editor
         {
             loadingPanel.loadingText.text = message; // Assuming loadingTextUI is a reference to your UI Text component
         }
-        private async Task<SceneData> CreateSceneData(LoadingScreen loadingScreen)
-        {
 
-
-            loadingScreen.UpdateLoading("Retrieving cubes...", 0f);
-            GameObject[] cubes = await GetCubesOnMainThread(loadingPanel);
-            if (cubes == null)
-            {
-                loadingScreen.HideLoadingScreen(); // Hide loading screen
-                return null;
-            }
-            await Task.Delay(500);
-            // Update loading screen with the count of cubes retrieved
-            int cubeCount = cubes.Length;
-            loadingScreen.UpdateLoading($"Gathering cube positions... Retrieved {cubeCount} cubes", 0.1f);
-            List<Vector2> cubePositions = cubes.Select(cube => (Vector2)cube.transform.position).ToList();
-            await Task.Delay(500);
-            loadingScreen.UpdateLoading("Calculating farthest object...", 0.2f);
-            float distance1 = 0f;
-            GetFarthestObjectOnMainThread(cubes, (targetObject) =>
-            {
-                // This block will run once the farthest object has been found
-                float distance = targetObject != null ? targetObject.position.x + additionalDistance : 0;
-                distance1 = distance;
-            });
-
-            await Task.Delay(500);
-            float calculateDifficulty = await Calculator.CalculateDifficultyAsync(
-         this.cubes,
-         saws,
-         longCubes,
-         hp,
-         size,
-         cubePositions.ToArray(),
-         float.Parse(bpm.text),
-         updateLoadingText: (text) =>
-         {
-             // Ensure updateLoadingText is executed on the main thread
-             MainThreadDispatcher.Enqueue(() =>
-             {
-                 loadingPanel.UpdateLoading(text, 0.45f);
-             });
-         }
-     );
-            await Task.Delay(5000);
-
-
-            // Load existing scene data if available, with fallback
-            SceneData data = await LoadSceneDataFromFile() ?? new SceneData();
-
-            loadingScreen.UpdateLoading("Creating Scene Data object...", 0.5f);
-            SceneData sceneData = new SceneData
-            {
-                sceneName = customSongName.text,
-                bpm = int.TryParse(bpmInput.text, out int bpmValue) ? bpmValue : 0,
-                calculatedDifficulty = calculateDifficulty,
-                gameVersion = Application.version,
-                saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                songLength = audio.clip != null ? audio.clip.length : 0,
-                ground = groundToggle != null && groundToggle.isOn,
-                levelLength = (int)(distance1 / 7),
-                creator = creator != null ? creator.text : "Unknown",
-                romanizedName = romaji != null ? romaji.text : "Unknown",
-                romanizedArtist = romajiArtist != null ? romajiArtist.text : "Unknown",
-                playerHP = hp != null ? (int)hp.value : 300,
-                boxSize = size != null ? size.value : 1,
-                artist = songArtist != null ? songArtist.text : "Unknown",
-                songName = customSongName.text,
-                offset = float.TryParse(offsetmarker != null ? offsetmarker.text : "0", out float offsetValue) ? offsetValue : 0,
-                ID = (data.ID == 0) ? Random.Range(int.MinValue, int.MaxValue) : data.ID,
-                defBGColor = Camera.main != null ? Camera.main.backgroundColor : Color.black
-            };
-            await Task.Delay(500);
-            loadingScreen.UpdateLoading("Saving background image if enabled...", 0.6f);
-            // Save background image if enabled
-            if (bgPreview != null && bgPreview.texture != null && bgImage != null && bgImage.isOn)
-            {
-                SaveBackgroundImageTexture(Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneData.sceneName, "bgImage.png"));
-            }
-            await Task.Delay(500);
-            loadingScreen.UpdateLoading("Processing positions for cubes, saws, and long cubes...", 0.7f);
-            sceneData.cubePositions = this.cubes?.Select(cube => cube.transform.position).ToList() ?? new List<Vector3>();
-            sceneData.cubeType = this.cubes
-    ?.Select(cube =>
+    private async Task<SceneData> CreateSceneData(LoadingScreen loadingScreen)
     {
-        // Get the base name without "(Clone)"
-        string name = cube.gameObject.name.Replace("(Clone)", "").Trim();
-
-        // Look up the mapped integer value for the name
-        if (cubeTypeMapping.TryGetValue(name, out int mappedIndex))
+        loadingScreen.UpdateLoading("Retrieving cubes...", 0f);
+        GameObject[] cubes = await GetCubesOnMainThread(loadingPanel);
+        if (cubes == null)
         {
-            return mappedIndex;
-        }
-
-        return 1;
-    })
-    .ToList(); // Convert to a list if sceneData.cubeType expects one
-
-            sceneData.sawPositions = saws?.Select(saw => saw.transform.position).ToList() ?? new List<Vector3>();
-            if (longCubes != null)
-            {
-                sceneData.longCubePositions = longCubes.Select(cube => cube.transform.position).ToList();
-                sceneData.longCubeWidth = longCubes.Select(cube => cube.GetComponent<SpriteRenderer>()?.size.x ?? 0).ToList();
-            }
-
-            loadingScreen.UpdateLoading("Scene data created successfully.", 1f);
             loadingScreen.HideLoadingScreen(); // Hide loading screen
-            return sceneData;
+            return null;
         }
-
-        private async Task<SceneData> CreateLevelSceneData(LoadingScreen loadingScreen)
+        await Task.Delay(500);
+        // Update loading screen with the count of cubes retrieved
+        int cubeCount = cubes.Length;
+        loadingScreen.UpdateLoading($"Gathering cube positions... Retrieved {cubeCount} cubes", 0.1f);
+        List<Vector2> cubePositions = cubes.Select(cube => (Vector2)cube.transform.position).ToList();
+        await Task.Delay(500);
+        loadingScreen.UpdateLoading("Calculating farthest object...", 0.2f);
+        float distance1 = 0f;
+        GetFarthestObjectOnMainThread(cubes, (targetObject) =>
         {
-            loadingScreen.ShowLoadingScreen(); // Show loading screen
+            // This block will run once the farthest object has been found
+            float distance = targetObject != null ? targetObject.position.x + additionalDistance : 0;
+            distance1 = distance;
+        });
 
-            loadingScreen.UpdateLoading("Retrieving cubes...", 0f);
-            GameObject[] cubes = await GetCubesOnMainThread(loadingPanel);
-            if (cubes == null)
+        await Task.Delay(500);
+        float calculateDifficulty = await Calculator.CalculateDifficultyAsync(
+            this.cubes,
+            saws,
+            longCubes,
+            hp,
+            size,
+            cubePositions.ToArray(),
+            float.Parse(bpmInput.text),
+            updateLoadingText: (text) =>
             {
-                loadingScreen.HideLoadingScreen(); // Hide loading screen
-                return null;
+                // Ensure updateLoadingText is executed on the main thread
+                MainThreadDispatcher.Enqueue(() =>
+                {
+                    loadingPanel.UpdateLoading(text, 0.45f);
+                });
             }
-            await Task.Delay(500);
-            // Update loading screen with the count of cubes retrieved
-            int cubeCount = cubes.Length;
-            loadingScreen.UpdateLoading($"Gathering cube positions... Retrieved {cubeCount} cubes", 0.1f);
-            List<Vector2> cubePositions = cubes.Select(cube => (Vector2)cube.transform.position).ToList();
-            await Task.Delay(500);
-            loadingScreen.UpdateLoading("Calculating farthest object...", 0.2f);
-            float distance1 = 0f;
-            GetFarthestObjectOnMainThread(cubes, (targetObject) =>
-            {
-                // This block will run once the farthest object has been found
-                float distance = targetObject != null ? targetObject.position.x + additionalDistance : 0;
-                distance1 = distance;
-            });
+        );
+        await Task.Delay(5000);
 
-            await Task.Delay(500);
+        // Load existing scene data if available, with fallback
+        SceneData data = await LoadSceneDataFromFile() ?? new SceneData();
 
-            loadingScreen.UpdateLoading("Calculating difficulty...", 0.4f);
-            float calculateDifficulty = await Calculator.CalculateDifficultyAsync(
-        this.cubes,
-        saws,
-        longCubes,
-        hp,
-        size,
-        cubePositions.ToArray(),
-        float.Parse(bpm.text),
-        updateLoadingText: (text) =>
+        loadingScreen.UpdateLoading("Creating Scene Data object...", 0.5f);
+        SceneData sceneData = new SceneData
         {
-            // Ensure updateLoadingText is executed on the main thread
-            MainThreadDispatcher.Enqueue(() =>
+            sceneName = customSongName.text,
+            bpm = int.TryParse(bpmInput.text, out int bpmValue) ? bpmValue : 0,
+            calculatedDifficulty = calculateDifficulty,
+            gameVersion = Application.version,
+            saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+            songLength = audio.clip != null ? audio.clip.length : 0,
+            ground = groundToggle != null && groundToggle.isOn,
+            levelLength = (int)(distance1 / 7),
+            creator = creator != null ? creator.text : "Unknown",
+            romanizedName = romaji != null ? romaji.text : "Unknown",
+            romanizedArtist = romajiArtist != null ? romajiArtist.text : "Unknown",
+            playerHP = hp != null ? (int)hp.value : 300,
+            boxSize = size != null ? size.value : 1,
+            artist = songArtist != null ? songArtist.text : "Unknown",
+            songName = customSongName.text,
+            offset = float.TryParse(offsetmarker != null ? offsetmarker.text : "0", out float offsetValue) ? offsetValue : 0,
+            ID = (data.ID == 0) ? UnityEngine.Random.Range(int.MinValue, int.MaxValue) : data.ID,
+            defBGColor = Camera.main != null ? Camera.main.backgroundColor : Color.black
+        };
+        await Task.Delay(500);
+        loadingScreen.UpdateLoading("Saving background image if enabled...", 0.6f);
+
+        // Save background image or video if enabled
+        if (bgPreview != null && bgPreview.texture != null && bgImage != null && bgImage.isOn)
+        {
+            string sceneFolderPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneData.sceneName);
+            Directory.CreateDirectory(sceneFolderPath);
+
+            if (camBG != null)
             {
-                loadingPanel.UpdateLoading(text, 0.45f);
-            });
+                // Save the video file
+                string videoFilePath = Path.Combine(sceneFolderPath, "backgroundVideo.mp4");
+                File.Copy(videoPlayer.url, videoFilePath, true);
+
+                // Extract the first frame of the video and save it as bgImage.png
+                string bgImagePath = Path.Combine(sceneFolderPath, "bgImage.png");
+                await SaveFirstFrameAsImage(videoPlayer.url, bgImagePath);
+            }
+            else
+            {
+                // Save the background image as bgImage.png
+                string bgImagePath = Path.Combine(sceneFolderPath, "bgImage.png");
+                SaveBackgroundImageTexture(bgImagePath);
+            }
         }
-    );
-            await Task.Delay(5000);
-            // Load existing scene data if available, with fallback
-            SceneData data = await LoadSceneDataFromFile() ?? new SceneData();
-
-            loadingScreen.UpdateLoading("Creating Scene Data object...", 0.5f);
-            SceneData sceneData = new SceneData
+        await Task.Delay(500);
+        loadingScreen.UpdateLoading("Processing positions for cubes, saws, and long cubes...", 0.7f);
+        sceneData.cubePositions = this.cubes?.Select(cube => cube.transform.position).ToList() ?? new List<Vector3>();
+        sceneData.cubeType = this.cubes
+            ?.Select(cube =>
             {
-                levelName = customSongName.text,
-                sceneName = customSongName.text,
-                calculatedDifficulty = calculateDifficulty,
-                gameVersion = Application.version,
-                saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                songLength = audio.clip != null ? audio.clip.length : 0,
-                artist = songArtist != null ? songArtist.text : "Unknown",
-                songName = customSongName.text,
-                ground = groundToggle != null && groundToggle.isOn,
-                levelLength = (int)(distance1 / 7),
-                creator = creator != null ? creator.text : "Unknown",
-                romanizedName = romaji != null ? romaji.text : "Unknown",
-                romanizedArtist = romajiArtist != null ? romajiArtist.text : "Unknown",
-                offset = float.TryParse(offsetmarker?.text, out float offsetValue) ? offsetValue : 0,
-                ID = (data.ID == 0) ? Random.Range(int.MinValue, int.MaxValue) : data.ID
-            }; await Task.Delay(500);
-            loadingScreen.UpdateLoading("Populating objects...", 0.6f);
+                // Get the base name without "(Clone)"
+                string name = cube.gameObject.name.Replace("(Clone)", "").Trim();
 
-            sceneData.cubePositions = this.cubes?.Select(cube => cube.transform.position).ToList() ?? new List<Vector3>();
-            sceneData.cubeType = this.cubes
-    ?.Select(cube =>
+                // Look up the mapped integer value for the name
+                if (cubeTypeMapping.TryGetValue(name, out int mappedIndex))
+                {
+                    return mappedIndex;
+                }
+
+                return 1;
+            })
+            .ToList(); // Convert to a list if sceneData.cubeType expects one
+
+        sceneData.sawPositions = saws?.Select(saw => saw.transform.position).ToList() ?? new List<Vector3>();
+        if (longCubes != null)
+        {
+            sceneData.longCubePositions = longCubes.Select(cube => cube.transform.position).ToList();
+            sceneData.longCubeWidth = longCubes.Select(cube => cube.GetComponent<SpriteRenderer>()?.size.x ?? 0).ToList();
+        }
+
+        loadingScreen.UpdateLoading("Scene data created successfully.", 1f);
+        loadingScreen.HideLoadingScreen(); // Hide loading screen
+        return sceneData;
+    }
+
+    private async Task SaveFirstFrameAsImage(string videoFilePath, string imagePath)
     {
-        // Get the base name without "(Clone)"
-        string name = cube.gameObject.name.Replace("(Clone)", "").Trim();
+        VideoPlayer videoPlayer = new GameObject("VideoPlayer").AddComponent<VideoPlayer>();
+        videoPlayer.url = videoFilePath;
+        videoPlayer.renderMode = VideoRenderMode.RenderTexture;
+        RenderTexture renderTexture = new RenderTexture(1920, 1080, 0);
+        videoPlayer.targetTexture = renderTexture;
 
-        // Look up the mapped integer value for the name
-        if (cubeTypeMapping.TryGetValue(name, out int mappedIndex))
+        videoPlayer.Prepare();
+        while (!videoPlayer.isPrepared)
         {
-            return mappedIndex;
+            await Task.Yield();
         }
 
-        return 1;
-    })
-    .ToList();
-            sceneData.sawPositions = saws?.Select(saw => saw.transform.position).ToList() ?? new List<Vector3>();
-            if (longCubes != null)
-            {
-                sceneData.longCubePositions = longCubes.Select(cube => cube.transform.position).ToList();
-                sceneData.longCubeWidth = longCubes.Select(cube => cube.GetComponent<SpriteRenderer>()?.size.x ?? 0).ToList();
-            }
+        videoPlayer.Play();
+        videoPlayer.Pause();
 
-            // Set source and destination paths for the scene
-            string sourceFolderPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneData.levelName);
-            string destinationFolderPath = Path.Combine(Application.persistentDataPath, "levels", sceneData.ID + " - " + sceneData.levelName);
-            await Task.Delay(500);
-            loadingScreen.UpdateLoading("Copying files...", 0.7f);
-            try
-            {
-                await CopyFilesAsync(sourceFolderPath, destinationFolderPath);
-            }
-            catch (Exception ex)
-            {
-                loadingScreen.HideLoadingScreen(); // Hide loading screen
-                return null;
-            }
-            await Task.Delay(500);
-            loadingScreen.UpdateLoading("Creating ZIP file...", 0.8f);
-            string exportFolder = Path.Combine(Application.persistentDataPath, "exports");
-            if (!Directory.Exists(exportFolder))
-                Directory.CreateDirectory(exportFolder);
-            string zipExport = Path.Combine(Application.persistentDataPath, "exports", $"{sceneData.ID} - {sceneData.sceneName}.jdl");
-            string zipFilePath = Path.Combine(Application.persistentDataPath, "levels", $"{sceneData.ID} - {sceneData.sceneName}.jdl");
+        Texture2D texture = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGB24, false);
+        RenderTexture.active = renderTexture;
+        texture.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
+        texture.Apply();
+        RenderTexture.active = null;
 
+        byte[] bytes = texture.EncodeToPNG();
+        File.WriteAllBytes(imagePath, bytes);
 
-            try
-            {
-                if (File.Exists(zipFilePath))
-                {
-                    File.Delete(zipFilePath);
-                }
-                if (File.Exists(zipExport))
-                {
-                    File.Delete(zipExport);
-                }
-                ZipFile.CreateFromDirectory(destinationFolderPath, zipExport, System.IO.Compression.CompressionLevel.NoCompression, false, null);
-                ZipFile.CreateFromDirectory(destinationFolderPath, zipFilePath, System.IO.Compression.CompressionLevel.NoCompression, false, null);
-                // Delete the original copied folder
-                Directory.Delete(destinationFolderPath, true);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Error creating ZIP file: {ex.Message}");
-                loadingScreen.HideLoadingScreen(); // Hide loading screen
-                return null;
-            }
+        Destroy(videoPlayer.gameObject);
+        Destroy(renderTexture);
+        Destroy(texture);
+    }
 
+    private async Task<SceneData> CreateLevelSceneData(LoadingScreen loadingScreen)
+    {
+        loadingScreen.ShowLoadingScreen(); // Show loading screen
 
-            loadingScreen.UpdateLoading("Level scene data created successfully.", 1f);
+        loadingScreen.UpdateLoading("Retrieving cubes...", 0f);
+        GameObject[] cubes = await GetCubesOnMainThread(loadingPanel);
+        if (cubes == null)
+        {
             loadingScreen.HideLoadingScreen(); // Hide loading screen
-            return sceneData;
+            return null;
         }
-        private void GetFarthestObjectOnMainThread(GameObject[] cubes, Action<Transform> callback)
+        await Task.Delay(500);
+        // Update loading screen with the count of cubes retrieved
+        int cubeCount = cubes.Length;
+        loadingScreen.UpdateLoading($"Gathering cube positions... Retrieved {cubeCount} cubes", 0.1f);
+        List<Vector2> cubePositions = cubes.Select(cube => (Vector2)cube.transform.position).ToList();
+        await Task.Delay(500);
+        loadingScreen.UpdateLoading("Calculating farthest object...", 0.2f);
+        float distance1 = 0f;
+        GetFarthestObjectOnMainThread(cubes, (targetObject) =>
         {
-            // Check if cubes is null or empty
-            if (cubes == null || cubes.Length == 0)
+            // This block will run once the farthest object has been found
+            float distance = targetObject != null ? targetObject.position.x + additionalDistance : 0;
+            distance1 = distance;
+        });
+
+        await Task.Delay(500);
+
+        loadingScreen.UpdateLoading("Calculating difficulty...", 0.4f);
+        float calculateDifficulty = await Calculator.CalculateDifficultyAsync(
+            this.cubes,
+            saws,
+            longCubes,
+            hp,
+            size,
+            cubePositions.ToArray(),
+            float.Parse(bpmInput.text),
+            updateLoadingText: (text) =>
             {
-
-                callback(null); // Call the callback with null
-                return; // Early return if no cubes are provided
-            }
-
-            // Enqueue the action to run on the main thread
-            MainThreadDispatcher.Enqueue(() =>
-            {
-                // Run the FindFarthestObjectInX method on the main thread
-                Transform result = Calculator.FindFarthestObjectInX(cubes);
-
-
-                // Call the callback with the result
-                callback(result);
-            });
-        }
-
-
-
-        private Task CopyFilesAsync(string sourceFolderPath, string destinationFolderPath)
-        {
-
-            return Task.Run(() =>
-            {
-                foreach (string sourcePath in Directory.GetFiles(sourceFolderPath, "*", SearchOption.AllDirectories))
+                // Ensure updateLoadingText is executed on the main thread
+                MainThreadDispatcher.Enqueue(() =>
                 {
-                    string relativePath = sourcePath.Substring(sourceFolderPath.Length + 1);
-                    string destinationPath = Path.Combine(destinationFolderPath, relativePath);
+                    loadingPanel.UpdateLoading(text, 0.45f);
+                });
+            }
+        );
+        await Task.Delay(5000);
+        // Load existing scene data if available, with fallback
+        SceneData data = await LoadSceneDataFromFile() ?? new SceneData();
 
-                    string destinationDirectory = Path.GetDirectoryName(destinationPath);
-                    if (!Directory.Exists(destinationDirectory))
-                    {
-                        Directory.CreateDirectory(destinationDirectory);
-                    }
+        loadingScreen.UpdateLoading("Creating Scene Data object...", 0.5f);
+        SceneData sceneData = new SceneData
+        {
+            levelName = customSongName.text,
+            sceneName = customSongName.text,
+            calculatedDifficulty = calculateDifficulty,
+            gameVersion = Application.version,
+            saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+            songLength = audio.clip != null ? audio.clip.length : 0,
+            artist = songArtist != null ? songArtist.text : "Unknown",
+            songName = customSongName.text,
+            ground = groundToggle != null && groundToggle.isOn,
+            levelLength = (int)(distance1 / 7),
+            creator = creator != null ? creator.text : "Unknown",
+            romanizedName = romaji != null ? romaji.text : "Unknown",
+            romanizedArtist = romajiArtist != null ? romajiArtist.text : "Unknown",
+            offset = float.TryParse(offsetmarker?.text, out float offsetValue) ? offsetValue : 0,
+            ID = (data.ID == 0) ? UnityEngine.Random.Range(int.MinValue, int.MaxValue) : data.ID
+        };
+        await Task.Delay(500);
+        loadingScreen.UpdateLoading("Populating objects...", 0.6f);
 
-                    File.Copy(sourcePath, destinationPath, true);
+        sceneData.cubePositions = this.cubes?.Select(cube => cube.transform.position).ToList() ?? new List<Vector3>();
+        sceneData.cubeType = this.cubes
+            ?.Select(cube =>
+            {
+                // Get the base name without "(Clone)"
+                string name = cube.gameObject.name.Replace("(Clone)", "").Trim();
+
+                // Look up the mapped integer value for the name
+                if (cubeTypeMapping.TryGetValue(name, out int mappedIndex))
+                {
+                    return mappedIndex;
                 }
-            });
+
+                return 1;
+            })
+            .ToList();
+        sceneData.sawPositions = saws?.Select(saw => saw.transform.position).ToList() ?? new List<Vector3>();
+        if (longCubes != null)
+        {
+            sceneData.longCubePositions = longCubes.Select(cube => cube.transform.position).ToList();
+            sceneData.longCubeWidth = longCubes.Select(cube => cube.GetComponent<SpriteRenderer>()?.size.x ?? 0).ToList();
         }
+
+        // Set source and destination paths for the scene
+        string sourceFolderPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneData.levelName);
+        string destinationFolderPath = Path.Combine(Application.persistentDataPath, "levels", sceneData.ID + " - " + sceneData.levelName);
+        await Task.Delay(500);
+        loadingScreen.UpdateLoading("Copying files...", 0.7f);
+        try
+        {
+            await CopyFilesAsync(sourceFolderPath, destinationFolderPath);
+        }
+        catch (Exception ex)
+        {
+            loadingScreen.HideLoadingScreen(); // Hide loading screen
+            return null;
+        }
+        await Task.Delay(500);
+        loadingScreen.UpdateLoading("Creating ZIP file...", 0.8f);
+        string exportFolder = Path.Combine(Application.persistentDataPath, "exports");
+        if (!Directory.Exists(exportFolder))
+            Directory.CreateDirectory(exportFolder);
+        string zipExport = Path.Combine(Application.persistentDataPath, "exports", $"{sceneData.ID} - {sceneData.sceneName}.jdl");
+        string zipFilePath = Path.Combine(Application.persistentDataPath, "levels", $"{sceneData.ID} - {sceneData.sceneName}.jdl");
+
+        try
+        {
+            if (File.Exists(zipFilePath))
+            {
+                File.Delete(zipFilePath);
+            }
+            if (File.Exists(zipExport))
+            {
+                File.Delete(zipExport);
+            }
+            ZipFile.CreateFromDirectory(destinationFolderPath, zipExport, System.IO.Compression.CompressionLevel.NoCompression, false, null);
+            ZipFile.CreateFromDirectory(destinationFolderPath, zipFilePath, System.IO.Compression.CompressionLevel.NoCompression, false, null);
+            // Delete the original copied folder
+            Directory.Delete(destinationFolderPath, true);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error creating ZIP file: {ex.Message}");
+            loadingScreen.HideLoadingScreen(); // Hide loading screen
+            return null;
+        }
+
+        loadingScreen.UpdateLoading("Level scene data created successfully.", 1f);
+        loadingScreen.HideLoadingScreen(); // Hide loading screen
+        return sceneData;
+    }
+
+    private void GetFarthestObjectOnMainThread(GameObject[] cubes, Action<Transform> callback)
+    {
+        // Check if cubes is null or empty
+        if (cubes == null || cubes.Length == 0)
+        {
+            callback(null); // Call the callback with null
+            return; // Early return if no cubes are provided
+        }
+
+        // Enqueue the action to run on the main thread
+        MainThreadDispatcher.Enqueue(() =>
+        {
+            // Run the FindFarthestObjectInX method on the main thread
+            Transform result = Calculator.FindFarthestObjectInX(cubes);
+
+            // Call the callback with the result
+            callback(result);
+        });
+    }
+
+    private Task CopyFilesAsync(string sourceFolderPath, string destinationFolderPath)
+    {
+        return Task.Run(() =>
+        {
+            foreach (string sourcePath in Directory.GetFiles(sourceFolderPath, "*", SearchOption.AllDirectories))
+            {
+                string relativePath = sourcePath.Substring(sourceFolderPath.Length + 1);
+                string destinationPath = Path.Combine(destinationFolderPath, relativePath);
+
+                string destinationDirectory = Path.GetDirectoryName(destinationPath);
+                if (!Directory.Exists(destinationDirectory))
+                {
+                    Directory.CreateDirectory(destinationDirectory);
+                }
+
+                File.Copy(sourcePath, destinationPath, true);
+            }
+        });
+    }
+
     }
 }

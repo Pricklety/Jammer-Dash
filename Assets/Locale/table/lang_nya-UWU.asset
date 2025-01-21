@@ -470,10 +470,6 @@ MonoBehaviour:
     m_Localized: join account!!!
     m_Metadata:
       m_Items: []
-  - m_Id: 13370845557272576
-    m_Localized: leave account :(
-    m_Metadata:
-      m_Items: []
   - m_Id: 13371624351444992
     m_Localized: display meow country!
     m_Metadata:

@@ -13,6 +13,7 @@ using JammerDash.Difficulty;
 using UnityEngine.Networking;
 using System.Text;
 using Newtonsoft.Json;
+using UnityEngine.Video;
 
 namespace JammerDash.Game
 {
@@ -265,6 +266,12 @@ namespace JammerDash.Game
         private IEnumerator End()
         {
             StartCoroutine(CustomLevelDataManager.Instance.LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "bgImage.png"), img));
+            if (File.Exists(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "backgroundVideo.mp4")))
+            {
+                img.texture = FindAnyObjectByType<VideoPlayer>().targetTexture;
+                
+            }
+            
             // Play the animation if available
             if (anim != null)
             {
@@ -384,7 +391,7 @@ namespace JammerDash.Game
         if (Account.Instance.loggedIn)
         {
             long score = player0.counter.score;
-            if (score > 0)
+            if (score > 0 && (!CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.auto) || CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.noSpikes)))
             {
                 StartCoroutine(UpdateUserScore(score));
             }

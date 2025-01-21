@@ -297,7 +297,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2246745174683648
-    m_Localized: Image
+    m_Localized: Background
     m_Metadata:
       m_Items: []
   - m_Id: 2246468149293056
@@ -470,10 +470,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 13369743621337088
     m_Localized: Log in
-    m_Metadata:
-      m_Items: []
-  - m_Id: 13370845557272576
-    m_Localized: Log out
     m_Metadata:
       m_Items: []
   - m_Id: 13371624351444992

@@ -100,6 +100,7 @@ providers = {
 objectSelectors = {
 }
 recentSearches = [
+	"st: options"
 	"at: tr(ja-JP):\"some value\""
 	"st: resta"
 	"st: failed"
@@ -119,7 +120,6 @@ recentSearches = [
 	"st: hide afk"
 	"st: hide currently"
 	"st: hide playing"
-	"st: blind"
 ]
 searchItemFavorites = [
 ]

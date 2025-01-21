@@ -26,8 +26,6 @@ namespace JammerDash.Audio
         public Text functionKeybind;
         public Font font;
         bool isLogoSFX = false;
-        public AudioClip sfxShort;
-        public AudioClip sfxLong;
         public bool shuffle = false;
         bool songPlayed = false;
         private float masterVolume = 1.0f;
@@ -95,8 +93,7 @@ namespace JammerDash.Audio
                 devText.gameObject.SetActive(false);
 
 
-            if (isLogoSFX)
-                sfxS.PlayOneShot(sfxShort);
+           
 
             // Initialize FileSystemWatcher
             string persistentPath = Application.persistentDataPath;
@@ -351,10 +348,35 @@ namespace JammerDash.Audio
         }
         private void Update()
         {
-            if (audios == null || volClickClip == null) return;
-
             // Handle global keybinds
-            HandleGlobalKeybinds();
+           SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+
+            // Example global keybind: Fullscreen toggle
+            if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.Return))
+            {
+                KeybindPanel.ToggleFunction("Toggle fullscreen", "Alt + Enter");
+            }
+
+            // Toggle UI globally
+            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeybindingManager.toggleUI))
+            {
+                data.canvasOff = !data.canvasOff;
+                SettingsFileHandler.SaveSettingsToFile(data);
+                KeybindPanel.ToggleFunction("Toggle gameplay interface", $"Shift + {KeybindingManager.toggleUI}");
+            }
+
+            if (Input.GetKey(KeyCode.F2) && menu.playPanel.activeSelf) 
+            {
+                KeybindPanel.ToggleFunction("Random level", "F2");
+            }
+
+            bool gain = master.audioMixer.GetFloat("Gain", value: out float a);
+            if (a != data.bassgain)
+            {
+                master.audioMixer.SetFloat("Gain", data.bass ? data.bassgain : 1f);
+            }
+
+
 
             // Scene-specific logic
             if (currentSceneIndex == 1)
@@ -434,36 +456,6 @@ namespace JammerDash.Audio
 
         }
 
-        private void HandleGlobalKeybinds()
-        {
-            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-
-            // Example global keybind: Fullscreen toggle
-            if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.Return))
-            {
-                KeybindPanel.ToggleFunction("Toggle fullscreen", "Alt + Enter");
-            }
-
-            // Toggle UI globally
-            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeybindingManager.toggleUI))
-            {
-                data.canvasOff = !data.canvasOff;
-                SettingsFileHandler.SaveSettingsToFile(data);
-                KeybindPanel.ToggleFunction("Toggle gameplay interface", $"Shift + {KeybindingManager.toggleUI}");
-            }
-
-            if (Input.GetKey(KeyCode.F2) && menu.playPanel.activeSelf) 
-            {
-                KeybindPanel.ToggleFunction("Random level", "F2");
-            }
-
-            bool gain = master.audioMixer.GetFloat("Gain", value: out float a);
-            if (a != data.bassgain)
-            {
-                master.audioMixer.SetFloat("Gain", data.bass ? data.bassgain : 1f);
-            }
-
-        }
 
         private void HandleSceneSpecificLogic()
         {
@@ -508,6 +500,8 @@ namespace JammerDash.Audio
             case "Master":
                 foreach (AudioSource audio in audios)
                 {
+                    if (audio.outputAudioMixerGroup != null)
+                        audio.outputAudioMixerGroup = master;
                     audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", newVolume - value);
                     slider.GetComponentInChildren<Text>().text = $"{category}: {newVolume}dB";
                 } 

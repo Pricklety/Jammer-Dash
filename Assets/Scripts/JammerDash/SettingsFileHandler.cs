@@ -57,8 +57,8 @@ namespace JammerDash
         public int selectedFPS = 60;
         public bool vsync = true;
         public float volume = 0;
-        public float musicVol = 0.75f;
-        public float sfxVol = 1;
+        public float musicVol = 0.40f;
+        public float sfxVol = 0.60f;
         public int backgroundType = 0;
         public bool sfx = true;
         public bool hitNotes = true;

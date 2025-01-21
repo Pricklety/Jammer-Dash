@@ -129,6 +129,7 @@ namespace JammerDash.Menus
         public string artist; // Artist name on the level item
         public string path; // Level's extracted path
         public int levelRow = -1; // Selected level index
+        public Text scoreMult;
       
         [Header("Video Background")]
         public GameObject videoPlayerObject; // Video player object
@@ -148,6 +149,7 @@ namespace JammerDash.Menus
 
         [Header("Profile")]
         public Text[] usernames; // Array of texts that only display the player's username
+        public RawImage[] avatars; // Array of images that display the player's avatar
         public Text nickname; // Text object in the community panel displaying your nickname
         public Text spMain; // main SP text (handles the "SP: sp" text)
         public Text[] sps; // sp texts (handles the "{sp}sp" texts)
@@ -155,10 +157,12 @@ namespace JammerDash.Menus
         public Text roleText;
         public GameObject adminButton;
 
+        public InputField[] editUser; // Edit user panel - Input fields 
+
         // Lookup
         public InputField lookup;
         public Button lookupButton;
-
+        public RawImage lookupPfp;
         public Text lookupUser;
         public Text lookupRole;
         public Text lookupCountry;
@@ -324,6 +328,7 @@ namespace JammerDash.Menus
     }
      private void UpdateUserProfile(User user)
     {
+        StartCoroutine(LoadPfp(user.pfp));
         lookupNickname.text = user.display_name ?? "None";
         lookupCountry.text = $"{user.country} // {user.region}";
         lookupFlag.sprite = Resources.Load<Sprite>("icons/countries/" + user.country_code);
@@ -332,6 +337,24 @@ namespace JammerDash.Menus
         lookupJoin.text = $"Joined at {user.joined}";
         lookupUUID.text = $"UUID: {user.uuid}";
     }
+
+    IEnumerator LoadPfp(string uri) 
+    {
+                    using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(uri))
+                    {
+                        yield return request.SendWebRequest();
+        
+                        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+                        {
+                            Debug.LogError($"Error downloading profile picture: {request.error}");
+                            lookupPfp.texture = Resources.Load<Texture>("defaultPFP");
+                        }
+                        else
+                        {
+                            lookupPfp.texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+                        }
+                    }
+                }
     public void SetAdmin()
     {
         StartCoroutine(EditUserCoroutine());
@@ -608,6 +631,11 @@ namespace JammerDash.Menus
             Debug.Log(pass);
             StartCoroutine(Account.Instance.ApplyLogin(usernameInput1.text, pass));
             loginPage.SetActive(false);
+        }
+
+        
+        public void EditAcc() {
+            StartCoroutine(Account.Instance.EditUser(editUser[0].text, editUser[1].text, editUser[2].text, editUser[3].text));
         }
 
         public void Logout() {
@@ -1264,7 +1292,7 @@ switch (data.backgroundType)
             yield return null;
         }
 
-
+        
         public void ShowQuit()
         {
             quitPanel.SetActive(true);
@@ -1524,7 +1552,7 @@ public void FixedUpdate()
         UpdateStatsText();
         nextUpdateTime = Time.time + updateInterval;
     }
-
+    backgroundVideo.gameObject.SetActive(SettingsFileHandler.LoadSettingsFromFile().backgroundType == 4);
     HandleQuitPanel();
     UpdateBackgroundParallax();
     HandleEscapeInput();
@@ -1532,6 +1560,8 @@ public void FixedUpdate()
 
     string role = Account.Instance.role;
     adminButton.SetActive(role.Contains("Developer"));
+
+    scoreMult.text = $"Score Multiplier: {CustomLevelDataManager.Instance.scoreMultiplier:0.00}x";
 }
 
         private void UpdateShuffleImage()
@@ -1553,6 +1583,10 @@ public void FixedUpdate()
             }
             nickname.text = $"@{Account.Instance.username}";
             roleText.text = Account.Instance.role;
+
+            foreach (RawImage image in avatars) {
+                image.texture = Account.Instance.pfp;
+            }
         }
 
       
@@ -1893,6 +1927,11 @@ public void FixedUpdate()
                 musicPanel.SetActive(false);
             }
         }
+
+        public void RandomSeed(string value) {
+            int value1 = int.Parse(value);
+            CustomLevelDataManager.Instance.seed = value1;
+        }
     }
 
     [Serializable]
@@ -1920,6 +1959,7 @@ public void FixedUpdate()
         public string country_code;
         public string joined;
         public string uuid;
+        public string pfp;
     }
 
     [System.Serializable]
