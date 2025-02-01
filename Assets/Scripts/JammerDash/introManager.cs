@@ -13,25 +13,35 @@ namespace JammerDash
         public Text introtext;
         public AudioSource source;
 
-
+        void Awake() {
+             bool doesPathExist = File.Exists(Path.Combine(Application.persistentDataPath, "path.txt"));
+               
+                if (doesPathExist) {
+                     string path = File.ReadAllText(Path.Combine(Application.persistentDataPath, "path.txt"));
+                     
+                Main.gamePath = path;
+                }
+                else if (!doesPathExist)
+                Main.gamePath = Application.persistentDataPath;
+        }
         void Start()
         {
 
-            if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "backgrounds")))
+            if (!Directory.Exists(Path.Combine(Main.gamePath, "backgrounds")))
             {
-                Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "backgrounds"));
+                Directory.CreateDirectory(Path.Combine(Main.gamePath, "backgrounds"));
             }
-            if (!File.Exists(Path.Combine(Application.persistentDataPath, "scores.dat"))) {
-                File.Create(Path.Combine(Application.persistentDataPath, "scores.dat")).Dispose();
+            if (!File.Exists(Path.Combine(Main.gamePath, "scores.dat"))) {
+                File.Create(Path.Combine(Main.gamePath, "scores.dat")).Dispose();
             }
-            if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "scenes")))
+            if (!Directory.Exists(Path.Combine(Main.gamePath, "scenes")))
             {
-                Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "scenes"));
+                Directory.CreateDirectory(Path.Combine(Main.gamePath, "scenes"));
             }
-            if (!Directory.Exists(Path.Combine(Application.persistentDataPath, "levels")))
+            if (!Directory.Exists(Path.Combine(Main.gamePath, "levels")))
             {
-                Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "levels"));
-                Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "levels", "extracted"));
+                Directory.CreateDirectory(Path.Combine(Main.gamePath, "levels"));
+                Directory.CreateDirectory(Path.Combine(Main.gamePath, "levels", "extracted"));
             }
             if (!PlayerPrefs.HasKey("bootSafe031"))
             {

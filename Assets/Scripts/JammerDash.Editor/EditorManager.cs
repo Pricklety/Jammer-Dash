@@ -55,14 +55,12 @@ namespace JammerDash.Editor
         public Image bgColorSel;
         public GameObject grSelector;
         public Toggle bgImage;
-        public GameObject bgimgblur;
         public GameObject bgSelector;
         public RawImage bgPreview;
         public RawImage camBG;
         public GameObject camBG1;
         public VideoPlayer videoPlayer;
         public GameObject bgSel;
-        public Toggle groundToggle;
         public InputField sceneNameInput;
         public GameObject bgPic; // Reference to the bgPic game object
         public GameObject musicPanel;
@@ -117,14 +115,14 @@ namespace JammerDash.Editor
         public GameObject sawPrefab;
         public GameObject longCubePrefab;
         public Transform parentTransform;
-        public List<Vector3> cubePositions = new();
-        public List<Vector3> sawPositions = new();
-        public List<Vector3> longCubePositions = new();
+        public List<Vector2> cubePositions = new();
+        public List<Vector2> sawPositions = new();
+        public List<Vector2> longCubePositions = new();
         public List<float> longCubeWidth = new();
         public string imageTexturePath;
         public string imageParentPath;
         public Color backgroundColor;
-        public string sceneNameInBundle;
+        public string nameInBundle;
         public List<GameObject> cubes; // List of cube game objects
         public List<GameObject> saws; // List of saw game objects
         public List<GameObject> longCubes;
@@ -340,8 +338,8 @@ namespace JammerDash.Editor
             cubes = new List<GameObject>();
             saws = new List<GameObject>();
             longCubes = new();
-            string sceneName = customSongName.text;
-            string filePath = GetSceneDataPath(scene.ID, scene.sceneName);
+            string name = customSongName.text;
+            string filePath = GetSceneDataPath(scene.ID, scene.name);
             ID = scene.ID;
             if (File.Exists(filePath))
             {
@@ -424,10 +422,10 @@ namespace JammerDash.Editor
                     collider.offset = new Vector2(width / 2, 0f);
                     longCubes.Add(longCubeObject);
                 }
-                StartCoroutine(LoadImageCoroutine(Path.Combine(Application.persistentDataPath, "scenes", $"{scene.ID} - {scene.sceneName}", "bgImage.png")));
+                StartCoroutine(LoadImageCoroutine(Path.Combine(Main.gamePath, "scenes", $"{scene.ID} - {scene.name}", "bgImage.png")));
                 bpm.text = sceneData.bpm.ToString();
                 color1.startingColor = sceneData.defBGColor;
-                StartCoroutine(LoadAudioClip(Path.Combine(Application.persistentDataPath, "scenes", $"{scene.ID} - {scene.sceneName}", $"{sceneData.artist} - {sceneData.songName}.mp3")));
+                StartCoroutine(LoadAudioClip(Path.Combine(Main.gamePath, "scenes", $"{scene.ID} - {scene.name}", $"{sceneData.artist} - {sceneData.songName}.mp3")));
                 creator.text = sceneData.creator;
                 romaji.text = sceneData.romanizedName;
                 romajiArtist.text = sceneData.romanizedArtist;
@@ -589,7 +587,7 @@ private void OnVideoPrepared(VideoPlayer source)
                 SceneData sceneData = await CreateLevelSceneData(loadingPanel);
 
 
-                Notifications.instance.Notify($"{sceneData.sceneName} successfully exported with ID {sceneData.ID}.", null);
+                Notifications.instance.Notify($"{sceneData.name} successfully exported with ID {sceneData.ID}.", null);
             }
             catch (Exception e)
             {
@@ -682,7 +680,7 @@ private void OnVideoPrepared(VideoPlayer source)
             lengthSlider.value = cam.transform.position.x / 7;
             GameObject[] beats = GameObject.FindGameObjectsWithTag("Beat");
 
-
+            bgPic.SetActive(bgImage.isOn);
             size.gameObject.GetComponentInChildren<Text>().text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Cube size")}: {size.value}x";
             hp.gameObject.GetComponentInChildren<Text>().text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Player HP")}: {hp.value}";
 
@@ -769,7 +767,6 @@ private void OnVideoPrepared(VideoPlayer source)
 
 
 
-            bgColorSel.color = cam.backgroundColor;
 
             if (Input.GetKey(KeybindingManager.deleteBPM) && Input.GetKey(KeybindingManager.delete))
             {
@@ -782,6 +779,7 @@ private void OnVideoPrepared(VideoPlayer source)
             ray = Camera.main.ScreenPointToRay(Input.mousePosition.normalized);
 
             Camera.main.backgroundColor = color1.GetColor();
+            bgColorSel.color = color1.GetColor();
 
             Vector2 screenPos = new(Input.mousePosition.x, Input.mousePosition.y);
             Vector2 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
@@ -1011,27 +1009,9 @@ private void OnVideoPrepared(VideoPlayer source)
                 player.transform.position = new Vector2(0, -1);
             }
 
-            if (bgImage.isOn)
-            {
-                bgimgblur.SetActive(false);
-                camBG1.SetActive(true);
-            }
-            else
-            {
-                bgimgblur.SetActive(true);
-                camBG1.SetActive(false);
-            }
+            
 
-            if (!groundToggle.isOn)
-            {
-                ground.SetActive(false);
-                elev.SetActive(false);
-            }
-            else
-            {
-                ground.SetActive(true);
-                elev.SetActive(true);
-            }
+            
 
             if (player.enabled)
             {
@@ -1182,7 +1162,7 @@ private void OnVideoPrepared(VideoPlayer source)
         }
         public void OpenSongFolder()
         {
-            string path = @Path.Combine(Application.persistentDataPath, "scenes", $"{ID} - {customSongName.text}");
+            string path = @Path.Combine(Main.gamePath, "scenes", $"{ID} - {customSongName.text}");
             path = path.Replace("\\", "/");
             string normalizedPath = Path.GetFullPath(path);
             Process.Start("explorer.exe", normalizedPath);
@@ -1240,11 +1220,11 @@ private void OnVideoPrepared(VideoPlayer source)
 
 
 
-        private string GetSceneDataPath(int ID, string sceneName)
+        private string GetSceneDataPath(int ID, string name)
         {
-            string directoryPath = Path.Combine(Application.persistentDataPath, "scenes", $"{ID} - {sceneName}");
+            string directoryPath = Path.Combine(Main.gamePath, "scenes", $"{ID} - {name}");
 
-            string filePath = Path.Combine(directoryPath, sceneName + ".json");
+            string filePath = Path.Combine(directoryPath, name + ".json");
             return filePath;
         }
 
@@ -1381,16 +1361,17 @@ private void OnVideoPrepared(VideoPlayer source)
                 string json = JsonUtility.ToJson(sceneData, true);
 
                 // Get the file path based on the scene name
-                string filePath = GetSceneDataPath(sceneData.ID, sceneData.sceneName);
+                string filePath = GetSceneDataPath(sceneData.ID, sceneData.name);
 
                 // Write the JSON data to the file
                 File.WriteAllText(filePath, json);
 
-                Notifications.instance.Notify($"{sceneData.sceneName} successfully saved.", null);
+                Notifications.instance.Notify($"{sceneData.name} successfully saved.", null);
             }
             catch (Exception e)
             {
                 Notifications.instance.Notify($"Oops, something wrong happened!\nTry again later.", null);
+                Debug.LogError("Error while saving/exporting level: " + e);
             }
         }
 
@@ -1406,7 +1387,7 @@ private void OnVideoPrepared(VideoPlayer source)
                 string json = JsonUtility.ToJson(sceneData, true);
 
                 // Get the file path based on the scene name
-                string filePath = GetSceneDataPath(sceneData.ID, sceneData.sceneName);
+                string filePath = GetSceneDataPath(sceneData.ID, sceneData.name);
 
                 // Write the JSON data to the file
                 File.WriteAllText(filePath, json);
@@ -1452,7 +1433,7 @@ private void OnVideoPrepared(VideoPlayer source)
 
         private async Task<SceneData> LoadSceneDataFromFile()
         {
-            string path = Path.Combine(Application.persistentDataPath, "scenes", ID.ToString() + " - " + sceneNameInput.text, sceneNameInput.text + ".json");
+            string path = Path.Combine(Main.gamePath, "scenes", ID.ToString() + " - " + sceneNameInput.text, sceneNameInput.text + ".json");
             SceneData data = null;
 
             if (File.Exists(path))
@@ -1507,7 +1488,7 @@ private void OnVideoPrepared(VideoPlayer source)
         });
 
         await Task.Delay(500);
-        float calculateDifficulty = await Calculator.CalculateDifficultyAsync(
+            float calculateDifficulty = await Calculator.CalculateDifficultyAsync(
             this.cubes,
             saws,
             longCubes,
@@ -1524,25 +1505,22 @@ private void OnVideoPrepared(VideoPlayer source)
                 });
             }
         );
-        await Task.Delay(5000);
-
+        await Task.Delay(3000);
         // Load existing scene data if available, with fallback
         SceneData data = await LoadSceneDataFromFile() ?? new SceneData();
 
         loadingScreen.UpdateLoading("Creating Scene Data object...", 0.5f);
-        SceneData sceneData = new SceneData
+        SceneData sceneData = new SceneData // This is the sceneData for edit levels
         {
-            sceneName = customSongName.text,
-            bpm = int.TryParse(bpmInput.text, out int bpmValue) ? bpmValue : 0,
+            version = 2,
+            name = customSongName.text,
             calculatedDifficulty = calculateDifficulty,
-            gameVersion = Application.version,
+            bpm = int.TryParse(bpmInput.text, out int bpmValue) ? bpmValue : 0,
             saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             songLength = audio.clip != null ? audio.clip.length : 0,
-            ground = groundToggle != null && groundToggle.isOn,
-            levelLength = (int)(distance1 / 7),
             creator = creator != null ? creator.text : "Unknown",
-            romanizedName = romaji != null ? romaji.text : "Unknown",
-            romanizedArtist = romajiArtist != null ? romajiArtist.text : "Unknown",
+            romanizedName = romajiArtist != null ? romajiArtist.text : "Unknown",
+            romanizedArtist = romaji != null ? romaji.text : "Unknown",
             playerHP = hp != null ? (int)hp.value : 300,
             boxSize = size != null ? size.value : 1,
             artist = songArtist != null ? songArtist.text : "Unknown",
@@ -1551,24 +1529,25 @@ private void OnVideoPrepared(VideoPlayer source)
             ID = (data.ID == 0) ? UnityEngine.Random.Range(int.MinValue, int.MaxValue) : data.ID,
             defBGColor = Camera.main != null ? Camera.main.backgroundColor : Color.black
         };
-        await Task.Delay(500);
         loadingScreen.UpdateLoading("Saving background image if enabled...", 0.6f);
 
         // Save background image or video if enabled
         if (bgPreview != null && bgPreview.texture != null && bgImage != null && bgImage.isOn)
         {
-            string sceneFolderPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneData.sceneName);
+            string sceneFolderPath = Path.Combine(Main.gamePath, "scenes", sceneData.ID + " - " + sceneData.name);
             Directory.CreateDirectory(sceneFolderPath);
 
             if (camBG != null)
             {
                 // Save the video file
                 string videoFilePath = Path.Combine(sceneFolderPath, "backgroundVideo.mp4");
+                if (videoPlayer.url != Path.Combine(sceneFolderPath, "backgroundVideo.mp4"))
                 File.Copy(videoPlayer.url, videoFilePath, true);
 
                 // Extract the first frame of the video and save it as bgImage.png
                 string bgImagePath = Path.Combine(sceneFolderPath, "bgImage.png");
-                await SaveFirstFrameAsImage(videoPlayer.url, bgImagePath);
+                loadingScreen.UpdateLoading("Generating thumbnail...", 0.65f);
+                await SaveFrameAsImage(videoPlayer.url, bgImagePath);
             }
             else
             {
@@ -1577,14 +1556,13 @@ private void OnVideoPrepared(VideoPlayer source)
                 SaveBackgroundImageTexture(bgImagePath);
             }
         }
-        await Task.Delay(500);
         loadingScreen.UpdateLoading("Processing positions for cubes, saws, and long cubes...", 0.7f);
-        sceneData.cubePositions = this.cubes?.Select(cube => cube.transform.position).ToList() ?? new List<Vector3>();
+        sceneData.cubePositions = this.cubes?.Select(cube => (Vector2)cube.transform.position).ToList() ?? new List<Vector2>();
         sceneData.cubeType = this.cubes
             ?.Select(cube =>
             {
                 // Get the base name without "(Clone)"
-                string name = cube.gameObject.name.Replace("(Clone)", "").Trim();
+                string name = cube.name.Replace("(Clone)", "").Trim();
 
                 // Look up the mapped integer value for the name
                 if (cubeTypeMapping.TryGetValue(name, out int mappedIndex))
@@ -1596,48 +1574,75 @@ private void OnVideoPrepared(VideoPlayer source)
             })
             .ToList(); // Convert to a list if sceneData.cubeType expects one
 
-        sceneData.sawPositions = saws?.Select(saw => saw.transform.position).ToList() ?? new List<Vector3>();
+        sceneData.sawPositions = saws?.Select(saw => (Vector2)saw.transform.position).ToList() ?? new List<Vector2>();
         if (longCubes != null)
         {
-            sceneData.longCubePositions = longCubes.Select(cube => cube.transform.position).ToList();
+            sceneData.longCubePositions = longCubes.Select(cube => (Vector2)cube.transform.position).ToList();
             sceneData.longCubeWidth = longCubes.Select(cube => cube.GetComponent<SpriteRenderer>()?.size.x ?? 0).ToList();
         }
 
         loadingScreen.UpdateLoading("Scene data created successfully.", 1f);
+        await Task.Delay(100);
         loadingScreen.HideLoadingScreen(); // Hide loading screen
         return sceneData;
     }
 
-    private async Task SaveFirstFrameAsImage(string videoFilePath, string imagePath)
+   private async Task SaveFrameAsImage(string videoFilePath, string imagePath)
+{
+    // Create VideoPlayer object and set it up
+    VideoPlayer videoPlayer = new GameObject("VideoPlayer").AddComponent<VideoPlayer>();
+    videoPlayer.url = videoFilePath;
+    videoPlayer.renderMode = VideoRenderMode.RenderTexture;
+    
+    RenderTexture renderTexture = new RenderTexture(1920, 1080, 0);
+    videoPlayer.targetTexture = renderTexture;
+
+    videoPlayer.Prepare();
+    while (!videoPlayer.isPrepared)
     {
-        VideoPlayer videoPlayer = new GameObject("VideoPlayer").AddComponent<VideoPlayer>();
-        videoPlayer.url = videoFilePath;
-        videoPlayer.renderMode = VideoRenderMode.RenderTexture;
-        RenderTexture renderTexture = new RenderTexture(1920, 1080, 0);
-        videoPlayer.targetTexture = renderTexture;
-
-        videoPlayer.Prepare();
-        while (!videoPlayer.isPrepared)
-        {
-            await Task.Yield();
-        }
-
-        videoPlayer.Play();
-        videoPlayer.Pause();
-
-        Texture2D texture = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGB24, false);
-        RenderTexture.active = renderTexture;
-        texture.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
-        texture.Apply();
-        RenderTexture.active = null;
-
-        byte[] bytes = texture.EncodeToPNG();
-        File.WriteAllBytes(imagePath, bytes);
-
-        Destroy(videoPlayer.gameObject);
-        Destroy(renderTexture);
-        Destroy(texture);
+        await Task.Yield(); // Wait until video is prepared
     }
+
+    // Calculate the middle time of the video
+    double videoDuration = videoPlayer.length;
+    double middleTime = videoDuration / 2.0;
+
+    // Seek to the middle of the video and play
+    videoPlayer.time = middleTime;
+    videoPlayer.Play();
+
+    // Wait for the frame to be rendered (make sure it's fully ready)
+    await WaitForFrameToRender(videoPlayer);
+
+    // Pause the video after rendering the frame
+    videoPlayer.Pause();
+
+    // Create a texture to read the frame
+    Texture2D texture = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGB24, false);
+    RenderTexture.active = renderTexture;
+    texture.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
+    texture.Apply();
+    RenderTexture.active = null;
+
+    // Encode texture as PNG and save it
+    byte[] bytes = texture.EncodeToPNG();
+    File.WriteAllBytes(imagePath, bytes);
+
+    // Clean up
+    Destroy(videoPlayer.gameObject);
+    Destroy(renderTexture);
+    Destroy(texture);
+}
+private async Task WaitForFrameToRender(VideoPlayer videoPlayer)
+{
+    while (!videoPlayer.isPlaying)
+    {
+        await Task.Yield();
+    }
+
+    await Task.Delay(1500); 
+}
+
 
     private async Task<SceneData> CreateLevelSceneData(LoadingScreen loadingScreen)
     {
@@ -1645,9 +1650,10 @@ private void OnVideoPrepared(VideoPlayer source)
 
         loadingScreen.UpdateLoading("Retrieving cubes...", 0f);
         GameObject[] cubes = await GetCubesOnMainThread(loadingPanel);
-        if (cubes == null)
+        if (cubes == null || cubes.Count() == 0)
         {
             loadingScreen.HideLoadingScreen(); // Hide loading screen
+            Notifications.instance.Notify("You can't export an empty level.", null);
             return null;
         }
         await Task.Delay(500);
@@ -1655,7 +1661,7 @@ private void OnVideoPrepared(VideoPlayer source)
         int cubeCount = cubes.Length;
         loadingScreen.UpdateLoading($"Gathering cube positions... Retrieved {cubeCount} cubes", 0.1f);
         List<Vector2> cubePositions = cubes.Select(cube => (Vector2)cube.transform.position).ToList();
-        await Task.Delay(500);
+        await Task.Delay(100);
         loadingScreen.UpdateLoading("Calculating farthest object...", 0.2f);
         float distance1 = 0f;
         GetFarthestObjectOnMainThread(cubes, (targetObject) =>
@@ -1678,7 +1684,6 @@ private void OnVideoPrepared(VideoPlayer source)
             float.Parse(bpmInput.text),
             updateLoadingText: (text) =>
             {
-                // Ensure updateLoadingText is executed on the main thread
                 MainThreadDispatcher.Enqueue(() =>
                 {
                     loadingPanel.UpdateLoading(text, 0.45f);
@@ -1686,32 +1691,59 @@ private void OnVideoPrepared(VideoPlayer source)
             }
         );
         await Task.Delay(5000);
-        // Load existing scene data if available, with fallback
         SceneData data = await LoadSceneDataFromFile() ?? new SceneData();
+        
+        loadingScreen.UpdateLoading("Creating Level info...", 0.5f);
+        int levelLength = (int)(distance1 / 7);
+        int numSections = Mathf.Max(1, levelLength / 10);
 
-        loadingScreen.UpdateLoading("Creating Scene Data object...", 0.5f);
+        Section[] sections = new Section[numSections];
+
+        for (int i = 0; i < numSections; i++)
+{
+    float sectionStart = i * 10;
+    float sectionEnd = sectionStart + 10;
+
+    sections[i] = new Section
+    {
+        sectionBegin = sectionStart,
+        sectionEnd = sectionEnd,
+        bpm = int.TryParse(bpmInput.text, out int bpmValue2) ? bpmValue2 : 0,
+        difficulty = Calculator.CalculateSectionDifficulty(
+            cubes.ToList(),
+            saws,
+            longCubes,
+            cubePositions.ToArray(),
+            bpmValue2,
+            i,
+            10
+        )
+    };
+}
+
         SceneData sceneData = new SceneData
         {
-            levelName = customSongName.text,
-            sceneName = customSongName.text,
+            version = 2,
+            name = customSongName.text,
             calculatedDifficulty = calculateDifficulty,
             gameVersion = Application.version,
             saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             songLength = audio.clip != null ? audio.clip.length : 0,
             artist = songArtist != null ? songArtist.text : "Unknown",
             songName = customSongName.text,
-            ground = groundToggle != null && groundToggle.isOn,
             levelLength = (int)(distance1 / 7),
             creator = creator != null ? creator.text : "Unknown",
             romanizedName = romaji != null ? romaji.text : "Unknown",
             romanizedArtist = romajiArtist != null ? romajiArtist.text : "Unknown",
             offset = float.TryParse(offsetmarker?.text, out float offsetValue) ? offsetValue : 0,
-            ID = (data.ID == 0) ? UnityEngine.Random.Range(int.MinValue, int.MaxValue) : data.ID
+            bpm = int.TryParse(bpmInput.text, out int bpmValue) ? bpmValue : 0,
+            ID = (data.ID == 0) ? UnityEngine.Random.Range(int.MinValue, int.MaxValue) : data.ID,
+            sections = sections
         };
-        await Task.Delay(500);
+        await Task.Delay(5000);
         loadingScreen.UpdateLoading("Populating objects...", 0.6f);
 
-        sceneData.cubePositions = this.cubes?.Select(cube => cube.transform.position).ToList() ?? new List<Vector3>();
+        sceneData.cubePositions = this.cubes?.Select(cube => (Vector2)cube.transform.position).ToList() ?? new List<Vector2>();
         sceneData.cubeType = this.cubes
             ?.Select(cube =>
             {
@@ -1727,16 +1759,16 @@ private void OnVideoPrepared(VideoPlayer source)
                 return 1;
             })
             .ToList();
-        sceneData.sawPositions = saws?.Select(saw => saw.transform.position).ToList() ?? new List<Vector3>();
+        sceneData.sawPositions = saws?.Select(saw => (Vector2)saw.transform.position).ToList() ?? new List<Vector2>();
         if (longCubes != null)
         {
-            sceneData.longCubePositions = longCubes.Select(cube => cube.transform.position).ToList();
+            sceneData.longCubePositions = longCubes.Select(cube => (Vector2)cube.transform.position).ToList();
             sceneData.longCubeWidth = longCubes.Select(cube => cube.GetComponent<SpriteRenderer>()?.size.x ?? 0).ToList();
         }
 
         // Set source and destination paths for the scene
-        string sourceFolderPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneData.levelName);
-        string destinationFolderPath = Path.Combine(Application.persistentDataPath, "levels", sceneData.ID + " - " + sceneData.levelName);
+        string sourceFolderPath = Path.Combine(Main.gamePath, "scenes", sceneData.ID + " - " + sceneData.name);
+        string destinationFolderPath = Path.Combine(Main.gamePath, "levels", sceneData.ID + " - " + sceneData.name);
         await Task.Delay(500);
         loadingScreen.UpdateLoading("Copying files...", 0.7f);
         try
@@ -1746,15 +1778,17 @@ private void OnVideoPrepared(VideoPlayer source)
         catch (Exception ex)
         {
             loadingScreen.HideLoadingScreen(); // Hide loading screen
+            Debug.LogWarning("Something wrong happened: " + ex);
+            Notifications.instance.Notify("Something happened and exporting failed.\nPlease report this issue by sending the player logs.", () => Process.Start(JammerDash.Main.gamePath + "/Player.log"));
             return null;
         }
         await Task.Delay(500);
         loadingScreen.UpdateLoading("Creating ZIP file...", 0.8f);
-        string exportFolder = Path.Combine(Application.persistentDataPath, "exports");
+        string exportFolder = Path.Combine(Main.gamePath, "exports");
         if (!Directory.Exists(exportFolder))
             Directory.CreateDirectory(exportFolder);
-        string zipExport = Path.Combine(Application.persistentDataPath, "exports", $"{sceneData.ID} - {sceneData.sceneName}.jdl");
-        string zipFilePath = Path.Combine(Application.persistentDataPath, "levels", $"{sceneData.ID} - {sceneData.sceneName}.jdl");
+        string zipExport = Path.Combine(Main.gamePath, "exports", $"{sceneData.ID} - {sceneData.name}.jdl");
+        string zipFilePath = Path.Combine(Main.gamePath, "levels", $"{sceneData.ID} - {sceneData.name}.jdl");
 
         try
         {
@@ -1777,7 +1811,7 @@ private void OnVideoPrepared(VideoPlayer source)
             loadingScreen.HideLoadingScreen(); // Hide loading screen
             return null;
         }
-
+        await Task.Delay(250);
         loadingScreen.UpdateLoading("Level scene data created successfully.", 1f);
         loadingScreen.HideLoadingScreen(); // Hide loading screen
         return sceneData;

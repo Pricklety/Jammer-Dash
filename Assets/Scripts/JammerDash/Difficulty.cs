@@ -24,7 +24,7 @@ namespace JammerDash.Difficulty
             try
             {
                 // Read all lines from the file
-                var rows = File.ReadAllLines(Path.Combine(Application.persistentDataPath, filePath));
+                var rows = File.ReadAllLines(Path.Combine(Main.gamePath, filePath));
 
                 foreach (var row in rows)
                 {
@@ -73,7 +73,7 @@ namespace JammerDash.Difficulty
             try
             {
                 // Read all lines from the file
-                var rows = File.ReadAllLines(Path.Combine(Application.persistentDataPath, filePath));
+                var rows = File.ReadAllLines(Path.Combine(Main.gamePath, filePath));
 
                 stats.TotalPlays = rows.Length;
 
@@ -127,7 +127,7 @@ namespace JammerDash.Difficulty
             try
             {
                 // Read all lines from the file
-                var rows = File.ReadAllLines(Path.Combine(Application.persistentDataPath, filePath));
+                var rows = File.ReadAllLines(Path.Combine(Main.gamePath, filePath));
 
                 // A dictionary to track the highest third entry (3rd column) per level ID (1st column)
                 Dictionary<string, float> levelMaxThirdValues = new Dictionary<string, float>();
@@ -234,29 +234,24 @@ namespace JammerDash.Difficulty
             Debug.Log($"Section {sectionIndex} difficulty: {sectionDifficulty}");
         }
 
-        foreach (var section in sectionDifficulties)
-        {
-            difficulty += section;
-        }
+        difficulty = sectionDifficulties.Average();
 
         // Apply additional impacts
         difficulty += CalculateHealthImpact(hp);
         difficulty += CalculateSizeImpact(size);
 
-        // Scale difficulty based on BPM
-        difficulty *= Mathf.Clamp(bpm * 0.1f, 1f, 5f); // Adjust the scale with BPM for reasonable results
 
-        Debug.Log($"Final difficulties: {difficulty} / 30: {difficulty / 30}");
+        Debug.Log($"Final difficulties: {difficulty}");
 
         // Apply final scaling to match desired difficulty progression
         if (difficulty < 0.01f) difficulty = 0.01f;
 
-        return Task.FromResult(difficulty / 30);
+        return Task.FromResult(difficulty);
     }
     catch (Exception e)
     {
         Debug.LogError(e);
-        return Task.FromResult(0f);
+        return Task.FromResult(0.01f);
     }
 }
  public static float CalculateSectionDifficulty(
@@ -369,7 +364,7 @@ public static float CalculateLongCubeImpact(List<GameObject> sectionLongCubes)
     // Long cubes add more difficulty to the section
     foreach (GameObject longCube in sectionLongCubes)
     {
-        longCubeImpact += 1f; // Adjust this number based on the impact you want
+        longCubeImpact += 1.55f;
     }
 
     return longCubeImpact;

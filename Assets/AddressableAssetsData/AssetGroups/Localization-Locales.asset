@@ -57,6 +57,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - Locale
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7202339fee618254f9cd688b1eb17e4f
+    m_Address: French (fr)
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a46810f867c578a4d86a4127d2b718de
     m_Address: Japanese (Japan) (ja-JP)
     m_ReadOnly: 1

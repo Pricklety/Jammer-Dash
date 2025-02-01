@@ -374,10 +374,6 @@ MonoBehaviour:
     m_Localized: Ricerca...
     m_Metadata:
       m_Items: []
-  - m_Id: 2500536736399360
-    m_Localized: "Modalit\xE0 cieca"
-    m_Metadata:
-      m_Items: []
   - m_Id: 2500561184997376
     m_Localized: Nascondi stato di riproduzione
     m_Metadata:
@@ -476,6 +472,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2574255201660928
     m_Localized: Continuare
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21764891598237696
+    m_Localized: Texture
     m_Metadata:
       m_Items: []
   references:

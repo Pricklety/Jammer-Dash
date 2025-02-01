@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7687836736429870816}
   - component: {fileID: 4236012243192107593}
   - component: {fileID: -7903215662307214089}
+  - component: {fileID: 3336323331535161026}
   m_Layer: 3
   m_Name: hitter02
   m_TagString: LongCube
@@ -177,3 +178,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsLongCube: 0
   longCubeLength: 0
+--- !u!114 &3336323331535161026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2127196284957857532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8d811f4bae7e484dbe7399e1da3d5bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textureName: cube002
+  fallbackTexture: {fileID: 2800000, guid: 2b871bd7ebd841744acef4cc4adb82e3, type: 3}

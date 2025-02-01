@@ -4,10 +4,12 @@
     <type fullname="JammerDash.Game.CubeCounter" preserve="all" />
     <type fullname="JammerDash.Game.FinishLine" preserve="all" />
     <type fullname="JammerDash.Game.LevelEntry" preserve="all" />
+    <type fullname="JammerDash.Game.Note.NoteBehaviour" preserve="all" />
     <type fullname="JammerDash.Game.PauseMenu" preserve="all" />
     <type fullname="JammerDash.Game.Player.PlayerMovement" preserve="all" />
     <type fullname="JammerDash.Game.RestartCustom" preserve="all" />
     <type fullname="JammerDash.Game.SongProgress" preserve="all" />
+    <type fullname="JammerDash.Texture" preserve="all" />
     <type fullname="SimpleSpectrum" preserve="all" />
     <type fullname="JammerDash.SceneData" preserve="nothing" serialized="true" />
   </assembly>

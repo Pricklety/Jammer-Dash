@@ -330,10 +330,6 @@ MonoBehaviour:
     m_Localized: "\u0160erch\xE1..."
     m_Metadata:
       m_Items: []
-  - m_Id: 2500536736399360
-    m_Localized: "M\xF3d\u0161a Blinda"
-    m_Metadata:
-      m_Items: []
   - m_Id: 2500561184997376
     m_Localized: "Skritar st\xE1t\xFAs kraxt\xEAna"
     m_Metadata:
@@ -476,6 +472,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 13374434543513600
     m_Localized: "Log\xF3r as"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21764891598237696
+    m_Localized: "Tekst\xFAra"
     m_Metadata:
       m_Items: []
   references:

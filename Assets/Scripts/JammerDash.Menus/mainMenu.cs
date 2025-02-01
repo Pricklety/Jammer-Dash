@@ -23,7 +23,6 @@ using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 using JammerDash.Tech;
 using JammerDash.Menus.Options;
-using System.Xml.Serialization;
 using UnityEngine.Localization.Settings;
 using JammerDash.Difficulty;
 using System.Text.RegularExpressions;
@@ -158,6 +157,8 @@ namespace JammerDash.Menus
         public GameObject adminButton;
 
         public InputField[] editUser; // Edit user panel - Input fields 
+        public Slider levelSlider;
+        public Text levelText;
 
         // Lookup
         public InputField lookup;
@@ -203,7 +204,7 @@ namespace JammerDash.Menus
             if (Account.Instance.loggedIn)
             SetCountry();
 
-            string path = Path.Combine(Application.persistentDataPath, "levels", "extracted");
+            string path = Path.Combine(JammerDash.Main.gamePath, "levels", "extracted");
 
            
 
@@ -218,7 +219,7 @@ namespace JammerDash.Menus
             }
 
             // Initialize FileSystemWatcher
-            string persistentPath = Application.persistentDataPath;
+            string persistentPath = JammerDash.Main.gamePath;
             Debug.Log($"Setting up FileSystemWatcher for path: {persistentPath}");
 
             // Initialize FileSystemWatcher
@@ -245,6 +246,10 @@ namespace JammerDash.Menus
             await LoadLevelFromLevels(null); // Play screen
             
             StartCoroutine(LoadRandomBackground(null));
+
+            if (!Account.Instance.loggedIn && !Account.Instance.checkRegister) {
+                Accounts();
+            }
         }
         private void HandleFileWatcherError(object sender, ErrorEventArgs e)
         {
@@ -347,7 +352,7 @@ namespace JammerDash.Menus
                         if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
                         {
                             Debug.LogError($"Error downloading profile picture: {request.error}");
-                            lookupPfp.texture = Resources.Load<Texture>("defaultPFP");
+                            lookupPfp.texture = Resources.Load<UnityEngine.Texture>("defaultPFP");
                         }
                         else
                         {
@@ -377,7 +382,7 @@ namespace JammerDash.Menus
 
         using (UnityWebRequest www = UnityWebRequest.Post($"https://api.jammerdash.com/v1/account/{adminUUID.text}/edit-user", form))
         {
-            www.SetRequestHeader("Authorization", "Bearer " + GetAuthToken()); // Add your auth token here
+            www.SetRequestHeader("Authorization", "Bearer " + GetAuthToken());
             yield return www.SendWebRequest();
 
             if (www.result != UnityWebRequest.Result.Success)
@@ -460,7 +465,7 @@ namespace JammerDash.Menus
         public async Task LoadLevelFromLevels(string[] specificFiles = null)
         {
             // Define the levels and extracted folder paths
-            string levelsPath = Path.Combine(Application.persistentDataPath, "levels");
+            string levelsPath = Path.Combine(JammerDash.Main.gamePath, "levels");
             string extractedFolderPath = Path.Combine(levelsPath, "extracted");
 
             // Ensure the levels and extracted folders exist
@@ -503,13 +508,13 @@ namespace JammerDash.Menus
                         UnityEngine.Debug.LogError($"Failed to deserialize JSON from file: {jsonFilePath}");
                         continue;
                     }
-
+                    string name = string.IsNullOrEmpty(sceneData.sceneName) ? sceneData.name : sceneData.sceneName;
                     // Create a directory in "extracted" with the format "ID - Name"
-                    string extractedPath = Path.Combine(extractedFolderPath, $"{sceneData.ID} - {sceneData.sceneName}");
+                    string extractedPath = Path.Combine(extractedFolderPath, $"{sceneData.ID} - " + name);
                     Directory.CreateDirectory(extractedPath);
 
                     // Move JSON file to the extracted directory
-                    string jsonDestinationPath = Path.Combine(extractedPath, sceneData.sceneName + ".json");
+                    string jsonDestinationPath = Path.Combine(extractedPath, name + ".json");
                     if (File.Exists(jsonDestinationPath))
                     {
                         File.Delete(jsonDestinationPath);
@@ -597,7 +602,7 @@ namespace JammerDash.Menus
             {
                 foreach (string path in paths)
                 {
-                    File.Move(path, Path.Combine(Application.persistentDataPath, "levels", Path.GetFileName(path)));
+                    File.Move(path, Path.Combine(JammerDash.Main.gamePath, "levels", Path.GetFileName(path)));
                     
                     Notifications.instance.Notify($"Importing {Path.GetFileName(path)}...", null);
                 }
@@ -608,6 +613,8 @@ namespace JammerDash.Menus
 
         public void Accounts()
         {
+            
+                Account.Instance.checkRegister = true;
             if (!Account.Instance.loggedIn)
             {
                 accPanel.SetActive(!accPanel.activeSelf);
@@ -794,7 +801,7 @@ switch (data.backgroundType)
                 case 4:
                     videoPlayerObject.SetActive(true);
                     videoImage.SetActive(true);
-                    string videoDirectory = Path.Combine(Application.persistentDataPath, "backgrounds");
+                    string videoDirectory = Path.Combine(JammerDash.Main.gamePath, "backgrounds");
                     List<string> validVideoFiles = GetValidVideoFiles(videoDirectory, 250 * 1024 * 1024); // 250MB limit
                     if (validVideoFiles.Count == 0)
                     {
@@ -819,7 +826,7 @@ switch (data.backgroundType)
                     }
                     break;
             }
-             int randomIndex = (sprite.Length == 1) ? 0 : Random.Range(0, sprite.Length);
+             int randomIndex = (sprite.Length == 1) ? 0 : Random.Range(0, sprite.Length - 1);
                 bg.sprite = sprite[randomIndex];
         }
         else
@@ -842,7 +849,7 @@ switch (data.backgroundType)
         }
         private async Task LoadCustomBackgroundAsync()
         {
-            string path = Application.persistentDataPath + "/backgrounds";
+            string path = JammerDash.Main.gamePath + "/backgrounds";
 
             // Supported image file types in Unity
             string[] supportedExtensions = new string[] { "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.tga" };
@@ -1009,8 +1016,7 @@ switch (data.backgroundType)
             mapper = map.text;
             SceneData newLevelData = new SceneData
             {
-                sceneName = songName,
-                levelName = songName,
+                name = songName,
                 calculatedDifficulty = newDifficulty,
                 songName = songName,
                 artist = artist,
@@ -1033,8 +1039,8 @@ switch (data.backgroundType)
             string json = sceneData.ToJson();
 
             // Save JSON to a new file in the persistentDataPath + scenes & levels folder
-            string namepath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneData.levelName);
-            string filePath = Path.Combine(namepath, $"{sceneData.levelName}.json");
+            string namepath = Path.Combine(JammerDash.Main.gamePath, "scenes", sceneData.ID + " - " + sceneData.name);
+            string filePath = Path.Combine(namepath, $"{sceneData.name}.json");
             string musicPath = Path.Combine(namepath, $"{sceneData.artist} - {sceneData.songName}.mp3");
             if (Directory.Exists(namepath))
             {
@@ -1044,7 +1050,7 @@ switch (data.backgroundType)
             {
                 Directory.CreateDirectory(namepath);
                 File.WriteAllText(filePath, json);
-                File.Copy(path, Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneData.levelName, $"{artist} - {songName}.mp3"));
+                File.Copy(path, Path.Combine(JammerDash.Main.gamePath, "scenes", sceneData.ID + " - " + sceneData.name, $"{artist} - {songName}.mp3"));
             }
 
         }
@@ -1056,7 +1062,7 @@ switch (data.backgroundType)
             {
                 Destroy(child.gameObject);
             }
-            string levelsPath = Path.Combine(Application.persistentDataPath, "scenes");
+            string levelsPath = Path.Combine(JammerDash.Main.gamePath, "scenes");
 
             if (!Directory.Exists(levelsPath))
             {
@@ -1105,9 +1111,10 @@ switch (data.backgroundType)
             if (level != null)
             {
                 UnityEngine.Debug.Log(sceneData);
-                // Assuming YourPanelScript has methods to set text or image properties
-                level.SetLevelName($"{sceneData.sceneName}");
-                level.SetSongName($"♫ {sceneData.artist} - {sceneData.songName}");
+                   level.SetLevelName(SettingsFileHandler.LoadSettingsFromFile().preferNoRomaji == true 
+    ? sceneData.name 
+    : sceneData.romanizedName);
+                level.SetSongName(SettingsFileHandler.LoadSettingsFromFile().preferNoRomaji == true ? $"{sceneData.artist} - {sceneData.songName}" : $"{sceneData.romanizedArtist} - {sceneData.romanizedName}");
                 level.SetDifficulty($"{sceneData.calculatedDifficulty:0.00} sn");
 
             }
@@ -1145,8 +1152,13 @@ switch (data.backgroundType)
 
             if (level != null)
             {
-                level.SetLevelName($"{sceneData.sceneName}");
-                level.SetInfo($"♫ {sceneData.artist} - {sceneData.songName} // {LocalizationSettings.StringDatabase.GetLocalizedString("lang", "mapped by")} {sceneData.creator}");
+                 level.SetLevelName(SettingsFileHandler.LoadSettingsFromFile().preferNoRomaji == true 
+    ? sceneData.name 
+    : sceneData.romanizedName);
+                level.SetInfo($"♫ {(SettingsFileHandler.LoadSettingsFromFile().preferNoRomaji == true ? sceneData.artist : sceneData.romanizedArtist)} - " +
+              $"{(SettingsFileHandler.LoadSettingsFromFile().preferNoRomaji == true ? sceneData.songName : sceneData.romanizedName)} // " +
+              $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "mapped by")} " +
+              $"{sceneData.creator}");
             }
             else
             {
@@ -1500,7 +1512,7 @@ switch (data.backgroundType)
         public void CrashReports()
         {
             // File path of the player log
-            string logFilePath = Application.persistentDataPath + "/Player.log";
+            string logFilePath = JammerDash.Main.gamePath + "/Player.log";
 
             // Open the player log file using the default application associated with its file type
             Process.Start(logFilePath);
@@ -1508,7 +1520,7 @@ switch (data.backgroundType)
 
         public void SettingsFile()
         {
-            string logFilePath = Application.persistentDataPath + "/settings.json";
+            string logFilePath = JammerDash.Main.gamePath + "/settings.json";
 
             Process.Start(logFilePath);
         }
@@ -1593,7 +1605,7 @@ public void FixedUpdate()
 
         private void UpdateStatsText()
         {
-            if (!File.Exists(Application.persistentDataPath + "/scores.dat"))
+            if (!File.Exists(JammerDash.Main.gamePath + "/scores.dat"))
             {
                 return;
             }
@@ -1716,7 +1728,8 @@ public void FixedUpdate()
 
         public void Update()
         {
-           
+           levelSlider.value = Account.Instance.totalXP / Account.Instance.xpRequiredPerLevel[Account.Instance.level];
+           levelText.text = $"Level {Account.Instance.level}";
             HandleBackgroundLoading();
             HandleIdleState();
             UpdateTimers();
@@ -1830,7 +1843,7 @@ public void FixedUpdate()
 
         private void HandleIdleAnimations()
         {
-            if (afkTime > 25f && !IsPanelActive(settingsPanel, accPanel, additionalPanel))
+            if (afkTime > 10f && !IsPanelActive(settingsPanel, accPanel, additionalPanel))
             {
                 if (!hasPlayedIdle)
                 {
@@ -1840,7 +1853,7 @@ public void FixedUpdate()
                     hasPlayedIdle = true;
                 }
             }
-            else if (afkTime > 25f && IsPanelActive(settingsPanel, accPanel, additionalPanel))
+            else if (afkTime > 10f && IsPanelActive(settingsPanel, accPanel, additionalPanel))
             {
                 Cursor.visible = true;
                 notIdle.PlayInFixedTime("notIdle");
@@ -1889,7 +1902,7 @@ public void FixedUpdate()
         {
             _ = LoadLevelFromLevels(null);
             LoadLevelsFromFiles();
-            int levelCount = Directory.GetDirectories(Path.Combine(Application.persistentDataPath, "levels", "extracted"), "*").Count();
+            int levelCount = Directory.GetDirectories(Path.Combine(JammerDash.Main.gamePath, "levels", "extracted"), "*").Count();
             Notifications.instance.Notify($"Level list reloaded.\n{levelCount} levels total", null);
         }
 

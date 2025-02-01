@@ -67,14 +67,9 @@ namespace JammerDash.Game
                             break;
                         case ModType.hidden:
                             multipliers.Add(1.04f);
-                            modsToDisable.Add(ModType.remember);
                             break;
                         case ModType.remember:
                             multipliers.Add(1.04f);
-                            modsToDisable.Add(ModType.hidden);
-                            break;
-                        case ModType.flashlight:
-                            multipliers.Add(1.06f);
                             break;
                         case ModType.perfect:
                             multipliers.Add(1.02f);
@@ -112,7 +107,7 @@ namespace JammerDash.Game
             // Disable conflicting mods
             foreach (var modToDisable in modsToDisable)
             {
-                modStates[modToDisable] = false;
+                modStates.Remove(modToDisable);
             }
 
             // Calculate and apply the score multiplier
@@ -132,6 +127,14 @@ namespace JammerDash.Game
 
             CustomLevelDataManager.Instance.scoreMultiplier = scoreMultiplier;
             CustomLevelDataManager.Instance.modStates = new Dictionary<ModType, bool>(modStates);
+           foreach (var mod1 in modStates)
+{
+    if (mod1.Value) // Check if the mod is active
+    {
+        Debug.LogWarning($"Mod {mod1.Key} is currently active.");
+    }
+}
+
         }
 
         public void DisableAllMods()
@@ -163,11 +166,10 @@ namespace JammerDash.Game
         /// SpeedIncrease (SI) - Speeds up the song (1.5x) (1.08x score bonus)
         /// hidden (HD) - Hides the notes (like HD in osu!) (1.04x score bonus)
         /// Remember (RM) - Does the opposite of hidden and shows the notes for a short time (1.04x score bonus)
-        /// Flashlight (FL) - Draws a black outline and everything is black 5 tiles after the player (This only affects X pos) (1.06x score bonus)
         /// Perfect (PF) - You can only have Factor 5 clicks. (1.02x score bonus)
         /// Random (RD) - Randomizes the notes (Unranked) (1.04x score bonus)
         /// Sudden Death (SuD) - If you miss a note, you fail (1x score bonus)
-        SpeedIncrease, hidden, remember, flashlight, perfect, random, suddenDeath,
+        SpeedIncrease, hidden, remember, perfect, random, suddenDeath,
 
         // Decreased diff
         /// SpeedDecrease (SD) - Slows down the song (0.75x) (0.88x score bonus)

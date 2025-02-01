@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 660413570759603244}
   - component: {fileID: 8608870485356016619}
   - component: {fileID: 6477321560855445010}
+  - component: {fileID: -1086081065147421414}
+  - component: {fileID: 7002200187115447807}
   m_Layer: 0
   m_Name: NumOK
   m_TagString: Untagged
@@ -138,3 +140,29 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &-1086081065147421414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1274005456745493585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8d811f4bae7e484dbe7399e1da3d5bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textureName: custom/prickle/bad
+  fallbackTexture: {fileID: 2800000, guid: 8c4a7837b9645ab43a9d78d4a66fe214, type: 3}
+--- !u!114 &7002200187115447807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1274005456745493585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47801ab6ebfc53d42bf2b53c79b7ddbc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

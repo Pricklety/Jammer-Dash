@@ -14,6 +14,8 @@ using UnityEngine.Networking;
 using System.Text;
 using Newtonsoft.Json;
 using UnityEngine.Video;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace JammerDash.Game
 {
@@ -141,7 +143,7 @@ namespace JammerDash.Game
         void SaveLevelDataForLevelDefault(float actualdest, float destruction)
         {
             // Construct the path based on conditions
-            string levelsPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", CustomLevelDataManager.Instance.ID + " - " + CustomLevelDataManager.Instance.levelName);
+            string levelsPath = Path.Combine(Main.gamePath, "levels", "extracted", CustomLevelDataManager.Instance.ID + " - " + CustomLevelDataManager.Instance.levelName);
 
             string[] levelFiles = Directory.GetFiles(levelsPath, "*.json", SearchOption.AllDirectories);
             string levelName = "";
@@ -161,7 +163,8 @@ namespace JammerDash.Game
                 string json = File.ReadAllText(Path.Combine(levelsPath, levelName + ".json"));
                 SceneData sceneData = SceneData.FromJson(json);
                 data = sceneData;
-                SaveLevelDataDef(sceneData.ID, scores.GetTier(actualdest), player0._performanceScore, actualdest, "scores", destruction, player0.five, player0.three, player0.one, player0.misses, Account.Instance.username, player0.highestCombo);
+                ModType[] mods = CustomLevelDataManager.Instance.modStates.Keys.ToArray();
+                SaveLevelDataDef(sceneData.ID, scores.GetTier(actualdest), player0._performanceScore, actualdest, "scores", destruction, player0.five, player0.three, player0.one, player0.misses, Account.Instance.username, player0.highestCombo, mods);
             }
             else
             {
@@ -169,15 +172,15 @@ namespace JammerDash.Game
             }
         }
 
-        void SaveLevelDataDef(int levelID, string tierName, float sp, float actualdest, string fileName, float destruction, int five, int three, int one, int miss, string username, int combo)
+        void SaveLevelDataDef(int levelID, string tierName, float sp, float actualdest, string fileName, float destruction, int five, int three, int one, int miss, string username, int combo, ModType[] mods)
         {
-            string filePath = Path.Combine(Application.persistentDataPath, fileName + ".dat");
+            string filePath = Path.Combine(Main.gamePath, fileName + ".dat");
             using (StreamWriter writer = File.AppendText(filePath))
             {
                 string formattedActualDest = actualdest.ToString("0.#################");
                 string formattedDestruction = destruction.ToString("0.#################");
 
-                writer.WriteLine($"{levelID},{tierName}, {sp},{formattedActualDest},{formattedDestruction},{five},{three},{one},{miss},{combo},{username}");
+                writer.WriteLine($"{levelID},{tierName}, {sp},{formattedActualDest},{formattedDestruction},{five},{three},{one},{miss},{combo},{username},{string.Join(";", mods.Where(m => m != ModType.None))}");
             }
         }
         public void SetSpectrum()
@@ -192,7 +195,7 @@ namespace JammerDash.Game
 
         long LoadLevelData(int levelID, string fileName, long destruction)
         {
-            string filePath = Path.Combine(Application.persistentDataPath, fileName + ".dat");
+            string filePath = Path.Combine(Main.gamePath, fileName + ".dat");
 
             if (File.Exists(filePath))
             {
@@ -265,8 +268,8 @@ namespace JammerDash.Game
         }
         private IEnumerator End()
         {
-            StartCoroutine(CustomLevelDataManager.Instance.LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "bgImage.png"), img));
-            if (File.Exists(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "backgroundVideo.mp4")))
+            StartCoroutine(CustomLevelDataManager.Instance.LoadImage(Path.Combine(Main.gamePath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "bgImage.png"), img));
+            if (File.Exists(Path.Combine(Main.gamePath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "backgroundVideo.mp4")))
             {
                 img.texture = FindAnyObjectByType<VideoPlayer>().targetTexture;
                 
@@ -346,7 +349,6 @@ namespace JammerDash.Game
             if (Account.Instance.loggedIn) {
                 OnFinishLineCrossed();
             }
-            Account.Instance.GainXP(destruction);
         }
    private IEnumerator UpdateUserScore(long score)
     {
@@ -391,11 +393,15 @@ namespace JammerDash.Game
         if (Account.Instance.loggedIn)
         {
             long score = player0.counter.score;
-            if (score > 0 && (!CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.auto) || CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.noSpikes)))
+            Account.Instance.totalXP += score;
+            if (score > 0)
             {
                 StartCoroutine(UpdateUserScore(score));
             }
-            else
+            else if (CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.auto) || CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.noSpikes) || CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.autoMove)) {
+                Notifications.instance.Notify("This play is unranked.", null);
+            }
+            else if (score == 0)
             {
                 Debug.LogError("Score is invalid or zero.");
                 Notifications.instance.Notify("Score is invalid or zero.", null);

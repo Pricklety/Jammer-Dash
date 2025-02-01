@@ -28,7 +28,7 @@ namespace JammerDash.Game
                 string levelName = CustomLevelDataManager.Instance.ID + " - " + CustomLevelDataManager.Instance.levelName;
                 string jsonName = CustomLevelDataManager.Instance.levelName;
 
-                string levelsFolderPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", levelName);
+                string levelsFolderPath = Path.Combine(Main.gamePath, "levels", "extracted", levelName);
                 string levelJsonFilePath = Path.Combine(levelsFolderPath, $"{jsonName}.json");
 
                 if (File.Exists(levelJsonFilePath) && !string.IsNullOrEmpty(CustomLevelDataManager.Instance.levelName))

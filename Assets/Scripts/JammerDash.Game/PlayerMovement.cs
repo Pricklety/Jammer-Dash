@@ -105,6 +105,8 @@ namespace JammerDash.Game.Player
         public float rememberTimer = 0f;
         private List<GameObject> notes = new List<GameObject>();
 
+        public GameObject[] keys;
+
         private void Awake()
         {
             music = AudioManager.Instance.source;
@@ -182,10 +184,7 @@ namespace JammerDash.Game.Player
 
         private void OnHit()
         {
-            if (Input.GetKey(KeybindingManager.hit1))
-                k++;
-            if (Input.GetKey(KeybindingManager.hit2))
-                l++;
+            
             RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1f, cubeLayerMask);
 
             if (hit.collider != null)
@@ -202,10 +201,7 @@ namespace JammerDash.Game.Player
         {
             if (transform.position.y > -1)
             {
-                if (transform.position.y > 0)
-                {
-                    sfxS.PlayOneShot(impact);
-                }
+                
                 transform.position = new Vector3(transform.position.x, -1, transform.position.z);
             }
         }
@@ -310,34 +306,25 @@ namespace JammerDash.Game.Player
             string playerTime = string.Format("{0}:{1:00}", playerMinutes, playerSeconds);
             string finishLineTime = string.Format("{0}:{1:00}", finishLineMinutes, finishLineSeconds);
 
-            keyText.text = $"{playerTime} / {finishLineTime}";
+            keyText.text = $"{playerTime}\t\t\t\t\t\t{finishLineTime}";
 
 
         }
+            public float fadeDistance = 3f; 
+            public LayerMask objectLayer;
+            public float fadeSpeed = 2f;
         private void Update()
         {
             if (!isDying)
             {
-                 // Enable or disable flashlight effect based on mod state
-        if (Mods.instance.modStates.ContainsKey(ModType.flashlight))
-        {
-            flashlightOverlay.SetActive(true);
-        }
-        else
-        {
-            flashlightOverlay.SetActive(false);
-        }
-
-         // Enable or disable flashlight effect based on mod state
-        if (Mods.instance.modStates.ContainsKey(ModType.flashlight))
-        {
-            flashlightOverlay.SetActive(true);
-        }
-        else
-        {
-            flashlightOverlay.SetActive(false);
-        }
-
+                    flashlightOverlay.SetActive(Mods.instance.modStates.ContainsKey(ModType.remember));
+                
+                if (Mods.instance.modStates.ContainsKey(ModType.hidden)) {
+                     FadeObjectsInFrontOfPlayer();
+                }
+                float vidSpeed;
+                Mods.instance.master.GetFloat("MasterPitch", out vidSpeed);
+                FindFirstObjectByType<VideoPlayer>().playbackSpeed = vidSpeed;
         
 
             if (CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.autoMove) || CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.auto))
@@ -429,15 +416,62 @@ namespace JammerDash.Game.Player
             }
             else
             {
-            acc.text = $""; 
+            acc.text = $"0.00% | F- | 0sp"; 
             }
 
             if (FindNearestCubeDistance() > 21)
             {
             keyText.text = "Break!";
             }
+
+            if (Input.GetKeyDown(KeybindingManager.hit1)) {
+                keys[0].GetComponent<Animation>().Stop("keyHit");
+                keys[0].GetComponent<Animation>().Play("keyHit");
+                k++;
+                keys[0].GetComponent<Text>().text = k.ToString();
+            }
+            if (Input.GetKeyDown(KeybindingManager.hit2)) {
+                keys[1].GetComponent<Animation>().Stop("keyHit");
+                keys[1].GetComponent<Animation>().Play("keyHit");
+                l++;
+                keys[1].GetComponent<Text>().text = l.ToString();
+            }
         }
-    
+          private Dictionary<GameObject, Coroutine> fadingObjects = new Dictionary<GameObject, Coroutine>();
+        void FadeObjectsInFrontOfPlayer()
+    {
+        // Get all objects in a cone in front of the player
+        Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position + transform.right * fadeDistance, new Vector2(5, 5), 0, objectLayer);
+
+        // Process objects to fade them
+        foreach (var hit in hits)
+        {
+            GameObject obj = hit.gameObject;
+            if (!fadingObjects.ContainsKey(obj))
+            {
+                Coroutine fadeCoroutine = StartCoroutine(FadeOut(obj));
+                fadingObjects[obj] = fadeCoroutine;
+            }
+        }
+    }
+
+    IEnumerator FadeOut(GameObject obj)
+    {
+        SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
+        if (spriteRenderer == null) yield break;
+
+        Color originalColor = spriteRenderer.color;
+        while (spriteRenderer.color.a > 0f)
+        {
+            Color newColor = spriteRenderer.color;
+            newColor.a -= Time.deltaTime * fadeSpeed;
+            spriteRenderer.color = newColor;
+            yield return null;
+        }
+
+        spriteRenderer.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0f);
+        fadingObjects.Remove(obj);
+    }
         private void MoveToNextCube()
         {
             Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 10, cubeLayerMask);
@@ -880,7 +914,6 @@ namespace JammerDash.Game.Player
             deathPanel.SetActive(true);
             music.pitch = 0f;
             transform.localScale = Vector3.zero;
-            JammerDash.Account.Instance.GainXP(counter.score);
             enabled = false;
         }
 
@@ -954,9 +987,8 @@ namespace JammerDash.Game.Player
                             ShowBadText();
                         }
                     }
-                    health -= 30;
+                    StartCoroutine(ChangeTextCombo());
                     Total += 5;
-                    misses++;
                 }
 
 
@@ -975,7 +1007,8 @@ namespace JammerDash.Game.Player
                     Total += 5;
                     if (!missedCubes.Contains(collision.gameObject))
                     {
-                        misses++;
+                        
+                        StartCoroutine(ChangeTextCombo());
                     }
                 }
                 if (collision.gameObject.name.Contains("hitter02") && collision.transform.position.y != transform.position.y && !activeCubes.Contains(collision.gameObject)) {

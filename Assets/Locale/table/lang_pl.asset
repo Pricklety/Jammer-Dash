@@ -330,10 +330,6 @@ MonoBehaviour:
     m_Localized: 'Szukaj... '
     m_Metadata:
       m_Items: []
-  - m_Id: 2500536736399360
-    m_Localized: "Tryb \u015Blepy"
-    m_Metadata:
-      m_Items: []
   - m_Id: 2500561184997376
     m_Localized: Ukryj status gry
     m_Metadata:
@@ -477,6 +473,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 13374434543513600
     m_Localized: Zalogowano jako
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21764891598237696
+    m_Localized: Tekstur
     m_Metadata:
       m_Items: []
   references:

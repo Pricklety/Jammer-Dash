@@ -330,10 +330,6 @@ MonoBehaviour:
     m_Localized: Pencaharian...
     m_Metadata:
       m_Items: []
-  - m_Id: 2500536736399360
-    m_Localized: Mode Buta
-    m_Metadata:
-      m_Items: []
   - m_Id: 2500561184997376
     m_Localized: Sembunyikan status bermain
     m_Metadata:
@@ -476,6 +472,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 13374434543513600
     m_Localized: Masuk sebagai
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21764891598237696
+    m_Localized: Tekstur
     m_Metadata:
       m_Items: []
   references:

@@ -43,13 +43,23 @@ namespace JammerDash.Menus.Play
 
             Debug.Log("Setting mod " + modName + " to " + value);
 
-            Mods.instance.SetMod(modName, value);
 
             if (modName == ModType.random)
             {
                 var random = new System.Random();
                 GameObject.Find("randomInput").GetComponent<InputField>().text = random.Next(int.MaxValue).ToString();
             }
+
+            if (modName == ModType.SpeedIncrease) {
+                GameObject.Find("SD").GetComponent<Toggle>().isOn = false;
+                Mods.instance.SetMod(ModType.SpeedDecrease, false);
+            }
+            else if (modName == ModType.SpeedDecrease) {
+                GameObject.Find("SI").GetComponent<Toggle>().isOn = false;
+                Mods.instance.SetMod(ModType.SpeedIncrease, false);
+            }
+            
+            Mods.instance.SetMod(modName, value);
         }
 
         public void DisableAllMods()

@@ -50,7 +50,7 @@ namespace JammerDash.Tech
         }
 
         // Function to load SceneData based on the scene name
-        public SceneData LoadLevelData(string sceneName, int id)
+        public SceneData LoadLevelData(string name, int id)
         {
             if (sceneLoaded)
             {
@@ -58,15 +58,15 @@ namespace JammerDash.Tech
                 return null;
             }
 
-            levelName = sceneName;
+            levelName = name;
             ID = id;
-            string filePath = Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{id} - {levelName}", $"{levelName}.json");
+            string filePath = Path.Combine(Main.gamePath, "levels", "extracted", $"{id} - {levelName}", $"{levelName}.json");
 
             if (File.Exists(filePath))
             {
                 string json = File.ReadAllText(filePath);
                 SceneData sceneData = SceneData.FromJson(json);
-                levelName = sceneData.sceneName;
+                levelName = sceneData.name;
                 creator = sceneData.creator;
                 artist = sceneData.artist;
                 diff = (int)sceneData.calculatedDifficulty;
@@ -85,9 +85,9 @@ namespace JammerDash.Tech
 
             return null;
         }
-        public SceneData LoadEditLevelData(int ID, string sceneName)
+        public SceneData LoadEditLevelData(int ID, string name)
         {
-            string filePath = Path.Combine(Application.persistentDataPath, "scenes", ID.ToString() + " - " + sceneName, $"{sceneName}.json");
+            string filePath = Path.Combine(Main.gamePath, "scenes", ID.ToString() + " - " + name, $"{name}.json");
 
             if (File.Exists(filePath))
             {
@@ -95,13 +95,13 @@ namespace JammerDash.Tech
                 SceneData sceneData = SceneData.FromJson(json);
 
                 // Load the audio clip
-                string audioFilePath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneName, $"{sceneData.songName}");
+                string audioFilePath = Path.Combine(Main.gamePath, "scenes", sceneData.ID + " - " + name, $"{sceneData.songName}");
 
                 if (SceneManager.GetActiveScene().name == "SampleScene")
                 {
                     OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
                     EditorManager manager = FindObjectOfType<EditorManager>();
-                    using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneName, "bgImage.png")))
+                    using (UnityWebRequest www = UnityWebRequestTexture.GetTexture(Path.Combine(Main.gamePath, "scenes", sceneData.ID + " - " + name, "bgImage.png")))
                     {
                         if (www.isDone)
                         {
@@ -110,15 +110,14 @@ namespace JammerDash.Tech
                             manager.bgPreview.texture = DownloadHandlerTexture.GetContent(www);
                         }
                     }
-                    manager.sceneNameInput.text = sceneData.sceneName;
+                    manager.sceneNameInput.text = sceneData.name;
                     manager.songArtist.text = sceneData.artist;
                     manager.customSongName.text = sceneData.songName;
-                    manager.ground.SetActive(sceneData.ground);
-                    manager.groundToggle.isOn = sceneData.ground;
-                    manager.lineController.audioClip = sceneData.clip;
                     manager.LoadSceneData(sceneData);
                     manager.ID = sceneData.ID;
-                    levelName = sceneData.sceneName;
+                    string videoPath = Path.Combine(Main.gamePath, "scenes", $"{sceneData.ID} - {name}", "backgroundVideo.mp4");
+                    manager.videoPlayer.url = File.Exists(videoPath) ? videoPath : null;
+                    levelName = sceneData.name;
                     creator = sceneData.creator;
                     diff = (int)sceneData.calculatedDifficulty;
                     this.ID = sceneData.ID;
@@ -216,11 +215,10 @@ namespace JammerDash.Tech
     private IEnumerator ProcessAfterSceneLoaded()
     {
         yield return new WaitForEndOfFrame();
-        string filePath = Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{ID} - {levelName}", $"{levelName}.json");
+        string filePath = Path.Combine(Main.gamePath, "levels", "extracted", $"{ID} - {levelName}", $"{levelName}.json");
         Debug.Log(filePath);
         string json = File.ReadAllText(filePath);
         SceneData sceneData = SceneData.FromJson(json);
-        Debug.Log(sceneData.levelName);
         data = sceneData;
         Debug.Log(sceneData.cubePositions.Count);
 
@@ -398,7 +396,7 @@ namespace JammerDash.Tech
             }
         }
 
-        StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{ID} - {levelName}", "bgImage.png"), null));
+        StartCoroutine(LoadImage(Path.Combine(Main.gamePath, "levels", "extracted", $"{ID} - {levelName}", "bgImage.png"), null));
 
         Camera[] cams = FindObjectsOfType<Camera>();
         foreach (Camera cam in cams)
@@ -407,15 +405,15 @@ namespace JammerDash.Tech
         }
     }
 
-    private Dictionary<float, List<Vector3>> GroupByX(List<Vector3> positions)
+    private Dictionary<float, List<Vector2>> GroupByX(List<Vector2> positions)
     {
-        var groups = new Dictionary<float, List<Vector3>>();
+        var groups = new Dictionary<float, List<Vector2>>();
 
         foreach (var pos in positions)
         {
             if (!groups.ContainsKey(pos.x))
             {
-                groups[pos.x] = new List<Vector3>();
+                groups[pos.x] = new List<Vector2>();
             }
             groups[pos.x].Add(pos);
         }

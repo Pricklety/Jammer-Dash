@@ -15,7 +15,7 @@ using Debug = UnityEngine.Debug;
 using System.Security.Cryptography;
 using System.Net.Http;
 using System.Net;
-
+using Texture = UnityEngine.Texture2D;
 namespace JammerDash
 {
     public class Account : MonoBehaviour
@@ -30,7 +30,7 @@ namespace JammerDash
         public string url;
         public string token;
         public string ip;
-        public Texture pfp;
+        public UnityEngine.Texture pfp;
         public bool isBanned;
 
         public string role;
@@ -40,7 +40,6 @@ namespace JammerDash
 
         [Header("Level")]
         public int level = 0;
-        public long currentXP = 0;
         public long[] xpRequiredPerLevel;
         public long totalXP = 0;
 
@@ -53,6 +52,8 @@ namespace JammerDash
         [Header("Playtime")]
         public float playtime;
         public static Account Instance { get; private set; }
+
+        public bool checkRegister = false;
 
         public bool loggedIn;
 
@@ -79,24 +80,6 @@ namespace JammerDash
             LoginData(); // Try to load login data only once at the start
         }
 
-        public void GainXP(long amount)
-        {
-            currentXP += amount;
-
-            // Update totalXP by reading the scores.dat file and summing every 5th entry
-            totalXP = CalculateTotalXPFromFile();
-
-            // Check if the player has enough XP to level up
-            if (currentXP >= xpRequiredPerLevel[level + 1])
-            {
-                LevelUp();
-                SaveLocalData();
-            }
-            else
-            {
-                SaveLocalData();
-            }
-        }
         private bool IsFileInUse(string filePath)
         {
             try
@@ -132,17 +115,17 @@ namespace JammerDash
         private static readonly object fileLock = new object();
         private void SaveLocalData()
         {
-            if (!File.Exists(Path.Combine(Application.persistentDataPath, "loginData.dat"))) {
-                File.Create(Path.Combine(Application.persistentDataPath, "loginData.dat"));
+            if (!File.Exists(Path.Combine(Main.gamePath, "loginData.dat"))) {
+                File.Create(Path.Combine(Main.gamePath, "loginData.dat"));
             }
 
-            if (!File.Exists(Path.Combine(Application.persistentDataPath, "playerData.dat"))) {
-                File.Create(Path.Combine(Application.persistentDataPath, "playerData.dat"));
+            if (!File.Exists(Path.Combine(Main.gamePath, "playerData.dat"))) {
+                File.Create(Path.Combine(Main.gamePath, "playerData.dat"));
             }
             lock (fileLock) // Ensure thread safety
             {
                 try
-                {  string loginDataPath = Path.Combine(Application.persistentDataPath, "loginData.dat");
+                {  string loginDataPath = Path.Combine(Main.gamePath, "loginData.dat");
                     if (!IsFileInUse(loginDataPath))
                     {
                         LoginData login = new LoginData
@@ -161,14 +144,13 @@ namespace JammerDash
                             formatter1.Serialize(stream1, login);
                         }
                     }
-                    string playerDataPath = Path.Combine(Application.persistentDataPath, "playerData.dat");
+                    string playerDataPath = Path.Combine(Main.gamePath, "playerData.dat");
                     if (!IsFileInUse(playerDataPath))
                     {
                         PlayerData data = new PlayerData
                         {
                             username = username.ToLower(),
                             level = level,
-                            currentXP = currentXP,
                             country = cc,
                             isLocal = true,
                             isOnline = true,
@@ -196,48 +178,16 @@ namespace JammerDash
             }
         }
 
-        // Method to calculate totalXP by summing every 5th entry from scores.dat
-        private long CalculateTotalXPFromFile()
-        {
-            long sum = 0;
-            string filePath = Path.Combine(Application.persistentDataPath, "scores.dat");
-
-            try
-            {
-                if (!File.Exists(filePath))
-                {
-                    Debug.LogError($"File does not exist at path: {filePath}");
-                    return 0;
-                }
-
-                var lines = File.ReadAllLines(filePath);
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    var line = lines[i];
-                    var parts = line.Split(',');
-                    if (parts.Length > 4 && long.TryParse(parts[4], out long score))
-                    {
-                        sum += score;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Error reading the file: {ex.Message}");
-            }
-
-            return sum;
-        }
+       
 
         private void LevelUp()
         {
-            if (currentXP >= xpRequiredPerLevel[level] && level <= 299)
+            if (totalXP >= xpRequiredPerLevel[level] && level <= 299)
             {
-                currentXP -= xpRequiredPerLevel[level];
                 level++;
                 LevelUp();
             }
-            Notifications.instance.Notify($"Level up! ({level - 1} -> {level})", null);
+            
         }
 
         public void Apply(string nickname, string username, string user, string email, string cc)
@@ -308,7 +258,6 @@ public IEnumerator ApplyLogin(string username, string user)
             try
             {
                 var successResponse = JObject.Parse(request.downloadHandler.text);
-                Notifications.instance.Notify($"Successfully logged in as {loginData.username}", null);
                 string[] welcomeMessages = new string[]
                 {
                     "Welcome back, {0}!",
@@ -326,14 +275,20 @@ public IEnumerator ApplyLogin(string username, string user)
                 Debug.Log(successResponse);
                 #endif
                 // Extract basic information
+                // Assign the fetched details
                 string token = successResponse["token"].ToString();
+                string nickname = successResponse["user"]["nickname"]?.ToString();
+                string _username = successResponse["user"]["username"]?.ToString();
                 string uuid = successResponse["user"]["id"].ToString();
                 string cc = successResponse["user"]["cc"]?.ToString();
                 string cn = successResponse["user"]["country"]?.ToString();
                 string rg = successResponse["user"]["region"]?.ToString();
+                string totalscore = successResponse["user"]["totalscore"]?.ToString();
+                this.nickname = nickname;
+                this.totalXP = long.Parse(totalscore);
                 this.uuid = uuid;
                 this.token = token;
-                this.username = username;
+                this.username = _username;
                 this.user = user;
                 this.cc = cc;
                 this.country_name = cn;
@@ -405,6 +360,7 @@ public IEnumerator EditUser(string username, string mail, string nickname, strin
                 #endif
                 // Extract basic information
                 this.username = username;
+                this.nickname = nickname;
                 // Fetch additional user details using the UUID
                 StartCoroutine(FetchUserDetails(uuid, token));
             }
@@ -470,8 +426,6 @@ private IEnumerator FetchUserDetails(string uuid, string token)
             {
                 var accountData = JObject.Parse(userRequest.downloadHandler.text);
 
-                // Assign the fetched details
-                this.nickname = accountData["display_name"]?.ToString();
                 this.role = accountData["role_perms"]?.ToString();
                 if (!string.IsNullOrEmpty(accountData["pfp_link"]?.ToString()))
                 {
@@ -479,7 +433,7 @@ private IEnumerator FetchUserDetails(string uuid, string token)
                     StartCoroutine(DownloadProfilePicture(pfpLink));
                 }
                 else {
-                    this.pfp = Resources.Load<Texture>("defaultPFP");
+                    this.pfp = Resources.Load<UnityEngine.Texture>("defaultPFP");
                 }
 
                string[] words = role.Split('_');
@@ -521,8 +475,8 @@ role = string.Join(" ", words);
 
         public void CalculateXPRequirements()
         {
-            long initialXP = 10000000L;
-            float growthRate = 1.03f;
+            long initialXP = 100000L;
+            float growthRate = 1.40f;
             xpRequiredPerLevel = new long[300];
 
             xpRequiredPerLevel[0] = initialXP;
@@ -582,12 +536,12 @@ role = string.Join(" ", words);
                     {
                         var errorResponse = JObject.Parse(request.downloadHandler.text);
                         var errors = errorResponse["errors"];
-                        Notifications.instance.Notify($"{errors.Count()} error(s) occurred. More info in the player logs (click).", () => Process.Start($@"{Path.Combine(Application.persistentDataPath, "Player.log")}"));
+                        Notifications.instance.Notify($"{errors.Count()} error(s) occurred. More info in the player logs (click).\nYour data has been saved locally.", () => Process.Start($@"{Path.Combine(Application.persistentDataPath, "Player.log")}"));
                         Debug.LogError(errors);
                     }
                     catch (Exception ex)
                     {
-                        Notifications.instance.Notify("An unknown error occurred. Please try again.", null);
+                        Notifications.instance.Notify("An unknown error occurred. Please try again.\nHowever, we've set up a local account for you.", null);
                         Debug.LogError($"Request Error: {request.error}");
                         Debug.LogError($"Response Code: {request.responseCode}");
                         Debug.LogError($"SSL/TLS Handshake Error: {request.downloadHandler.text}");
@@ -622,7 +576,7 @@ role = string.Join(" ", words);
 
         void LoginData()
         {
-            string path = Application.persistentDataPath + "/loginData.dat"; // No file extension here
+            string path = Main.gamePath + "/loginData.dat"; // No file extension here
 
             if (File.Exists(path))
             {
@@ -668,8 +622,8 @@ private IEnumerator CallLogout(string url)
     }
 }        public PlayerData LoadData()
         {
-            string path = Application.persistentDataPath + "/playerData.dat";
-            string playtime = Application.persistentDataPath + "/playtime.dat";
+            string path = Main.gamePath + "/playerData.dat";
+            string playtime = Main.gamePath + "/playtime.dat";
 
             string play = File.ReadAllText(playtime);
             this.playtime = float.Parse(play);
@@ -705,6 +659,8 @@ private IEnumerator CallLogout(string url)
             {
                 checkInternet.SetActive(false);
             }
+
+            LevelUp();
         }
         public string ConvertPlaytimeToReadableFormat()
         {
@@ -731,7 +687,7 @@ private IEnumerator CallLogout(string url)
 
         private void SavePlaytime()
         {
-            string playtimePath = Path.Combine(Application.persistentDataPath, "playtime.dat");
+            string playtimePath = Path.Combine(Main.gamePath, "playtime.dat");
             try
             {
                 using (StreamWriter writer = new StreamWriter(playtimePath, false))
@@ -759,7 +715,6 @@ private IEnumerator CallLogout(string url)
     {
         [Header("Stats")]
         public int level;
-        public long currentXP;
         public long[] xpRequiredPerLevel;
         public long totalXP;
         public float playtime;
