@@ -69,7 +69,7 @@ namespace JammerDash.Menus.Play
 
         public void DeleteLevel()
         {
-            string levelPath = Path.Combine(Application.persistentDataPath, "scenes", sceneData.ID + " - " + sceneData.levelName);
+            string levelPath = Path.Combine(JammerDash.Main.gamePath, "scenes", sceneData.ID + " - " + sceneData.name);
 
             // Check if the level path exists
             if (Directory.Exists(levelPath))
@@ -77,11 +77,11 @@ namespace JammerDash.Menus.Play
                 // Delete the directory and its contents recursively
                 Directory.Delete(levelPath, true);
 
-                Debug.Log("Level deleted successfully: " + sceneData.levelName);
+                Debug.Log("Level deleted successfully: " + sceneData.name);
             }
             else
             {
-                Debug.LogWarning("Level does not exist: " + sceneData.levelName);
+                Debug.LogWarning("Level does not exist: " + sceneData.name);
             }
 
             // Clear existing level information panels
@@ -139,7 +139,7 @@ namespace JammerDash.Menus.Play
 
         public void EditLevel()
         {
-            string json = File.ReadAllText(Application.persistentDataPath + $"/scenes/{ID} - {levelNameText.text}/" + $"{levelNameText.text}.json");
+            string json = File.ReadAllText(JammerDash.Main.gamePath + $"/scenes/{ID} - {levelNameText.text}/" + $"{levelNameText.text}.json");
             SceneData sceneData = SceneData.FromJson(json);
             if (sceneData != null)
             {

@@ -46,7 +46,7 @@ namespace JammerDash.Tech
         void DisplayList()
         {
             // Get all music files in the specified folder
-            string musicFolderPathFull = Path.Combine(Application.persistentDataPath, musicFolderPath);
+            string musicFolderPathFull = Path.Combine(Main.gamePath, musicFolderPath);
             string[] musicFiles = Directory.GetFiles(musicFolderPathFull);
 
 

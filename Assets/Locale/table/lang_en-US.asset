@@ -177,7 +177,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 41289854840832
-    m_Localized: Bass booster
+    m_Localized: Bass gain
     m_Metadata:
       m_Items: []
   - m_Id: 41482788630528
@@ -332,10 +332,6 @@ MonoBehaviour:
     m_Localized: options
     m_Metadata:
       m_Items: []
-  - m_Id: 2500536736399360
-    m_Localized: Blind mode
-    m_Metadata:
-      m_Items: []
   - m_Id: 2500561184997376
     m_Localized: Hide playing status
     m_Metadata:
@@ -478,6 +474,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 13374434543513600
     m_Localized: Logged in as
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21764891598237696
+    m_Localized: Textures
     m_Metadata:
       m_Items: []
   references:

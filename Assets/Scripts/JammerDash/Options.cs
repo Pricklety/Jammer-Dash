@@ -21,11 +21,14 @@ using TMPro;
 using UnityEngine.Localization.Settings;
 using UnityEngine.Localization.Tables;
 using UnityEngine.SocialPlatforms;
+using JammerDash.Tech;
+using SimpleFileBrowser;
 
 namespace JammerDash
 {
     public class Options : MonoBehaviour
     {
+        public Text path;
         public Animator newSong;
         public Text newName;
         public Text newName2;
@@ -51,14 +54,10 @@ namespace JammerDash
         public Toggle sfx;
         public Toggle vsync;
         public Dropdown playerType;
-        public Toggle cursorTrail;
         public Slider lowpass;
         public Dropdown backgrounds;
-        public Slider trailParticleCount;
         public Toggle showFPS;
         public Dropdown hitType;
-        public Slider trailFade;
-        public Text trailFadeText;
         public Toggle parallax;
         public Image backgroundImage;
         public Dropdown gameplayDir;
@@ -89,6 +88,9 @@ namespace JammerDash
         public Toggle regionDisplay;
 
         public Text logInOut;
+
+        public Dropdown textures;
+        public Toggle preferNoRomaji;
 
         [Header("Next Update")]
         public GameObject nextChangelogs;
@@ -132,6 +134,136 @@ namespace JammerDash
             version.text = Application.version;
         }
 
+     public GameObject restartPanel;  // Reference to the restart notification panel
+
+    public void ChangePath()
+    {
+        FileBrowser.ShowLoadDialog(
+            onSuccess: (path) =>
+            {
+                string oldPath = Main.gamePath;
+                Main.gamePath = path[0];
+                Debug.Log("Path changed to: " + Main.gamePath);
+
+                // Update the UI text
+                this.path.text = Main.gamePath;
+                
+                // Show the restart panel
+                ShowRestartPanel();
+                File.WriteAllText(Path.Combine(Application.persistentDataPath, "path.txt"), path[0]);
+                MoveAllContent(oldPath, Main.gamePath);
+            },
+            onCancel: () =>
+            {
+                Debug.Log("Path selection canceled.");
+            },
+            pickMode: FileBrowser.PickMode.Folders,
+            allowMultiSelection: false,
+            initialPath: Main.gamePath,
+            title: "Select Game Path"
+        );
+
+        ApplyOptions();
+    }
+    private void MoveAllContent(string sourcePath, string destinationPath)
+{
+    if (Directory.Exists(sourcePath))
+    {
+        // Ensure the destination directory exists
+        if (!Directory.Exists(destinationPath))
+        {
+            Directory.CreateDirectory(destinationPath);
+        }
+
+        // Copy all files
+        string[] files = Directory.GetFiles(sourcePath, "*", SearchOption.AllDirectories);
+        foreach (string file in files)
+        {
+            // Get the relative path of the file (e.g., subfolders)
+            string relativePath = file.Substring(sourcePath.Length + 1);
+
+            // Determine the destination file path
+            string destFile = Path.Combine(destinationPath, relativePath);
+
+            // Ensure the destination directory exists
+            string destDir = Path.GetDirectoryName(destFile);
+            if (!Directory.Exists(destDir))
+            {
+                Directory.CreateDirectory(destDir);
+            }
+
+            // Copy the file
+            File.Copy(file, destFile, true);
+        }
+
+        // Delete all files from the source
+        foreach (string file in files)
+        {
+            if (Path.GetFileName(file) != "path.txt")
+    {
+        File.Delete(file);
+    }
+        }
+
+        // Copy all subdirectories
+        string[] directories = Directory.GetDirectories(sourcePath, "*", SearchOption.AllDirectories);
+        foreach (string directory in directories)
+        {
+            // Get the relative path of the directory
+            string relativePath = directory.Substring(sourcePath.Length + 1);
+
+            // Determine the destination directory path
+            string destDir = Path.Combine(destinationPath, relativePath);
+
+            // Create the destination directory if it doesn't exist
+            if (!Directory.Exists(destDir))
+            {
+                Directory.CreateDirectory(destDir);
+            }
+        }
+
+        // Delete all directories from the source
+        foreach (string directory in directories)
+        {
+            Directory.Delete(directory, true);
+        }
+
+        // Finally, delete the source directory itself
+        Directory.Delete(sourcePath, true);
+        
+    }
+    else
+    {
+        Debug.LogWarning($"Source path {sourcePath} does not exist.");
+    }
+}
+
+
+    private void ShowRestartPanel()
+    {
+        // Activate the restart panel
+        if (restartPanel != null)
+        {
+            restartPanel.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning("Restart panel not assigned!");
+        }
+    }
+
+    public void RestartGame()
+    {
+        // Logic to restart the game
+        Debug.Log("Restarting game...");
+        Application.Quit();
+#if UNITY_EDITOR
+        if (Application.isEditor) {
+            UnityEditor.EditorApplication.isPlaying = false;
+        }
+        #endif
+    }
+
         public enum Language
         {
             English, // English
@@ -139,6 +271,7 @@ namespace JammerDash
             Русский,  // Russian
             Español, // Spanish (Latin America)
             Deutsch, // German
+            Français, // French
             BahasaIndonesia, // Indonesian
             portuguêsBrasil, // Brazilian Portuguese
             Italiano, // Italian
@@ -160,6 +293,7 @@ namespace JammerDash
                 { "Русский", Language.Русский },
                 { "Español (américa latina)", Language.Español },
                 { "Deutsch", Language.Deutsch },
+                { "Français", Language.Français },
                 { "bahasa indonesia", Language.BahasaIndonesia },
                 { "português (brasil)", Language.portuguêsBrasil },
                 { "italiano", Language.Italiano },
@@ -179,6 +313,7 @@ namespace JammerDash
                 { Language.Русский, ("ru-RU", "ru-RU") },
                 { Language.Español, ("es", "es") },
                 { Language.Deutsch, ("de-DE", "de-DE") },
+                { Language.Français, ("fr", "fr") },
                 { Language.BahasaIndonesia, ("id-ID", "id-ID") },
                 { Language.portuguêsBrasil, ("pt-BR", "pt-BR") },
                 { Language.Italiano, ("it", "it")},
@@ -239,24 +374,49 @@ namespace JammerDash
         }
 
         void PopulateDropdowns()
+{
+    // Populate resolution dropdown
+    resolutionDropdown.ClearOptions();
+
+    // Get the available resolutions for the current display
+    Resolution[] resolutions = Screen.resolutions;
+
+    // Create a list of resolution strings
+    List<string> resolutionOptions = new List<string>();
+    foreach (Resolution resolution in resolutions)
+    {
+        resolutionOptions.Add($"{resolution.width}x{resolution.height}");
+    }
+
+    // Add the resolution options to the dropdown
+    resolutionDropdown.AddOptions(resolutionOptions);
+
+    // Populate textures dropdown
+    textures.ClearOptions();
+
+    // Get all available texture packs from the "persistent/textures" folder
+    string texturePackPath = Path.Combine(Main.gamePath, "textures");
+    if (Directory.Exists(texturePackPath))
+    {
+        string[] directories = Directory.GetDirectories(texturePackPath);
+        List<string> texturePackOptions = new List<string>();
+
+        foreach (string directory in directories)
         {
-
-            // Populate resolution dropdown
-            resolutionDropdown.ClearOptions();
-            // Get the available resolutions for the current display
-            Resolution[] resolutions = Screen.resolutions;
-            // Create a list of resolution strings
-            List<string> resolutionOptions = new List<string>();
-            foreach (Resolution resolution in resolutions)
-            {
-                resolutionOptions.Add($"{resolution.width}x{resolution.height}");
-            }
-            // Add the resolution options to the dropdown
-            resolutionDropdown.AddOptions(resolutionOptions);
-
-            
+            // Extract folder name from the path
+            string folderName = new DirectoryInfo(directory).Name;
+            texturePackOptions.Add(folderName);
         }
-        
+
+        // Add the texture pack options to the dropdown
+        textures.AddOptions(texturePackOptions);
+    }
+    else
+    {
+        Directory.CreateDirectory(texturePackPath);
+    }
+}
+
 
       
         public void SetBackgroundImage()
@@ -320,12 +480,9 @@ namespace JammerDash
             hitSounds.isOn = settingsData.hitNotes;
             vsync.isOn = settingsData.vsync;
             playerType.value = settingsData.playerType;
-            cursorTrail.isOn = settingsData.cursorTrail;
             lowpass.value = settingsData.lowpassValue;
-            trailParticleCount.value = settingsData.mouseParticles;
             showFPS.isOn = settingsData.isShowingFPS;
             hitType.value = settingsData.hitType;
-            trailFade.value = settingsData.cursorFade;
             parallax.isOn = settingsData.parallax;
             confineMouse.isOn = settingsData.confinedMouse;
             wheelShortcut.isOn = settingsData.wheelShortcut;
@@ -341,6 +498,8 @@ namespace JammerDash
             discordAFK.isOn = settingsData.discordAFK;
             regionDisplay.isOn = settingsData.region;
             randomSong.isOn = settingsData.randomSong;
+            path.text = Main.gamePath;
+            preferNoRomaji.isOn = settingsData.preferNoRomaji; 
             SetDropdownValueFromSettings();
             
         }
@@ -397,11 +556,9 @@ namespace JammerDash
             settingsData.sfx = sfx.isOn;
             settingsData.vsync = vsync.isOn;
             settingsData.playerType = playerType.value;
-            settingsData.cursorTrail = cursorTrail.isOn;
             settingsData.lowpassValue = lowpass.value;
             settingsData.hitType = hitType.value;
             settingsData.isShowingFPS = showFPS.isOn;
-            settingsData.cursorFade = trailFade.value;
             settingsData.parallax = parallax.isOn;
             settingsData.confinedMouse = confineMouse.isOn;
             settingsData.wheelShortcut = wheelShortcut.isOn;
@@ -418,12 +575,13 @@ namespace JammerDash
             settingsData.shaders = shaders.isOn;
             settingsData.region = regionDisplay.isOn;
             settingsData.randomSong = randomSong.isOn;
+            settingsData.gamePath = Main.gamePath;
+            settingsData.preferNoRomaji = preferNoRomaji.isOn;
             ApplyFPSCap(settingsData.selectedFPS);
             ApplyResolution();
             HitNotes(settingsData.hitNotes);
             SFX(settingsData.sfx);
             Vsync(settingsData.vsync);
-            Cursor(settingsData.cursorTrail);
             SetLocale(settingsData.language);
         }
 
@@ -435,11 +593,6 @@ namespace JammerDash
         public void SFX(bool enabled)
         {
             audio.sfx = enabled;
-        }
-        public void Cursor(bool enabled)
-        {
-            FindFirstObjectByType<CursorTrail>().trailImage.gameObject.SetActive(enabled);
-            UnityEngine.Cursor.visible = true;
         }
         
         public void Vsync(bool enabled)
@@ -516,12 +669,9 @@ namespace JammerDash
                 sfx = sfx.isOn,
                 hitNotes = hitSounds.isOn,
                 playerType = playerType.value,
-                cursorTrail = cursorTrail.isOn,
                 lowpassValue = lowpass.value,
-                mouseParticles = trailParticleCount.value,
                 isShowingFPS = showFPS.isOn,
                 hitType = hitType.value,
-                cursorFade = trailFade.value,
                 parallax = parallax.isOn,
                 confinedMouse = confineMouse.isOn,
                 wheelShortcut = wheelShortcut.isOn,
@@ -537,8 +687,10 @@ namespace JammerDash
                 discordEdit = discordEdit.isOn,
                 region = regionDisplay.isOn,
                 randomSong = randomSong.isOn,
+                preferNoRomaji = preferNoRomaji.isOn,
                 saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
-                gameVersion = Application.version
+                gameVersion = Application.version,
+                gamePath = path.text
             };
 
             // Save the newSettingsData to a file
@@ -579,7 +731,7 @@ namespace JammerDash
 
         public void OpenExplorerAtMusicFolder()
         {
-            string arguments = Path.Combine(Application.persistentDataPath, "music");
+            string arguments = Path.Combine(Main.gamePath, "music");
             if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer)
                 Process.Start(arguments);
             else
@@ -588,7 +740,7 @@ namespace JammerDash
 
         public void OpenExplorerAtBGFolder()
         {
-            string arguments = Path.Combine(Application.persistentDataPath, "backgrounds");
+            string arguments = Path.Combine(Main.gamePath, "backgrounds");
             if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer)
                 Process.Start("explorer.exe", "/select," + arguments.Replace("/", "\\"));
             else
@@ -879,6 +1031,93 @@ namespace JammerDash
             }
         }
 
+        public GameObject sawGameObject;          // GameObject with animation to enable/disable
+    public GameObject visualizerLogo;        // Visualizer logo GameObject
+    public GameObject visualizerBack;        // Visualizer background GameObject
+
+    private Dictionary<string, Dictionary<string, string>> iniData;
+        public void ApplySettingsFromIni(string iniPath)
+    {
+        IniParser parser = new IniParser();
+        iniData = parser.ParseIni(iniPath);
+
+        if (iniData == null)
+        {
+            Debug.LogError("Failed to parse INI file.");
+            return;
+        }
+
+        // Handle [Animations]
+        if (iniData.ContainsKey("Animations"))
+        {
+            var animations = iniData["Animations"];
+            if (animations.ContainsKey("SawAnimation") && sawGameObject != null)
+            {
+                bool enableSawAnimation = animations["SawAnimation"].ToLower() == "true";
+                Animator sawAnimator = sawGameObject.GetComponent<Animator>();
+                if (sawAnimator != null)
+                {
+                    sawAnimator.enabled = enableSawAnimation;
+                    Debug.Log($"SawAnimation set to: {enableSawAnimation}");
+                }
+            }
+        }
+
+        // Handle [Visualizers]
+        if (iniData.ContainsKey("Visualizers"))
+        {
+            var visualizers = iniData["Visualizers"];
+
+            // VisualizerColorLogo
+            if (visualizers.ContainsKey("VisualizerColorLogo") && visualizerLogo != null)
+            {
+                string colorHex = visualizers["VisualizerColorLogo"];
+                if (ColorUtility.TryParseHtmlString(colorHex, out Color color))
+                {
+                    float alpha = visualizers.ContainsKey("VisualizerColorLogoAlpha")
+                        ? Mathf.Clamp(float.Parse(visualizers["VisualizerColorLogoAlpha"]) / 100f, 0, 1)
+                        : 1f;
+
+                    color.a = alpha;
+                    ApplyColorToVisualizer(visualizerLogo, color);
+                    Debug.Log($"VisualizerColorLogo set to: {color}");
+                }
+            }
+
+            // VisualizerColorBack
+            if (visualizers.ContainsKey("VisualizerColorBack") && visualizerBack != null)
+            {
+                string colorHex = visualizers["VisualizerColorBack"];
+                if (ColorUtility.TryParseHtmlString(colorHex, out Color color))
+                {
+                    float alpha = visualizers.ContainsKey("VisualizerColorBackAlpha")
+                        ? Mathf.Clamp(float.Parse(visualizers["VisualizerColorBackAlpha"]) / 100f, 0, 1)
+                        : 1f;
+
+                    color.a = alpha;
+                    ApplyColorToVisualizer(visualizerBack, color);
+                    Debug.Log($"VisualizerColorBack set to: {color}");
+                }
+            }
+        }
+    }
+    public void OnTexturePackSelected(int index)
+{
+    string selectedTexturePack = textures.options[index].text;
+    string selectedPath = Path.Combine(Main.gamePath, "textures", selectedTexturePack);
+    TexturePack.Instance.SetActiveTexturePack(selectedPath);
+    Debug.Log($"Selected Texture Pack: {selectedTexturePack}");
+}
+
+    private void ApplyColorToVisualizer(GameObject visualizer, Color color)
+    {
+        var spectrum = visualizer.GetComponent<SimpleSpectrum>();
+        if (spectrum != null)
+        {
+            spectrum.colorMin = color;
+        }
+    }
+
         public void CloseConfirm()
         {
             confirm.SetActive(false);
@@ -893,7 +1132,7 @@ namespace JammerDash
 
         public void Delete()
         {
-            string path = Path.Combine(Application.persistentDataPath, "levels");
+            string path = Path.Combine(Main.gamePath, "levels");
             if (Directory.Exists(path))
             {
                 foreach (string file in Directory.GetFiles(path))
@@ -914,13 +1153,12 @@ namespace JammerDash
 
         public void ResetPlayer()
         {
-            string playerpath = Path.Combine(Application.persistentDataPath, "playerData.dat");
-            string scorespath = Path.Combine(Application.persistentDataPath, "scores.dat");
+            string playerpath = Path.Combine(Main.gamePath, "playerData.dat");
+            string scorespath = Path.Combine(Main.gamePath, "scores.dat");
             File.Delete(playerpath);
             File.Delete(scorespath);
             Account.Instance.totalXP = 0;
             Account.Instance.level = 0;
-            Account.Instance.currentXP = 0;
             Account.Instance.SavePlayerData(Account.Instance.user, Account.Instance.email);
             confirmation.onClick.RemoveAllListeners();
 
@@ -958,7 +1196,6 @@ namespace JammerDash
 
         public void FixedUpdate()
         {
-            trailFadeText.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Trail fade")} ({trailFade.value:0.00}s)";
             dim.GetComponentInChildren<Text>().text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Background visibility")} ({dim.value}%)";
 
 

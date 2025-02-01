@@ -9,5 +9,6 @@ namespace JammerDash.Menus.Play.Score
         public Text scoreText;
         public Text accuracyText;
         public Text username;
+        public Text modText;
     }
 }

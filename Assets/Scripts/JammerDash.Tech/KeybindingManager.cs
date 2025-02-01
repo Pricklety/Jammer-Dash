@@ -69,7 +69,7 @@ namespace JammerDash
         private void Awake()
         {
             LoadKeybindingsFromJson();
-            savePath = Application.persistentDataPath + "/keybindings.json";
+            savePath = Main.gamePath + "/keybindings.json";
             instance = this;
         }
 

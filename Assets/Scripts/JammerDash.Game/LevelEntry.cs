@@ -24,7 +24,6 @@ namespace JammerDash.Game
         bool started = false;
         public TextMeshProUGUI infotext;
 
-        public Transform ground;
         public RawImage image;
 
         private void Start()
@@ -44,7 +43,7 @@ namespace JammerDash.Game
 
         IEnumerator LateStart()
         {
-            StartCoroutine(CustomLevelDataManager.Instance.LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "bgImage.png"), image));
+            StartCoroutine(CustomLevelDataManager.Instance.LoadImage(Path.Combine(Main.gamePath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "bgImage.png"), image));
 
             if (player0 != null && player1 != null)
             {
@@ -80,11 +79,11 @@ namespace JammerDash.Game
             song.pitch = 1f;
             song.volume = 1f;
             song.Play(); 
-            if (File.Exists(Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "backgroundVideo.mp4")))
+            if (File.Exists(Path.Combine(Main.gamePath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "backgroundVideo.mp4")))
             {
                 image.gameObject.SetActive(true);
                 image.texture = video.targetTexture;
-                video.url = Path.Combine(Application.persistentDataPath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "backgroundVideo.mp4");
+                video.url = Path.Combine(Main.gamePath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "backgroundVideo.mp4");
                 video.Play();
             }
             infotext.text = $"{CustomLevelDataManager.Instance.data.artist} - {CustomLevelDataManager.Instance.data.songName}";

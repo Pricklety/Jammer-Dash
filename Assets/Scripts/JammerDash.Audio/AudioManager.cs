@@ -14,7 +14,6 @@ using Debug = UnityEngine.Debug;
 using UnityEngine.Rendering.PostProcessing;
 
 using JammerDash.Menus;
-using JammerDash.Audio;
 
 namespace JammerDash.Audio
 {
@@ -70,7 +69,7 @@ namespace JammerDash.Audio
             {
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
-
+               
             }
             else
             {
@@ -96,11 +95,11 @@ namespace JammerDash.Audio
            
 
             // Initialize FileSystemWatcher
-            string persistentPath = Application.persistentDataPath;
+            string persistentPath = Main.gamePath;
             Debug.Log($"Setting up FileSystemWatcher for path: {persistentPath}");
 
             string sourceDirectory = Path.Combine(Application.streamingAssetsPath, "music");
-            string destinationDirectory = Path.Combine(Application.persistentDataPath, "music");
+            string destinationDirectory = Path.Combine(Main.gamePath, "music");
 
             if (!Directory.Exists(destinationDirectory))
             {
@@ -134,7 +133,7 @@ namespace JammerDash.Audio
             // Enable watcher
             fileWatcher.EnableRaisingEvents = true;
             Debug.Log("FileSystemWatcher initialized and active.");
-            string path = Path.Combine(Application.persistentDataPath, "music");
+            string path = Path.Combine(Main.gamePath, "music");
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
@@ -199,7 +198,7 @@ namespace JammerDash.Audio
         public void LoadAudioClipsAsync()
         {
 
-            string persistentPath = Application.persistentDataPath;
+            string persistentPath = Main.gamePath;
 
             // Collect all audio files
             string[] mp3Files = Directory.GetFiles(persistentPath, "*.mp3", SearchOption.AllDirectories);
@@ -500,7 +499,7 @@ namespace JammerDash.Audio
             case "Master":
                 foreach (AudioSource audio in audios)
                 {
-                    if (audio.outputAudioMixerGroup != null)
+                    if (audio.outputAudioMixerGroup == null)
                         audio.outputAudioMixerGroup = master;
                     audio.outputAudioMixerGroup.audioMixer.SetFloat("Master", newVolume - value);
                     slider.GetComponentInChildren<Text>().text = $"{category}: {newVolume}dB";
@@ -712,10 +711,13 @@ namespace JammerDash.Audio
         public IEnumerator LoadAudioClip(string filePath)
         {
             songLoaded = false;
+            filePath = filePath.Replace("\\", "/");
             Resources.UnloadUnusedAssets();
             // Encode the file path to ensure proper URL encoding
             string encodedPath = EncodeFilePath(filePath);
             string fileUri = "file://" + encodedPath;
+            if (Application.isEditor)
+            Debug.Log(fileUri);
             using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(fileUri, AudioType.UNKNOWN))
             {
                 ((DownloadHandlerAudioClip)www.downloadHandler).streamAudio = true;
@@ -781,7 +783,7 @@ namespace JammerDash.Audio
         {
             List<string> songPathsList = new List<string>();
 
-            string[] musicFiles = Directory.GetFiles(Application.persistentDataPath, "*.mp3", SearchOption.AllDirectories);
+            string[] musicFiles = Directory.GetFiles(Main.gamePath, "*.mp3", SearchOption.AllDirectories);
             songPathsList.AddRange(musicFiles);
 
             return songPathsList;
@@ -792,7 +794,7 @@ namespace JammerDash.Audio
         public int GetTotalNumberOfSongs()
         {
 
-            string[] musicFiles = Directory.GetFiles(Application.persistentDataPath, "*.mp3", SearchOption.AllDirectories);
+            string[] musicFiles = Directory.GetFiles(Main.gamePath, "*.mp3", SearchOption.AllDirectories);
             int numberOfMusicFiles = musicFiles.Length;
             return numberOfMusicFiles;
         }

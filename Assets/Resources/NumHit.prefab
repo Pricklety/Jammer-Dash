@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 2213679496251212182}
   - component: {fileID: 320752860142575550}
   - component: {fileID: 1886206949988386656}
+  - component: {fileID: 4562566019301497649}
+  - component: {fileID: -1706279879697699012}
   m_Layer: 0
   m_Name: NumHit
   m_TagString: Untagged
@@ -138,3 +140,29 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &4562566019301497649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9000457461671532491}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8d811f4bae7e484dbe7399e1da3d5bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textureName: custom/prickle/perfect
+  fallbackTexture: {fileID: 2800000, guid: 4986bc8bd18cfaf44b1389c89bdbd548, type: 3}
+--- !u!114 &-1706279879697699012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9000457461671532491}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47801ab6ebfc53d42bf2b53c79b7ddbc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

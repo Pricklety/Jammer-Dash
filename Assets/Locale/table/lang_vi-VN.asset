@@ -331,10 +331,6 @@ MonoBehaviour:
     m_Localized: "T\xECm\u2026"
     m_Metadata:
       m_Items: []
-  - m_Id: 2500536736399360
-    m_Localized: "Ch\u1EBF \u0111\u1ED9 m\xF9\r"
-    m_Metadata:
-      m_Items: []
   - m_Id: 2500561184997376
     m_Localized: "\u1EA8n tr\u1EA1ng th\xE1i ch\u01A1i "
     m_Metadata:
@@ -478,6 +474,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 13374434543513600
     m_Localized: "\u0110\xE3 \u0111\u0103ng nh\u1EADp v\u1EDBi t\u01B0 c\xE1ch"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21764891598237696
+    m_Localized: "K\u1EBFt c\u1EA5u"
     m_Metadata:
       m_Items: []
   references:

@@ -32,7 +32,7 @@ namespace JammerDash.Menus.Play
             }
 
             // Constructing the file path
-            string filePath = Path.Combine(Application.persistentDataPath, "scores.dat");
+            string filePath = Path.Combine(JammerDash.Main.gamePath, "scores.dat");
 
             // Check if the file exists
             if (!File.Exists(filePath))

@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 5623922741339103292}
   - component: {fileID: 5209984224624224732}
   - component: {fileID: 2635426181631092028}
+  - component: {fileID: -6341036639575311747}
+  - component: {fileID: -5334670116440803727}
   m_Layer: 0
   m_Name: ok
   m_TagString: Untagged
@@ -138,3 +140,29 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-6341036639575311747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5152394820148545469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8d811f4bae7e484dbe7399e1da3d5bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textureName: okNote
+  fallbackTexture: {fileID: 2800000, guid: 053471099366e514186be989a35861d5, type: 3}
+--- !u!114 &-5334670116440803727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5152394820148545469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47801ab6ebfc53d42bf2b53c79b7ddbc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -13,13 +13,13 @@ namespace JammerDash
             string json = JsonUtility.ToJson(data, true);
 
             // Save the settings to a file
-            string filePath = Application.persistentDataPath + "/settings.json";
+            string filePath = Main.gamePath + "/settings.json";
             System.IO.File.WriteAllText(filePath, json);
         }
         public static SettingsData LoadSettingsFromFile()
         {
             // Load settings from the file
-            string filePath = Application.persistentDataPath + "/settings.json";
+            string filePath = Main.gamePath + "/settings.json";
 
             if (System.IO.File.Exists(filePath))
             {
@@ -28,8 +28,10 @@ namespace JammerDash
             }
             else
             {
-                // Return default settings or handle the absence of a settings file
-                return new SettingsData();
+                SettingsData data = new SettingsData();
+                data.gamePath = Main.gamePath;
+                return data;
+                
             }
         }
 
@@ -64,13 +66,10 @@ namespace JammerDash
         public bool hitNotes = true;
         public bool focusVol = true;
         public int playerType = 0;
-        public bool cursorTrail = false;
         public float noFocusVolume = -20f;
         public float lowpassValue = 500;
-        public float mouseParticles = 1000;
         public bool isShowingFPS = false;
         public int hitType = 0;
-        public float cursorFade = 0.24f;
         public bool parallax = true;
         public bool confinedMouse = false;
         public int bgTime = 0;
@@ -89,9 +88,11 @@ namespace JammerDash
 
         public bool region = true;
         public bool randomSong = false;
+        public bool preferNoRomaji = true;
         public string language = SettingsFileHandler.GetLanguageName();
         public string gameVersion = Application.version;
         public string saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+        public string gamePath = Application.persistentDataPath;
 
     }
 }

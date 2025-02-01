@@ -57,7 +57,7 @@ namespace JammerDash.Menus.Play
         void DisplayLB(string levelName)
         {
             // Constructing the file path
-            string filePath = Path.Combine(Application.persistentDataPath, "scores.dat");
+            string filePath = Path.Combine(JammerDash.Main.gamePath, "scores.dat");
 
             // Check if the file exists
             if (!File.Exists(filePath))
@@ -77,12 +77,12 @@ namespace JammerDash.Menus.Play
                 string[] data = line.Split(',');
 
                 // Ensure that the data array has enough elements
-                if (data.Length >= 10) // Ensure there are at least 10 elements in the array
+                if (data.Length >= 11) // Ensure there are at least 10 elements in the array
                 {
                     string level = data[0];
                     if (level == levelName)
                     {
-                        string[] scoreData = new string[10];
+                        string[] scoreData = new string[12];
                         scoreData[0] = data[1]; // Ranking
                         scoreData[8] = data[2]; // Shine performance
                         scoreData[2] = data[3]; // Accuracy
@@ -93,6 +93,7 @@ namespace JammerDash.Menus.Play
                         scoreData[6] = data[8]; // Miss
                         scoreData[9] = data[9]; // Combo
                         scoreData[7] = data[10]; // Username
+                        scoreData[10] = (data.Length > 11) ? data[11] : ""; // Mods
                         
 
                         
@@ -121,16 +122,41 @@ namespace JammerDash.Menus.Play
                 string rankText = string.Format("{0}", scoreData[0]); // Ranking
                 string acc = string.Format("5: {0}\n3: {1}\n1: {2}\n0: {3}\n{4}sp", scoreData[3], scoreData[4], scoreData[5], scoreData[6], Mathf.RoundToInt(float.Parse(scoreData[8])).ToString()); // Accuracy breakdown (Five, Three, One, Miss)
                 string user = scoreData[7]; // Username
+                string mods = string.Join("\t", scoreData[10]
+    .Split(';')
+    .Select(m => modAbbreviations.ContainsKey(m) ? modAbbreviations[m] : m));
 
                
-
+                scorePanel.modText.text = mods;
                 scorePanel.rankText.sprite = Resources.Load<Sprite>($"ranking/{rankText}");
                 scorePanel.scoreText.text = displayText;
                 scorePanel.accuracyText.text = acc;
                 scorePanel.username.text = user;
             }
         }
-        
+        string InsertSpacesBeforeCaps(string input)
+{
+    return System.Text.RegularExpressions.Regex.Replace(input, "([a-z])([A-Z])", "$1 $2");
+}
+
+        Dictionary<string, string> modAbbreviations = new Dictionary<string, string>
+        {
+            { "SpeedIncrease", "SI" },
+            { "hidden", "HD" },
+            { "remember", "RM" },
+            { "perfect", "PF" },
+            { "random", "RD" },
+            { "suddenDeath", "SuD" },
+            { "SpeedDecrease", "SD" },
+            { "oneLine", "OL" },
+            { "noSpikes", "NS" },
+            { "easy", "EZ" },
+            { "yMirror", "MR" },
+            { "autoMove", "AM" },
+            { "auto", "AU" },
+            { "noDeath", "ND" }
+        };
+
         void Update()
         {
             bg = GameObject.FindGameObjectWithTag("BG").GetComponent<Image>();
@@ -163,7 +189,7 @@ namespace JammerDash.Menus.Play
         {
             if (GetComponent<CustomLevelScript>().sceneData != null && isSelected)
             {
-                StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", GetComponent<CustomLevelScript>().sceneData.ID + " - " + GetComponent<CustomLevelScript>().sceneData.sceneName, "bgImage.png")));
+                StartCoroutine(LoadImage(Path.Combine(JammerDash.Main.gamePath, "levels", "extracted", GetComponent<CustomLevelScript>().sceneData.ID + " - " + GetComponent<CustomLevelScript>().sceneData.name, "bgImage.png")));
             }
         }
         public IEnumerator Move(float lerpSpeed)
@@ -290,7 +316,7 @@ namespace JammerDash.Menus.Play
 
             if (customLevel.sceneData != null)
             {
-                string clipPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", customLevel.sceneData.ID + " - " + customLevel.sceneData.sceneName, customLevel.sceneData.artist + " - " + customLevel.sceneData.songName + ".mp3");
+                string clipPath = Path.Combine(JammerDash.Main.gamePath, "levels", "extracted", customLevel.sceneData.ID + " - " + customLevel.sceneData.name, customLevel.sceneData.artist + " - " + customLevel.sceneData.songName + ".mp3");
                 int audioClipIndex = -1; // Initialize to a value that indicates no match found
                                          // Normalize the clipPath
                 clipPath.Replace("/", "\\");
@@ -330,7 +356,7 @@ namespace JammerDash.Menus.Play
             }
             int selectedLevelIndex = Array.FindIndex(levels, level => level.isSelected);
             FindAnyObjectByType<mainMenu>().levelRow = selectedLevelIndex;
-            yield return StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", customLevel.sceneData.ID + " - " + customLevel.sceneData.sceneName, "bgImage.png")));
+            yield return StartCoroutine(LoadImage(Path.Combine(JammerDash.Main.gamePath, "levels", "extracted", customLevel.sceneData.ID + " - " + customLevel.sceneData.name, "bgImage.png")));
         }
         private IEnumerator LerpButtonSize(RectTransform rectTransform, Vector2 sizeChange, float duration = 0.1f)
         {
@@ -408,10 +434,9 @@ namespace JammerDash.Menus.Play
            
             if (customLevel.sceneData != null)
             {
-                string clipPath = Path.Combine(Application.persistentDataPath, "levels", "extracted", customLevel.sceneData.ID + " - " + customLevel.sceneData.sceneName, customLevel.sceneData.artist + " - " + customLevel.sceneData.songName + ".mp3");
+                string clipPath = Path.Combine(JammerDash.Main.gamePath, "levels", "extracted", customLevel.sceneData.ID + " - " + customLevel.sceneData.name, customLevel.sceneData.artist + " - " + customLevel.sceneData.songName + ".mp3");
                 int audioClipIndex = -1; // Initialize to a value that indicates no match found
-                                         // Normalize the clipPath
-                clipPath.Replace("/", "\\");
+                                         
                 // Iterate through the songPathsList
                 for (int i = 0; i < AudioManager.Instance.songPathsList.Count; i++)
                 {
@@ -447,7 +472,7 @@ namespace JammerDash.Menus.Play
             }
             int selectedLevelIndex = Array.FindIndex(levels, level => level.isSelected);
             FindAnyObjectByType<mainMenu>().levelRow = selectedLevelIndex;
-            yield return StartCoroutine(LoadImage(Path.Combine(Application.persistentDataPath, "levels", "extracted", customLevel.sceneData.ID + " - " + customLevel.sceneData.sceneName, "bgImage.png")));
+            yield return StartCoroutine(LoadImage(Path.Combine(JammerDash.Main.gamePath, "levels", "extracted", customLevel.sceneData.ID + " - " + customLevel.sceneData.name, "bgImage.png")));
 
 
 
@@ -509,7 +534,7 @@ namespace JammerDash.Menus.Play
         // Helper function to generate clip path
         private string GetClipPath(SceneData data)
         {
-            return Path.Combine(Application.persistentDataPath, "levels", "extracted", data.sceneName, $"{data.artist} - {data.songName}.mp3").Replace("/", "\\");
+            return Path.Combine(JammerDash.Main.gamePath, "levels", "extracted", data.name, $"{data.artist} - {data.songName}.mp3").Replace("/", "\\");
         }
 
         // Helper function to find index of clip path in songPathsList

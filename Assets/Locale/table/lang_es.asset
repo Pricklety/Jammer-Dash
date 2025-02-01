@@ -331,10 +331,6 @@ MonoBehaviour:
     m_Localized: "Seleccionar una canci\xF3n"
     m_Metadata:
       m_Items: []
-  - m_Id: 2500536736399360
-    m_Localized: Modo Ciego
-    m_Metadata:
-      m_Items: []
   - m_Id: 2500561184997376
     m_Localized: Esconder el estado de jugando
     m_Metadata:
@@ -477,6 +473,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 13374434543513600
     m_Localized: "Inici\xF3 sesi\xF3n como"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21764891598237696
+    m_Localized: Texturas
     m_Metadata:
       m_Items: []
   references:

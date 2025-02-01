@@ -102,7 +102,7 @@ namespace JammerDash.Menus.Play
                 return;
             }
 
-            CustomLevelDataManager.Instance.LoadLevelData(sceneData.sceneName, sceneData.ID);
+            CustomLevelDataManager.Instance.LoadLevelData(sceneData.name, sceneData.ID);
            
         }
 

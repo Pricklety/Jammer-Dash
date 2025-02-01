@@ -1,0 +1,484 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: lang_fr
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: fr
+  m_SharedData: {fileID: 11400000, guid: cf72037e39558674484c2c22edf2e151, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 42645680128
+    m_Localized: jouer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 714870976512
+    m_Localized: multijoueur
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2991782457344
+    m_Localized: modifier
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3021977251840
+    m_Localized: "arr\xEAter"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3082442338304
+    m_Localized: "D\xE9placez votre souris pour activer le menu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6902991908864
+    m_Localized: "Param\xE8tres g\xE9n\xE9raux"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7116955938816
+    m_Localized: Modifier les raccourcis clavier du jeu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7659258474496
+    m_Localized: "Trac\xE9 du curseur"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7936682323968
+    m_Localized: Fondu de piste
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16284794318848
+    m_Localized: Nombre de particules de traces de souris
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16739842748416
+    m_Localized: Limiter le curseur de la souris
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17375896367104
+    m_Localized: Raccourci de volume de la molette de la souris
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17977820934144
+    m_Localized: "Chanson al\xE9atoire au d\xE9marrage"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18405602193408
+    m_Localized: Langue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25210185150464
+    m_Localized: "Param\xE8tres de performances"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25549747613696
+    m_Localized: "R\xE9solution"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25997023997952
+    m_Localized: FPS max (0-999)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26351287496704
+    m_Localized: Afficher le compteur FPS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26584625016832
+    m_Localized: Synchronisation verticale
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28874199101440
+    m_Localized: "Param\xE8tres audio"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29060447170560
+    m_Localized: "<color=red>(FORT\_!)</color> Augmentez le volume maximum de 20"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29990836072448
+    m_Localized: Volume principal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30263662964736
+    m_Localized: Valeur de l'effet passe-bas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30665745723392
+    m_Localized: "M\xE9langez votre liste de lecture musicale"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31021686943744
+    m_Localized: Ouvrir le dossier de la playlist
+    m_Metadata:
+      m_Items: []
+  - m_Id: 32798117294080
+    m_Localized: "Param\xE8tres de jeu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33307360325632
+    m_Localized: "Visibilit\xE9 de l'arri\xE8re-plan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33955585814528
+    m_Localized: Notes de hit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34381060206592
+    m_Localized: Bruitage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34707171536896
+    m_Localized: "Type de caract\xE8re"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35511366414336
+    m_Localized: Textures des notes de frappe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35901868699648
+    m_Localized: "Param\xE8tres du menu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36120773619712
+    m_Localized: "Type d'arri\xE8re-plan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37224538271744
+    m_Localized: "Heure de changement d'arri\xE8re-plan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37605414629376
+    m_Localized: Parallaxe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37869047607296
+    m_Localized: Neige
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38131267104768
+    m_Localized: "T\xE9l\xE9charger l'arri\xE8re-plan (image ou vid\xE9o)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40729747484672
+    m_Localized: "Param\xE8tres amusants"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 40986791211008
+    m_Localized: Amplificateur de basses
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41289854840832
+    m_Localized: Gain des basses
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41482788630528
+    m_Localized: Entretien
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42188836794368
+    m_Localized: "Supprimer toutes les cartes personnalis\xE9es"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42379153338368
+    m_Localized: "R\xE9initialiser toutes vos donn\xE9es"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42804887777280
+    m_Localized: "Rechercher des mises \xE0 jour"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 43039567474688
+    m_Localized: Objets
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44204417970176
+    m_Localized: HP du joueur
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44553841242112
+    m_Localized: Taille
+    m_Metadata:
+      m_Items: []
+  - m_Id: 44862596542464
+    m_Localized: CLASSEMENT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 45690346631168
+    m_Localized: Vos niveaux
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46491345448960
+    m_Localized: Nouveau
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46977377202176
+    m_Localized: "Cr\xE9er un nouveau niveau"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 47223498960896
+    m_Localized: "S\xE9lectionnez une chanson"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246076816535552
+    m_Localized: "param\xE8tres"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246175391068160
+    m_Localized: Changez le fonctionnement de votre niveau
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246360406011904
+    m_Localized: "Param\xE8tres de niveau"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246385106268160
+    m_Localized: Nom du niveau
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246414898409472
+    m_Localized: "Cr\xE9ateur de niveau"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246431407190016
+    m_Localized: "Cr\xE9ateur de niveaux (romanis\xE9)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246453452451840
+    m_Localized: Calculer le BPM d'une chanson
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246745174683648
+    m_Localized: "Arri\xE8re-plan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2246468149293056
+    m_Localized: Marqueurs BPM Spawn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247211304464384
+    m_Localized: Sol
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247231307100160
+    m_Localized: "Aper\xE7u de l'arri\xE8re-plan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247244460437504
+    m_Localized: "Param\xE8tres de difficult\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247283312275456
+    m_Localized: Taille du cube
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247300961906688
+    m_Localized: "Param\xE8tres de la chanson"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247321564327936
+    m_Localized: Artiste de la chanson
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247342401630208
+    m_Localized: "Artiste de la chanson (romanis\xE9e)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247355554967552
+    m_Localized: Nom de la chanson
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247369245175808
+    m_Localized: "Nom de la chanson (romanis\xE9)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247383707136000
+    m_Localized: BPM de la chanson (nombre)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247408503861248
+    m_Localized: "D\xE9calage du marqueur (ms)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247442930708480
+    m_Localized: Lecture
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247458533519360
+    m_Localized: Multiplicateur de marqueurs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247473800785920
+    m_Localized: "S\xE9lectionner"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247490611556352
+    m_Localized: Annuler
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247512019283968
+    m_Localized: "Afficher les fichiers cach\xE9s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2247524937740288
+    m_Localized: Recherche...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500561184997376
+    m_Localized: Masquer le statut de jeu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500577794441216
+    m_Localized: Masquer le niveau de jeu actuel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500606051467264
+    m_Localized: Masquer le mode AFK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500635977826304
+    m_Localized: "Masquer le niveau d'\xE9dition en cours"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500697919307776
+    m_Localized: cartographe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500710737100800
+    m_Localized: "cartographi\xE9 par"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500722212716544
+    m_Localized: ID local
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500748318064640
+    m_Localized: "derni\xE8re sauvegarde le"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500982360227840
+    m_Localized: "Cr\xE9dits"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2500992455917568
+    m_Localized: "D\xE9veloppeurs et personnel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501015948214272
+    m_Localized: Artistes en vedette
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501050471530496
+    m_Localized: "Programmes utilis\xE9s pour cr\xE9er Jammer Dash"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501076245528576
+    m_Localized: Ouvrir les journaux des joueurs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501106243190784
+    m_Localized: Ouvrez le fichier settings.json
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501183821037568
+    m_Localized: Confitures
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501209586647040
+    m_Localized: Performance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501230793048064
+    m_Localized: "Pr\xE9cision"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501241060704256
+    m_Localized: "Couleur d'arri\xE8re-plan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501271393910784
+    m_Localized: Changer de couleur
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501289848848384
+    m_Localized: "Ins\xE9rer le code HEX"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2501322803494912
+    m_Localized: "\xE9tendre"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573297709166592
+    m_Localized: "sant\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573474192896000
+    m_Localized: score
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2573727289782272
+    m_Localized: combo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574255201660928
+    m_Localized: Continuer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574294158356480
+    m_Localized: "Red\xE9marrage"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574306774822912
+    m_Localized: Retour au menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2574527961444352
+    m_Localized: "\xC9chou\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575739440017408
+    m_Localized: "Il y a toujours un autre moment ! Peut-\xEAtre apr\xE8s avoir red\xE9marr\xE9
+      ?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575789129936896
+    m_Localized: "Niveau termin\xE9 !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2575999075823616
+    m_Localized: "jou\xE9 par"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11238275445010432
+    m_Localized: Shaders
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13013787829972992
+    m_Localized: "Param\xE8tres du compte"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13369743621337088
+    m_Localized: Se connecter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13371624351444992
+    m_Localized: "Afficher la r\xE9gion du pays"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13374434543513600
+    m_Localized: "Connect\xE9 en tant que"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21764891598237696
+    m_Localized: Textures
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

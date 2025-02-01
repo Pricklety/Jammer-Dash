@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 631539863216772468}
   - component: {fileID: 3423497238951749480}
   - component: {fileID: 3944939296753434904}
+  - component: {fileID: -7072544896560936092}
   m_Layer: 3
   m_Name: hitter04
   m_TagString: Cubes
@@ -195,3 +196,17 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 0
+--- !u!114 &-7072544896560936092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2358202793727089482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8d811f4bae7e484dbe7399e1da3d5bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textureName: cube004
+  fallbackTexture: {fileID: 2800000, guid: 0e5bb4f7e4d0c064481db8938c56a7dd, type: 3}

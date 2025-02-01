@@ -39,7 +39,7 @@ namespace JammerDash
             // Generate file name with current date and time
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
             string screenshotFileName = $"Screenshot_{timestamp}.png";
-            string screenshotFolder = Path.Combine(Application.persistentDataPath, "screenshots");
+            string screenshotFolder = Path.Combine(Main.gamePath, "screenshots");
             string screenshotPath = Path.Combine(screenshotFolder, screenshotFileName);
             if (!Directory.Exists(screenshotFolder))
                 Directory.CreateDirectory(screenshotFolder);
@@ -48,8 +48,6 @@ namespace JammerDash
             ScreenCapture.CaptureScreenshot(screenshotPath);
             AudioManager.Instance.source.PlayOneShot(shutter);
 
-            // Wait for a short period of time before checking if the file exists
-            yield return new WaitForSeconds(1f);
 
             // Wait until the file is created
             yield return new WaitUntil(() => File.Exists(screenshotPath));
@@ -69,7 +67,7 @@ namespace JammerDash
 
         public void OpenScreenshotFolder()
         {
-            string screenshotFolderPath = Path.Combine(Application.persistentDataPath, "screenshots");
+            string screenshotFolderPath = Path.Combine(Main.gamePath, "screenshots");
             
             if (Directory.Exists(screenshotFolderPath))
             {
