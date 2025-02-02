@@ -27,6 +27,7 @@ using JammerDash.Editor.Screens;
 using UnityEngine.Localization.Settings;
 using System.Diagnostics;
 using UnityEngine.Video;
+using System.Threading;
 
 namespace JammerDash.Editor
 {
@@ -83,6 +84,7 @@ namespace JammerDash.Editor
         public Text lengthText;
         public InputField romaji;
         public InputField romajiArtist;
+        public InputField source;
         
         public Slider hp;
         public Slider size;
@@ -1372,6 +1374,7 @@ private void OnVideoPrepared(VideoPlayer source)
             {
                 Notifications.instance.Notify($"Oops, something wrong happened!\nTry again later.", null);
                 Debug.LogError("Error while saving/exporting level: " + e);
+                FindAnyObjectByType<LoadingScreen>().HideLoadingScreen();
             }
         }
 
@@ -1527,11 +1530,11 @@ private void OnVideoPrepared(VideoPlayer source)
             songName = customSongName.text,
             offset = float.TryParse(offsetmarker != null ? offsetmarker.text : "0", out float offsetValue) ? offsetValue : 0,
             ID = (data.ID == 0) ? UnityEngine.Random.Range(int.MinValue, int.MaxValue) : data.ID,
-            defBGColor = Camera.main != null ? Camera.main.backgroundColor : Color.black
+            defBGColor = Camera.main != null ? Camera.main.backgroundColor : Color.black,
+            source = source.text
         };
-        loadingScreen.UpdateLoading("Saving background image if enabled...", 0.6f);
+        loadingScreen.UpdateLoading("Saving background image...", 0.6f);
 
-        // Save background image or video if enabled
         if (bgPreview != null && bgPreview.texture != null && bgImage != null && bgImage.isOn)
         {
             string sceneFolderPath = Path.Combine(Main.gamePath, "scenes", sceneData.ID + " - " + sceneData.name);
@@ -1541,13 +1544,18 @@ private void OnVideoPrepared(VideoPlayer source)
             {
                 // Save the video file
                 string videoFilePath = Path.Combine(sceneFolderPath, "backgroundVideo.mp4");
-                if (videoPlayer.url != Path.Combine(sceneFolderPath, "backgroundVideo.mp4"))
-                File.Copy(videoPlayer.url, videoFilePath, true);
+                if (videoPlayer.url != Path.Combine(sceneFolderPath, "backgroundVideo.mp4") && !string.IsNullOrEmpty(videoPlayer.url) && File.Exists(videoPlayer.url)) {
+                    File.Copy(videoPlayer.url, videoFilePath, true);
 
                 // Extract the first frame of the video and save it as bgImage.png
                 string bgImagePath = Path.Combine(sceneFolderPath, "bgImage.png");
-                loadingScreen.UpdateLoading("Generating thumbnail...", 0.65f);
+                if (!File.Exists(bgImagePath)) {
+                    loadingScreen.UpdateLoading("Generating thumbnail...", 0.65f);
                 await SaveFrameAsImage(videoPlayer.url, bgImagePath);
+                }
+                
+                }
+                
             }
             else
             {
@@ -1592,6 +1600,9 @@ private void OnVideoPrepared(VideoPlayer source)
     // Create VideoPlayer object and set it up
     VideoPlayer videoPlayer = new GameObject("VideoPlayer").AddComponent<VideoPlayer>();
     videoPlayer.url = videoFilePath;
+    
+
+
     videoPlayer.renderMode = VideoRenderMode.RenderTexture;
     
     RenderTexture renderTexture = new RenderTexture(1920, 1080, 0);
@@ -1738,6 +1749,7 @@ private async Task WaitForFrameToRender(VideoPlayer videoPlayer)
             offset = float.TryParse(offsetmarker?.text, out float offsetValue) ? offsetValue : 0,
             bpm = int.TryParse(bpmInput.text, out int bpmValue) ? bpmValue : 0,
             ID = (data.ID == 0) ? UnityEngine.Random.Range(int.MinValue, int.MaxValue) : data.ID,
+            source = source.text,
             sections = sections
         };
         await Task.Delay(5000);
