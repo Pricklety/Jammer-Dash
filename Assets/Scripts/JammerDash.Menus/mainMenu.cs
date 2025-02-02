@@ -1728,14 +1728,16 @@ public void FixedUpdate()
 
         public void Update()
         {
-           levelSlider.value = Account.Instance.totalXP / Account.Instance.xpRequiredPerLevel[Account.Instance.level];
-           levelText.text = $"Level {Account.Instance.level}";
-            HandleBackgroundLoading();
+          
             HandleIdleState();
+            HandleBackgroundLoading();
             UpdateTimers();
             HandleKeyBindings();
             if (fullcc != null)
-            fullCountryName.text = data.region ? fullcc : ccName;
+            fullCountryName.text = data.region ? fullcc : ccName; 
+            
+            levelSlider.value = Account.Instance.totalXP / Account.Instance.xpRequiredPerLevel[Account.Instance.level];
+           levelText.text = $"Level {Account.Instance.level}";
 
             
  if (Input.GetKeyDown(KeyCode.F2) && playPanel.activeSelf)
@@ -1813,7 +1815,9 @@ public void FixedUpdate()
             }
         }
     }
-
+        public void NotificationsList() {
+            Notifications.instance.NotificationsList();
+        }
 
         private void HandleBackgroundLoading()
         {

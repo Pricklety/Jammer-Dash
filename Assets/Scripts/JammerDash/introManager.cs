@@ -61,15 +61,15 @@ namespace JammerDash
            
             float elapsedTime = 0f;
 
-            while (elapsedTime < 6f)
+            while (elapsedTime < 3f)
             {
-                if (Input.GetKeyDown(KeyCode.Escape) && (Account.Instance.loggedIn || Application.isEditor))
+                if (Input.GetKeyDown(KeyCode.Escape) && Account.Instance.loggedIn)
                 {
                     operation.allowSceneActivation = true;
                     yield break; 
                 }
 
-                elapsedTime += Time.unscaledDeltaTime;
+                elapsedTime += Time.deltaTime;
                 yield return null;
             }
 

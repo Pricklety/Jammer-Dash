@@ -37,6 +37,7 @@ namespace JammerDash
         public string romanizedArtist;
         public string songName;
         public string romanizedName;
+        public string source = "Unknown";
         public float songLength;
         public float offset = 0;
 

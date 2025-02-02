@@ -113,6 +113,7 @@ namespace JammerDash.Tech
                     manager.sceneNameInput.text = sceneData.name;
                     manager.songArtist.text = sceneData.artist;
                     manager.customSongName.text = sceneData.songName;
+                    manager.source.text = sceneData.source;
                     manager.LoadSceneData(sceneData);
                     manager.ID = sceneData.ID;
                     string videoPath = Path.Combine(Main.gamePath, "scenes", $"{sceneData.ID} - {name}", "backgroundVideo.mp4");

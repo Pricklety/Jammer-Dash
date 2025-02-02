@@ -120,7 +120,7 @@ namespace JammerDash.Tech
                     {
                         presence.State = $"✎ Choosing a level to edit";
                     }
-                    else if (menu.afkTime < 25f)
+                    else if (menu.afkTime < 10f)
                     {
                         presence.Type = ActivityType.Playing;
                         presence.Details = "Main Menu";

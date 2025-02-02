@@ -497,7 +497,7 @@ namespace JammerDash.Menus.Play
             long unixTime = Convert.ToInt64(data.saveTime);
             DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(unixTime).ToUniversalTime();
             DateTimeOffset EUTime = TimeZoneInfo.ConvertTime(dateTimeOffset, TimeZoneInfo.Local);
-            return $"<size=18>{data.artist} - {data.songName}</size>\n{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "mapped by")} {data.creator}\n{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Local ID")}: {data.ID}, {LocalizationSettings.StringDatabase.GetLocalizedString("lang", "last saved on")} {EUTime:yyyy-MM-dd hh:MM:ss}";
+            return $"<size=18>(from {data.source}) {data.artist} - {data.songName}</size>\n{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "mapped by")} {data.creator}\n{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Local ID")}: {data.ID}, {LocalizationSettings.StringDatabase.GetLocalizedString("lang", "last saved on")} {EUTime:yyyy-MM-dd hh:MM:ss}";
         }
 
         // Handle playing the SFX or custom level audio

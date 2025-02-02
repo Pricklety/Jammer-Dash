@@ -368,6 +368,8 @@ namespace JammerDash.Audio
             {
                 KeybindPanel.ToggleFunction("Random level", "F2");
             }
+            if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Tab)) 
+            KeybindPanel.ToggleFunction("Notifications", "Left Control + Tab");
 
             bool gain = master.audioMixer.GetFloat("Gain", value: out float a);
             if (a != data.bassgain)
