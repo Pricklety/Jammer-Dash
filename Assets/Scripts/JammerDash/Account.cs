@@ -180,15 +180,6 @@ namespace JammerDash
 
        
 
-        private void LevelUp()
-        {
-            if (totalXP >= xpRequiredPerLevel[level] && level <= 299)
-            {
-                level++;
-                LevelUp();
-            }
-            
-        }
 
         public void Apply(string nickname, string username, string user, string email, string cc)
         {
@@ -647,7 +638,6 @@ private IEnumerator CallLogout(string url)
 
             
         }
-
         void Update()
         {
             playtime += Time.deltaTime;
@@ -660,7 +650,6 @@ private IEnumerator CallLogout(string url)
                 checkInternet.SetActive(false);
             }
 
-            LevelUp();
         }
         public string ConvertPlaytimeToReadableFormat()
         {

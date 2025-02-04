@@ -479,6 +479,14 @@ MonoBehaviour:
     m_Localized: Tekstur
     m_Metadata:
       m_Items: []
+  - m_Id: 26177406071582720
+    m_Localized: Ustaw opis poziomu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26178270689603584
+    m_Localized: opis
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -480,6 +480,14 @@ MonoBehaviour:
     m_Localized: "K\u1EBFt c\u1EA5u"
     m_Metadata:
       m_Items: []
+  - m_Id: 26177406071582720
+    m_Localized: "\u0110\u1EB7t m\xF4 t\u1EA3 c\u1EA5p \u0111\u1ED9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26178270689603584
+    m_Localized: "S\u1EF1 mi\xEAu t\u1EA3"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

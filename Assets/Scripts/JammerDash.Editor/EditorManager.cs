@@ -28,6 +28,8 @@ using UnityEngine.Localization.Settings;
 using System.Diagnostics;
 using UnityEngine.Video;
 using System.Threading;
+using TMPro;
+using System.Text.RegularExpressions;
 
 namespace JammerDash.Editor
 {
@@ -939,12 +941,12 @@ private void OnVideoPrepared(VideoPlayer source)
                
             }
 
-            if (Input.GetKeyDown(KeybindingManager.playMode) && !Input.GetKey(KeybindingManager.songMode))
+            if ((Input.GetKeyDown(KeybindingManager.playMode) && !Input.GetKey(KeybindingManager.songMode)) && EventSystem.current.currentSelectedGameObject.GetComponent<InputField>() == null)
             {
                 Play();
 
             }
-            if (Input.GetKey(KeybindingManager.songMode) && Input.GetKeyDown(KeybindingManager.playMode))
+            if ((Input.GetKey(KeybindingManager.songMode) && Input.GetKeyDown(KeybindingManager.playMode)) && EventSystem.current.currentSelectedGameObject.GetComponent<InputField>() == null)
             {
                 PlayAudio();
             }
@@ -1531,7 +1533,8 @@ private void OnVideoPrepared(VideoPlayer source)
             offset = float.TryParse(offsetmarker != null ? offsetmarker.text : "0", out float offsetValue) ? offsetValue : 0,
             ID = (data.ID == 0) ? UnityEngine.Random.Range(int.MinValue, int.MaxValue) : data.ID,
             defBGColor = Camera.main != null ? Camera.main.backgroundColor : Color.black,
-            source = source.text
+            source = source.text,
+            description = input.text,
         };
         loadingScreen.UpdateLoading("Saving background image...", 0.6f);
 
@@ -1750,7 +1753,8 @@ private async Task WaitForFrameToRender(VideoPlayer videoPlayer)
             bpm = int.TryParse(bpmInput.text, out int bpmValue) ? bpmValue : 0,
             ID = (data.ID == 0) ? UnityEngine.Random.Range(int.MinValue, int.MaxValue) : data.ID,
             source = source.text,
-            sections = sections
+            sections = sections,
+            description = input.text
         };
         await Task.Delay(5000);
         loadingScreen.UpdateLoading("Populating objects...", 0.6f);
@@ -1867,6 +1871,55 @@ private async Task WaitForFrameToRender(VideoPlayer videoPlayer)
                 File.Copy(sourcePath, destinationPath, true);
             }
         });
+    }
+    public TextMeshProUGUI outputText;
+
+    public GameObject description;
+    public InputField input;
+
+    public void ToggleDescription() {
+        description.SetActive(!description.activeSelf);
+    }
+
+public void ParseBBCode(string bbCodeText)
+    {
+        string parsedText = bbCodeText;
+
+      // Basic Formatting
+        parsedText = Regex.Replace(parsedText, @"\[b\](.*?)\[/b\]", "<b>$1</b>");
+        parsedText = Regex.Replace(parsedText, @"\[i\](.*?)\[/i\]", "<i>$1</i>");
+        parsedText = Regex.Replace(parsedText, @"\[u\](.*?)\[/u\]", "<u>$1</u>");
+        parsedText = Regex.Replace(parsedText, @"\[s\](.*?)\[/s\]", "<s>$1</s>"); // Strikethrough
+
+        // Text Color & Size
+        parsedText = Regex.Replace(parsedText, @"\[color=(.*?)\](.*?)\[/color\]", "<color=$1>$2</color>");
+        parsedText = Regex.Replace(parsedText, @"\[size=(.*?)\](.*?)\[/size\]", "<size=$1>$2</size>");
+
+        // Alignment
+        parsedText = Regex.Replace(parsedText, @"\[align=(left|center|right|justified)\](.*?)\[/align\]", "<align=$1>$2</align>");
+
+        // Hyperlinks
+        parsedText = Regex.Replace(parsedText, @"\[url=(.*?)\](.*?)\[/url\]", "<link=\"$1\">$2</link>");
+
+        // Superscript & Subscript
+        parsedText = Regex.Replace(parsedText, @"\[sup\](.*?)\[/sup\]", "<sup>$1</sup>");
+        parsedText = Regex.Replace(parsedText, @"\[sub\](.*?)\[/sub\]", "<sub>$1</sub>");
+
+        // Quotes & Indent
+        parsedText = Regex.Replace(parsedText, @"\[quote\](.*?)\[/quote\]", "<indent=10%><i>$1</i></indent>");
+        parsedText = Regex.Replace(parsedText, @"\[indent=(\d+)\](.*?)\[/indent\]", "<indent=$1>$2</indent>");
+
+        // Image Support (TextMeshPro Sprites)
+        parsedText = Regex.Replace(parsedText, @"\[img=(.*?)\]", "<sprite name=\"$1\">");
+
+        // Line Height
+        parsedText = Regex.Replace(parsedText, @"\[line-height=(\d+)\](.*?)\[/line-height\]", "<line-height=$1>$2</line-height>");
+
+        // Centering (Custom workaround since TMP does not support <center>)
+        parsedText = Regex.Replace(parsedText, @"\[center\](.*?)\[/center\]", "<align=center>$1</align>");
+
+
+        outputText.text = parsedText;
     }
 
     }

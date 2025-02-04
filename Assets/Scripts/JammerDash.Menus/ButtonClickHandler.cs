@@ -13,6 +13,7 @@ using JammerDash.Tech;
 using UnityEngine.Localization.Settings;
 using System.Data.Common;
 using JammerDash.Game;
+using System.Text.RegularExpressions;
 
 namespace JammerDash.Menus.Play
 {
@@ -26,6 +27,7 @@ namespace JammerDash.Menus.Play
         public Button button;
         public RectTransform buttonRectTransform;
         public bool isSelected = false;
+        public TextMeshProUGUI desc;
         public Text levelLength;
         public Text levelBPM;
         public Text diff;
@@ -273,13 +275,14 @@ namespace JammerDash.Menus.Play
             {
                 CustomLevelDataManager data = CustomLevelDataManager.Instance;
                 data.sceneLoaded = false;
+                desc = GameObject.Find("description").GetComponent<TextMeshProUGUI>();
                 levelLength = GameObject.Find("info").GetComponent<Text>();
                 levelBPM = GameObject.Find("infoBPM").GetComponent<Text>();
                 diff = GameObject.Find("infodiff").GetComponent<Text>();
                 levelObj = GameObject.Find("infoobj").GetComponent<Text>();
                 hp = GameObject.Find("health").GetComponent<Text>();
                 size = GameObject.Find("cubeSize").GetComponent<Text>();
-                bonus = GameObject.Find("levelbonusinfoi").GetComponent<Text>();
+                bonus = GameObject.Find("levelbonusinfoi").GetComponent<Text>(); 
                 slider = GameObject.Find("sliderDiff").GetComponent<Slider>();
 
                 // Find the selected level's index
@@ -397,7 +400,7 @@ namespace JammerDash.Menus.Play
             ButtonClickHandler[] levels = FindObjectsByType<ButtonClickHandler>(FindObjectsSortMode.InstanceID);
             if (customLevel != null)
             {
-
+                desc = GameObject.Find("description").GetComponent<TextMeshProUGUI>();
                 levelLength = GameObject.Find("info").GetComponent<Text>();
                 levelBPM = GameObject.Find("infoBPM").GetComponent<Text>();
                 diff = GameObject.Find("infodiff").GetComponent<Text>();
@@ -477,13 +480,52 @@ namespace JammerDash.Menus.Play
 
 
         }
+          public string ParseBBCode(string bbCodeText)
+    {
+        string parsedText = bbCodeText;
 
+       // Basic Formatting
+        parsedText = Regex.Replace(parsedText, @"\[b\](.*?)\[/b\]", "<b>$1</b>");
+        parsedText = Regex.Replace(parsedText, @"\[i\](.*?)\[/i\]", "<i>$1</i>");
+        parsedText = Regex.Replace(parsedText, @"\[u\](.*?)\[/u\]", "<u>$1</u>");
+        parsedText = Regex.Replace(parsedText, @"\[s\](.*?)\[/s\]", "<s>$1</s>"); // Strikethrough
+
+        // Text Color & Size
+        parsedText = Regex.Replace(parsedText, @"\[color=(.*?)\](.*?)\[/color\]", "<color=$1>$2</color>");
+        parsedText = Regex.Replace(parsedText, @"\[size=(.*?)\](.*?)\[/size\]", "<size=$1>$2</size>");
+
+        // Alignment
+        parsedText = Regex.Replace(parsedText, @"\[align=(left|center|right|justified)\](.*?)\[/align\]", "<align=$1>$2</align>");
+
+        // Hyperlinks
+        parsedText = Regex.Replace(parsedText, @"\[url=(.*?)\](.*?)\[/url\]", "<link=\"$1\">$2</link>");
+
+        // Superscript & Subscript
+        parsedText = Regex.Replace(parsedText, @"\[sup\](.*?)\[/sup\]", "<sup>$1</sup>");
+        parsedText = Regex.Replace(parsedText, @"\[sub\](.*?)\[/sub\]", "<sub>$1</sub>");
+
+        // Quotes & Indent
+        parsedText = Regex.Replace(parsedText, @"\[quote\](.*?)\[/quote\]", "<indent=10%><i>$1</i></indent>");
+        parsedText = Regex.Replace(parsedText, @"\[indent=(\d+)\](.*?)\[/indent\]", "<indent=$1>$2</indent>");
+
+        // Image Support (TextMeshPro Sprites)
+        parsedText = Regex.Replace(parsedText, @"\[img=(.*?)\]", "<sprite name=\"$1\">");
+
+        // Line Height
+        parsedText = Regex.Replace(parsedText, @"\[line-height=(\d+)\](.*?)\[/line-height\]", "<line-height=$1>$2</line-height>");
+
+        // Centering (Custom workaround since TMP does not support <center>)
+        parsedText = Regex.Replace(parsedText, @"\[center\](.*?)\[/center\]", "<align=center>$1</align>");
+
+        return parsedText;
+    }
         // Helper function to update UI with scene data
         private void UpdateUIWithLevelData(SceneData data)
         {
             levelLength.text = $"{FormatTime(data.songLength):N0}";
             float masterPitch;
             Mods.instance.master.GetFloat("MasterPitch", out masterPitch);
+            desc.text = string.IsNullOrEmpty(data.description) ? "" : ParseBBCode(data.description);
             levelBPM.text = $"{data.bpm * masterPitch:F0} ({data.bpm:F0})";
             diff.text = $"{data.calculatedDifficulty * CustomLevelDataManager.Instance.scoreMultiplier * masterPitch:F2} ({data.calculatedDifficulty:F2})";
             levelObj.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Objects")}: {(data.cubePositions.Count + data.sawPositions.Count + data.longCubePositions.Count):N0} ({data.cubePositions.Count}, {data.sawPositions.Count}, {data.longCubePositions.Count})";
