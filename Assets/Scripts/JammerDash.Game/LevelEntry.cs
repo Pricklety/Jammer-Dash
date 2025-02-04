@@ -21,6 +21,7 @@ namespace JammerDash.Game
         public VideoPlayer video;
         public GameObject player0;
         public GameObject player1;
+        public GameObject player2;
         bool started = false;
         public TextMeshProUGUI infotext;
 
@@ -45,19 +46,28 @@ namespace JammerDash.Game
         {
             StartCoroutine(CustomLevelDataManager.Instance.LoadImage(Path.Combine(Main.gamePath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "bgImage.png"), image));
 
-            if (player0 != null && player1 != null)
+            if (player0 != null && player1 != null && player2 != null)
             {
                 SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
                 if (data.playerType == 0)
                 {
                     Destroy(player1);
+                    Destroy(player2);
                     player0.SetActive(true);
                     player.enabled = false;
                 }
                 else if (data.playerType == 1)
                 {
                     Destroy(player0);
+                    Destroy(player2);
                     player1.SetActive(true);
+                    player.enabled = false;
+                }
+                else if (data.playerType == 2)
+                {
+                    Destroy(player0);
+                    Destroy(player1);
+                    player2.SetActive(true);
                     player.enabled = false;
                 }
                 player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>();

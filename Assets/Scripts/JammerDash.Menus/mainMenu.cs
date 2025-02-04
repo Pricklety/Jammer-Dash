@@ -156,9 +156,7 @@ namespace JammerDash.Menus
         public Text roleText;
         public GameObject adminButton;
 
-        public InputField[] editUser; // Edit user panel - Input fields 
-        public Slider levelSlider;
-        public Text levelText;
+        public InputField[] editUser; // Edit user panel - Input fields
 
         // Lookup
         public InputField lookup;
@@ -1695,6 +1693,7 @@ public void FixedUpdate()
                 audioMixer.SetFloat("Lowpass", data.lowpassValue);
             }
         }
+      
 
         private void HandleQuitAction()
         {
@@ -1736,8 +1735,6 @@ public void FixedUpdate()
             if (fullcc != null)
             fullCountryName.text = data.region ? fullcc : ccName; 
             
-            levelSlider.value = Account.Instance.totalXP / Account.Instance.xpRequiredPerLevel[Account.Instance.level];
-           levelText.text = $"Level {Account.Instance.level}";
 
             
  if (Input.GetKeyDown(KeyCode.F2) && playPanel.activeSelf)

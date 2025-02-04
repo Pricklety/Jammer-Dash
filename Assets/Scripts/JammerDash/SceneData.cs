@@ -25,6 +25,7 @@ namespace JammerDash
         public bool ground = true;
         public int levelLength;
         public float calculatedDifficulty = 0f;
+        public string description;
         
 
         // Difficulty

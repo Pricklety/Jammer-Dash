@@ -479,6 +479,14 @@ MonoBehaviour:
     m_Localized: Textura
     m_Metadata:
       m_Items: []
+  - m_Id: 26177406071582720
+    m_Localized: "Descri\xE7\xE3o do n\xEDvel definido"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26178270689603584
+    m_Localized: "Descri\xE7\xE3o"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

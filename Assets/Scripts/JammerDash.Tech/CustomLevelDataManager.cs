@@ -116,6 +116,7 @@ namespace JammerDash.Tech
                     manager.source.text = sceneData.source;
                     manager.LoadSceneData(sceneData);
                     manager.ID = sceneData.ID;
+                    manager.input.text = sceneData.description;
                     string videoPath = Path.Combine(Main.gamePath, "scenes", $"{sceneData.ID} - {name}", "backgroundVideo.mp4");
                     manager.videoPlayer.url = File.Exists(videoPath) ? videoPath : null;
                     levelName = sceneData.name;

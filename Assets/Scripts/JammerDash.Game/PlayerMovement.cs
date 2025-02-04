@@ -667,7 +667,6 @@ namespace JammerDash.Game.Player
             counter.destroyedCubes -= 100 - combo;
             sfxS.PlayOneShot(fail);
 
-            combo = 0;
             StartCoroutine(ChangeTextCombo());
         }
 
@@ -679,6 +678,7 @@ namespace JammerDash.Game.Player
             float lerpTimer = 0f;
             misses++;
             health -= 20;
+            combo = 0;
             counter.score -= Mathf.RoundToInt(maxScore * 3 / counter.cubes.Length);
             if (counter.score < 0)
             counter.score = 0;
