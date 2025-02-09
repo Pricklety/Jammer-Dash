@@ -25,9 +25,9 @@ Sadly no, but we hope to be able to allow support in the future.
 |----------------------|---------------------------------------|
 | **OS**               | Windows 7 or higher                  |
 | **CPU**              | Intel Core i3-2120 (3.3GHz) or AMD FX-4100 (3.6GHz) |
-| **RAM**              | 512MB or above                       |
+| **RAM**              | 2GB or above (4GB if you're on Windows 10)                      |
 | **GPU**              | NVIDIA GeForce GTX 460, AMD Radeon HD 6850 (256MB VRAM) |
-| **Storage**          | 500MB free space                     |
+| **Storage**          | 1GB free space                     |
 | **Resolution**       | 1280x720 or higher                   |
 | **Framerate**        | 60 FPS with VSync enabled            |
 
@@ -39,7 +39,7 @@ Sadly no, but we hope to be able to allow support in the future.
 |----------------------|---------------------------------------|
 | **OS**               | Windows 10 or higher                 |
 | **CPU**              | Intel Core i5-10400F (2.9GHz, 6 cores) or AMD Ryzen 5 5500 (3.6GHz, 6 cores) |
-| **RAM**              | 1GB or above                         |
+| **RAM**              | 4GB or above (6GB if you're on Windows 10)                       |
 | **GPU**              | NVIDIA GeForce GTX 1050 Ti, AMD Radeon RX 570 (1GB VRAM) |
 | **Storage**          | 1GB free (base), 4GB with music and levels |
 | **Resolution**       | 1920x1080 or higher                  |

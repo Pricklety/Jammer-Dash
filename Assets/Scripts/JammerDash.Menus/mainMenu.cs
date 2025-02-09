@@ -1510,7 +1510,7 @@ switch (data.backgroundType)
         public void CrashReports()
         {
             // File path of the player log
-            string logFilePath = JammerDash.Main.gamePath + "/Player.log";
+            string logFilePath = Application.persistentDataPath + "/Player.log";
 
             // Open the player log file using the default application associated with its file type
             Process.Start(logFilePath);

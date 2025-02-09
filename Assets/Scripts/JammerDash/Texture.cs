@@ -1,69 +1,98 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace JammerDash {
-
-        public class Texture : MonoBehaviour
+namespace JammerDash
 {
-    public string textureName; // The name of the texture file (e.g., "exampleTexture.png")
-    public Texture2D fallbackTexture; // Fallback texture to use if the texture is missing
-    private SpriteRenderer objectRenderer; // Renderer for 2D objects
-    private Image uiImage; // Image component for UI elements
-
-    void Awake()
+    public class Texture : MonoBehaviour
     {
-        // Check if this object has a Renderer (2D objects)
-        objectRenderer = GetComponent<SpriteRenderer>();
+        public string textureName;
+        public Texture2D fallbackTexture;
 
-        // Check if this object has an Image (UI)
-        uiImage = GetComponent<Image>();
+        private SpriteRenderer objectRenderer;
+        private Image uiImage;
+        private Texture2D currentTexture;
 
-        if (objectRenderer == null && uiImage == null)
+        void Awake()
         {
-            Debug.LogError($"No Renderer or Image found on {gameObject.name}. This script requires one of them.");
-        }
-    }
+            objectRenderer = GetComponent<SpriteRenderer>();
+            uiImage = GetComponent<Image>();
 
-    public void UpdateTexture(string texturePackPath)
-    {
-        if (string.IsNullOrEmpty(textureName)) return;
-
-        string textureFilePath = Path.Combine(texturePackPath, textureName + ".png");
-
-        if (File.Exists(textureFilePath))
-        {
-            byte[] textureData = File.ReadAllBytes(textureFilePath);
-            Texture2D texture = new Texture2D(2, 2);
-            if (texture.LoadImage(textureData))
+            if (objectRenderer == null && uiImage == null)
             {
-                ApplyTexture(texture);
-                Debug.Log($"Texture applied: {textureName} from {texturePackPath}");
+                Debug.LogError($"[TEXTURE SYSTEM] No Renderer or Image found on {gameObject.name}. This script requires one of them.");
+            }
+        }
+
+        public void UpdateTexture(string texturePackPath)
+        {
+            if (this == null || string.IsNullOrEmpty(textureName)) return;
+
+            string textureFilePath = Path.Combine(texturePackPath, textureName);
+            if (!textureFilePath.EndsWith(".png")) textureFilePath += ".png";
+
+            StartCoroutine(LoadTextureAsync(textureFilePath));
+        }
+
+        private IEnumerator LoadTextureAsync(string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                byte[] textureData = File.ReadAllBytes(filePath);
+                Texture2D newTexture = new Texture2D(2, 2);
+                bool success = newTexture.LoadImage(textureData);
+
+                if (success)
+                {
+                    ApplyTexture(newTexture);
+                    Debug.Log($"[TEXTURE SYSTEM] Texture applied: {textureName} from {filePath}");
+                }
+                else
+                {
+                    Debug.LogError($"[TEXTURE SYSTEM] Failed to load texture: {textureName}");
+                    ApplyTexture(fallbackTexture);
+                }
             }
             else
             {
-                Debug.LogError($"Failed to load texture: {textureName}");
+                Debug.LogWarning($"[TEXTURE SYSTEM] Texture file not found: {filePath}. Applying fallback texture.");
+                ApplyTexture(fallbackTexture);
+            }
+            yield return null;
+        }
+
+        public void ApplyTexture(Texture2D texture)
+        {
+            if (texture == null) return;
+            if (currentTexture != null && currentTexture != fallbackTexture)
+            {
+                Destroy(currentTexture);
+            }
+
+            currentTexture = texture;
+
+            if (objectRenderer != null)
+            {
+                MaterialPropertyBlock block = new MaterialPropertyBlock();
+                objectRenderer.GetPropertyBlock(block);
+                block.SetTexture("_MainTex", texture);
+                objectRenderer.SetPropertyBlock(block);
+            }
+            else if (uiImage != null)
+            {
+                uiImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
             }
         }
-        else
+
+        private void OnDestroy()
         {
-            Debug.LogWarning($"Texture file not found: {textureFilePath}. Applying fallback texture.");
-            ApplyTexture(fallbackTexture);
+            if (currentTexture != null && currentTexture != fallbackTexture)
+            {
+                Destroy(currentTexture);
+            }
         }
     }
-
-    private void ApplyTexture(Texture2D texture)
-    {
-        if (texture == null) return;
-
-        if (objectRenderer != null) // Apply to 3D objects
-        {
-            objectRenderer.material.mainTexture = texture;
-        }
-        else if (uiImage != null) // Apply to UI elements
-        {
-            uiImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-        }
-    }
-}
+   
 }

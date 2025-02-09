@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8608870485356016619}
   - component: {fileID: 6477321560855445010}
   - component: {fileID: 372830022911820504}
+  - component: {fileID: 4515560796655886457}
   m_Layer: 0
   m_Name: RinMiss
   m_TagString: Untagged
@@ -151,3 +152,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47801ab6ebfc53d42bf2b53c79b7ddbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4515560796655886457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1274005456745493585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8d811f4bae7e484dbe7399e1da3d5bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textureName: custom/Miss
+  fallbackTexture: {fileID: 2800000, guid: 1a5a36f23b67167459cb6546b526a1e7, type: 3}

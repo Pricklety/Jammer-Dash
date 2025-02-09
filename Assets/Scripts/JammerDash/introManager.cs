@@ -43,6 +43,15 @@ namespace JammerDash
                 Directory.CreateDirectory(Path.Combine(Main.gamePath, "levels"));
                 Directory.CreateDirectory(Path.Combine(Main.gamePath, "levels", "extracted"));
             }
+            if (!Directory.Exists(Path.Combine(Main.gamePath, "textures")))
+            {
+                Directory.CreateDirectory(Path.Combine(Main.gamePath, "textures"));
+                Directory.CreateDirectory(Path.Combine(Main.gamePath, "textures", "default"));
+                if (Directory.Exists(Path.Combine(Application.streamingAssetsPath, "textures", "default")))
+                {
+                    Directory.Move(Path.Combine(Application.streamingAssetsPath, "textures", "default"), Path.Combine(Main.gamePath, "textures", "default"));
+                }
+            }
             if (!PlayerPrefs.HasKey("bootSafe031"))
             {
                 PlayerPrefs.DeleteAll();

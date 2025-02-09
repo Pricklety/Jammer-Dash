@@ -266,90 +266,119 @@ namespace JammerDash.Game
                 return formattedNumber;
             }
         }
-        private IEnumerator End()
+      private IEnumerator End()
+{
+    // Load the background image or video
+    string levelPath = Path.Combine(Main.gamePath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}");
+    string imagePath = Path.Combine(levelPath, "bgImage.png");
+    string videoPath = Path.Combine(levelPath, "backgroundVideo.mp4");
+
+    if (File.Exists(imagePath))
+    {
+        StartCoroutine(CustomLevelDataManager.Instance.LoadImage(imagePath, img));
+    }
+
+    if (File.Exists(videoPath))
+    {
+        img.texture = FindAnyObjectByType<VideoPlayer>().targetTexture;
+    }
+
+    // Play the finish animation if available
+    anim?.Play("finish");
+
+    long destruction = player0.counter.score;
+    float actualdest = player0.Total > 0 ? (float)player0.counter.destructionPercentage : 0;
+
+    // Update score display
+    score.text = $"Level: {Account.Instance.level}\n" +
+                 $"XP: {FormatNumber(Account.Instance.totalXP)}\n\n" +
+                 $"SP: {player0.SPInt:N0}\n" +
+                 $"Ranking: \n" +
+                 $"Total SP: {Mathf.RoundToInt(Calculator.CalculateSP("scores.dat"))}\n\n" +
+                 $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "played by")} {Account.Instance.username}";
+
+    acc.text = $"Accuracy: {(player0.Total > 0 ? player0.counter.accCount / player0.Total * 100 : 0):F2}%\n" +
+               $"Score: {player0.counter.score}\n" +
+               $"Combo: {player0.highestCombo}x";
+
+    total.text = $"Leaderboard: \nTotal level score: \nJams: \nLevel shines: \n";
+
+    finishMenu.SetActive(true);
+
+    // Load ranking sprite
+    if (scoreRank != null)
+    {
+        string texturePackPath = TexturePack.GetActiveTexturePackPath();
+
+        if (!string.IsNullOrEmpty(texturePackPath))
         {
-            StartCoroutine(CustomLevelDataManager.Instance.LoadImage(Path.Combine(Main.gamePath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "bgImage.png"), img));
-            if (File.Exists(Path.Combine(Main.gamePath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "backgroundVideo.mp4")))
+            string rankImagePath = Path.Combine(texturePackPath, "ranking", $"{player0.counter.GetTier(player0.Total > 0 ? player0.counter.accCount / player0.Total * 100 : 0)}.png");
+
+            if (File.Exists(rankImagePath))
             {
-                img.texture = FindAnyObjectByType<VideoPlayer>().targetTexture;
-                
+                scoreRank.sprite = LoadSpriteFromPath(rankImagePath);
             }
-            
-            // Play the animation if available
-            if (anim != null)
+            else
             {
-                anim.Play("finish");
-            }
-
-            
-            long destruction = player0.counter.score;
-            float actualdest = (float)player0.counter.destructionPercentage;
-
-            score.text = $"Level: {Account.Instance.level}\n" +
-                $"XP: {FormatNumber(Account.Instance.totalXP)}\n" +
-                $"\n" +
-                $"SP: {player0.SPInt:N0}\n" +
-                $"Ranking: \n" +
-                $"Total SP: {Mathf.RoundToInt(Calculator.CalculateSP("scores.dat"))}\n" +
-                $"\n" +
-                $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "played by")} {Account.Instance.username}";
-            acc.text = $"Accuracy: {player0.counter.accCount / player0.Total * 100}%\n" +
-                $"Score: {player0.counter.score}\n" +
-                $"Combo: {player0.highestCombo}x"; //total and combo texts are free
-            total.text = $"Leaderboard: \n" +
-                $"Total level score: \n" +
-                $"Jams: \n" +
-                $"Level shines: \n";
-
-            finishMenu.SetActive(true);
-            if (scoreRank != null)
-            {
-                scoreRank.sprite = Resources.Load<Sprite>($"ranking/{player0.counter.GetTier(player0.counter.accCount / player0.Total * 100)}");
-            }
-
-            player.transform.localScale = Vector3.zero;
-            player0.enabled = false;
-
-            SaveLevelData(actualdest, destruction);
-
-
-            // Update score breakdown
-            five.text = $"{player0.five}";
-            three.text = $"{player0.three}";
-            one.text = $"{player0.one}";
-            miss.text = $"{player0.misses}";
-
-            main.text = $"{data.artist}\r\n{data.songName}";
-
-
-            // Play the exponential progress animation with SFX
-            float targetAccuracy = player0.counter.accCount / player0.Total;
-            float progress = 0;
-            float duration = 2f;
-            float elapsedTime = 0f;
-
-            // Play the long SFX
-            AudioManager.Instance.sfxS.PlayOneShot(Resources.Load<AudioClip>("Audio/SFX/progress"));
-
-            // Gradually update the progress slider value
-            while (progress < targetAccuracy)
-            {
-                elapsedTime += Time.deltaTime;
-                float t = elapsedTime / duration;
-                progress = Mathf.Pow(t, 2) * targetAccuracy; // Exponential interpolation
-                level.value = Mathf.Clamp(progress, 0, 1);
-
-                yield return null;
-            }
-
-
-            // Play rank SFX after progress completes
-            AudioManager.Instance.sfxS.PlayOneShot(Resources.Load<AudioClip>($"Audio/SFX/ranking/{player0.counter.GetTier(targetAccuracy * 100)} Rank"));
-            
-            if (Account.Instance.loggedIn) {
-                OnFinishLineCrossed();
+                Debug.LogWarning($"[End] Rank image not found: {rankImagePath}");
             }
         }
+        else
+        {
+            Debug.LogWarning("[End] No active texture pack found, using fallback.");
+            scoreRank.sprite = Resources.Load<Sprite>($"ranking/{player0.counter.GetTier(player0.counter.accCount / player0.Total * 100)}");
+        }
+    }
+
+    // Disable player movement
+    player.transform.localScale = Vector3.zero;
+    player0.enabled = false;
+
+    // Save level data
+    SaveLevelData(actualdest, destruction);
+
+    // Update breakdown stats
+    five.text = $"{player0.five}";
+    three.text = $"{player0.three}";
+    one.text = $"{player0.one}";
+    miss.text = $"{player0.misses}";
+
+    main.text = $"{data.artist}\r\n{data.songName}";
+
+    // Play progress animation with sound
+    float targetAccuracy = player0.Total > 0 ? (player0.counter.accCount / player0.Total) : 0;
+    float progress = 0;
+    float duration = 2f;
+    float elapsedTime = 0f;
+
+    AudioManager.Instance.sfxS.PlayOneShot(Resources.Load<AudioClip>("Audio/SFX/progress"));
+
+    while (progress < targetAccuracy)
+    {
+        elapsedTime += Time.deltaTime;
+        float t = elapsedTime / duration;
+        progress = Mathf.Pow(t, 2) * targetAccuracy; // Exponential interpolation
+        level.value = Mathf.Clamp(progress, 0, 1);
+        yield return null;
+    }
+
+    // Play ranking SFX
+    string rankSFXPath = $"Audio/SFX/ranking/{player0.counter.GetTier(targetAccuracy * 100)} Rank";
+    AudioClip rankSFX = Resources.Load<AudioClip>(rankSFXPath);
+    if (rankSFX != null)
+    {
+        AudioManager.Instance.sfxS.PlayOneShot(rankSFX);
+    }
+    else
+    {
+        Debug.LogWarning($"[End] Rank SFX not found: {rankSFXPath}");
+    }
+
+    if (Account.Instance.loggedIn)
+    {
+        OnFinishLineCrossed();
+    }
+}
    private IEnumerator UpdateUserScore(long score)
     {
         string userId = Account.Instance.uuid;
@@ -408,6 +437,24 @@ namespace JammerDash.Game
             }
         }
     }
+     Sprite LoadSpriteFromPath(string path)
+    {
+        if (File.Exists(path)) {
+            byte[] imageData = File.ReadAllBytes(path);
+            Texture2D texture = new Texture2D(2, 2);
+            if (texture.LoadImage(imageData))
+            {
+                return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+            }
+    
+        }
+        else {
+            return Resources.Load<Sprite>($"Audio/SFX/ranking/{player0.counter.GetTier(player0.counter.accCount / player0.Total * 100)}");
+        }
+
+        return null;
+   
+    }   
 
     }
 }

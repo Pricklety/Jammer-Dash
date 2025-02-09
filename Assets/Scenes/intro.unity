@@ -220,6 +220,7 @@ GameObject:
   - component: {fileID: 14404854}
   - component: {fileID: 14404853}
   - component: {fileID: 14404852}
+  - component: {fileID: 14404855}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -284,6 +285,20 @@ RectTransform:
   m_AnchoredPosition: {x: -50, y: 50}
   m_SizeDelta: {x: 32, y: 32}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &14404855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 14404851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8d811f4bae7e484dbe7399e1da3d5bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textureName: no internet
+  fallbackTexture: {fileID: 2800000, guid: f4e135e519e44d24aa057c08278d6241, type: 3}
 --- !u!1 &20591588
 GameObject:
   m_ObjectHideFlags: 0
@@ -1325,6 +1340,7 @@ GameObject:
   - component: {fileID: 771550640}
   - component: {fileID: 771550642}
   - component: {fileID: 771550641}
+  - component: {fileID: 771550643}
   m_Layer: 5
   m_Name: logo (1)
   m_TagString: Untagged
@@ -1390,6 +1406,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 771550639}
   m_CullTransparentMesh: 1
+--- !u!114 &771550643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 771550639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8d811f4bae7e484dbe7399e1da3d5bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textureName: circle
+  fallbackTexture: {fileID: 2800000, guid: 77660ce59e1a13948b08a422c61f8d04, type: 3}
 --- !u!1 &787129916
 GameObject:
   m_ObjectHideFlags: 0
@@ -2450,6 +2480,7 @@ MonoBehaviour:
     ground: 1
     levelLength: 0
     calculatedDifficulty: 0
+    description: 
     playerHP: 300
     boxSize: 1
     bpm: 0
@@ -4277,6 +4308,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1949502304}
   - component: {fileID: 1949502305}
+  - component: {fileID: 1949502306}
   m_Layer: 0
   m_Name: texture
   m_TagString: Untagged
@@ -4306,9 +4338,21 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1949502303}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a35fa02120561d40a7bc1d14b18ce90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1949502306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1949502303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b74c934f606ff8b4fb363b2f95394bf8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1993568604

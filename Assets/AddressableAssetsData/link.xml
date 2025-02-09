@@ -9,8 +9,9 @@
     <type fullname="JammerDash.Game.Player.PlayerMovement" preserve="all" />
     <type fullname="JammerDash.Game.RestartCustom" preserve="all" />
     <type fullname="JammerDash.Game.SongProgress" preserve="all" />
+    <type fullname="JammerDash.PadAnimation" preserve="all" />
+    <type fullname="JammerDash.PlayerAnimation" preserve="all" />
     <type fullname="JammerDash.Texture" preserve="all" />
-    <type fullname="SimpleSpectrum" preserve="all" />
     <type fullname="JammerDash.SceneData" preserve="nothing" serialized="true" />
   </assembly>
   <assembly fullname="Coffee.UIParticle, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
@@ -86,9 +87,6 @@
     <type fullname="TMPro.TMP_FontWeightPair" preserve="nothing" serialized="true" />
     <type fullname="TMPro.VertexGradient" preserve="nothing" serialized="true" />
   </assembly>
-  <assembly fullname="UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-    <type fullname="UnityEditor.Audio.AudioMixerSnapshotController" preserve="all" />
-  </assembly>
   <assembly fullname="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
     <type fullname="UnityEngine.Animation" preserve="all" />
     <type fullname="UnityEngine.AnimationClip" preserve="all" />
@@ -96,8 +94,6 @@
     <type fullname="UnityEngine.RuntimeAnimatorController" preserve="all" />
   </assembly>
   <assembly fullname="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-    <type fullname="UnityEngine.Audio.AudioMixer" preserve="all" />
-    <type fullname="UnityEngine.Audio.AudioMixerGroup" preserve="all" />
     <type fullname="UnityEngine.AudioClip" preserve="all" />
     <type fullname="UnityEngine.AudioListener" preserve="all" />
     <type fullname="UnityEngine.AudioSource" preserve="all" />

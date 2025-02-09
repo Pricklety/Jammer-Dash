@@ -29,23 +29,22 @@ namespace JammerDash.Game
 
         private void Start()
         {
-
             song = AudioManager.Instance.source;
             song.pitch = 0;
             player.enabled = false;
-            StartCoroutine(LateStart());
             Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
             foreach (Canvas canvas in canvases)
             {
                 canvas.renderMode = RenderMode.ScreenSpaceCamera;
             }
-
+            
+            StartCoroutine(LateStart());
         }
 
         IEnumerator LateStart()
         {
             StartCoroutine(CustomLevelDataManager.Instance.LoadImage(Path.Combine(Main.gamePath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "bgImage.png"), image));
-
+            
             if (player0 != null && player1 != null && player2 != null)
             {
                 SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
@@ -97,7 +96,8 @@ namespace JammerDash.Game
                 video.Play();
             }
             infotext.text = $"{CustomLevelDataManager.Instance.data.artist} - {CustomLevelDataManager.Instance.data.songName}";
-
+            
+            TexturePack.Instance.UpdateTexture();
 
         }
     }
