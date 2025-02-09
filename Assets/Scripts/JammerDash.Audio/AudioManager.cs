@@ -200,10 +200,15 @@ namespace JammerDash.Audio
 
             string persistentPath = Main.gamePath;
 
-            // Collect all audio files
-            string[] mp3Files = Directory.GetFiles(persistentPath, "*.mp3", SearchOption.AllDirectories);
-            string[] wavFiles = Directory.GetFiles(persistentPath, "*.wav", SearchOption.AllDirectories);
-            string[] allAudioFiles = mp3Files.Concat(wavFiles).ToArray();
+             string[] mp3Files = Directory.GetFiles(persistentPath, "*.mp3", SearchOption.AllDirectories)
+                                     .Where(file => !file.Contains(Path.DirectorySeparatorChar + "textures" + Path.DirectorySeparatorChar))
+                                     .ToArray();
+
+        string[] wavFiles = Directory.GetFiles(persistentPath, "*.wav", SearchOption.AllDirectories)
+                                     .Where(file => !file.Contains(Path.DirectorySeparatorChar + "textures" + Path.DirectorySeparatorChar))
+                                     .ToArray();
+
+        string[] allAudioFiles = mp3Files.Concat(wavFiles).ToArray();
 
 
             foreach (string audioFile in allAudioFiles)

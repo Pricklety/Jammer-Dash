@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using JammerDash.Audio;
+using UnityEngine.Video;
 
 namespace JammerDash.Editor
 {
@@ -59,7 +60,8 @@ namespace JammerDash.Editor
         }
 
         public void ToggleLine()
-        {
+        {   
+            VideoPlayer video = FindAnyObjectByType<VideoPlayer>();
             if (currentLine == null && !audioSource.isPlaying)
             {
                 Vector3 spawnPosition = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 10));
@@ -73,6 +75,9 @@ namespace JammerDash.Editor
                 initialXPosition = currentLine.transform.position.x;
 
                 audioSource.time = spawnPosition.x / 7;
+                
+                video.time = spawnPosition.x / 7;
+                video.Play();
                 audioSource.Play();
 
             }
@@ -80,6 +85,8 @@ namespace JammerDash.Editor
             {
                 StopLine();
                 audioSource.Stop();
+                video.Stop();
+                video.time = 0;
                 isPaused = true;
                 audioSource.time = 0;
             }

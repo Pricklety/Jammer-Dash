@@ -37,7 +37,6 @@ namespace JammerDash.Game.Player
         public Animation movement;
         public Text scoreText;
         public Text keyText;
-        public Text debug;
         public Text acc;
         private PostProcessVolume volume;
         private Vignette vignette;
@@ -107,6 +106,13 @@ namespace JammerDash.Game.Player
 
         public GameObject[] keys;
 
+        private VideoPlayer videoPlayer;
+private FinishLine finishLine;
+private bool hasAutoMove;
+private bool hasAuto;
+private bool hasEasyMode;
+private Camera mainCam;
+
         private void Awake()
         {
             music = AudioManager.Instance.source;
@@ -151,8 +157,9 @@ namespace JammerDash.Game.Player
                     badTextPrefab = Resources.Load<GameObject>("bad");
                     break;
             }
-           
-            
+           videoPlayer = FindFirstObjectByType<VideoPlayer>();
+    finishLine = FindFirstObjectByType<FinishLine>();
+    mainCam = Camera.main;
             scoreMultiplier = CustomLevelDataManager.Instance.scoreMultiplier;
             health = maxHealth;
         }
@@ -205,23 +212,6 @@ namespace JammerDash.Game.Player
                 transform.position = new Vector3(transform.position.x, -1, transform.position.z);
             }
         }
-        private void UpdateVignette(int currentHealth)
-        {
-            vignette.color.Override(Color.red);
-            float healthPercentage = 1f - ((float)currentHealth / (maxHealth / 2f));
-
-            if (healthPercentage < 0)
-            {
-                healthPercentage = 0;
-            }
-            else if (healthPercentage > 1)
-            {
-                healthPercentage = 1;
-            }
-            vignette.center.Override(new Vector2(0.5f, 0.5f));
-            float vignetteIntensity = Mathf.Lerp(0, 0.25f, healthPercentage);
-            vignette.intensity.Override(vignetteIntensity);
-        }
 
         private void FixedUpdate()
         {
@@ -231,29 +221,6 @@ namespace JammerDash.Game.Player
             hpint = (int)health;
            
            
-
-            // Debug text area
-            {
-               
-                
-                debug.text = $"<b>KEYS</b>\r" +
-                    $"\nKey1: {k}\r\n" +
-                    $"Key2: {l}\r\n" +
-                    $"\r\n" +
-                    $"<b>POSITIONING</b>\r\n" +
-                    $"Pos: {transform.position.x},{transform.position.y}\r\n" +
-                    $"MusicTime: {music.time}\r\n" +
-                    $"\r\n<b>SCORING</b>\r\n" +
-                    $"five: {five}\r\n" +
-                    $"three: {three}\r\n" +
-                    $"one: {one}\r\n" +
-                    $"miss: {misses}\r\n" +
-                    $"score: {counter.score}\r\n" +
-                    $"combo: {combo}x\r\n" +
-                    $"health: {hpint}\r\n" +
-                    $"accuracy: {counter.accCount / Total * 100:000.00}% ({counter.accCount} / {Total})\r\n" +
-                    $"sp: {_performanceScore:0.00}";
-            }
             if (health > maxHealth)
             {
                 health = maxHealth;
@@ -261,7 +228,6 @@ namespace JammerDash.Game.Player
             hpSlider.value = health;
             hpSlider.maxValue = maxHealth;
 
-            UpdateVignette(hpint);
 
             combotext.text = combo.ToString() + "x";
 
@@ -313,130 +279,131 @@ namespace JammerDash.Game.Player
             public float fadeDistance = 3f; 
             public LayerMask objectLayer;
             public float fadeSpeed = 2f;
-        private void Update()
-        {
-            if (!isDying)
-            {
-                    flashlightOverlay.SetActive(Mods.instance.modStates.ContainsKey(ModType.remember));
-                
-                if (Mods.instance.modStates.ContainsKey(ModType.hidden)) {
-                     FadeObjectsInFrontOfPlayer();
-                }
-                float vidSpeed;
-                Mods.instance.master.GetFloat("MasterPitch", out vidSpeed);
-                FindFirstObjectByType<VideoPlayer>().playbackSpeed = vidSpeed;
-        
+      private void Update()
+{
+    if (isDying) return; // Early exit if the player is dying
 
-            if (CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.autoMove) || CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.auto))
-            {
-                MoveToNextCube();
-            }
-            else
-            {
-                if (Input.GetKeyDown(KeybindingManager.up))
-                {
-                OnJump();
-                }
-                if (Input.GetKeyDown(KeybindingManager.down))
-                {
-                OnCrouch();
-                }
-                if (Input.GetKeyDown(KeybindingManager.boost))
-                {
-                OnBoost();
-                }
-                if (Input.GetKeyDown(KeybindingManager.ground))
-                {
-                OnResetPosition();
-                }
-                if (Input.GetKeyDown(KeybindingManager.hit1) || Input.GetKeyDown(KeybindingManager.hit2))
-                {
-                    OnHit();
-                }
-            }
+    // Cache dictionary lookups
+    var modStates = Mods.instance.modStates;
+    var levelStates = CustomLevelDataManager.Instance.modStates;
 
-            if (CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.auto))
-            {
-                AutoHit();
-            }
-            
-            }
+    bool hasRememberMod = modStates.ContainsKey(ModType.remember);
+    bool hasHiddenMod = modStates.ContainsKey(ModType.hidden);
+    hasAutoMove = levelStates.ContainsKey(ModType.autoMove);
+    hasAuto = levelStates.ContainsKey(ModType.auto);
+    hasEasyMode = levelStates.ContainsKey(ModType.easy);
 
-            if (Input.GetKeyDown(KeyCode.F5))
-            {
-            var parentGameObject = debug.transform.parent.gameObject;
-            parentGameObject.SetActive(!parentGameObject.activeSelf);
-            }
+    // Toggle flashlight overlay
+    flashlightOverlay.SetActive(hasRememberMod);
 
-            if (music.isPlaying) {
-                if (!CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.easy))
-                transform.position = Vector2.Lerp(transform.position, new Vector2(music.time * 7, transform.position.y), 1);
-                else if (CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.easy))
-                transform.position = Vector2.Lerp(transform.position, new Vector2(music.time * 5, transform.position.y), 0.5f);
-            }
-            else {
-                 if (!CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.easy))
-                transform.Translate(7 * Time.deltaTime * Vector2.right);
-                else if (CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.easy))
-                transform.Translate(5 * Time.deltaTime * Vector2.right);
-            }
+    // Handle fading objects
+    if (hasHiddenMod)
+    {
+        FadeObjectsInFrontOfPlayer();
+    }
 
-            float distanceToFinishLine = Mathf.Abs(cam.transform.position.x - FindFirstObjectByType<FinishLine>().transform.position.x);
-            if (cam.transform.position.x < FindFirstObjectByType<FinishLine>().transform.position.x)
-            {
-            if (distanceToFinishLine < 3)
-            {
-                Vector3 targetPos = new Vector3(FindFirstObjectByType<FinishLine>().transform.position.x, 0.7f, -10);
-                Vector3 smoothPosition = Vector3.Lerp(cam.transform.position, targetPos, 10f * Time.deltaTime);
-                cam.transform.position = smoothPosition;
-            }
-            else
-            {
-                Vector3 targetPosition = new Vector3(transform.position.x + 6, 0.7f, -10);
-                Vector3 smoothedPosition = Vector3.Lerp(cam.transform.position, targetPosition, 1000f * Time.deltaTime);
-                cam.transform.position = smoothedPosition;
-            }
-            }
+    // Set video playback speed
+    if (Mods.instance.master.GetFloat("MasterPitch", out float vidSpeed))
+    {
+        videoPlayer.playbackSpeed = vidSpeed;
+    }
 
-            ShinePerformance calc = new ShinePerformance(five, three, one, misses, combo, highestCombo, CustomLevelDataManager.Instance.diff, CustomLevelDataManager.Instance.data.levelLength, CustomLevelDataManager.Instance.data.cubePositions.Count + CustomLevelDataManager.Instance.data.longCubePositions.Count, CustomLevelDataManager.Instance.data.sawPositions.Count, CustomLevelDataManager.Instance.data.bpm, (float)counter.accCount / Total * 100);
-            _performanceScore = calc.PerformanceScore;
-            SPInt = Mathf.RoundToInt(_performanceScore);
-            if (Total > 0)
-            {
-            float acc = (float)counter.accCount / Total * 100;
-            if (float.IsNaN(acc))
-            {
-                acc = 0;
-            }
-            else if (float.IsNaN(_performanceScore))
-            {
-                _performanceScore = 0;
-            }
-            this.acc.text = $"{acc:F2}% | {counter.GetTier(acc)} | {~~SPInt:F0} sp";
-            }
-            else
-            {
-            acc.text = $"0.00% | F- | 0sp"; 
-            }
+    // Handle movement
+    if (hasAutoMove || hasAuto)
+    {
+        MoveToNextCube();
+    }
+    else
+    {
+        HandlePlayerInput();
+    }
 
-            if (FindNearestCubeDistance() > 21)
-            {
-            keyText.text = "Break!";
-            }
+    // Handle auto-hit
+    if (hasAuto)
+    {
+        AutoHit();
+    }
 
-            if (Input.GetKeyDown(KeybindingManager.hit1)) {
-                keys[0].GetComponent<Animation>().Stop("keyHit");
-                keys[0].GetComponent<Animation>().Play("keyHit");
-                k++;
-                keys[0].GetComponent<Text>().text = k.ToString();
-            }
-            if (Input.GetKeyDown(KeybindingManager.hit2)) {
-                keys[1].GetComponent<Animation>().Stop("keyHit");
-                keys[1].GetComponent<Animation>().Play("keyHit");
-                l++;
-                keys[1].GetComponent<Text>().text = l.ToString();
-            }
-        }
+    // Update player position based on music time
+    if (music.isPlaying)
+    {
+        float targetX = music.time * (hasEasyMode ? 5 : 7);
+        transform.position = Vector3.Lerp(transform.position, new Vector3(targetX, transform.position.y, -1), hasEasyMode ? 0.5f : 1f);
+    }
+    else
+    {
+        float speed = hasEasyMode ? 5 : 7;
+        transform.Translate(speed * Time.deltaTime * Vector2.right);
+    }
+
+    // Optimize camera movement
+    float distanceToFinish = Mathf.Abs(mainCam.transform.position.x - finishLine.transform.position.x);
+    if (mainCam.transform.position.x < finishLine.transform.position.x)
+    {
+        Vector3 targetPos = new Vector3(
+            distanceToFinish < 3 ? finishLine.transform.position.x : transform.position.x + 6, 
+            0.7f, -10);
+
+        mainCam.transform.position = Vector3.MoveTowards(mainCam.transform.position, targetPos, 10f * Time.deltaTime);
+    }
+
+    // Optimize performance calculations
+    _performanceScore = new ShinePerformance(
+        five, three, one, misses, combo, highestCombo,
+        CustomLevelDataManager.Instance.diff,
+        CustomLevelDataManager.Instance.data.levelLength,
+        CustomLevelDataManager.Instance.data.cubePositions.Count + CustomLevelDataManager.Instance.data.longCubePositions.Count,
+        CustomLevelDataManager.Instance.data.sawPositions.Count,
+        CustomLevelDataManager.Instance.data.bpm,
+        (float)counter.accCount / Total * 100
+    ).PerformanceScore;
+
+    SPInt = Mathf.RoundToInt(_performanceScore);
+
+    // Update accuracy display
+    float acc = Total > 0 ? (float)counter.accCount / Total * 100 : 0;
+    this.acc.text = $"{acc:F2}% | {counter.GetTier(acc)} | {SPInt:F0} sp";
+
+    // Check for break message
+    if (FindNearestCubeDistance() > 21)
+    {
+        keyText.text = "Break!";
+    }
+
+    // Optimize key input handling
+    HandleKeyInputs();
+}
+
+private void HandlePlayerInput()
+{
+    if (Input.GetKeyDown(KeybindingManager.up)) OnJump();
+    else if (Input.GetKeyDown(KeybindingManager.down)) OnCrouch();
+    else if (Input.GetKeyDown(KeybindingManager.boost)) OnBoost();
+    else if (Input.GetKeyDown(KeybindingManager.ground)) OnResetPosition();
+    else if (Input.GetKeyDown(KeybindingManager.hit1) || Input.GetKeyDown(KeybindingManager.hit2)) OnHit();
+}
+
+private void HandleKeyInputs()
+{
+    if (Input.GetKeyDown(KeybindingManager.hit1))
+    {
+        AnimateKey(0, ref k);
+    }
+    else if (Input.GetKeyDown(KeybindingManager.hit2))
+    {
+        AnimateKey(1, ref l);
+    }
+}
+
+private void AnimateKey(int index, ref int counter)
+{
+    var keyAnim = keys[index].GetComponent<Animation>();
+    keyAnim.Stop("keyHit");
+    keyAnim.Play("keyHit");
+
+    counter++;
+    keys[index].GetComponent<Text>().text = counter.ToString();
+}
           private Dictionary<GameObject, Coroutine> fadingObjects = new Dictionary<GameObject, Coroutine>();
         void FadeObjectsInFrontOfPlayer()
     {
@@ -577,7 +544,7 @@ namespace JammerDash.Game.Player
                 }
                 combo++;
 
-                StartCoroutine(ChangeScore(Vector3.Distance(hit.collider.transform.position, transform.position), hit));
+                StartCoroutine(ChangeScore(Vector2.Distance(hit.collider.transform.position, transform.position), hit));
 
                 anim.Stop("comboanim");
                 anim.Play("comboanim");

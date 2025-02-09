@@ -277,7 +277,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300000, guid: 7354b63c854dbc04f972e48904fc9fda, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -286,7 +286,7 @@ MonoBehaviour:
   m_FillClockwise: 0
   m_FillOrigin: 2
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 0.75
+  m_PixelsPerUnitMultiplier: 2
 --- !u!114 &7639366849960705822
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -364,20 +364,13 @@ MonoBehaviour:
   sawPrefab: {fileID: 6790652013434663268, guid: e7cfd04f467fef246a13d24e93894e8a, type: 3}
   sceneData:
     version: 1
-    sceneName: 
+    name: 
     creator: 
     ID: 0
     ground: 1
-    levelName: 
     levelLength: 0
     calculatedDifficulty: 0
-    defBGColor: {r: 0, g: 0, b: 0, a: 0}
-    defGColor: {r: 0, g: 0, b: 0, a: 0}
-    cubePositions: []
-    sawPositions: []
-    longCubePositions: []
-    longCubeWidth: []
-    cubeType: 
+    description: 
     playerHP: 300
     boxSize: 1
     bpm: 0
@@ -385,15 +378,21 @@ MonoBehaviour:
     romanizedArtist: 
     songName: NikoN1nja - Slowly Going Insane
     romanizedName: 
+    source: Unknown
     songLength: 0
     offset: 0
-    clip: {fileID: 0}
     gameVersion: 
     saveTime: 1.7114893e+9
-    isVerified: 0
-    isUploaded: 0
-    playerScore: 0
-    rank: 
+    defBGColor: {r: 0, g: 0, b: 0, a: 0}
+    cubePositions: []
+    sawPositions: []
+    longCubePositions: []
+    longCubeWidth: []
+    cubeType: 
+    sawType: 
+    breakTimes: []
+    sceneName: 
+    levelName: 
 --- !u!114 &7916049887309445861
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -429,6 +428,7 @@ MonoBehaviour:
   button: {fileID: 7639366849960705822}
   buttonRectTransform: {fileID: 7639366849960705823}
   isSelected: 0
+  desc: {fileID: 0}
   levelLength: {fileID: 0}
   levelBPM: {fileID: 0}
   diff: {fileID: 0}

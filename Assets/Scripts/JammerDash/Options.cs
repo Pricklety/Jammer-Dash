@@ -500,6 +500,7 @@ namespace JammerDash
             randomSong.isOn = settingsData.randomSong;
             path.text = Main.gamePath;
             preferNoRomaji.isOn = settingsData.preferNoRomaji; 
+            textures.value = settingsData.texture;
             SetDropdownValueFromSettings();
             
         }
@@ -577,6 +578,8 @@ namespace JammerDash
             settingsData.randomSong = randomSong.isOn;
             settingsData.gamePath = Main.gamePath;
             settingsData.preferNoRomaji = preferNoRomaji.isOn;
+            settingsData.texture = textures.value;
+            TexturePack.Instance.UpdateTexture();
             ApplyFPSCap(settingsData.selectedFPS);
             ApplyResolution();
             HitNotes(settingsData.hitNotes);
@@ -688,6 +691,7 @@ namespace JammerDash
                 region = regionDisplay.isOn,
                 randomSong = randomSong.isOn,
                 preferNoRomaji = preferNoRomaji.isOn,
+                texture = textures.value,
                 saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                 gameVersion = Application.version,
                 gamePath = path.text

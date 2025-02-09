@@ -154,6 +154,7 @@ namespace JammerDash.Editor
         // Start is called before the first frame update
         void Start()
         {
+            TexturePack.Instance.UpdateTexture();
             cubes = new List<GameObject>();
             saws = new List<GameObject>();
             if (vol != null && vol.profile != null)

@@ -89,6 +89,7 @@ namespace JammerDash
         public bool region = true;
         public bool randomSong = false;
         public bool preferNoRomaji = true;
+        public int texture = 0;
         public string language = SettingsFileHandler.GetLanguageName();
         public string gameVersion = Application.version;
         public string saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();

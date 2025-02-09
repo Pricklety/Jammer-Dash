@@ -16016,7 +16016,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8d811f4bae7e484dbe7399e1da3d5bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textureName: skygradient
+  textureName: settingsBG
   fallbackTexture: {fileID: 2800000, guid: 3005a347315cf7647abb00f6fddd0cdf, type: 3}
 --- !u!1 &1876687437
 GameObject:
