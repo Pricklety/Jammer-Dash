@@ -66,10 +66,10 @@ namespace JammerDash.Game
                             modsToDisable.Add(ModType.SpeedIncrease);
                             break;
                         case ModType.hidden:
-                            multipliers.Add(1.04f);
+                            multipliers.Add(1.06f);
                             break;
                         case ModType.remember:
-                            multipliers.Add(1.04f);
+                            multipliers.Add(1.18f);
                             break;
                         case ModType.perfect:
                             multipliers.Add(1.02f);
@@ -167,7 +167,7 @@ namespace JammerDash.Game
         /// hidden (HD) - Hides the notes (like HD in osu!) (1.04x score bonus)
         /// Remember (RM) - Does the opposite of hidden and shows the notes for a short time (1.04x score bonus)
         /// Perfect (PF) - You can only have Factor 5 clicks. (1.02x score bonus)
-        /// Random (RD) - Randomizes the notes (Unranked) (1.04x score bonus)
+        /// Random (RD) - Randomizes the notes (1.04x score bonus) (UNRANKED)
         /// Sudden Death (SuD) - If you miss a note, you fail (1x score bonus)
         SpeedIncrease, hidden, remember, perfect, random, suddenDeath,
 
@@ -181,8 +181,8 @@ namespace JammerDash.Game
         // Other
         /// None - Default JD Experience
         /// Mirror (MR) - Mirrors the game on the Y scale. (1x score bonus)
-        /// Auto Move (AM) - Automatically moves the player (0x score bonus)
-        /// Auto (AU) - Automatically plays the game (0x score bonus)
+        /// Auto Move (AM) - Automatically moves the player (0x score bonus) (UNRANKED)
+        /// Auto (AU) - Automatically plays the game (0x score bonus) (UNRANKED)
         /// No Death (ND) - You can't die (1x score bonus)
         None, yMirror, autoMove, auto, noDeath
     }

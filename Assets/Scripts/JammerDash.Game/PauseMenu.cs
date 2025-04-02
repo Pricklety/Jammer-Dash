@@ -54,13 +54,6 @@ namespace JammerDash.Game
         // Update is called once per frame
         void Update()
         {
-
-            if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>() != null)
-                music = AudioManager.Instance.source;
-
-
-            
-            image.color = new(image.color.r, image.color.g, image.color.b, dim.value);
             if (Input.GetKeyDown(KeyCode.Escape) && (CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.noDeath) ? CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.noDeath) : GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0) && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindFirstObjectByType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
             {
 
@@ -102,6 +95,13 @@ namespace JammerDash.Game
             {
                 GameObject.Find("loadingText").GetComponent<Text>().text = "";
             }
+        }
+
+        void FixedUpdate()
+        {
+            image.color = new(image.color.r, image.color.g, image.color.b, dim.value);
+              if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>() != null && music == null)
+                music = AudioManager.Instance.source;
         }
 
         void OnApplicationFocus(bool focus)

@@ -20,7 +20,8 @@ namespace JammerDash {
 
         public void LoadConfig()
         {
-            string configPath = Path.Combine(TexturePack.GetActiveTexturePackPath(), "pack.ini");
+            if (!string.IsNullOrEmpty(TexturePack.GetActiveTexturePackPath())) {
+                 string configPath = Path.Combine(TexturePack.GetActiveTexturePackPath(), "pack.ini");
             
             if (!File.Exists(configPath))
             {
@@ -44,6 +45,8 @@ namespace JammerDash {
                     Debug.Log($"[TEXTURE SYSTEM] 🔹 Loaded: {key} = {value}");
                 }
             }
+            }
+               
         }
 
         void ApplySettings()

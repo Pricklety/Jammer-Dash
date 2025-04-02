@@ -1525,8 +1525,8 @@ private void OnVideoPrepared(VideoPlayer source)
             saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             songLength = audio.clip != null ? audio.clip.length : 0,
             creator = creator != null ? creator.text : "Unknown",
-            romanizedName = romajiArtist != null ? romajiArtist.text : "Unknown",
-            romanizedArtist = romaji != null ? romaji.text : "Unknown",
+            romanizedName = romaji != null ? romaji.text : "Unknown",
+            romanizedArtist = romajiArtist != null ? romajiArtist.text : "Unknown",
             playerHP = hp != null ? (int)hp.value : 300,
             boxSize = size != null ? size.value : 1,
             artist = songArtist != null ? songArtist.text : "Unknown",
@@ -1710,19 +1710,20 @@ private async Task WaitForFrameToRender(VideoPlayer videoPlayer)
         
         loadingScreen.UpdateLoading("Creating Level info...", 0.5f);
         int levelLength = (int)(distance1 / 7);
-        int numSections = Mathf.Max(1, levelLength / 10);
+        float sectionLength = 70f;
+int totalSections = Mathf.CeilToInt((float)cubes.Length / sectionLength);
 
-        Section[] sections = new Section[numSections];
+Section[] sections = new Section[totalSections];
 
-        for (int i = 0; i < numSections; i++)
+for (int sectionIndex = 0; sectionIndex < totalSections; sectionIndex++)
 {
-    float sectionStart = i * 10;
-    float sectionEnd = sectionStart + 10;
+    float sectionStartX = sectionIndex * sectionLength; // X-axis start position
+    float sectionEndX = (sectionIndex + 1) * sectionLength; // X-axis end position
 
-    sections[i] = new Section
+    Section section = new Section()
     {
-        sectionBegin = sectionStart,
-        sectionEnd = sectionEnd,
+        sectionBegin = sectionStartX, // Convert to milliseconds
+        sectionEnd = sectionEndX, // Convert to milliseconds
         bpm = int.TryParse(bpmInput.text, out int bpmValue2) ? bpmValue2 : 0,
         difficulty = Calculator.CalculateSectionDifficulty(
             cubes.ToList(),
@@ -1730,10 +1731,13 @@ private async Task WaitForFrameToRender(VideoPlayer videoPlayer)
             longCubes,
             cubePositions.ToArray(),
             bpmValue2,
-            i,
+            sectionIndex,
             10
         )
     };
+
+    sections[sectionIndex] = section;
+    Debug.Log($"Section {sectionIndex}: Begin = {section.sectionBegin}ms, End = {section.sectionEnd}ms");
 }
 
         SceneData sceneData = new SceneData
@@ -1757,7 +1761,7 @@ private async Task WaitForFrameToRender(VideoPlayer videoPlayer)
             sections = sections,
             description = input.text
         };
-        await Task.Delay(5000);
+        await Task.Delay(7000);
         loadingScreen.UpdateLoading("Populating objects...", 0.6f);
 
         sceneData.cubePositions = this.cubes?.Select(cube => (Vector2)cube.transform.position).ToList() ?? new List<Vector2>();

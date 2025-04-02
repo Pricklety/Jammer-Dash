@@ -22,25 +22,18 @@ namespace JammerDash.Editor.Basics
             {
                 IsLongCube = false;
             }
-        }
 
-        // Update is called once per frame
-        void Update()
-        {
             if (SceneManager.GetActiveScene().name == "LevelDefault")
             {
 
-                if (gameObject.name.Contains("hitter") && CustomLevelDataManager.Instance.cubesize != 0)
+                if (gameObject.name.Contains("hitter"))
                 {
                     transform.localScale = new Vector2(CustomLevelDataManager.Instance.data.boxSize, CustomLevelDataManager.Instance.data.boxSize);
                 }
-                else if (CustomLevelDataManager.Instance.cubesize == 0)
-                {
-                    transform.localScale = new Vector2(CustomLevelDataManager.Instance.data.boxSize, CustomLevelDataManager.Instance.data.boxSize);
-                }
+                
             }
-            
         }
+
     }
 
 }

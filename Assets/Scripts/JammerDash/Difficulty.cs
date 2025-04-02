@@ -50,7 +50,6 @@ namespace JammerDash.Difficulty
                 }
                 else
                 {
-                    Debug.LogWarning("No valid 4th entry values found.");
                     return 0;
                 }
             }
@@ -121,60 +120,71 @@ namespace JammerDash.Difficulty
 
 
         public static float CalculateSP(string filePath)
-        {// List to store the highest adjusted third values for each row
-            List<float> adjustedThirdValues = new List<float>();
+{
+    // List to store the highest adjusted third values for each row
+    List<float> adjustedThirdValues = new List<float>();
 
-            try
+    try
+    {
+        // Read all lines from the file
+        var rows = File.ReadAllLines(Path.Combine(Main.gamePath, filePath));
+
+        // A dictionary to track the highest third entry (3rd column) per level ID (1st column)
+        Dictionary<string, float> levelMaxThirdValues = new Dictionary<string, float>();
+
+        foreach (var row in rows)
+        {
+            // Split the row by commas
+            var entries = row.Split(',');
+
+            if (entries.Length < 12) continue; // Ensure at least twelve columns are present
+
+            // Get the level ID (1st column) and the 3rd column value
+            string levelId = entries[0];
+
+            // Extract mod string and check if it contains any unranked mod
+            string modString = entries[11];
+            if (modString.Contains(ModType.random.ToString()) ||
+                modString.Contains(ModType.autoMove.ToString()) ||
+                modString.Contains(ModType.auto.ToString()))
             {
-                // Read all lines from the file
-                var rows = File.ReadAllLines(Path.Combine(Main.gamePath, filePath));
-
-                // A dictionary to track the highest third entry (3rd column) per level ID (1st column)
-                Dictionary<string, float> levelMaxThirdValues = new Dictionary<string, float>();
-
-                foreach (var row in rows)
-                {
-                    // Split the row by commas
-                    var entries = row.Split(',');
-
-                    if (entries.Length < 3) continue; // Ensure at least three columns are present
-
-                    // Get the level ID (1st column) and the 3rd column value
-                    string levelId = entries[0];
-                    if (!float.TryParse(entries[2], out float thirdValue) || float.IsNaN(thirdValue)) continue;
-
-                    // Update the dictionary with the highest third value for each level ID
-                    if (levelMaxThirdValues.ContainsKey(levelId))
-                    {
-                        // Keep the maximum third value for the same level ID
-                        levelMaxThirdValues[levelId] = Math.Max(levelMaxThirdValues[levelId], thirdValue);
-                    }
-                    else
-                    {
-                        levelMaxThirdValues[levelId] = thirdValue;
-                    }
-                }
-
-                // Now calculate the SP score using the decay formula for the top 50 values
-                List<float> topValues = levelMaxThirdValues.Values.OrderByDescending(v => v).Take(50).ToList();
-                float totalSP = 0f;
-
-                // Apply the decay formula: Total sp = p * 0.96^(n-1)
-                for (int i = 0; i < topValues.Count; i++)
-                {
-                    float p = topValues[i];
-                    float adjustedValue = p * Mathf.Pow(0.96f, i); // Apply decay for each value
-                    totalSP += adjustedValue;
-                }
-
-                return totalSP;
+                continue; // Skip unranked plays
             }
-            catch (Exception ex)
+
+            if (!float.TryParse(entries[2], out float thirdValue) || float.IsNaN(thirdValue)) continue;
+
+            // Update the dictionary with the highest third value for each level ID
+            if (levelMaxThirdValues.ContainsKey(levelId))
             {
-                Debug.LogError($"Error reading or processing file: {ex.Message}");
-                return 0;
+                // Keep the maximum third value for the same level ID
+                levelMaxThirdValues[levelId] = Math.Max(levelMaxThirdValues[levelId], thirdValue);
+            }
+            else
+            {
+                levelMaxThirdValues[levelId] = thirdValue;
             }
         }
+
+        // Now calculate the SP score using the decay formula for the top 50 values
+        List<float> topValues = levelMaxThirdValues.Values.OrderByDescending(v => v).Take(50).ToList();
+        float totalSP = 0f;
+
+        // Apply the decay formula: Total sp = p * 0.96^(n-1)
+        for (int i = 0; i < topValues.Count; i++)
+        {
+            float p = topValues[i];
+            float adjustedValue = p * Mathf.Pow(0.96f, i); // Apply decay for each value
+            totalSP += adjustedValue;
+        }
+
+        return totalSP;
+    }
+    catch (Exception ex)
+    {
+        Debug.LogError($"Error reading or processing file: {ex.Message}");
+        return 0;
+    }
+}
 
   public static Transform FindFarthestObjectInX(GameObject[] objects)
         {

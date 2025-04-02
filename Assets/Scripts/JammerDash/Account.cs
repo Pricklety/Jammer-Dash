@@ -74,10 +74,10 @@ namespace JammerDash
 
         private void Start()
         {
-            LoadData();
-            StartCoroutine(SavePlaytimeEverySecond());
-            CalculateXPRequirements();
             LoginData(); // Try to load login data only once at the start
+            LoadData();
+            CalculateXPRequirements();
+            InvokeRepeating(nameof(SavePlaytime), 1f, 1);
         }
 
         private bool IsFileInUse(string filePath)
@@ -115,9 +115,7 @@ namespace JammerDash
         private static readonly object fileLock = new object();
         private void SaveLocalData()
         {
-            if (!File.Exists(Path.Combine(Main.gamePath, "loginData.dat"))) {
-                File.Create(Path.Combine(Main.gamePath, "loginData.dat"));
-            }
+            SavePlaytime();
 
             if (!File.Exists(Path.Combine(Main.gamePath, "playerData.dat"))) {
                 File.Create(Path.Combine(Main.gamePath, "playerData.dat"));
@@ -372,28 +370,29 @@ private void HandleErrorResponse(UnityWebRequest request)
     {
         #if UNITY_EDITOR
         Debug.LogError($"Request Error: {request.error}");
-    Debug.LogError($"Response Code: {request.responseCode}");
-    Debug.LogError($"SSL/TLS Handshake Error: {request.downloadHandler.text}");
+        Debug.LogError($"Response Code: {request.responseCode}");
+        Debug.LogError($"SSL/TLS Handshake Error: {request.downloadHandler.text}");
         #endif
+
         var errorResponse = JObject.Parse(request.downloadHandler.text);
-        var errors = errorResponse["error"];
-        if (errors != null && errors.Count() > 0)
+        var errorMessage = errorResponse["error"]?.ToString(); // Extract error message safely
+
+        if (!string.IsNullOrEmpty(errorMessage))
         {
-            Notifications.instance.Notify($"{errors.Count()} error(s) occurred. More info in the player logs (click).", 
-                () => Process.Start($@"{Path.Combine(Application.persistentDataPath, "Player.log")}"));
+            Notifications.instance.Notify($"Error: {errorMessage}.", null);
         }
         else
         {
-            Notifications.instance.Notify("Unknown error occurred during login.", null);
+            Notifications.instance.Notify("An unknown error occurred during login.", null);
         }
     }
     catch (Exception ex)
     {
-        Notifications.instance.Notify($"An unknown error occurred: {ex.Message}", null); 
+        Notifications.instance.Notify($"An unexpected error occurred: {ex.Message}", null);
         Debug.LogError($"Request Error: {request.error}");
         Debug.LogError($"Response Code: {request.responseCode}");
         Debug.LogError($"SSL/TLS Handshake Error: {request.downloadHandler.text}");
-        Debug.LogError($"{ex.Message}");
+        Debug.LogError($"Exception: {ex}");
     }
 }
 
@@ -483,7 +482,7 @@ role = string.Join(" ", words);
                        string ip = new WebClient().DownloadString("http://ipv4.icanhazip.com");
             LoginData loginData = new LoginData
             {
-                nickname = username,
+                nickname = nickname,
                 username = username.ToLower(),
                 email = email,
                 password = pass,
@@ -600,12 +599,13 @@ private IEnumerator CallLogout(string url)
 {
     UnityWebRequest request = new UnityWebRequest(url, "POST");
     yield return request.SendWebRequest();
-
+    string path = Path.Combine(Main.gamePath, "loginData.dat");
     if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
     {
         Debug.Log("Logged out.");
         Notifications.instance.Notify("Logged out.", null);
         loggedIn = false;
+        File.Delete(path);
     }
     else
     {
@@ -615,9 +615,18 @@ private IEnumerator CallLogout(string url)
         {
             string path = Main.gamePath + "/playerData.dat";
             string playtime = Main.gamePath + "/playtime.dat";
-
             string play = File.ReadAllText(playtime);
             this.playtime = float.Parse(play);
+
+            if (File.Exists(playtime)) {
+
+            InvokeRepeating(nameof(SavePlaytime), 1, 1);
+            }
+            else {
+                File.Create(playtime);
+                SavePlaytime();
+            }
+            
             if (File.Exists(path))
             {
                 XmlSerializer formatter = new XmlSerializer(typeof(PlayerData));
@@ -632,10 +641,8 @@ private IEnumerator CallLogout(string url)
             }
             else
             {
-                
                 return null;
             }
-
             
         }
         void Update()
@@ -690,14 +697,6 @@ private IEnumerator CallLogout(string url)
             }
         }
 
-        private IEnumerator SavePlaytimeEverySecond()
-        {
-            while (true)
-            {
-                SavePlaytime();
-                yield return new WaitForSeconds(1f); // Wait for 1 second
-            }
-        }
     }
     [System.Serializable]
     public class PlayerData

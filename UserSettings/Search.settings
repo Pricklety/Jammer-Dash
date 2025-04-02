@@ -9,9 +9,9 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
-	"picker_window_position_offset.075BCD15" = "-152;95;320;550"
+	"picker_window_position_offset.075BCD15" = "-152;95;420;550"
 	"picker_visibility_flags.075BCD15" = "264"
-	"picker_item_size.075BCD15" = "55"
+	"picker_item_size.075BCD15" = "32"
 	"picker_inspector.075BCD15" = "0"
 	"picker_current_group.075BCD15" = "st"
 }
@@ -100,6 +100,9 @@ providers = {
 objectSelectors = {
 }
 recentSearches = [
+	"st: song name"
+	"st: song nam"
+	"st: song name ("
 	"st: options"
 	"at: tr(ja-JP):\"some value\""
 	"st: resta"
@@ -116,10 +119,6 @@ recentSearches = [
 	"st: change"
 	"st: backg"
 	"st: open the "
-	"st: edfiting"
-	"st: hide afk"
-	"st: hide currently"
-	"st: hide playing"
 ]
 searchItemFavorites = [
 ]

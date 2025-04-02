@@ -63,6 +63,8 @@ namespace JammerDash.Audio
         private FileSystemWatcher fileWatcher; 
         private HashSet<string> knownFiles = new HashSet<string>();
 
+        SettingsData data;
+
         private void Awake()
         {
             if (Instance == null)
@@ -82,10 +84,12 @@ namespace JammerDash.Audio
 
         public void Start()
         {
+
             InitializeForScene(SceneManager.GetActiveScene().buildIndex);
 
             masterS.onValueChanged.AddListener(OnMasterVolumeChanged);
             source = GetComponent<AudioSource>();
+            source.volume = SettingsFileHandler.LoadSettingsFromFile().musicVol;
             if (Debug.isDebugBuild)
                 devText.gameObject.SetActive(true);
             else
@@ -240,7 +244,6 @@ namespace JammerDash.Audio
 
             // Refresh AudioSources
             audios = FindObjectsByType<AudioSource>(FindObjectsSortMode.None);
-
             // Reset volume updated flag
             isVolumeUpdated = false;
             postProcess = Camera.main.GetComponent<PostProcessVolume>();
@@ -300,7 +303,7 @@ namespace JammerDash.Audio
         {
 
 
-            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+            data = SettingsFileHandler.LoadSettingsFromFile();
             if (SceneManager.GetActiveScene().buildIndex == 1)
             {
                 if (menu == null)
@@ -351,117 +354,95 @@ namespace JammerDash.Audio
             }
         }
         private void Update()
-        {
-            // Handle global keybinds
-           SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
-
-            // Example global keybind: Fullscreen toggle
-            if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.Return))
-            {
-                KeybindPanel.ToggleFunction("Toggle fullscreen", "Alt + Enter");
-            }
-
-            // Toggle UI globally
-            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeybindingManager.toggleUI))
-            {
-                data.canvasOff = !data.canvasOff;
-                SettingsFileHandler.SaveSettingsToFile(data);
-                KeybindPanel.ToggleFunction("Toggle gameplay interface", $"Shift + {KeybindingManager.toggleUI}");
-            }
-
-            if (Input.GetKey(KeyCode.F2) && menu.playPanel.activeSelf) 
-            {
-                KeybindPanel.ToggleFunction("Random level", "F2");
-            }
-            if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Tab)) 
-            KeybindPanel.ToggleFunction("Notifications", "Left Control + Tab");
-
-            bool gain = master.audioMixer.GetFloat("Gain", value: out float a);
-            if (a != data.bassgain)
-            {
-                master.audioMixer.SetFloat("Gain", data.bass ? data.bassgain : 1f);
-            }
-
-
-
-            // Scene-specific logic
-            if (currentSceneIndex == 1)
-            {
-                HandleSceneSpecificLogic();
-            }
-
-            // Manage audio sources globally
-            ManageAudioSources();
-
-            float value1 = Input.GetAxisRaw("Mouse ScrollWheel");
-
-             if (IsMouseOverSlider(musicSlider))
-                musicSlider.transform.localScale = new(0.95f, 0.95f, 1);
-                else
-                musicSlider.transform.localScale = new(0.75f, 0.75f, 1);
-
-            if (IsMouseOverSlider(sfxSlider))
-                sfxSlider.transform.localScale = new(0.95f, 0.95f, 1);
-                else
-                sfxSlider.transform.localScale = new(0.75f, 0.75f, 1);
-            if (IsMouseOverSlider(masterS))
-                masterS.transform.localScale = new(1.25f, 1.25f, 1);
-                else
-                masterS.transform.localScale = Vector3.one;
-
-        if (value1 != 0)
-        {
-            
-            if (IsMouseOverSlider(masterS) || Input.GetKey(KeyCode.LeftShift))
-            {
-                masterS.gameObject.SetActive(true);
-                musicSlider.gameObject.SetActive(true);
-                sfxSlider.gameObject.SetActive(true);
-                HandleVolumeChange(masterS, "Master", value1);
-                if (options != null)
-                        options.masterVolumeSlider.value = masterS.value;
-                
-            }
-            else if (IsMouseOverSlider(musicSlider) || Input.GetKey(KeyCode.LeftAlt))
-            {
-                masterS.gameObject.SetActive(true);
-                musicSlider.gameObject.SetActive(true);
-                sfxSlider.gameObject.SetActive(true);
-                HandleVolumeChange(musicSlider, "Music", value1 / 100);
-                if (options != null)
-                        options.musicVolSlider.value = musicSlider.value;
-            }
-            else if (IsMouseOverSlider(sfxSlider) || Input.GetKey(KeyCode.LeftControl))
-            {
-                masterS.gameObject.SetActive(true);
-                musicSlider.gameObject.SetActive(true);
-                sfxSlider.gameObject.SetActive(true);
-                HandleVolumeChange(sfxSlider, "SFX", value1 / 100);
-                if (options != null)
-                        options.sfxSlider.value = sfxSlider.value;
-            }
+{
     
+
+    // Handle global keybinds efficiently
+    if (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.Return))
+        KeybindPanel.ToggleFunction("Toggle fullscreen", "Alt + Enter");
+
+    if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeybindingManager.toggleUI))
+    {
+        data.canvasOff = !data.canvasOff;
+        SettingsFileHandler.SaveSettingsToFile(data);
+        KeybindPanel.ToggleFunction("Toggle gameplay interface", $"Shift + {KeybindingManager.toggleUI}");
+    }
+
+    if (Input.GetKey(KeyCode.F2) && menu.playPanel.activeSelf)
+        KeybindPanel.ToggleFunction("Random level", "F2");
+
+    if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Tab))
+        KeybindPanel.ToggleFunction("Notifications", "Left Control + Tab");
+
+    if (master.audioMixer.GetFloat("Gain", out float a) && a != data.bassgain)
+        master.audioMixer.SetFloat("Gain", data.bass ? data.bassgain : 1f);
+
+    // Handle scene-specific logic
+    if (currentSceneIndex == 1)
+        HandleSceneSpecificLogic();
+
+    // Manage global audio sources
+    ManageAudioSources();
+
+    float scrollValue = Input.GetAxisRaw("Mouse ScrollWheel");
+
+    // Optimize slider scaling logic
+    Vector3 smallScale = new(0.75f, 0.75f, 1);
+    Vector3 mediumScale = new(0.95f, 0.95f, 1);
+    Vector3 largeScale = new(1.25f, 1.25f, 1);
+
+    musicSlider.transform.localScale = IsMouseOverSlider(musicSlider) ? mediumScale : smallScale;
+    sfxSlider.transform.localScale = IsMouseOverSlider(sfxSlider) ? mediumScale : smallScale;
+    masterS.transform.localScale = IsMouseOverSlider(masterS) ? largeScale : Vector3.one;
+
+    // Volume adjustment with scroll wheel
+    if (scrollValue != 0)
+    {
+        bool masterActive = IsMouseOverSlider(masterS) || Input.GetKey(KeyCode.LeftShift);
+        bool musicActive = IsMouseOverSlider(musicSlider) || Input.GetKey(KeyCode.LeftAlt);
+        bool sfxActive = IsMouseOverSlider(sfxSlider) || Input.GetKey(KeyCode.LeftControl);
+
+        bool anyActive = masterActive || musicActive || sfxActive;
+
+        masterS.gameObject.SetActive(anyActive);
+        musicSlider.gameObject.SetActive(anyActive);
+        sfxSlider.gameObject.SetActive(anyActive);
+
+        if (masterActive)
+        {
+            HandleVolumeChange(masterS, "Master", scrollValue);
+            if (options != null) options.masterVolumeSlider.value = masterS.value;
         }
-
-
-        HandleSliderAutoHide(masterS);
-        HandleSliderAutoHide(musicSlider);
-        HandleSliderAutoHide(sfxSlider);
-
-            if (SceneManager.GetActiveScene().buildIndex == 1 && (!songPlayed && !paused && !source.isPlaying || (source.time >= source.clip.length || !source.isPlaying && !paused)))
-            {
-                PlayNextSong(songPlayed);
-                songPlayed = true;
-            }
-
-            // Reset songPlayed if conditions change and need to play the next song again
-            if (songPlayed && source.time < 5f && source.isPlaying)
-            {
-                songPlayed = false;
-            }
-
+        else if (musicActive)
+        {
+            HandleVolumeChange(musicSlider, "Music", scrollValue / 100);
+            if (options != null) options.musicVolSlider.value = musicSlider.value;
         }
+        else if (sfxActive)
+        {
+            HandleVolumeChange(sfxSlider, "SFX", scrollValue / 100);
+            if (options != null) options.sfxSlider.value = sfxSlider.value;
+        }
+    }
 
+    // Handle auto-hide logic for sliders
+    HandleSliderAutoHide(masterS);
+    HandleSliderAutoHide(musicSlider);
+    HandleSliderAutoHide(sfxSlider);
+
+    // Optimized music playback logic
+    bool shouldPlayNext = !songPlayed && !paused && !source.isPlaying ||
+                          (source.time >= source.clip.length || !source.isPlaying && !paused);
+
+    if (SceneManager.GetActiveScene().buildIndex == 1 && shouldPlayNext)
+    {
+        PlayNextSong(songPlayed);
+        songPlayed = true;
+    }
+
+    if (songPlayed && source.time < 5f && source.isPlaying)
+        songPlayed = false;
+}
 
         private void HandleSceneSpecificLogic()
         {
@@ -544,7 +525,6 @@ namespace JammerDash.Audio
         timer += Time.deltaTime;
         if (timer > 2f && slider.gameObject.activeSelf)
         {
-            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
         float newVolume = Mathf.Clamp(masterS.value, -80f, 20f);
             data.volume = newVolume;
             data.musicVol = musicSlider.value;
@@ -563,7 +543,6 @@ namespace JammerDash.Audio
 
         private void UpdateAllVolumes()
         {
-            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
             foreach (AudioSource audio in audios)
             {
                 audio.outputAudioMixerGroup = master;
@@ -653,7 +632,6 @@ namespace JammerDash.Audio
 
                 PlayCurrentSong();
                 new WaitForSecondsRealtime(1f);
-                SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
                 if (data.bgTime == 0 && menu.mainPanel.activeSelf)
                    StartCoroutine(menu.LoadRandomBackground(null));
             }
@@ -676,7 +654,6 @@ namespace JammerDash.Audio
                 UnityEngine.Debug.Log($"Currently playing song index: {currentClipIndex}");
                 PlayCurrentSong();
                 new WaitForSecondsRealtime(1f);
-                SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
                 if (data.bgTime == 0 && menu.mainPanel.activeSelf)
                     StartCoroutine(menu.LoadRandomBackground(null));
 

@@ -282,7 +282,12 @@ namespace JammerDash.Menus
     }
      private IEnumerator FetchUserDetails(string username)
     {
-        string apiUrl = "https://api.jammerdash.com/v1/account/users";
+        bool isuuid = Guid.TryParse(username, out _);
+        string apiUrl = "";
+        if (isuuid)
+            apiUrl = "https://api.jammerdash.com/v1/account/profile?uuid=" + username;
+        else
+        apiUrl = "https://api.jammerdash.com/v1/account/profile?username=" + username;
         using (UnityWebRequest www = UnityWebRequest.Get(apiUrl))
         {
             www.SetRequestHeader("User-Agent", Secret.UserAgent);
@@ -297,10 +302,10 @@ namespace JammerDash.Menus
             {
                 var jsonResponse = www.downloadHandler.text;
 
-                UserDataResponse data;
+                User data;
                 try
                 {
-                    data = JsonConvert.DeserializeObject<UserDataResponse>(jsonResponse);
+                    data = JsonConvert.DeserializeObject<User>(jsonResponse);
                 }
                 catch (JsonException ex)
                 {
@@ -309,15 +314,14 @@ namespace JammerDash.Menus
                     yield break;
                 }
 
-                if (data == null || data.users == null)
+                if (data == null)
                 {
                     Debug.LogError("Failed to deserialize user data.");
-                    Notifications.instance.Notify("Failed to fetch user data. Please try again.", null);
+                    Notifications.instance.Notify("We failed to fetch data for " + username, null);
                     yield break;
                 }
-                totalText.text = $"{data.users.Count} users registered.";
-                var user = data.users.Find(u => u.username.ToLower() == username.ToLower());
-
+                var user = data; 
+            
                 if (user == null)
                 {
                     Notifications.instance.Notify($"User with username \"{username}\" not found.", null);
@@ -341,23 +345,66 @@ namespace JammerDash.Menus
         lookupUUID.text = $"UUID: {user.uuid}";
     }
 
-    IEnumerator LoadPfp(string uri) 
+   IEnumerator LoadPfp(string uri)
+{
+    using (UnityWebRequest request = UnityWebRequest.Get(uri))
     {
-                    using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(uri))
-                    {
-                        yield return request.SendWebRequest();
-        
-                        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
-                        {
-                            Debug.LogError($"Error downloading profile picture: {request.error}");
-                            lookupPfp.texture = Resources.Load<UnityEngine.Texture>("defaultPFP");
-                        }
-                        else
-                        {
-                            lookupPfp.texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
-                        }
-                    }
+        // Add custom headers to avoid caching
+        request.SetRequestHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        request.SetRequestHeader("Pragma", "no-cache");
+        request.SetRequestHeader("If-None-Match", ""); // Remove etag to force a fresh fetch
+
+        // Send the request and wait for completion
+        yield return request.SendWebRequest();
+
+        // Check for errors in the request
+        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+        {
+            Debug.LogError($"Error downloading profile picture: {request.error} (HTTP {request.responseCode})");
+            lookupPfp.texture = Resources.Load<UnityEngine.Texture>("defaultPFP");
+        }
+        else
+        {
+            // Check the Content-Type of the response
+            string contentType = request.GetResponseHeader("Content-Type");
+            Debug.Log($"Content-Type: {contentType}");
+
+            // Check if the server is returning HTML (likely an error page)
+            if (request.downloadHandler.text.Contains("<html>"))
+            {
+                Debug.LogError("Received an HTML page instead of an image!");
+                lookupPfp.texture = Resources.Load<UnityEngine.Texture>("defaultPFP");
+                yield break;
+            }
+
+            // Log the size of the data received
+            byte[] textureData = request.downloadHandler.data;
+            Debug.Log($"Downloaded {textureData.Length} bytes");
+
+            if (textureData != null && textureData.Length > 0)
+            {
+                Texture2D downloadedTexture = new Texture2D(1, 1, TextureFormat.RGBA32, false); // Use RGBA32 format
+                if (downloadedTexture.LoadImage(textureData))  // Load image data into the texture
+                {
+                    Debug.Log("Texture downloaded and loaded successfully.");
+                    lookupPfp.texture = downloadedTexture;
                 }
+                else
+                {
+                    Debug.LogError("Failed to load image into Texture2D.");
+                    lookupPfp.texture = Resources.Load<UnityEngine.Texture>("defaultPFP");
+                }
+            }
+            else
+            {
+                Debug.LogError("No data received for the texture!");
+                lookupPfp.texture = Resources.Load<UnityEngine.Texture>("defaultPFP");
+            }
+        }
+    }
+}
+
+            
     public void SetAdmin()
     {
         StartCoroutine(EditUserCoroutine());
@@ -616,11 +663,15 @@ namespace JammerDash.Menus
             if (!Account.Instance.loggedIn)
             {
                 accPanel.SetActive(!accPanel.activeSelf);
+                if (loginPage.activeSelf)
+                loginPage.SetActive(false);
+                
             }
             else
             {
                 logOutPanel.SetActive(!logOutPanel.activeSelf);   
             }
+
             
         }
 
@@ -745,100 +796,91 @@ namespace JammerDash.Menus
         public IEnumerator LoadRandomBackground(Sprite sprite1)
         {
             UnityEngine.Debug.Log(data);
-bg.color = Color.white;
- float duration = 0.2f;
+        bg.color = Color.white;
+        float duration = 0.2f;
         float elapsedTime = 0f;
 
         Image imageComponent = bg;
-
         Color startColor = imageComponent.color;
         Color targetColor = new(startColor.r, startColor.g, startColor.b, 0f);
 
-        while (elapsedTime < duration)
-        {
-            imageComponent.color = Color.Lerp(startColor, targetColor, elapsedTime / duration);
-            elapsedTime += Time.deltaTime;
-             if (sprite1 == null) 
-        {
+        // Ensure sprite selection happens only ONCE
+        Sprite[] spriteArray = null;
 
-switch (data.backgroundType)
+        if (sprite1 == null)
+        {
+            switch (data.backgroundType)
             {
                 case 1:
-                    sprite = Resources.LoadAll<Sprite>("backgrounds/default");
-                    if (videoImage != null)
-                    {
-                        videoPlayerObject.SetActive(false);
-                        videoImage.SetActive(false);
-                    }
+                    spriteArray = Resources.LoadAll<Sprite>("backgrounds/default");
                     if (DateTime.Now.Month == 12)
                     {
-                        sprite = Resources.LoadAll<Sprite>("backgrounds/christmas");
-                        if (videoImage != null)
-                        {
-                            videoPlayerObject.SetActive(false);
-                            videoImage.SetActive(false);
-                        }
+                        spriteArray = Resources.LoadAll<Sprite>("backgrounds/christmas");
                     }
-                    else if (DateTime.Now.Month == 2 && DateTime.Now.Day == 14)
+                        else if (DateTime.Now.Month == 2 && DateTime.Now.Day == 14)
                     {
-                        sprite = Resources.LoadAll<Sprite>("backgrounds/valentine");
-                        if (videoImage != null)
-                        {
-                            videoPlayerObject.SetActive(false);
-                            videoImage.SetActive(false);
-                        }
+                        spriteArray = Resources.LoadAll<Sprite>("backgrounds/valentine");
                     }
                     break;
+
                 case 2:
                     // Implement server-side seasonal backgrounds
+                    break;
 
-                    break;
                 case 3:
-                    _ = LoadCustomBackgroundAsync();
-                    break;
+                    yield return LoadCustomBackgroundAsync();
+                    yield break; // Stop further execution
+              
                 case 4:
                     videoPlayerObject.SetActive(true);
                     videoImage.SetActive(true);
                     string videoDirectory = Path.Combine(JammerDash.Main.gamePath, "backgrounds");
                     List<string> validVideoFiles = GetValidVideoFiles(videoDirectory, 250 * 1024 * 1024); // 250MB limit
+
                     if (validVideoFiles.Count == 0)
                     {
                         Debug.LogWarning("No valid video files found within size constraints.");
-                        break;
+                        yield break;
                     }
 
-                    // Assign video clips or URLs to the video player
                     foreach (string file in validVideoFiles)
                     {
                         videoUrls.Add(file);
                         Debug.Log("Loading video: " + file);
                         AddVideoToPlayer(file);
-                    }
-                    break;
+                    }   
+                    yield break; // Stop execution since videos are handled separately
+
                 default:
-                    sprite = Resources.LoadAll<Sprite>("backgrounds/basic");
-                    if (videoPlayerObject != null)
-                    {
-                        videoPlayerObject.SetActive(false);
-                        videoImage.SetActive(false);
-                    }
+                    spriteArray = Resources.LoadAll<Sprite>("backgrounds/basic");
                     break;
             }
-             int randomIndex = (sprite.Length == 1) ? 0 : Random.Range(0, sprite.Length - 1);
-                bg.sprite = sprite[randomIndex];
+
+            // Ensure a sprite was loaded before trying to assign it
+            if (spriteArray != null && spriteArray.Length > 0)
+            {
+                int randomIndex = Random.Range(0, spriteArray.Length);
+                bg.sprite = spriteArray[randomIndex];
+            }
         }
         else
-            {
-                bg.sprite = sprite1;
-            }
+        {
+            bg.sprite = sprite1;
+        }
+
+        while (elapsedTime < duration)
+        {
+            imageComponent.color = Color.Lerp(startColor, targetColor, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
             yield return null;
         }
 
-        startColor = imageComponent.color;
-        targetColor = Color.white;
-        imageComponent.color = Color.Lerp(startColor, targetColor, 1f);
-       Resources.UnloadUnusedAssets();
-        }
+        // Fade back to full opacity
+        imageComponent.color = Color.Lerp(targetColor, Color.white, 1f);
+
+        Resources.UnloadUnusedAssets();
+    }
+
 
         public async Task LoadLevelBackgroundAsync(string filePath)
         {
@@ -907,7 +949,7 @@ switch (data.backgroundType)
        string fullcc;
         public void SetCountry()
         {
-            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+           
             countryIMG.sprite = Resources.Load<Sprite>("icons/countries/" + Account.Instance.cc);
 
             ccName = Account.Instance.country_name;
@@ -1109,10 +1151,10 @@ switch (data.backgroundType)
             if (level != null)
             {
                 UnityEngine.Debug.Log(sceneData);
-                   level.SetLevelName(SettingsFileHandler.LoadSettingsFromFile().preferNoRomaji == true 
+                   level.SetLevelName(data.preferNoRomaji == true 
     ? sceneData.name 
     : sceneData.romanizedName);
-                level.SetSongName(SettingsFileHandler.LoadSettingsFromFile().preferNoRomaji == true ? $"{sceneData.artist} - {sceneData.songName}" : $"{sceneData.romanizedArtist} - {sceneData.romanizedName}");
+                level.SetSongName(data.preferNoRomaji == true ? $"{sceneData.artist} - {sceneData.songName}" : $"{sceneData.romanizedArtist} - {sceneData.romanizedName}");
                 level.SetDifficulty($"{sceneData.calculatedDifficulty:0.00} sn");
 
             }
@@ -1150,11 +1192,11 @@ switch (data.backgroundType)
 
             if (level != null)
             {
-                 level.SetLevelName(SettingsFileHandler.LoadSettingsFromFile().preferNoRomaji == true 
+                 level.SetLevelName(data.preferNoRomaji == true 
     ? sceneData.name 
     : sceneData.romanizedName);
-                level.SetInfo($"♫ {(SettingsFileHandler.LoadSettingsFromFile().preferNoRomaji == true ? sceneData.artist : sceneData.romanizedArtist)} - " +
-              $"{(SettingsFileHandler.LoadSettingsFromFile().preferNoRomaji == true ? sceneData.songName : sceneData.romanizedName)} // " +
+                level.SetInfo($"♫ {(data.preferNoRomaji == true ? sceneData.artist : sceneData.romanizedArtist)} - " +
+              $"{(data.preferNoRomaji == true ? sceneData.songName : sceneData.romanizedName)} // " +
               $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "mapped by")} " +
               $"{sceneData.creator}");
             }
@@ -1550,19 +1592,21 @@ switch (data.backgroundType)
         {
             AudioManager.Instance.shuffle = !AudioManager.Instance.shuffle;
         }
-        private float updateInterval = 0.5f; // Update interval in seconds
-private float nextUpdateTime = 0f;
+        private float updateInterval = 0.5f;
+private float nextUpdateTime = 2f;
 
 public void FixedUpdate()
 {
-    if (Time.time >= nextUpdateTime)
+    data = SettingsFileHandler.LoadSettingsFromFile();
+    updateInterval += Time.fixedDeltaTime;
+    if (updateInterval >= nextUpdateTime)
     {
         UpdateShuffleImage();
         UpdateUsernames();
         UpdateStatsText();
-        nextUpdateTime = Time.time + updateInterval;
+        updateInterval = 0f;
     }
-    backgroundVideo.gameObject.SetActive(SettingsFileHandler.LoadSettingsFromFile().backgroundType == 4);
+    backgroundVideo.gameObject.SetActive(data.backgroundType == 4);
     HandleQuitPanel();
     UpdateBackgroundParallax();
     HandleEscapeInput();
@@ -1581,7 +1625,7 @@ public void FixedUpdate()
 
         public void LoginPage() {
             loginPage.SetActive(true);
-            accPanel.SetActive(false);   
+            accPanel.SetActive(false);    
         }
 
         private void UpdateUsernames()
@@ -1638,7 +1682,6 @@ public void FixedUpdate()
 
         private void UpdateBackgroundParallax()
         {
-            data = SettingsFileHandler.LoadSettingsFromFile();
             if (data.parallax && IsFullscreenMode())
             {
                 ApplyParallaxEffect();
@@ -1844,7 +1887,7 @@ public void FixedUpdate()
 
         private void HandleIdleAnimations()
         {
-            if (afkTime > 10f && !IsPanelActive(settingsPanel, accPanel, additionalPanel))
+            if (afkTime > 10f && !IsPanelActive(settingsPanel, accPanel))
             {
                 if (!hasPlayedIdle)
                 {
@@ -1854,7 +1897,7 @@ public void FixedUpdate()
                     hasPlayedIdle = true;
                 }
             }
-            else if (afkTime > 10f && IsPanelActive(settingsPanel, accPanel, additionalPanel))
+            else if (afkTime > 10f && IsPanelActive(settingsPanel, accPanel))
             {
                 Cursor.visible = true;
                 notIdle.PlayInFixedTime("notIdle");

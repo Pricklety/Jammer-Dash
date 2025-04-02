@@ -67,7 +67,7 @@ public class PlayerAnimation : MonoBehaviour
             Texture2D texture = new Texture2D(2, 2);
             if (texture.LoadImage(imageData))
             {
-                texture.filterMode = FilterMode.Point;
+                texture.filterMode = FilterMode.Bilinear;
                 Debug.LogWarning($"[PlayerAnimation] Sprite changed: {filePath}.");
                 return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
             }

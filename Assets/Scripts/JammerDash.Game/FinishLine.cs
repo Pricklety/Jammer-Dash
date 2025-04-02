@@ -50,16 +50,16 @@ namespace JammerDash.Game
         public Text lvl;
 
 
-        private void OnTriggerEnter2D(Collider2D collision)
+        private void EndLevel()
         {
-            if (collision.tag == "Player")
-            {
+            
+                #if UNITY_EDITOR
+                Debug.Log("Finished!");
+                #endif
                 StartCoroutine(End());
                 player.transform.position = transform.position;
-                finishParticles.transform.position = player.transform.position;
-                Instantiate(finishParticles, new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z), Quaternion.identity);
                 finishSound.Play();
-            }
+            
 
         }
 
@@ -116,8 +116,12 @@ namespace JammerDash.Game
             }
             if (player.transform.position.x >= transform.position.x && player != null)
             {
-                player.transform.position = new Vector2(transform.position.x, transform.position.y + 0.5f);
-                player0.enabled = false;
+                player.transform.position = new Vector2(transform.position.x, transform.position.y);
+                if (player0.enabled) {
+                    EndLevel();
+                    player0.enabled = false;
+                }
+                
             }
 
             deadScore.text = "There's always another time! Maybe it's after you restart?";

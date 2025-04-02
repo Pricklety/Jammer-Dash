@@ -10,16 +10,17 @@ namespace JammerDash.Tech
         public GameObject panel;
         private int[] _frameRateSamples;
         private int _cacheNumbersAmount = 300;
-        private int _averageFromAmount = 10;
+        private int _averageFromAmount = 60;
         private int _averageCounter = 0;
         private int _currentAveraged;
         private Color _currentColor;
         private Color _targetColor;
-        private float _smoothTime = 0.10f; // Smoothing time in seconds
-
+        private float _smoothTime = 0.20f;
+        float ms;
+        SettingsData data;
         void Awake()
         {
-            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+            data = SettingsFileHandler.LoadSettingsFromFile();
             if (data.isShowingFPS)
             {
                 panel.SetActive(true);
@@ -32,8 +33,11 @@ namespace JammerDash.Tech
             _frameRateSamples = new int[_averageFromAmount];
             _currentColor = GetColorForFPS(0);
             _targetColor = _currentColor;
+            InvokeRepeating(nameof(GetData), 0, 2);
         }
-
+        void GetData() {
+            data = SettingsFileHandler.LoadSettingsFromFile();
+        }
         void Update()
         {
             // Sample FPS
@@ -61,10 +65,20 @@ namespace JammerDash.Tech
 
             // Calculate drawing time in milliseconds
             float drawingTimeMs = 1000f / Mathf.Max(_currentAveraged, 0.00001f); // Avoid division by zero
-
+            ms = drawingTimeMs;
+            
             // Assign to UI
             {
-                SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+                
+                    Text.text = $"FPS: <color=#{ColorUtility.ToHtmlStringRGBA(_currentColor)}>{_currentAveraged}</color>\n{ms:F2} ms";
+                
+
+            }
+        }
+
+        void FixedUpdate()
+        {
+           
                 if (data.isShowingFPS)
                 {
                     panel.SetActive(true);
@@ -73,10 +87,6 @@ namespace JammerDash.Tech
                 {
                     panel.SetActive(false);
                 }
-                    Text.text = $"FPS: <color=#{ColorUtility.ToHtmlStringRGBA(_currentColor)}>{_currentAveraged}</color>\n{drawingTimeMs:F2} ms";
-                
-
-            }
         }
 
 

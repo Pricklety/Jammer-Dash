@@ -44,7 +44,7 @@ public class JsonConverter : MonoBehaviour
 
     if (needsConversion)
     {
-        warningText.text = $"WARNING: This will modify {jsonFiles.Length} JSON files in:\n{directoryPath}\nContinue?";
+        warningText.text = $"WARNING: This will modify your level files in:\n{directoryPath}\nContinue?";
         warningPanel.SetActive(true);
 
         yesButton.onClick.AddListener(() => StartCoroutine(ProcessFiles()));
@@ -160,6 +160,10 @@ public string ConvertJson(string oldJson)
     try
     {
         var oldData = JsonConvert.DeserializeObject<SceneDataV1>(oldJson);
+
+        if (oldData.version ==  2) {
+            return null;
+        }
         if (oldData == null)
         {
             Debug.LogError("Failed to deserialize the old JSON data.");
