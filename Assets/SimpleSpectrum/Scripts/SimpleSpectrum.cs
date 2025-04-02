@@ -432,7 +432,7 @@ public class SimpleSpectrum : MonoBehaviour {
                 }
             }
 
-#if UNITY_EDITOR    //allows for editing curve while in play mode, disabled in build for optimisation
+#if UNITY_EDITOR
 
                 float spectrumLength = bars.Length * (1 + barXSpacing);
                 float midPoint = spectrumLength / 2;

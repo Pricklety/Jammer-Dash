@@ -5,8 +5,8 @@ GraphicsSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 16
   m_Deferred:
-    m_Mode: 0
-    m_Shader: {fileID: 0}
+    m_Mode: 1
+    m_Shader: {fileID: 69, guid: 0000000000000000f000000000000000, type: 0}
   m_DeferredReflections:
     m_Mode: 0
     m_Shader: {fileID: 0}
@@ -81,13 +81,13 @@ GraphicsSettings:
     m_BuildTarget: 1
     m_Tier: 2
     m_Settings:
-      standardShaderQuality: 2
+      standardShaderQuality: 1
       renderingPath: 1
       hdrMode: 1
-      realtimeGICPUUsage: 75
+      realtimeGICPUUsage: 25
       useReflectionProbeBoxProjection: 1
       useReflectionProbeBlending: 1
-      useHDR: 1
+      useHDR: 0
       useDetailNormalMap: 1
       useCascadedShadowMaps: 1
       prefer32BitShadowMaps: 1
@@ -114,5 +114,5 @@ GraphicsSettings:
   m_LightsUseColorTemperature: 0
   m_LogWhenShaderIsCompiled: 0
   m_LightProbeOutsideHullStrategy: 0
-  m_CameraRelativeLightCulling: 0
-  m_CameraRelativeShadowCulling: 0
+  m_CameraRelativeLightCulling: 1
+  m_CameraRelativeShadowCulling: 1

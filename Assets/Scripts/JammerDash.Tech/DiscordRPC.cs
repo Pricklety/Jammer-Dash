@@ -5,39 +5,28 @@ using Discord;
 using JammerDash.Editor;
 using JammerDash.Menus;
 using JammerDash.Audio;
+using NUnit.Framework.Constraints;
 using JammerDash.Game.Player;
 using JammerDash.Game;
 using System.Linq;
 
 namespace JammerDash.Tech
 {
+
     public class DiscordRPC : MonoBehaviour
     {
         private Discord.Activity presence;
         private Discord.Discord discord;
         private Discord.ActivityManager manager;
-        private SettingsData settings;
-        private mainMenu menu;
-        private EditorManager editorManager;
-        private AudioSource audioSource;
-        private CubeCounter cubeCounter;
-        private PlayerMovement playerMovement;
-        private bool isInitialized = false;
 
-        private void Start()
+        void Start()
         {
+            DateTime currentDateTime = DateTime.UtcNow;
+            DateTimeOffset dateTimeOffset = new DateTimeOffset(currentDateTime);
             try
             {
-                settings = SettingsFileHandler.LoadSettingsFromFile(); // Cache settings
+                SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
                 discord = new Discord.Discord(1127906222482391102, (ulong)Discord.CreateFlags.NoRequireDiscord);
-                manager = discord.GetActivityManager();
-                menu = FindAnyObjectByType<mainMenu>();
-                editorManager = FindFirstObjectByType<EditorManager>();
-                audioSource = AudioManager.Instance.source;
-                cubeCounter = FindFirstObjectByType<CubeCounter>();
-                playerMovement = FindFirstObjectByType<PlayerMovement>();
-
-                // Initialize Presence
                 presence = new Discord.Activity
                 {
                     Assets = new Discord.ActivityAssets()
@@ -49,106 +38,95 @@ namespace JammerDash.Tech
                     },
                     Timestamps = new Discord.ActivityTimestamps()
                     {
-                        Start = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+
+                        Start = dateTimeOffset.ToUnixTimeSeconds()
                     },
                     Instance = true
                 };
-
-                // Initial Presence Update
-                UpdateDiscordPresence();
+                manager = discord.GetActivityManager();
                 manager.UpdateActivity(presence, null);
+                InvokeRepeating(nameof(UpdateDiscordPresence), 0, 2);
 
-                // Schedule Updates Every 5 Seconds Instead of Every Frame
-                InvokeRepeating(nameof(UpdateDiscordPresence), 5f, 5f);
-                isInitialized = true;
             }
             catch (Exception ex)
             {
                 Debug.LogError("Error initializing Discord SDK: " + ex.Message);
             }
         }
-
-        private void Update()
+        private void FixedUpdate()
         {
-            if (isInitialized)
-            {
-                discord.RunCallbacks();
-            }
+            discord?.RunCallbacks();
         }
-
         private void OnDisable()
         {
-            if (discord != null)
-            {
-                discord.Dispose();
-            }
+            discord.Dispose();
         }
-
         private void UpdateDiscordPresence()
         {
             string sceneName = SceneManager.GetActiveScene().name;
-            if (!settings.discordPlay && sceneName == "LevelDefault")
-            {
-                presence.Details = $"▶ {CustomLevelDataManager.Instance.data.artist} - {CustomLevelDataManager.Instance.data.songName}";
-                presence.State = $"by {CustomLevelDataManager.Instance.creator}";
-                presence.Assets.SmallImage = "note";
-
-                if (cubeCounter != null && playerMovement != null)
+            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
+                if (!data.discordPlay)
                 {
-                    float accuracy = (cubeCounter.accCount / (float)playerMovement.Total) * 100;
-                    presence.Assets.SmallText = $"{cubeCounter.rank} | {accuracy:0.00}%";
+                    // Update presence based on the active scene
+                    if (sceneName == "LevelDefault")
+                    {
+                        presence.Details = $"▶ {CustomLevelDataManager.Instance.data.artist} - {CustomLevelDataManager.Instance.data.songName}";
+                        presence.State = $"by {CustomLevelDataManager.Instance.creator}";
+                        presence.Assets.SmallImage = "note";
+                        presence.Assets.SmallText = $"{FindFirstObjectByType<CubeCounter>().rank} | {FindFirstObjectByType<CubeCounter>().accCount / FindFirstObjectByType<PlayerMovement>().Total * 100:0.00}%";
+                    }
                 }
-            }
-
-            if (!settings.discordEdit && sceneName == "SampleScene" && editorManager != null)
-            {
-                presence.Details = $"✎ {editorManager.customSongName.text}";
-                presence.State = $"{editorManager.songArtist.text}";
-                presence.Assets.SmallImage = "cube";
-                presence.Assets.SmallText = $"{editorManager.bpm.text} BPM | {editorManager.cubes.Count() + editorManager.longCubes.Count() + editorManager.saws.Count()} objects";
-            }
-
-            if (sceneName == "MainMenu")
-            {
-                presence.Assets.SmallImage = "shine";
-                presence.Assets.SmallText = $"{Mathf.RoundToInt(Difficulty.Calculator.CalculateSP("scores.dat"))}sp | {Difficulty.Calculator.CalculateAccuracy("scores.dat"):0.00}% | lv{Account.Instance.level}";
-
-                if (menu != null)
+                if (!data.discordEdit)
                 {
-                    if (menu.playPanel.activeSelf)
+                    if (sceneName == "SampleScene")
                     {
-                        presence.State = "▶ Choosing a level to play";
+                        var editorManager = FindFirstObjectByType<EditorManager>();
+                        presence.Details = $"✎ {editorManager.customSongName.text}";
+                        presence.State = $"{editorManager.songArtist.text}";
+                    presence.Assets.SmallImage = "cube";
+                    presence.Assets.SmallText = $"{editorManager.bpm.text} BPM | {editorManager.cubes.Count() + editorManager.longCubes.Count() + editorManager.saws.Count()} objects";
                     }
-                    else if (menu.settingsPanel.activeSelf)
-                    {
-                        presence.State = "⚙︎ Changing options";
-                    }
-                    else if (menu.levelInfo.activeSelf)
-                    {
-                        presence.State = "✎ Choosing a level to edit";
-                    }
-                    else if (menu.afkTime < 10f)
+                }
+
+                if (sceneName == "MainMenu")
+                {
+                    presence.Assets.SmallImage = "shine";
+                    presence.Assets.SmallText = $"{Mathf.RoundToInt(Difficulty.Calculator.CalculateSP("scores.dat"))}sp | {Difficulty.Calculator.CalculateAccuracy("scores.dat"):0.00}% | lv{Account.Instance.level}";
+                    var menu = FindAnyObjectByType<mainMenu>();
+                    if (menu.afkTime < 10f)
                     {
                         presence.Type = ActivityType.Playing;
                         presence.Details = "Main Menu";
-                        presence.State = "ᶻ 𝗓 𐰁 Idle";
+                        presence.State = $"ᶻ 𝗓 𐰁 Idle";
+                        presence.Assets.SmallText = $"{Mathf.RoundToInt(Difficulty.Calculator.CalculateSP("scores.dat"))}sp | {Difficulty.Calculator.CalculateAccuracy("scores.dat"):0.00}% | lv{Account.Instance.level}";
+                    
                     }
-                    else if (menu.afkTime > 10f && !settings.discordAFK)
+                    else if (menu.afkTime > 10f && !data.discordAFK)
                     {
+                float Time = AudioManager.Instance.source.time;
+                float length = AudioManager.Instance.source.clip.length;
                         presence.Type = ActivityType.Listening;
                         presence.Details = "AFK";
-
-                        if (audioSource != null && audioSource.clip != null)
-                        {
-                            presence.State = $"♪ {audioSource.clip.name}";
-                        }
                     }
+
                 }
+
+                // Update the Discord activity with the modified presence
+                manager.UpdateActivity(presence, (res) =>
+                {
+
+                });
             }
+             public string FormatTime(float time)
+        {
+            int minutes = Mathf.FloorToInt(time / 60);
+            int seconds = Mathf.FloorToInt(time % 60);
 
-            manager.UpdateActivity(presence, null);
+            // Ensure seconds don't go beyond 59
+            seconds = Mathf.Clamp(seconds, 0, 59);
+
+            return string.Format("{0:00}:{1:00}", minutes, seconds);
         }
-
+        }
         
     }
-}

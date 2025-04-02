@@ -10,11 +10,10 @@ using UnityEngine.UI;
 using Random = UnityEngine.Random;
 using UnityEngine.InputSystem;
 using JammerDash.Tech;
-using JammerDash.Game.Player;
-using UnityEngine.InputSystem.Controls;
 using JammerDash.Difficulty;
 using System.Linq;
 using UnityEngine.Video;
+
 namespace JammerDash.Game.Player
 {
     public class PlayerMovement : MonoBehaviour 
@@ -38,8 +37,6 @@ namespace JammerDash.Game.Player
         public Text scoreText;
         public Text keyText;
         public Text acc;
-        private PostProcessVolume volume;
-        private Vignette vignette;
 
         [Header("Sound effects")]
         public AudioClip[] hitSounds;
@@ -96,8 +93,6 @@ namespace JammerDash.Game.Player
         public int one;
         public int SPInt;
         private bool isBufferRunning = false;
-        public float vignetteStartHealthPercentage = 0.5f;
-        public UnityEngine.Color startColor = UnityEngine.Color.red;
 
         public GameObject flashlightOverlay;
         public float rememberDuration = 2f;
@@ -123,9 +118,6 @@ private Camera mainCam;
             longCubes = GameObject.FindGameObjectsWithTag("LongCube").ToList();
             music.time = 0f;
             CustomLevelDataManager.Instance.sceneLoaded = false;
-            volume = Camera.main.GetComponent<PostProcessVolume>();
-            volume.profile.TryGetSettings(out vignette);
-            vignette.color.value = startColor;
            if (CustomLevelDataManager.Instance.playerhp != 0)
             {
                 maxHealth = CustomLevelDataManager.Instance.playerhp;
@@ -162,6 +154,7 @@ private Camera mainCam;
     mainCam = Camera.main;
             scoreMultiplier = CustomLevelDataManager.Instance.scoreMultiplier;
             health = maxHealth;
+            InvokeRepeating(nameof(UpdateText), 0, 0.5f);
         }
       
 
@@ -238,26 +231,9 @@ private Camera mainCam;
                 combo = 0;
             }
                 scoreText.text = $"{counter.score}";
-           
-        if (!CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.noDeath)) {
-            if (health <= 0 && Time.timeScale > 0)
-            {
-                Time.timeScale -= 0.05f;
-                music.pitch = Time.timeScale;
-                FindFirstObjectByType<VideoPlayer>().playbackSpeed = Time.timeScale;
-                health = 0;
-                isDying = true;
-
-            }
-
-            if (health <= 0 && Time.timeScale <= 0.1f)
-            {
-                EndLife();
-                Time.timeScale = 0f;
-                health = 0;
-            }
         }
-            
+
+        void UpdateText() {
             float playerPositionInSeconds = transform.position.x / 7;
             float finishLinePositionInSeconds = FindFirstObjectByType<FinishLine>().transform.position.x / 7;
 
@@ -273,14 +249,50 @@ private Camera mainCam;
             string finishLineTime = string.Format("{0}:{1:00}", finishLineMinutes, finishLineSeconds);
 
             keyText.text = $"{playerTime}\t\t\t\t\t\t{finishLineTime}";
-
-
         }
             public float fadeDistance = 3f; 
             public LayerMask objectLayer;
             public float fadeSpeed = 2f;
       private void Update()
-{
+{ 
+    if (!CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.noDeath)) {
+            if (health <= 0 && Time.timeScale > 0)
+            {
+                Time.timeScale -= 0.25f * Time.fixedDeltaTime;
+                music.pitch = Time.timeScale;
+                FindFirstObjectByType<VideoPlayer>().playbackSpeed = Time.timeScale;
+                health = 0;
+                isDying = true;
+
+            }
+
+            if (health <= 0 && Time.timeScale <= 0.1f)
+            {
+                EndLife();
+                Time.timeScale = 0f;
+                health = 0;
+            }
+        } 
+        float pitch;
+        music.outputAudioMixerGroup.audioMixer.GetFloat("MasterPitch", out pitch);
+
+        if (music.isPlaying)
+        {
+            float pitchAdjustedSpeed = (hasEasyMode ? 5f : 7f);
+            float targetX = music.time * pitchAdjustedSpeed;
+
+            transform.position = new Vector3(
+                Mathf.MoveTowards(transform.position.x, targetX, pitchAdjustedSpeed * Time.deltaTime),
+                transform.position.y,
+                -1
+            );
+        }
+        else
+        {
+            float speed = (hasEasyMode ? 5 : 7) * pitch;
+            transform.Translate(speed * Time.deltaTime * Vector2.right);
+        }
+    
     if (isDying) return; // Early exit if the player is dying
 
     // Cache dictionary lookups
@@ -324,27 +336,17 @@ private Camera mainCam;
         AutoHit();
     }
 
-    // Update player position based on music time
-    if (music.isPlaying)
-    {
-        float targetX = music.time * (hasEasyMode ? 5 : 7);
-        transform.position = Vector3.Lerp(transform.position, new Vector3(targetX, transform.position.y, -1), hasEasyMode ? 0.5f : 1f);
-    }
-    else
-    {
-        float speed = hasEasyMode ? 5 : 7;
-        transform.Translate(speed * Time.deltaTime * Vector2.right);
-    }
+   
 
     // Optimize camera movement
-    float distanceToFinish = Mathf.Abs(mainCam.transform.position.x - finishLine.transform.position.x);
+    float distanceToFinish = Vector2.Distance(mainCam.transform.position, finishLine.transform.position);
     if (mainCam.transform.position.x < finishLine.transform.position.x)
     {
         Vector3 targetPos = new Vector3(
-            distanceToFinish < 3 ? finishLine.transform.position.x : transform.position.x + 6, 
+            distanceToFinish <= 0 ? finishLine.transform.position.x : transform.position.x + 6, 
             0.7f, -10);
 
-        mainCam.transform.position = Vector3.MoveTowards(mainCam.transform.position, targetPos, 10f * Time.deltaTime);
+        mainCam.transform.position = targetPos;
     }
 
     // Optimize performance calculations
@@ -358,10 +360,18 @@ private Camera mainCam;
         (float)counter.accCount / Total * 100
     ).PerformanceScore;
 
+    if (_performanceScore == float.PositiveInfinity || _performanceScore == float.NegativeInfinity || _performanceScore == float.NaN) {
+        _performanceScore = 0;
+    }
+
     SPInt = Mathf.RoundToInt(_performanceScore);
+
 
     // Update accuracy display
     float acc = Total > 0 ? (float)counter.accCount / Total * 100 : 0;
+    if (float.IsNaN(acc)) {
+        acc = 100;
+    }
     this.acc.text = $"{acc:F2}% | {counter.GetTier(acc)} | {SPInt:F0} sp";
 
     // Check for break message
@@ -521,7 +531,7 @@ private void AnimateKey(int index, ref int counter)
 
         private IEnumerator WaitAndHandleHit(RaycastHit2D hit)
         {
-            while (Vector2.Distance(transform.position, hit.transform.position) > 0.25f)
+            while (Vector2.Distance(transform.position, hit.transform.position) > 0.05f)
             {
             yield return null;
             }
@@ -557,6 +567,7 @@ private void AnimateKey(int index, ref int counter)
             {
                 missedCubes.Add(nearestCube);
                 HandleBadHit();
+                hit.collider.enabled = false;
             }
             }
         }
@@ -697,7 +708,7 @@ private void AnimateKey(int index, ref int counter)
             Image markerImage = marker.GetComponent<Image>();
 
             // Color the marker based on how early or late the player hit
-            if (Mathf.Abs(playerDistance) <= 0.2f)  // Perfect timing range (within tolerance)
+            if (Mathf.Abs(playerDistance) <= 0.25f)  // Perfect timing range (within tolerance)
             {
                 markerImage.color = Color.green;  // Green for perfect
             }
@@ -802,26 +813,21 @@ private void AnimateKey(int index, ref int counter)
             }
 
             counter.destroyedCubes += 50;
-            float formula = ((maxScore * factor / cubes.Count + longCubes.Count / 2) * Mathf.Pow(counter.accCount / Total, 3) * combo / highestCombo) * scoreMultiplier;
-            
-            float newDestroyedCubes = counter.score + formula;
-            newDestroyedCubes = Mathf.RoundToInt(newDestroyedCubes);
-
-            float elapsedTime = 0f;
-            float duration = 0.1f;
-
-            health += maxHealth / (20f * factor);
-
-            while (elapsedTime < duration)
-            {
-                counter.score = (int)Mathf.Lerp(counter.score, newDestroyedCubes, elapsedTime / duration);
-                elapsedTime += Time.deltaTime;
-                scoreText.text = $"{counter.score}";
-                yield return null;
-            }
-
-            // Ensure final score is precisely updated
-            counter.score = Mathf.RoundToInt(newDestroyedCubes);
+            float a = (float)cubes.Count + (float)longCubes.Count * 2f;
+			float num = (float)maxScore * factor / Mathf.Max(a, 1f) * Mathf.Pow(counter.accCount / Mathf.Max((float)Total, 1f), 3f) * (float)combo / Mathf.Max((float)highestCombo, 1f) * scoreMultiplier;
+			float newDestroyedCubes = (float)counter.score + num;
+			newDestroyedCubes = (float)Mathf.RoundToInt(newDestroyedCubes);
+			float elapsedTime = 0f;
+			float duration = 0.1f;
+			health += maxHealth / (50f * factor);
+			while (elapsedTime < duration)
+			{
+				counter.score = (int)Mathf.Lerp((float)counter.score, newDestroyedCubes, elapsedTime / duration);
+				elapsedTime += Time.deltaTime;
+				scoreText.text = string.Format("{0}", counter.score);
+				yield return null;
+			}
+			counter.score = Mathf.RoundToInt(newDestroyedCubes);
             yield return new WaitForSeconds(0.2f);
         }
 
@@ -888,12 +894,7 @@ private void AnimateKey(int index, ref int counter)
         {
             if (GetComponent<BoxCollider2D>().IsTouching(collision))
             {
-                if (collision.tag == "Saw" && !isDying)
-                {
-                    isDying = true;
-                    sfxS.PlayOneShot(hitSounds[7]);
-                    health -= int.MaxValue;
-                }
+                
                 if (collision.tag == "Cubes" && collision.gameObject.name.Contains("hitter01"))
             {
             collision.GetComponent<Animation>().Play();
@@ -912,9 +913,6 @@ private void AnimateKey(int index, ref int counter)
                 sfxS.PlayOneShot(hitSounds[1]);
                 }
 
-
-                float distance = Vector2.Distance(collision.transform.position, transform.position);
-                float middle = Mathf.Abs(collision.offset.x);
 
                 combo++;
                 if (highestCombo < combo)
@@ -945,7 +943,7 @@ private void AnimateKey(int index, ref int counter)
             {
                 activeCubes.Remove(collision.gameObject);
 
-                if (!passedCubes.Contains(collision.gameObject))
+                if (!passedCubes.Contains(collision.gameObject) && !missedCubes.Contains(collision.gameObject))
                 {
                     if (AudioManager.Instance != null)
                     {
@@ -956,12 +954,13 @@ private void AnimateKey(int index, ref int counter)
                     }
                     StartCoroutine(ChangeTextCombo());
                     Total += 5;
+                    passedCubes.Add(collision.gameObject);
                 }
 
 
             }
 
-                if (collision.tag == "Cubes" && collision.transform.position.y != transform.position.y && !activeCubes.Contains(collision.gameObject)) {
+                if (collision.tag == "Cubes" && !passedCubes.Contains(collision.gameObject)) {
               
                     if (AudioManager.Instance != null)
                     {
@@ -970,7 +969,7 @@ private void AnimateKey(int index, ref int counter)
                             ShowBadText();
                         }
                     }
-                    health -= 30;
+                    health -= 20;
                     Total += 5;
                     if (!missedCubes.Contains(collision.gameObject))
                     {
@@ -985,18 +984,17 @@ private void AnimateKey(int index, ref int counter)
                         {
                             ShowBadText();
                         }
-                    }      health -= 30;
+                    }      health -= 20;
                     Total += 5;             
                 }
-            
             if (collision.gameObject.name.Contains("hitter02") && activeCubes.Contains(collision.gameObject))
-            {   if (bufferActive && collision.transform.position.y == transform.position.y)
+            {   if (bufferActive && collision.transform.position.y == transform.position.y && (Input.GetKey(KeybindingManager.hit1) || Input.GetKey(KeybindingManager.hit2)))
                 {
                     activeCubes.Remove(collision.gameObject);
                     DestroyCube(collision.gameObject);
                     sfxS.PlayOneShot(hitSounds[6]);
                     StartCoroutine(ChangeScore(0f, new RaycastHit2D()));
-                    health += 20;
+                    health += 10;
                     combo++;
                     if (highestCombo < combo)
                     {
@@ -1017,7 +1015,7 @@ private void AnimateKey(int index, ref int counter)
                             ShowBadText();
                         }
                     }
-                    health -= 30;
+                    health -= 20;
                     Total += 5;
                     misses++;
                     activeCubes.Remove(collision.gameObject);
@@ -1036,7 +1034,7 @@ private void AnimateKey(int index, ref int counter)
         {
             if (bufferActive)
             {
-                health += 0.075f;
+                health += 0.025f;
                 yield return null;
             }
 
@@ -1046,7 +1044,15 @@ private void AnimateKey(int index, ref int counter)
 
 
         private void OnTriggerStay2D(Collider2D collision)
-        {
+        {if (GetComponent<BoxCollider2D>().IsTouching(collision))
+            {
+            if (collision.tag == "Saw" && !isDying && !CustomLevelDataManager.Instance.modStates.ContainsKey(ModType.noDeath))
+                {
+                    isDying = true;
+                    sfxS.PlayOneShot(hitSounds[7]);
+                    health -= int.MaxValue;
+                }
+            }
             if (collision.gameObject.name.Contains("hitter02") && collision.transform.position.y == transform.position.y)
             {
             float distance = Vector2.Distance(collision.transform.position, transform.position);
@@ -1094,7 +1100,7 @@ private void AnimateKey(int index, ref int counter)
                 else if (distance >= middle)
                 {
                     sfxS.PlayOneShot(hitSounds[1]);
-                    health -= 15;
+                    health -= 20;
                     combo = 0;
                     StartCoroutine(ChangeScore(0.48f, new RaycastHit2D()));
                     if (AudioManager.Instance != null && AudioManager.Instance.hits)
@@ -1105,7 +1111,12 @@ private void AnimateKey(int index, ref int counter)
                 activeCubes.Add(collision.gameObject); // Mark the cube as passed
                 }
             }
-
+            if ((Input.GetKeyUp(KeybindingManager.hit1) || Input.GetKeyUp(KeybindingManager.hit2)) && !isDying && activeCubes.Contains(collision.gameObject)) {
+                Color col = collision.GetComponent<SpriteRenderer>().color;
+                col = new Color(col.r, col.g, col.b, col.a / 2);
+                collision.GetComponent<SpriteRenderer>().color = col;
+                collision.enabled = false;
+            }
             if (!isBufferRunning && bufferActive)
             {
                 StartCoroutine(OnTriggerEnter2DBufferLoop());

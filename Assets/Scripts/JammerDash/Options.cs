@@ -939,101 +939,85 @@ namespace JammerDash
        
        public InputField username;
         public void Update()
+{
+    var account = Account.Instance;
+    var currentSelected = EventSystem.current.currentSelectedGameObject;
+
+    // Update account display text only when necessary
+    string newUsername = $"{account.nickname} (@{account.username})";
+    if (username.text != newUsername)
+        username.text = newUsername;
+
+    string newLogText = account.loggedIn 
+        ? LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Account settings") 
+        : LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Log in");
+
+    if (logInOut.text != newLogText)
+        logInOut.text = newLogText;
+
+    if (audio != null)
+    {
+        var source = audio.source;
+        if (source.clip != null)
         {
-            username.text = $"{Account.Instance.nickname} (@{Account.Instance.username})";
-           logInOut.text = Account.Instance.loggedIn ? LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Account settings") : LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Log in");
-            if (audio != null)
+            DisplayMusicInfo(source.clip, source.time);
+
+            int clipLength = (int)source.clip.length;
+            if (musicSlider.maxValue != clipLength)
+                musicSlider.maxValue = clipLength;
+
+            UpdateDropdownSelection();
+
+            // Avoid redundant updates
+            if (playlist.value != audio.currentClipIndex)
             {
-                DisplayMusicInfo(audio.source.clip, audio.source.time);
-                musicSlider.maxValue = (int)audio.source.clip.length;
-                UpdateDropdownSelection();
                 isUserInteraction = false;
                 playlist.value = audio.currentClipIndex;
                 isUserInteraction = true;
-
-
-              
-                if (EventSystem.current.currentSelectedGameObject == null ||
-                    EventSystem.current.currentSelectedGameObject.GetComponent<InputField>() == null)
-                {
-                    if (Input.GetKeyDown(KeybindingManager.prevSong))
-                    {
-                        PlayPreviousSong();
-                    }
-                    else if (Input.GetKeyDown(KeybindingManager.play))
-                    {
-                        Play();
-                    }
-                    else if (Input.GetKeyDown(KeybindingManager.pause))
-                    {
-                        Pause();
-                    }
-                    else if (Input.GetKeyDown(KeybindingManager.nextSong))
-                    {
-                        PlayNextSong();
-                    }
-                }
-                else
-                {
-                    // do nothing
-                }
-
-
-
-            }
-             // Check if master volume slider is selected
-    if (EventSystem.current.currentSelectedGameObject == masterVolumeSlider.gameObject)
-    {
-        audio.masterS.gameObject.SetActive(true);
-    }
-    else if (EventSystem.current.currentSelectedGameObject != masterVolumeSlider.gameObject && audio.timer > 2f)
-    {
-        audio.masterS.gameObject.SetActive(false);
-    }
-
-    // Check if music volume slider is selected
-    if (EventSystem.current.currentSelectedGameObject == musicVolSlider.gameObject)
-    {
-        audio.musicSlider.gameObject.SetActive(true);
-    }
-    else if (EventSystem.current.currentSelectedGameObject != musicVolSlider.gameObject && audio.timer > 2f)
-    {
-        audio.musicSlider.gameObject.SetActive(false);
-    }
-
-    // Check if SFX volume slider is selected
-    if (EventSystem.current.currentSelectedGameObject == sfxSlider.gameObject)
-    {
-        audio.sfxSlider.gameObject.SetActive(true);
-    }
-    else if (EventSystem.current.currentSelectedGameObject != sfxSlider.gameObject && audio.timer > 2f)
-    {
-        audio.sfxSlider.gameObject.SetActive(false);
-    }
-
-          
-
-            
-            snowObj.SetActive(settingsData.snow);
-
-            if (increaseVol.isOn)
-            {
-                masterVolumeSlider.maxValue = 20f;
-            }
-            else
-            {
-                masterVolumeSlider.maxValue = 0f;
-            }
-
-            if (confineMouse.isOn)
-            {
-                UnityEngine.Cursor.lockState = CursorLockMode.Confined;
-            }
-            else
-            {
-                UnityEngine.Cursor.lockState = CursorLockMode.None;
             }
         }
+
+        // Handle keybindings for music controls
+        if (currentSelected == null || currentSelected.GetComponent<InputField>() == null)
+        {
+            switch (true)
+            {
+                case var _ when Input.GetKeyDown(KeybindingManager.prevSong):
+                    PlayPreviousSong();
+                    break;
+                case var _ when Input.GetKeyDown(KeybindingManager.play):
+                    Play();
+                    break;
+                case var _ when Input.GetKeyDown(KeybindingManager.pause):
+                    Pause();
+                    break;
+                case var _ when Input.GetKeyDown(KeybindingManager.nextSong):
+                    PlayNextSong();
+                    break;
+            }
+        }
+
+        float timerThreshold = 2f;
+
+        // Optimized volume slider handling
+        audio.masterS.gameObject.SetActive(currentSelected == masterVolumeSlider.gameObject || audio.timer <= timerThreshold);
+        audio.musicSlider.gameObject.SetActive(currentSelected == musicVolSlider.gameObject || audio.timer <= timerThreshold);
+        audio.sfxSlider.gameObject.SetActive(currentSelected == sfxSlider.gameObject || audio.timer <= timerThreshold);
+    }
+
+    // Toggle snow effect only if value changed
+    if (snowObj.activeSelf != settingsData.snow)
+        snowObj.SetActive(settingsData.snow);
+
+    // Update max volume only if needed
+    float newMaxVolume = increaseVol.isOn ? 20f : 0f;
+    if (masterVolumeSlider.maxValue != newMaxVolume)
+        masterVolumeSlider.maxValue = newMaxVolume;
+
+    // Optimize cursor state toggle
+    UnityEngine.Cursor.lockState = confineMouse.isOn ? CursorLockMode.Confined : CursorLockMode.None;
+}
+
 
         public GameObject sawGameObject;          // GameObject with animation to enable/disable
     public GameObject visualizerLogo;        // Visualizer logo GameObject

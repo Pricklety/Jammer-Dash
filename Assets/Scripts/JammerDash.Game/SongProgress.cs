@@ -19,6 +19,8 @@ namespace JammerDash.Game
         public GameObject canvas;
         public FinishLine finish;
         public PlayerMovement player;
+
+        SettingsData data;
         private void Start()
         {
             audioSource = AudioManager.Instance.source;
@@ -63,18 +65,22 @@ namespace JammerDash.Game
                 progressText = GameObject.Find("progressText").GetComponent<Text>();
             }
             // Update the current progress
-            float currentProgress = (player.transform.position.x / finish.transform.position.x) * 100;
+            float currentProgress = player.transform.position.x / finish.transform.position.x * 100;
 
-            float progressPercentage = (player.transform.position.x / finish.transform.position.x) * 100;
 
             // Update the text value with the progress percentage
-            progressText.text = progressPercentage.ToString("0") + "%";
+            progressText.text = currentProgress.ToString("0") + "%";
 
             // Update the slider value with the current progress
             progressSlider.value = currentProgress;
-            SettingsData data = SettingsFileHandler.LoadSettingsFromFile();
             
             canvas.SetActive(!data.canvasOff);
+        }
+
+        void FixedUpdate()
+        {
+            
+            data = SettingsFileHandler.LoadSettingsFromFile();
         }
 
         private IEnumerator LoadAudioClip(string filePath)
