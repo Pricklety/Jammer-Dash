@@ -264,7 +264,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 38131267104768
-    m_Localized: "Subir Fondo (imagen o video)\r"
+    m_Localized: 'Subir Fondo (imagen o video)
+
+'
     m_Metadata:
       m_Items: []
   - m_Id: 37869047607296
@@ -344,7 +346,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2500635977826304
-    m_Localized: "Esconder el nivel que se est\xE1 editando\r"
+    m_Localized: "Esconder el nivel que se est\xE1 editando\r\n"
     m_Metadata:
       m_Items: []
   - m_Id: 2500697919307776

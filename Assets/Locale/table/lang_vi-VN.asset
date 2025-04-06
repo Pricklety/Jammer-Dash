@@ -35,7 +35,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 3021977251840
-    m_Localized: "T\u1EAFt game\r\xB8"
+    m_Localized: "T\u1EAFt game\r\n\xB8"
     m_Metadata:
       m_Items: []
   - m_Id: 3082442338304
@@ -224,7 +224,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 46977377202176
-    m_Localized: "T\u1EA1o m\xE0n m\u1EDBi\r"
+    m_Localized: "T\u1EA1o m\xE0n m\u1EDBi\r\n"
     m_Metadata:
       m_Items: []
   - m_Id: 2246076816535552
@@ -248,7 +248,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2246431407190016
-    m_Localized: "T\xE1c gi\u1EA3 m\xE0n (Romaji)\r"
+    m_Localized: "T\xE1c gi\u1EA3 m\xE0n (Romaji)\r\n"
     m_Metadata:
       m_Items: []
   - m_Id: 2246453452451840
@@ -292,7 +292,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2247355554967552
-    m_Localized: "T\xEAn b\xE0i nh\u1EA1c\r"
+    m_Localized: "T\xEAn b\xE0i nh\u1EA1c\r\n"
     m_Metadata:
       m_Items: []
   - m_Id: 2247369245175808

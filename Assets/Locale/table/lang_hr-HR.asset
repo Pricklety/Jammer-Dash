@@ -132,7 +132,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 34381060206592
-    m_Localized: "Zvukovni efekti\r"
+    m_Localized: 'Zvukovni efekti
+
+'
     m_Metadata:
       m_Items: []
   - m_Id: 34707171536896

@@ -256,7 +256,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2246468149293056
-    m_Localized: "Zeige BPM Markierungen\r"
+    m_Localized: 'Zeige BPM Markierungen
+
+'
     m_Metadata:
       m_Items: []
   - m_Id: 2246745174683648
@@ -472,7 +474,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 13374434543513600
-    m_Localized: "\rAngemeldet als"
+    m_Localized: '
+
+      Angemeldet als'
     m_Metadata:
       m_Items: []
   - m_Id: 21764891598237696
