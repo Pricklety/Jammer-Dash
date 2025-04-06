@@ -139,7 +139,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 3082442338304
-    m_Localized: "Mueve tu mouse para activar el men\xFA"
+    m_Localized: "Haga clic en el logotipo para activar el men\xFA."
     m_Metadata:
       m_Items: []
   - m_Id: 6902991908864
@@ -485,6 +485,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 26178270689603584
     m_Localized: "Descripci\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 47772041705443328
+    m_Localized: online
     m_Metadata:
       m_Items: []
   references:

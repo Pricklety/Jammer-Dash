@@ -80,7 +80,7 @@ namespace JammerDash
         public bool canvasOff = false;
         public bool bass = false;
         public float bassgain = 1.5f;
-        public float dim = 1;
+        public float dim = 0.35f;
         public bool shaders = false;
         public bool discordPlay = false;
         public bool discordAFK = false;
@@ -92,6 +92,7 @@ namespace JammerDash
         public int texture = 0;
         public string language = SettingsFileHandler.GetLanguageName();
         public string gameVersion = Application.version;
+        public bool mouseHits = true;
         public string saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
         public string gamePath = Application.persistentDataPath;
 

@@ -423,11 +423,11 @@ namespace JammerDash.Editor
 
                     // Set the width of the SpriteRenderer
                     longCubeRenderer.size = new Vector2(width, 1);
-                    collider.size = new Vector2(width + 0.5f, 1.05f);
+                    collider.size = new Vector2(width - 0.5f, 1.05f);
                     collider.offset = new Vector2(width / 2, 0f);
                     longCubes.Add(longCubeObject);
                 }
-                StartCoroutine(LoadImageCoroutine(Path.Combine(Main.gamePath, "scenes", $"{scene.ID} - {scene.name}", "bgImage.png")));
+                if (!File.Exists(Path.Combine(Main.gamePath, "scenes", $"{scene.ID} - {scene.name}", "backgroundVideo.mp4"))) StartCoroutine(LoadImageCoroutine(Path.Combine(Main.gamePath, "scenes", $"{scene.ID} - {scene.name}", "bgImage.png"))); else StartCoroutine(LoadImageCoroutine(Path.Combine(Main.gamePath, "scenes", $"{scene.ID} - {scene.name}", "backgroundVideo.mp4"))); 
                 bpm.text = sceneData.bpm.ToString();
                 color1.startingColor = sceneData.defBGColor;
                 StartCoroutine(LoadAudioClip(Path.Combine(Main.gamePath, "scenes", $"{scene.ID} - {scene.name}", $"{sceneData.artist} - {sceneData.songName}.mp3")));
@@ -581,8 +581,6 @@ private void OnVideoPrepared(VideoPlayer source)
 {
     Debug.Log("Video successfully prepared and loaded.");
 
-    // You can notify the user that the video is ready
-    Notifications.instance.Notify("Video loaded and ready to play!", null);
 }
         public async Task SaveLevelData()
         {
@@ -671,11 +669,11 @@ private void OnVideoPrepared(VideoPlayer source)
         {
             cam.transform.position = new Vector3(lengthSlider.value * 7, 1, -10);
         }
-
+        private Transform currentTargetBeat = null;
         // Update is called once per frame
         void Update()
         {
-            expandText.text = $"{KeybindingManager.changeLongCubeSize} + {KeybindingManager.place} {LocalizationSettings.StringDatabase.GetLocalizedString("lang", "to expand")}";
+            expandText.text = $"{KeybindingManager.changeLongCubeSize} + Arrows {LocalizationSettings.StringDatabase.GetLocalizedString("lang", "to expand")}";
             lengthText.text = FormatTime(lengthSlider.value / 7);
             if (Camera.main.transform.position.x > lengthSlider.value / 7)
             {
@@ -689,27 +687,79 @@ private void OnVideoPrepared(VideoPlayer source)
             size.gameObject.GetComponentInChildren<Text>().text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Cube size")}: {size.value}x";
             hp.gameObject.GetComponentInChildren<Text>().text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Player HP")}: {hp.value}";
 
-            if (Input.GetKey(KeybindingManager.changeLongCubeSize) && Input.GetKeyDown(KeybindingManager.place) && selectedObject != null && selectedObject.gameObject.name.Contains("hitter02"))
+            if (Input.GetKey(KeybindingManager.changeLongCubeSize) && selectedObject != null && selectedObject.gameObject.name.Contains("hitter02"))
+    if (Input.GetKey(KeybindingManager.changeLongCubeSize) &&
+        selectedObject != null &&
+        selectedObject.gameObject.name.Contains("hitter02"))
+    {
+        GameObject[] beatObjects = GameObject.FindGameObjectsWithTag("Beat");
+        if (beatObjects.Length == 0) return;
+
+        // Sort beats by X position for consistent cycling
+        List<Transform> sortedBeats = beatObjects
+            .Select(b => b.transform)
+            .OrderBy(t => t.position.x)
+            .ToList();
+
+        Vector3 objectPosition = selectedObject.position;
+        int currentIndex = -1;
+
+        // Determine current beat index
+        if (currentTargetBeat != null)
+        {
+            currentIndex = sortedBeats.IndexOf(currentTargetBeat);
+        }
+        else
+        {
+            // If no current beat, find the closest in any direction
+            float closest = Mathf.Infinity;
+            for (int i = 0; i < sortedBeats.Count; i++)
             {
-                Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
-
-                Vector3 objectPosition = selectedObject.position;
-
-                float mouseToObjectDistanceX = mouseWorldPosition.x - objectPosition.x;
-
-                if (mouseToObjectDistanceX > 0)
+                float dist = Mathf.Abs(sortedBeats[i].position.x - objectPosition.x);
+                if (dist < closest)
                 {
-                    float newSizeX = Mathf.Abs(mouseToObjectDistanceX);
-
-                    newSizeX = Mathf.Clamp(newSizeX, 1f, Mathf.Infinity);
-
-                    SpriteRenderer spriteRenderer = selectedObject.GetComponent<SpriteRenderer>();
-                    if (spriteRenderer != null)
-                    {
-                        spriteRenderer.size = new Vector2(newSizeX, spriteRenderer.size.y);
-                    }
+                    closest = dist;
+                    currentTargetBeat = sortedBeats[i];
+                    currentIndex = i;
                 }
             }
+        }
+
+        // Move to next/previous beat
+        if (Input.GetKeyDown(KeyCode.RightArrow) && currentIndex < sortedBeats.Count - 1)
+        {
+            currentIndex++;
+            currentTargetBeat = sortedBeats[currentIndex];
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow) && currentIndex > 0)
+        {
+            currentIndex--;
+            currentTargetBeat = sortedBeats[currentIndex];
+        }
+
+        // Apply size based on distance to selected beat
+        if (currentTargetBeat != null)
+        {
+            float newSizeX = Mathf.Abs(currentTargetBeat.position.x - objectPosition.x);
+            newSizeX = Mathf.Clamp(newSizeX, 1f, Mathf.Infinity);
+
+            SpriteRenderer spriteRenderer = selectedObject.GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.size = new Vector2(newSizeX, spriteRenderer.size.y);
+                selectedObject.GetComponent<BoxCollider2D>().size = new Vector2(newSizeX - 0.5f, 1.05f);
+                
+                    selectedObject.GetComponent<BoxCollider2D>().offset = new Vector2(newSizeX / 2, 0f);
+            }
+        }
+    }
+    else
+    {
+        currentTargetBeat = null; // reset when key is released
+    }
+
+
+
             if (offsetmarker.text.Length > 0)
             {
                 float value = float.Parse(offsetmarker.text);
@@ -870,6 +920,7 @@ private void OnVideoPrepared(VideoPlayer source)
                             break;
                         case "hitter02(Clone)":
                             audio.PlayOneShot(hitSounds[1]);
+                            item.transform.position = new Vector2(item.transform.position.x - 0.5f, item.transform.position.y);
                             break;
                         case "hitter03(Clone)":
                             audio.PlayOneShot(hitSounds[2]);
@@ -887,21 +938,53 @@ private void OnVideoPrepared(VideoPlayer source)
                             break;
                     }
 
-                    if (item.CompareTag("Cubes"))
-                    {
-                        cubes.Add(item);
-                        SelectObject(item.transform);
-                    }
-                    else if (item.CompareTag("Saw"))
-                    {
-                        saws.Add(item);
-                        SelectObject(item.transform);
-                    }
-                    else if (item.CompareTag("LongCube"))
-                    {
-                        longCubes.Add(item);
-                        SelectObject(item.transform);
-                    }
+                        if (item.CompareTag("Cubes"))
+{
+    // Remove any existing cubes at the same X position
+    List<GameObject> cubesToRemove = new List<GameObject>();
+    foreach (GameObject cube in cubes)
+    {
+        if (Mathf.Approximately(cube.transform.position.x, item.transform.position.x))
+        {
+            cubesToRemove.Add(cube);
+        }
+    }
+
+    foreach (GameObject cube in cubesToRemove)
+    {
+        Destroy(cube);
+        cubes.Remove(cube);
+    }
+
+    cubes.Add(item);
+    SelectObject(item.transform);
+}
+else if (item.CompareTag("Saw"))
+{
+    saws.Add(item);
+    SelectObject(item.transform);
+}
+else if (item.CompareTag("LongCube"))
+{
+    List<GameObject> longCubesToRemove = new List<GameObject>();
+    foreach (GameObject cube in longCubes)
+    {
+        if (Mathf.Approximately(cube.transform.position.x, item.transform.position.x))
+        {
+            longCubesToRemove.Add(cube);
+        }
+    }
+
+    foreach (GameObject cube in longCubesToRemove)
+    {
+        Destroy(cube);
+        longCubes.Remove(cube);
+    }
+
+    longCubes.Add(item);
+    SelectObject(item.transform);
+}
+
                 }
             }
 
@@ -1494,24 +1577,7 @@ private void OnVideoPrepared(VideoPlayer source)
         });
 
         await Task.Delay(500);
-            float calculateDifficulty = await Calculator.CalculateDifficultyAsync(
-            this.cubes,
-            saws,
-            longCubes,
-            hp,
-            size,
-            cubePositions.ToArray(),
-            float.Parse(bpmInput.text),
-            updateLoadingText: (text) =>
-            {
-                // Ensure updateLoadingText is executed on the main thread
-                MainThreadDispatcher.Enqueue(() =>
-                {
-                    loadingPanel.UpdateLoading(text, 0.45f);
-                });
-            }
-        );
-        await Task.Delay(3000);
+       
         // Load existing scene data if available, with fallback
         SceneData data = await LoadSceneDataFromFile() ?? new SceneData();
 
@@ -1520,7 +1586,6 @@ private void OnVideoPrepared(VideoPlayer source)
         {
             version = 2,
             name = customSongName.text,
-            calculatedDifficulty = calculateDifficulty,
             bpm = int.TryParse(bpmInput.text, out int bpmValue) ? bpmValue : 0,
             saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             songLength = audio.clip != null ? audio.clip.length : 0,
@@ -1688,63 +1753,17 @@ private async Task WaitForFrameToRender(VideoPlayer videoPlayer)
 
         await Task.Delay(500);
 
-        loadingScreen.UpdateLoading("Calculating difficulty...", 0.4f);
-        float calculateDifficulty = await Calculator.CalculateDifficultyAsync(
-            this.cubes,
-            saws,
-            longCubes,
-            hp,
-            size,
-            cubePositions.ToArray(),
-            float.Parse(bpmInput.text),
-            updateLoadingText: (text) =>
-            {
-                MainThreadDispatcher.Enqueue(() =>
-                {
-                    loadingPanel.UpdateLoading(text, 0.45f);
-                });
-            }
-        );
-        await Task.Delay(5000);
+       
         SceneData data = await LoadSceneDataFromFile() ?? new SceneData();
         
         loadingScreen.UpdateLoading("Creating Level info...", 0.5f);
-        int levelLength = (int)(distance1 / 7);
-        float sectionLength = 70f;
-int totalSections = Mathf.CeilToInt((float)cubes.Length / sectionLength);
 
-Section[] sections = new Section[totalSections];
 
-for (int sectionIndex = 0; sectionIndex < totalSections; sectionIndex++)
-{
-    float sectionStartX = sectionIndex * sectionLength; // X-axis start position
-    float sectionEndX = (sectionIndex + 1) * sectionLength; // X-axis end position
-
-    Section section = new Section()
-    {
-        sectionBegin = sectionStartX, // Convert to milliseconds
-        sectionEnd = sectionEndX, // Convert to milliseconds
-        bpm = int.TryParse(bpmInput.text, out int bpmValue2) ? bpmValue2 : 0,
-        difficulty = Calculator.CalculateSectionDifficulty(
-            cubes.ToList(),
-            saws,
-            longCubes,
-            cubePositions.ToArray(),
-            bpmValue2,
-            sectionIndex,
-            10
-        )
-    };
-
-    sections[sectionIndex] = section;
-    Debug.Log($"Section {sectionIndex}: Begin = {section.sectionBegin}ms, End = {section.sectionEnd}ms");
-}
 
         SceneData sceneData = new SceneData
         {
             version = 2,
             name = customSongName.text,
-            calculatedDifficulty = calculateDifficulty,
             gameVersion = Application.version,
             saveTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             songLength = audio.clip != null ? audio.clip.length : 0,
@@ -1757,8 +1776,6 @@ for (int sectionIndex = 0; sectionIndex < totalSections; sectionIndex++)
             offset = float.TryParse(offsetmarker?.text, out float offsetValue) ? offsetValue : 0,
             bpm = int.TryParse(bpmInput.text, out int bpmValue) ? bpmValue : 0,
             ID = (data.ID == 0) ? UnityEngine.Random.Range(int.MinValue, int.MaxValue) : data.ID,
-            source = source.text,
-            sections = sections,
             description = input.text
         };
         await Task.Delay(7000);

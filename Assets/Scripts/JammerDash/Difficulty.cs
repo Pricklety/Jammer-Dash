@@ -187,76 +187,89 @@ namespace JammerDash.Difficulty
 }
 
   public static Transform FindFarthestObjectInX(GameObject[] objects)
+    {
+        Transform farthestObject = null;
+        float maxX = float.MinValue;
+
+        foreach (GameObject obj in objects)
         {
-            Transform farthestObject = null;
-            float maxX = float.MinValue;
-
-            foreach (GameObject obj in objects)
+            float x = obj.transform.position.x;
+            if (x > maxX)
             {
-                float x = obj.transform.position.x;
-                if (x > maxX)
-                {
-                    maxX = x;
-                    farthestObject = obj.transform;
-                }
+                maxX = x;
+                farthestObject = obj.transform;
             }
-
-            return farthestObject;
         }
-       public static Task<float> CalculateDifficultyAsync(
-    List<GameObject> cubes,
-    List<GameObject> saws,
-    List<GameObject> longCubes,
-    Slider hp,
-    Slider size,
+
+        return farthestObject;
+    }
+    public static bool IsObjectInSection(Vector2 pos, int index, float length)
+    {
+        return pos.x >= index * length && pos.x < (index + 1) * length;
+    }
+
+  
+
+ public static Task<float> CalculateDifficultyAsync(
+    List<Vector2> cubes,
+    List<Vector2> saws,
+    List<Vector2> longCubes,
+    int hp,
+    int size,
     Vector2[] cubePositions,
+    List<Vector2> longCubePositions,
     float bpm,
+    float levelTime,
     Action<string> updateLoadingText)
 {
     try
+{
+    updateLoadingText("Starting section-based difficulty calculation...");
+    List<float> sectionDifficulties = new List<float>();
+
+    float sectionLength = 70f;
+    int totalSections = Mathf.CeilToInt(cubes.Count / sectionLength);
+
+    // Difficulty contribution weights
+    float strainWeight = 0.45f;
+    float spamWeight = 0.35f;
+    float longCubeWeight = 0.65f;
+    float globalDampening = 0.8f;
+
+    for (int sectionIndex = 0; sectionIndex < totalSections; sectionIndex++)
     {
-        float difficulty = 0f;
+        updateLoadingText($"Calculating section {sectionIndex + 1} of {totalSections}...");
 
-        updateLoadingText("Starting section-based difficulty calculation...");
-        Debug.Log("Starting section-based difficulty calculation...");
-        List<float> sectionDifficulties = new List<float>();
+        Vector2[] sectionCubes = cubes
+            .Where(c => IsObjectInSection(c, sectionIndex, sectionLength))
+            .ToArray();
 
-        // Split the level into sections based on X axis (or other factors if needed)
-        float sectionLength = 70f;
-        int totalSections = Mathf.CeilToInt(cubes.Count / sectionLength);
+        List<Vector2> sectionLongCubes = longCubes
+            .Where(c => IsObjectInSection(c, sectionIndex, sectionLength))
+            .ToList();
 
-        for (int sectionIndex = 0; sectionIndex < totalSections; sectionIndex++)
-        {
-            updateLoadingText($"Calculating difficulty for section {sectionIndex + 1} of {totalSections}...");
-            Debug.Log($"Calculating difficulty for section {sectionIndex + 1} of {totalSections}...");
+        float strain = CalculateStrain(sectionCubes.ToList());
+        float spam = CalculateSpamFactor(sectionCubes.ToList());
+        float longImpact = CalculateLongCubeImpact(sectionLongCubes) + CalculateLongCubeMetaBuffs(sectionLongCubes);
 
-            float sectionDifficulty = CalculateSectionDifficulty(
-                cubes,
-                saws,
-                longCubes,
-                cubePositions,
-                bpm,
-                sectionIndex,
-                sectionLength
-            );
+        float sectionDifficulty = (strain * strainWeight) + (spam * spamWeight) + (longImpact * longCubeWeight);
+        sectionDifficulties.Add(sectionDifficulty);
+    }
 
-            sectionDifficulties.Add(sectionDifficulty);
-            Debug.Log($"Section {sectionIndex} difficulty: {sectionDifficulty}");
-        }
+    float averageSectionDifficulty = sectionDifficulties.Count > 0 ? sectionDifficulties.Average() : 0f;
 
-        difficulty = sectionDifficulties.Average();
+    // Global modifiers
+    float hpPenalty = CalculateHealthImpact(hp);
+    float sizePenalty = CalculateSizeImpact(size);
+    float bpmScaling = bpm * 0.002f;
 
-        // Apply additional impacts
-        difficulty += CalculateHealthImpact(hp);
-        difficulty += CalculateSizeImpact(size);
+    float finalDifficulty = (averageSectionDifficulty + hpPenalty + sizePenalty + bpmScaling) * globalDampening;
 
 
-        Debug.Log($"Final difficulties: {difficulty}");
+        // Slight global dampening
+        finalDifficulty *= 1.3f;
 
-        // Apply final scaling to match desired difficulty progression
-        if (difficulty < 0.01f) difficulty = 0.01f;
-
-        return Task.FromResult(difficulty);
+        return Task.FromResult(finalDifficulty);
     }
     catch (Exception e)
     {
@@ -264,136 +277,185 @@ namespace JammerDash.Difficulty
         return Task.FromResult(0.01f);
     }
 }
- public static float CalculateSectionDifficulty(
-            List<GameObject> cubes,
-            List<GameObject> saws,
-            List<GameObject> longCubes,
-            Vector2[] cubePositions,
-            float bpm,
-            int sectionIndex,
-            float sectionLength)
+
+    public static float CalculateStrain(List<Vector2> cubes)
+    {
+        if (cubes == null || cubes.Count < 2) return 0f;
+
+        cubes = cubes.OrderBy(c => c.x).ToList();
+        const float decayBase = 0.9f;
+        float lastStrain = 0f;
+        float peakStrain = 0f;
+        float strainSum = 0f;
+        float weight = 1f;
+        float totalWeight = 0f;
+
+        for (int i = 1; i < cubes.Count; i++)
         {
-            float sectionDifficulty = 0f;
+            float dx = Mathf.Max(0.1f, cubes[i].x - cubes[i - 1].x);
+            float dy = Mathf.Abs(cubes[i].y - cubes[i - 1].y);
+            float strain = dy / dx;
 
-            // Calculate the cube density and how hard it is to move between them (Y-Axis and X-Axis)
-            GameObject[] sectionCubes = cubes.Where(cube => IsCubeInSection(cube.transform.position, sectionIndex, sectionLength)).ToArray();
-            sectionDifficulty += CalculateCubeDensity(sectionCubes, cubePositions);
+            lastStrain *= Mathf.Pow(decayBase, dx / 2f);
+            lastStrain += strain;
 
-            // Consider saws impact in this section
-            List<GameObject> sectionSaws = saws.Where(saw => IsObjectInSection(saw.transform.position, sectionIndex, sectionLength)).ToList();
-            sectionDifficulty += CalculateSawImpact(sectionSaws);
-
-            // Add impact from long cubes
-            List<GameObject> sectionLongCubes = longCubes.Where(longCube => IsObjectInSection(longCube.transform.position, sectionIndex, sectionLength)).ToList();
-            sectionDifficulty += CalculateLongCubeImpact(sectionLongCubes);
-
-           
-
-            return sectionDifficulty;
-        }
-  public static bool IsCubeInSection(Vector3 position, int sectionIndex, float sectionLength)
-        {
-            return position.x >= sectionIndex * sectionLength && position.x < (sectionIndex + 1) * sectionLength;
+            strainSum += lastStrain * weight;
+            peakStrain = Mathf.Max(peakStrain, lastStrain);
+            weight *= 0.98f;
+            totalWeight += weight;
         }
 
-        public static bool IsObjectInSection(Vector3 position, int sectionIndex, float sectionLength)
+        float avgStrain = strainSum / Mathf.Max(1f, totalWeight);
+        return avgStrain * 0.6f + peakStrain * 0.4f;
+    }
+
+    // Spam Detection (tight objects in same lane)
+    public static float CalculateSpamFactor(List<Vector2> cubes)
+    {
+        float spamFactor = 0f;
+        int streak = 1;
+        cubes = cubes.OrderBy(c => c.x).ToList();
+
+        for (int i = 1; i < cubes.Count; i++)
         {
-            return position.x >= sectionIndex * sectionLength && position.x < (sectionIndex + 1) * sectionLength;
+            float dx = cubes[i].x - cubes[i - 1].x;
+            bool sameLane = Mathf.Approximately(cubes[i].y, cubes[i - 1].y);
+
+            if (sameLane && dx < 1f)
+            {
+                streak++;
+                spamFactor += streak * 1.5f;
+            }
+            else if (sameLane && dx < 2.5f)
+            {
+                streak++;
+                spamFactor += streak * 0.2f;
+            }
+            else
+            {
+                streak = 1;
+            }
         }
-public static float CalculateCubeDensity(GameObject[] sectionCubes, Vector2[] cubePositions)
+
+        return Mathf.Clamp(spamFactor, 0f, 3f);
+    }
+
+    // Long Note Arrangement Impact
+    public static float CalculateLongCubeImpact(List<Vector2> sectionLongCubes)
+{
+    float impact = 0f;
+
+    if (sectionLongCubes.Count < 4)
+    {
+        impact = sectionLongCubes.Count * 0.4f;  // Slight nerf
+    }
+    else
+    {
+        impact = sectionLongCubes.Count * 0.6f;  // Nerfed from 1.0x
+        List<float> xDistances = new List<float>();
+        for (int i = 0; i < sectionLongCubes.Count; i++)
+        {
+            for (int j = i + 1; j < sectionLongCubes.Count; j++)
+            {
+                float xDist = Mathf.Abs(sectionLongCubes[i].x - sectionLongCubes[j].x);
+                float yDiff = Mathf.Abs(sectionLongCubes[i].y - sectionLongCubes[j].y);
+
+                if (xDist < 5f && yDiff > 1f)
+                {
+                    impact *= 1.05f;  // Slightly softer buff
+                }
+            }
+        }
+    }
+
+    return impact;
+}
+
+
+    // Additional meta buffs for long notes (lane variety and bursts)
+   public static float CalculateLongCubeMetaBuffs(List<Vector2> longCubePositions)
+{
+    if (longCubePositions == null || longCubePositions.Count == 0) return 0f;
+
+    longCubePositions = longCubePositions.OrderBy(c => c.x).ToList();
+
+    var lanesUsed = new HashSet<int>(longCubePositions.Select(p => (int)p.y));
+    float diversityBuff = lanesUsed.Count / 4f;
+
+    float spamBuff = 0f;
+    int streak = 1;
+
+    for (int i = 1; i < longCubePositions.Count; i++)
+    {
+        float dx = longCubePositions[i].x - longCubePositions[i - 1].x;
+        bool sameLane = Mathf.Approximately(longCubePositions[i].y, longCubePositions[i - 1].y);
+        if (sameLane && dx < 120f)
+        {
+            streak++;
+            spamBuff += streak * 0.025f;
+        }
+        else
+        {
+            streak = 1;
+        }
+    }
+
+    spamBuff = Mathf.Clamp(spamBuff, 0f, 1.2f);
+
+    float baseLongCubeCount = longCubePositions.Count;
+    return baseLongCubeCount * (0.07f * diversityBuff + 0.035f * spamBuff);  // Nerfed
+}
+
+    // Health affects difficulty (lower HP = harder)
+    public static float CalculateHealthImpact(int hp)
+    {
+        return Mathf.Clamp(1f / (hp + 1f), 0.2f, 2f);
+    }
+
+    // Size affects visibility and spacing
+    public static float CalculateSizeImpact(int size)
+    {
+        return Mathf.Exp(0.04f * (1f - size) * 1.10f);
+    }
+    public static float CalculateCubeDensity(Vector2[] sectionCubes)
 {
     float density = 0f;
+    List<float> xDistances = new List<float>();
+    List<float> yDifferences = new List<float>();
 
-    // First, calculate the X-axis proximity and Y-axis activity
-    List<float> xDistances = new List<float>();  // Store distances between cubes on the X-axis
-    List<float> yDifferences = new List<float>(); // Store Y differences between cubes
-
-    // Collect all X and Y distances between cubes
     for (int i = 0; i < sectionCubes.Length; i++)
     {
         for (int j = i + 1; j < sectionCubes.Length; j++)
         {
-            // Calculate horizontal distance (X-axis)
-            float xDistance = Mathf.Abs(sectionCubes[i].transform.position.x - sectionCubes[j].transform.position.x);
-            xDistances.Add(xDistance);
-
-            // Calculate vertical distance (Y-axis)
-            float yDifference = Mathf.Abs(sectionCubes[i].transform.position.y - sectionCubes[j].transform.position.y);
-            yDifferences.Add(yDifference);
+            float xDist = Mathf.Abs(sectionCubes[i].x - sectionCubes[j].x);
+            float yDiff = Mathf.Abs(sectionCubes[i].y - sectionCubes[j].y);
+            xDistances.Add(xDist);
+            yDifferences.Add(yDiff);
         }
     }
 
-    // Calculate proximity weight based on X-axis distances
-    float averageXDistance = xDistances.Count > 0 ? xDistances.Average() : 1f; // Avoid division by zero
-    float proximityWeight = Mathf.Clamp(1f - (averageXDistance / 2f), 0f, 1f); // Closer cubes, higher weight
+    float avgX = xDistances.Count > 0 ? xDistances.Average() : 1f;
+    float avgY = yDifferences.Count > 0 ? yDifferences.Average() : 0f;
 
-    // Calculate Y-axis activity
-    float averageYDifference = yDifferences.Count > 0 ? yDifferences.Average() : 0f;
-    float yActivityWeight = Mathf.Clamp(averageYDifference / 10f, 0f, 1f); // More Y variation, higher weight
+    float proximityWeight = Mathf.Clamp01(1f - avgX / 3.5f);  // Slightly softened
+    float yActivityWeight = Mathf.Clamp01(avgY / 8f);
 
-    // Combine proximity and Y-axis activity into the density calculation
-    density += proximityWeight * (1f + yActivityWeight); // Higher density with both smaller X distances and larger Y differences
+    density += proximityWeight * (1f + yActivityWeight);
 
-    // Return the final density
+    if (avgY > 1.5f && avgX < 4f)
+    {
+        density *= 0.4f;  // Nerfed from 0.5f
+    }
+
+    if (avgX > 4f)
+    {
+        density *= 0.1f;
+    }
+
     return density;
 }
 
-
-public static float CalculateSawImpact(List<GameObject> sectionSaws)
-{
-    float sawImpact = 0f;
-    int sawCount = sectionSaws.Count;
-
-    if (sawCount < 2) return sawImpact;
-
-    float totalYDistance = 0f;
-    int pairCount = 0;
-
-    // Calculate the average Y-distance between saws
-    sectionSaws.Sort((a, b) => a.transform.position.y.CompareTo(b.transform.position.y)); // Sort by Y
-
-    for (int i = 0; i < sawCount - 1; i++)
-    {
-        float yDistance = Mathf.Abs(sectionSaws[i].transform.position.y - sectionSaws[i + 1].transform.position.y);
-        totalYDistance += yDistance;
-        pairCount++;
-    }
-
-    float averageYDistance = totalYDistance / pairCount;
-
-    // The more spaced out the saws are, the higher the difficulty
-    sawImpact = Mathf.Clamp(1 / (averageYDistance + 0.1f), 0f, 5f);
-
-    return sawImpact;
 }
-
-public static float CalculateLongCubeImpact(List<GameObject> sectionLongCubes)
-{
-    float longCubeImpact = 0f;
-
-    // Long cubes add more difficulty to the section
-    foreach (GameObject longCube in sectionLongCubes)
-    {
-        longCubeImpact += 1.55f;
-    }
-
-    return longCubeImpact;
-}
-
-public static float CalculateHealthImpact(Slider hp)
-{
-    // Health impact increases as the slider moves towards 0
-    return 1 / (hp.value + 1) * 5f; // Arbitrary scaling factor
-}
-
-public static float CalculateSizeImpact(Slider size)
-{
-    // Size impact is exponential, more impact as the size increases
-    return Mathf.Exp(0.05f * (1f - size.value) * 2f); // Exponential scaling for difficulty
-}
-    }
-
-       
         public static class Object
     {
         public static async Task<GameObject[]> FindObjectsWithTags(string[] tags)
@@ -423,6 +485,8 @@ public static float CalculateSizeImpact(Slider size)
             return await tcs.Task;
         }
     }
+    
+
  public class ShinePerformance
     {
         private float _precision;
@@ -545,7 +609,8 @@ float masterPitch;
             return Math.Max(min, Math.Min(max, value));
         }
     } 
-}
+}   
+
 namespace JammerDash
 {
     public class PlayerStats

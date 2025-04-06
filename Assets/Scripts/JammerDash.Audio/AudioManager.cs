@@ -367,6 +367,11 @@ namespace JammerDash.Audio
         SettingsFileHandler.SaveSettingsToFile(data);
         KeybindPanel.ToggleFunction("Toggle gameplay interface", $"Shift + {KeybindingManager.toggleUI}");
     }
+    if (Input.GetKey(KeyCode.F8)) {
+        data.mouseHits = !data.mouseHits;
+        SettingsFileHandler.SaveSettingsToFile(data);
+        KeybindPanel.ToggleFunction("Mouse gameplay", "F8");
+    }
 
     if (Input.GetKey(KeyCode.F2) && menu.playPanel.activeSelf)
         KeybindPanel.ToggleFunction("Random level", "F2");

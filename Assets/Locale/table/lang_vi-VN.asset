@@ -39,7 +39,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 3082442338304
-    m_Localized: "Di chuy\u1EC3n chu\u1ED9t \u0111\u1EC3 k\xEDch ho\u1EA1t menu ch\xEDnh"
+    m_Localized: "Nh\u1EA5p v\xE0o logo \u0111\u1EC3 k\xEDch ho\u1EA1t menu"
     m_Metadata:
       m_Items: []
   - m_Id: 6902991908864
@@ -486,6 +486,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 26178270689603584
     m_Localized: "S\u1EF1 mi\xEAu t\u1EA3"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 47772041705443328
+    m_Localized: online
     m_Metadata:
       m_Items: []
   references:

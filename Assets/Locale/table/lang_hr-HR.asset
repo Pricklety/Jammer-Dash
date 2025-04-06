@@ -35,7 +35,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 3082442338304
-    m_Localized: "Pomakni mi\u0161 da aktivira\u0161 izbornik"
+    m_Localized: "Klikni na logo da aktivira\u0161 izbornik"
     m_Metadata:
       m_Items: []
   - m_Id: 6902991908864
@@ -485,6 +485,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 26178270689603584
     m_Localized: Opis
+    m_Metadata:
+      m_Items: []
+  - m_Id: 47772041705443328
+    m_Localized: online
     m_Metadata:
       m_Items: []
   references:

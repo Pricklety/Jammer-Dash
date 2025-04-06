@@ -13,6 +13,7 @@ using JammerDash.Tech;
 using UnityEngine.Localization.Settings;
 using System.Data.Common;
 using JammerDash.Game;
+using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 
 namespace JammerDash.Menus.Play
@@ -267,101 +268,112 @@ namespace JammerDash.Menus.Play
         // Apply the interpolated color to the fill image
         slider.fillRect.GetComponent<Image>().color = color;
     }
-        public IEnumerator PlayAudioOnlyMode()
-        {
-            ButtonClickHandler[] levels = FindObjectsByType<ButtonClickHandler>(FindObjectsSortMode.InstanceID);
-            var customLevel = GetComponent<CustomLevelScript>();
-            if (customLevel != null)
-            {
-                CustomLevelDataManager data = CustomLevelDataManager.Instance;
-                data.sceneLoaded = false;
-                desc = GameObject.Find("description").GetComponent<TextMeshProUGUI>();
-                levelLength = GameObject.Find("info").GetComponent<Text>();
-                levelBPM = GameObject.Find("infoBPM").GetComponent<Text>();
-                diff = GameObject.Find("infodiff").GetComponent<Text>();
-                levelObj = GameObject.Find("infoobj").GetComponent<Text>();
-                hp = GameObject.Find("health").GetComponent<Text>();
-                size = GameObject.Find("cubeSize").GetComponent<Text>();
-                bonus = GameObject.Find("levelbonusinfoi").GetComponent<Text>(); 
-                slider = GameObject.Find("sliderDiff").GetComponent<Slider>();
+     public async Task PlayAudioOnlyModeAsync()
+{
+    ButtonClickHandler[] levels = FindObjectsByType<ButtonClickHandler>(FindObjectsSortMode.InstanceID);
+    var customLevel = GetComponent<CustomLevelScript>();
 
-                // Find the selected level's index
-               
-                new WaitUntil(() => GetComponent<leaderboard>().panelContainer != null);
-                DestroyLeaderboard();
-                DisplayLB(customLevel.sceneData.ID.ToString());
+    if (customLevel != null)
+    {
+        CustomLevelDataManager data = CustomLevelDataManager.Instance;
+        data.sceneLoaded = false;
 
-                // Update UI elements
-                UpdateUIWithLevelData(customLevel.sceneData);
+        // UI elements
+        desc = GameObject.Find("description").GetComponent<TextMeshProUGUI>();
+        levelLength = GameObject.Find("info").GetComponent<Text>();
+        levelBPM = GameObject.Find("infoBPM").GetComponent<Text>();
+        levelObj = GameObject.Find("infoobj").GetComponent<Text>();
+        hp = GameObject.Find("health").GetComponent<Text>();
+        size = GameObject.Find("cubeSize").GetComponent<Text>();
+        bonus = GameObject.Find("levelbonusinfoi").GetComponent<Text>();
+        slider = GameObject.Find("sliderDiff").GetComponent<Slider>();
 
-                // Display formatted save time
-                bonus.text = GetFormattedBonusInfo(customLevel.sceneData);
-                    float duration = 0.1f; // Duration for the lerp
-                    float masterPitch;
-            Mods.instance.master.GetFloat("MasterPitch", out masterPitch);
+        // Wait until the leaderboard is ready
+        await Task.Yield();  // Equivalent to `yield return null` in Unity
+        DestroyLeaderboard();
+        DisplayLB(customLevel.sceneData.ID.ToString());
+
+
+        // Display formatted save time
+        bonus.text = GetFormattedBonusInfo(customLevel.sceneData);
+
+        
+             List<Vector2> cubePositions = new List<Vector2>();
+            List<Vector2> longCubePositions = new List<Vector2>();
+            List<Vector2> sawPositions = new List<Vector2>();
+
+            // Add cube positions from customLevel
+            cubePositions.AddRange(customLevel.sceneData.cubePositions); 
+            sawPositions.AddRange(customLevel.sceneData.sawPositions);
+            longCubePositions.AddRange(customLevel.sceneData.longCubePositions);
+
+              
+            
+        // After difficulty calculation, update the difficulty slider
+        float duration = 0.1f;  // Duration for the lerp
+        float masterPitch;
+        Mods.instance.master.GetFloat("MasterPitch", out masterPitch);
         float elapsedTime = 0f;
         float startValue = slider.value * CustomLevelDataManager.Instance.scoreMultiplier * masterPitch;
-        float targetValue = customLevel.sceneData.calculatedDifficulty * CustomLevelDataManager.Instance.scoreMultiplier * masterPitch;
+        float targetValue = c * CustomLevelDataManager.Instance.scoreMultiplier * masterPitch;
 
-        StartCoroutine(UpdateDifficultySlider(customLevel));
-            }
+        // Start the difficulty slider update coroutine
+        StartCoroutine(UpdateDifficultySlider(targetValue, duration));
 
-            // Reset other buttons' selection
-            StartCoroutine(DeselectOtherButtons());
+        // Reset other buttons' selection
+        StartCoroutine(DeselectOtherButtons());
 
-            isSelected = true;
-            yield return StartCoroutine(Move(5));
+        isSelected = true;
+        StartCoroutine(Move(5));
 
-            button.onClick.RemoveAllListeners();
+        button.onClick.RemoveAllListeners();
 
-            // Start Lerp for button scale
-            yield return StartCoroutine(LerpButtonSize(buttonRectTransform, new Vector3(850f, 120f, 0f)));
+        // Start Lerp for button scale
+        StartCoroutine(LerpButtonSize(buttonRectTransform, new Vector3(850f, 120f, 0f)));
 
-            if (customLevel.sceneData != null)
+        // Load the audio clip
+        if (customLevel.sceneData != null)
+        {
+            string clipPath = Path.Combine(JammerDash.Main.gamePath, "levels", "extracted", customLevel.sceneData.ID + " - " + customLevel.sceneData.name, customLevel.sceneData.artist + " - " + customLevel.sceneData.songName + ".mp3");
+            int audioClipIndex = -1;
+
+            clipPath.Replace("/", "\\");
+
+            // Iterate through the songPathsList to find a matching path
+            for (int i = 0; i < AudioManager.Instance.songPathsList.Count; i++)
             {
-                string clipPath = Path.Combine(JammerDash.Main.gamePath, "levels", "extracted", customLevel.sceneData.ID + " - " + customLevel.sceneData.name, customLevel.sceneData.artist + " - " + customLevel.sceneData.songName + ".mp3");
-                int audioClipIndex = -1; // Initialize to a value that indicates no match found
-                                         // Normalize the clipPath
-                clipPath.Replace("/", "\\");
-                // Iterate through the songPathsList
-                for (int i = 0; i < AudioManager.Instance.songPathsList.Count; i++)
+                string normalizedSongPath = AudioManager.Instance.songPathsList[i];
+                if (string.Equals(normalizedSongPath, clipPath, StringComparison.OrdinalIgnoreCase))
                 {
-                    // Normalize the current path in songPathsList
-                    string normalizedSongPath = AudioManager.Instance.songPathsList[i];
-
-                    if (string.Equals(normalizedSongPath, clipPath, StringComparison.OrdinalIgnoreCase)) // Case-insensitive comparison
-                    {
-                        audioClipIndex = i; // Set the index if a match is found
-                        break; // No need to continue searching once a match is found
-                    }
-                }
-
-                // If a match was found, set the audioClipIndex and load the audio clip
-                if (audioClipIndex != -1)
-                {
-                    // Set the audioClipIndex on the AudioManager.Instance
-                    AudioManager.Instance.currentClipIndex = audioClipIndex;
-
-                    // Load the audio clip asynchronously
-                    yield return StartCoroutine(AudioManager.Instance.LoadAudioClip(clipPath));
-                    yield return new WaitUntil(() => AudioManager.Instance.songLoaded);
-                    yield return new WaitForEndOfFrame();
-                    AudioManager.Instance.source.loop = true;
-                    AudioManager.Instance.source.time = UnityEngine.Random.Range(AudioManager.Instance.source.clip.length * 0f, AudioManager.Instance.source.clip.length * 0.5f);
-
-                }
-                else
-                {
-                    // Handle case where no match was found
-                    UnityEngine.Debug.LogError("Clip path not found in songPathsList!");
-                    Debug.LogError(clipPath);
+                    audioClipIndex = i;
+                    break;
                 }
             }
-            int selectedLevelIndex = Array.FindIndex(levels, level => level.isSelected);
-            FindAnyObjectByType<mainMenu>().levelRow = selectedLevelIndex;
-            yield return StartCoroutine(LoadImage(Path.Combine(JammerDash.Main.gamePath, "levels", "extracted", customLevel.sceneData.ID + " - " + customLevel.sceneData.name, "bgImage.png")));
-        }
-        private IEnumerator LerpButtonSize(RectTransform rectTransform, Vector2 sizeChange, float duration = 0.1f)
+
+            // If a match was found, load the audio clip
+            if (audioClipIndex != -1)
+            {
+                AudioManager.Instance.currentClipIndex = audioClipIndex;
+                StartCoroutine(AudioManager.Instance.LoadAudioClip(clipPath));
+                await Task.Yield();  // Equivalent to `yield return null` in Unity
+                AudioManager.Instance.source.loop = true;
+                AudioManager.Instance.source.time = UnityEngine.Random.Range(AudioManager.Instance.source.clip.length * 0f, AudioManager.Instance.source.clip.length * 0.5f);
+            }
+            else
+            {
+                UnityEngine.Debug.LogError("Clip path not found in songPathsList!");
+                Debug.LogError(clipPath);
+            }
+        }   
+
+        // Final
+        int selectedLevelIndex = Array.FindIndex(levels, level => level.isSelected);
+        FindAnyObjectByType<mainMenu>().levelRow = selectedLevelIndex;
+        StartCoroutine(LoadImage(Path.Combine(JammerDash.Main.gamePath, "levels", "extracted", customLevel.sceneData.ID + " - " + customLevel.sceneData.name, "bgImage.png")));
+    }
+}
+
+ private IEnumerator LerpButtonSize(RectTransform rectTransform, Vector2 sizeChange, float duration = 0.1f)
         {
             Vector2 initialSize = rectTransform.sizeDelta;
 
@@ -377,23 +389,23 @@ namespace JammerDash.Menus.Play
             rectTransform.sizeDelta = sizeChange;
         }
 
-        public IEnumerator UpdateDifficultySlider(CustomLevelScript customLevel) {
-            
-               float duration = 0.1f; // Duration for the lerp
-                float masterPitch;
-            Mods.instance.master.GetFloat("MasterPitch", out masterPitch);
-        float elapsedTime = 0f;
-        float startValue = slider.value * CustomLevelDataManager.Instance.scoreMultiplier * masterPitch;
-        float targetValue = customLevel.sceneData.calculatedDifficulty * CustomLevelDataManager.Instance.scoreMultiplier * masterPitch;
-             while (elapsedTime < duration)
-        {
-            slider.value = Mathf.Lerp(startValue, targetValue, elapsedTime / duration);
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }slider.value = targetValue;
-        
-                UpdateDifficultyColor(slider.value);
-        }
+
+// Method to update the difficulty slider
+public IEnumerator UpdateDifficultySlider(float targetValue, float duration)
+{
+    float startValue = slider.value;
+    float elapsedTime = 0f;
+
+    while (elapsedTime < duration)
+    {
+        slider.value = Mathf.Lerp(startValue, targetValue, elapsedTime / duration);
+        elapsedTime += Time.deltaTime;
+        yield return null;
+    }
+
+    slider.value = targetValue;
+    UpdateDifficultyColor(slider.value);  // You can call a method to update the slider's color
+}
         public IEnumerator HandleButtonClick()
         {
             var customLevel = GetComponent<CustomLevelScript>();
@@ -412,26 +424,54 @@ namespace JammerDash.Menus.Play
                 new WaitUntil(() => GetComponent<leaderboard>().panelContainer != null);
                 DestroyLeaderboard();
                 DisplayLB(customLevel.sceneData.ID.ToString());
-                // Update UI elements
-                UpdateUIWithLevelData(customLevel.sceneData);
 
                 // Display formatted save time
                 bonus.text = GetFormattedBonusInfo(customLevel.sceneData);
-
-                StartCoroutine(UpdateDifficultySlider(customLevel));
             }
 
             if (isSelected)
             {
                 PlayLevelAudioOrSFX();
             }
+            float difficulty = 0f;
+        
+             List<Vector2> cubePositions = new List<Vector2>();
+            List<Vector2> longCubePositions = new List<Vector2>();
 
-            yield return StartCoroutine(LerpButtonSize(buttonRectTransform, new Vector3(850f, 120f, 0f)));
-            // Reset other buttons' selection
-            StartCoroutine(DeselectOtherButtons());
+            List<Vector2> sawPositions = new List<Vector2>();
+            // Add cube positions from customLevel
+            cubePositions.AddRange(customLevel.sceneData.cubePositions); 
+            sawPositions.AddRange(customLevel.sceneData.sawPositions);
+            longCubePositions.AddRange(customLevel.sceneData.longCubePositions);
 
-            isSelected = true;
-            yield return StartCoroutine(Move(0));
+                Debug.Log("Starting difficulty calculation...");
+
+                // Call CalculateDifficultyAsync and await the result
+                 yield return StartCoroutine(CalculateDifficultyCoroutine(customLevel, difficulty, cubePositions, sawPositions, longCubePositions));
+
+            
+        
+        // Update UI with custom level data
+        // After difficulty calculation, update the difficulty slider
+        float duration = 0.1f;  // Duration for the lerp
+        float masterPitch;
+        Mods.instance.master.GetFloat("MasterPitch", out masterPitch);
+        float elapsedTime = 0f;
+        float startValue = slider.value * CustomLevelDataManager.Instance.scoreMultiplier * masterPitch;
+        float targetValue = c * CustomLevelDataManager.Instance.scoreMultiplier * masterPitch;
+        
+        UpdateUIWithLevelData(customLevel.sceneData, targetValue);
+        CustomLevelDataManager.Instance.diff = targetValue;
+
+        // Start the difficulty slider update coroutine
+        StartCoroutine(UpdateDifficultySlider(targetValue, duration));
+        StartCoroutine(LerpButtonSize(buttonRectTransform, new Vector3(850f, 120f, 0f)));
+
+        // Reset other buttons' selection
+        StartCoroutine(DeselectOtherButtons());
+
+        isSelected = true;
+            yield return StartCoroutine(Move(5));
 
             button.onClick.RemoveAllListeners();
            
@@ -480,6 +520,66 @@ namespace JammerDash.Menus.Play
 
 
         }
+        public float c;
+       private IEnumerator CalculateDifficultyCoroutine(CustomLevelScript customLevel, float difficulty, List<Vector2> cubePositions, List<Vector2> sawPositions, List<Vector2> longCubePositions)
+{
+    // Initialize variables for hp and size, default to 0 if parsing fails
+    int hpValue = 0;
+    int sizeValue = 0;
+
+    // Extract numeric part of hp.text and size.text using a simple method (remove non-numeric characters)
+    hpValue = ExtractNumberFromString(hp.text);
+    sizeValue = ExtractNumberFromString(size.text);
+
+    // Log the extracted values to verify
+    Debug.Log("Extracted HP: " + hpValue);
+    Debug.Log("Extracted Size: " + sizeValue);
+
+    Task<float> difficultyTask = Task.Run(() => 
+    {
+        return Difficulty.Calculator.CalculateDifficultyAsync(
+            cubes: cubePositions,  // Pass the appropriate cubes
+            saws: sawPositions,   // Pass the appropriate saws
+            longCubes: longCubePositions,  // Pass the appropriate long cubes
+            hp: hpValue,  // Use the extracted health value     
+            size: sizeValue,  // Use the extracted size value
+            bpm: customLevel.sceneData.bpm,  // Use level BPM
+            updateLoadingText: (text) => { Debug.Log(text); }, // Update loading text during the process
+            levelTime: customLevel.sceneData.songLength, // Use level length
+            cubePositions: customLevel.sceneData.cubePositions.ToArray(),
+            longCubePositions: customLevel.sceneData.longCubePositions
+        ).Result;  // Get the result of the task synchronously
+    });
+
+    // Wait until the task finishes
+    while (!difficultyTask.IsCompleted)
+    {
+        yield return null;  // Yield control back to Unity to avoid blocking the main thread
+    }
+
+    // Now that the task is complete, get the result
+    difficulty = difficultyTask.Result;
+    c = difficulty;
+    Debug.Log("Difficulty calculated: " + difficulty);
+}
+
+// Helper method to extract the numeric part of a string
+private int ExtractNumberFromString(string input)
+{
+    // This method uses a regular expression to extract digits from the string.
+    var number = new System.Text.RegularExpressions.Regex(@"[^0-9]");
+    var result = number.Replace(input, "");  // Remove all non-numeric characters
+    int parsedValue;
+    // Try parsing the result, default to 0 if parsing fails
+    if (int.TryParse(result, out parsedValue))
+    {
+        return parsedValue;
+    }
+    else
+    {
+        return 0;  // Default to 0 if parsing fails
+    }
+}
           public string ParseBBCode(string bbCodeText)
     {
         string parsedText = bbCodeText;
@@ -520,14 +620,14 @@ namespace JammerDash.Menus.Play
         return parsedText;
     }
         // Helper function to update UI with scene data
-        private void UpdateUIWithLevelData(SceneData data)
+        private void UpdateUIWithLevelData(SceneData data, float difficulty)
         {
             levelLength.text = $"{FormatTime(data.songLength):N0}";
             float masterPitch;
             Mods.instance.master.GetFloat("MasterPitch", out masterPitch);
             desc.text = string.IsNullOrEmpty(data.description) ? "" : ParseBBCode(data.description);
             levelBPM.text = $"{data.bpm * masterPitch:F0} ({data.bpm:F0})";
-            diff.text = $"{data.calculatedDifficulty * CustomLevelDataManager.Instance.scoreMultiplier * masterPitch:F2} ({data.calculatedDifficulty:F2})";
+            diff.text = $"{difficulty:F2}"; 	
             levelObj.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Objects")}: {(data.cubePositions.Count + data.sawPositions.Count + data.longCubePositions.Count):N0} ({data.cubePositions.Count}, {data.sawPositions.Count}, {data.longCubePositions.Count})";
             hp.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Player HP")}: {data.playerHP}";
             size.text = $"{LocalizationSettings.StringDatabase.GetLocalizedString("lang", "Object size")}: {data.boxSize}";

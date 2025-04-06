@@ -113,10 +113,7 @@ private Camera mainCam;
             music = AudioManager.Instance.source;
         }
         private void Start()
-        {
-            cubes = GameObject.FindGameObjectsWithTag("Cubes").ToList();
-            longCubes = GameObject.FindGameObjectsWithTag("LongCube").ToList();
-            music.time = 0f;
+        {music.time = 0f;
             CustomLevelDataManager.Instance.sceneLoaded = false;
            if (CustomLevelDataManager.Instance.playerhp != 0)
             {
@@ -149,14 +146,21 @@ private Camera mainCam;
                     badTextPrefab = Resources.Load<GameObject>("bad");
                     break;
             }
+            InvokeRepeating(nameof(UpdateText), 0, 0.5f);
            videoPlayer = FindFirstObjectByType<VideoPlayer>();
     finishLine = FindFirstObjectByType<FinishLine>();
     mainCam = Camera.main;
             scoreMultiplier = CustomLevelDataManager.Instance.scoreMultiplier;
             health = maxHealth;
-            InvokeRepeating(nameof(UpdateText), 0, 0.5f);
+            Invoke(nameof(Late), 1);
         }
       
+        void Late() {
+            
+            cubes = GameObject.FindGameObjectsWithTag("Cubes").ToList();
+            longCubes = GameObject.FindGameObjectsWithTag("LongCube").ToList();
+            
+        }
 
         private void OnJump()
         {
@@ -169,6 +173,16 @@ private Camera mainCam;
             if (transform.position.y < maxY - 1)
             {
                 transform.position += new Vector3(0f, jumpHeight * 2f, 0f);
+                sfxS.PlayOneShot(jump);
+
+            }
+
+        } 
+        private void OnLowBoost()
+        {
+            if (transform.position.y > 0)
+            {
+                transform.position += new Vector3(0f, jumpHeight * -2f, 0f);
                 sfxS.PlayOneShot(jump);
 
             }
@@ -205,10 +219,18 @@ private Camera mainCam;
                 transform.position = new Vector3(transform.position.x, -1, transform.position.z);
             }
         }
+        private void OnTop()
+        {
+            if (transform.position.y < 4)
+            {
+                
+                transform.position = new Vector3(transform.position.x, 4, transform.position.z);
+            }
+        }
 
         private void FixedUpdate()
         {
-            if (FindNearestCubeDistance() < 21)
+            if (FindNearestObjectDistance() < 49)
                 health -= 0.25f;
            
             hpint = (int)health;
@@ -275,23 +297,36 @@ private Camera mainCam;
         } 
         float pitch;
         music.outputAudioMixerGroup.audioMixer.GetFloat("MasterPitch", out pitch);
-
+        
+    PauseMenu pauseMenu = FindObjectOfType<PauseMenu>();
         if (music.isPlaying)
         {
-            float pitchAdjustedSpeed = (hasEasyMode ? 5f : 7f);
-            float targetX = music.time * pitchAdjustedSpeed;
+            float adjustedSpeed = (hasEasyMode ? 5f : 7f);
+            float targetX = (music.timeSamples / (float)music.clip.frequency) * adjustedSpeed;
+
+
 
             transform.position = new Vector3(
-                Mathf.MoveTowards(transform.position.x, targetX, pitchAdjustedSpeed * Time.deltaTime),
+                Mathf.MoveTowards(transform.position.x, targetX, adjustedSpeed * Time.deltaTime),
                 transform.position.y,
                 -1
             );
         }
         else
         {
+            if (transform.position.x > 0) {
             float speed = (hasEasyMode ? 5 : 7) * pitch;
             transform.Translate(speed * Time.deltaTime * Vector2.right);
+            }
+            else {
+                transform.Translate (7 * Time.deltaTime * Vector2.right);
+                if (Input.GetKeyDown(KeyCode.Escape)) {
+                    pauseMenu.Menu();
+                }
+            }
         }
+
+        
     
     if (isDying) return; // Early exit if the player is dying
 
@@ -375,9 +410,30 @@ private Camera mainCam;
     this.acc.text = $"{acc:F2}% | {counter.GetTier(acc)} | {SPInt:F0} sp";
 
     // Check for break message
-    if (FindNearestCubeDistance() > 21)
+    float nearestDistance = FindNearestObjectDistance();
+
+    if (pauseMenu != null)
     {
-        keyText.text = "Break!";
+        RawImage image = pauseMenu.image;
+        Color currentColor = image.color;
+
+        if (nearestDistance > 49)
+        { 
+            keyText.text = "Break!";
+            // Only lerp if current alpha is below 50%
+            if (currentColor.a < 0.5f)
+            {
+                float newAlpha = Mathf.Lerp(currentColor.a, 0.5f, Time.deltaTime * 0.5f);
+                image.color = new Color(currentColor.r, currentColor.g, currentColor.b, newAlpha);
+            }
+        }
+        else
+        {
+                float newAlpha = Mathf.Lerp(currentColor.a, pauseMenu.dim.value / 100, Time.deltaTime * 0.5f);
+
+            // Instantly revert to dim alpha when distance is below 50
+            image.color = new Color(currentColor.r, currentColor.g, currentColor.b, newAlpha);
+        }
     }
 
     // Optimize key input handling
@@ -389,8 +445,11 @@ private void HandlePlayerInput()
     if (Input.GetKeyDown(KeybindingManager.up)) OnJump();
     else if (Input.GetKeyDown(KeybindingManager.down)) OnCrouch();
     else if (Input.GetKeyDown(KeybindingManager.boost)) OnBoost();
+    else if (Input.GetKeyDown(KeybindingManager.lowboost)) OnLowBoost();
+    else if (Input.GetKeyDown(KeybindingManager.top)) OnTop();
     else if (Input.GetKeyDown(KeybindingManager.ground)) OnResetPosition();
     else if (Input.GetKeyDown(KeybindingManager.hit1) || Input.GetKeyDown(KeybindingManager.hit2)) OnHit();
+    else if (SettingsFileHandler.LoadSettingsFromFile().mouseHits) if(Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) OnHit();
 }
 
 private void HandleKeyInputs()
@@ -402,6 +461,17 @@ private void HandleKeyInputs()
     else if (Input.GetKeyDown(KeybindingManager.hit2))
     {
         AnimateKey(1, ref l);
+    }
+
+    if (SettingsFileHandler.LoadSettingsFromFile().mouseHits) {
+        if (Input.GetMouseButtonDown(0))
+    {
+        AnimateKey(0, ref k);
+    }
+    else if (Input.GetMouseButtonDown(1))
+    {
+        AnimateKey(1, ref l);
+    }
     }
 }
 
@@ -560,7 +630,7 @@ private void AnimateKey(int index, ref int counter)
                 anim.Play("comboanim");
             }
             }
-            else if (passedCubes.Count > 0 && FindNearestCubeDistance() < 2)
+            else if (passedCubes.Count > 0 && FindNearestObjectDistance() < 2)
             {
             GameObject nearestCube = hit.collider.gameObject;
             if (!missedCubes.Contains(nearestCube))
@@ -575,7 +645,7 @@ private void AnimateKey(int index, ref int counter)
         void HandleMiss()
         {
             
-            float nearestDistance = FindNearestCubeDistance();
+            float nearestDistance = FindNearestObjectDistance();
 
             if (passedCubes.Count > 0 && nearestDistance < 2)
             {
@@ -583,53 +653,35 @@ private void AnimateKey(int index, ref int counter)
             }
         }
 
-        public float FindNearestCubeDistance()
+     public float FindNearestObjectDistance()
+{
+    float nearestDistance = Mathf.Infinity;
+    Vector2 origin = (Vector2)transform.position + (Vector2)transform.right * 0.5f; // Small offset to avoid self-detection
+    Vector2 direction = transform.right;
+    float detectionRange = 100f;
+    float boxWidth = 0.5f;
+    float boxHeight = 10f;
+
+    RaycastHit2D[] hits = Physics2D.BoxCastAll(origin, new Vector2(boxWidth, boxHeight), 0f, direction, detectionRange);
+
+    foreach (RaycastHit2D hit in hits)
+    {
+        if (hit.collider == null || hit.collider.gameObject == gameObject)
+            continue;
+
+        float distance = hit.distance;
+
+        if (distance < nearestDistance)
         {
-            float nearestDistance = Mathf.Infinity;
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 10, cubeLayerMask);
-
-            foreach (Collider2D collider in colliders)
-            {
-                if (IsWithinColliderBounds(collider))
-                {
-                    return 0;
-                }
-
-                float distance = Vector2.Distance(transform.position, collider.transform.position);
-
-                BoxCollider2D boxCollider = collider as BoxCollider2D;
-                if (boxCollider != null)
-                {
-                    float colliderWidth = boxCollider.size.x;
-                    distance += colliderWidth / 2 - boxCollider.offset.x;
-                }
-
-                if (distance < nearestDistance)
-                {
-                    nearestDistance = distance;
-                }
-            }
-
-            return nearestDistance;
+            nearestDistance = distance;
         }
+    }
 
-        bool IsWithinColliderBounds(Collider2D collider)
-        {
-            if (collider is BoxCollider2D boxCollider)
-            {
-                Bounds bounds = boxCollider.bounds;
-                return bounds.Contains(transform.position);
-            }
-            else if (collider is CircleCollider2D circleCollider)
-            {
-                Vector2 circleCenter = (Vector2)circleCollider.transform.position + circleCollider.offset;
-                float radius = circleCollider.radius;
-                return Vector2.Distance(transform.position, circleCenter) <= radius;
-            }
+    // Debug the BoxCast
+    Debug.DrawRay(origin, direction * detectionRange, Color.red, 0.1f);
 
-
-            return false;
-        }
+    return nearestDistance == Mathf.Infinity ? 9999 : nearestDistance;
+}
 
 
         void HandleBadHit()
@@ -988,7 +1040,7 @@ private void AnimateKey(int index, ref int counter)
                     Total += 5;             
                 }
             if (collision.gameObject.name.Contains("hitter02") && activeCubes.Contains(collision.gameObject))
-            {   if (bufferActive && collision.transform.position.y == transform.position.y && (Input.GetKey(KeybindingManager.hit1) || Input.GetKey(KeybindingManager.hit2)))
+            {   if (bufferActive && collision.transform.position.y == transform.position.y && (Input.GetKey(KeybindingManager.hit1) || Input.GetKey(KeybindingManager.hit2) || (SettingsFileHandler.LoadSettingsFromFile().mouseHits && (Input.GetMouseButton(0) || Input.GetMouseButton(1)))))  
                 {
                     activeCubes.Remove(collision.gameObject);
                     DestroyCube(collision.gameObject);
@@ -1059,7 +1111,56 @@ private void AnimateKey(int index, ref int counter)
             float middle = Mathf.Abs(collision.offset.x);
 
             
+if (SettingsFileHandler.LoadSettingsFromFile().mouseHits) if(Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) {
+    bufferActive = false; // Reset bufferActive flag
+                if (!bufferActive)
+                {
+                sfxS.PlayOneShot(hitSounds[1]);
+                bufferActive = true;
 
+
+                if (distance < 1)
+                {
+                    combo++;
+                    if (highestCombo < combo)
+                    {
+                    highestCombo++;
+                    }
+
+                    StartCoroutine(ChangeScore(0f, new RaycastHit2D()));
+                    if (AudioManager.Instance != null && AudioManager.Instance.hits)
+                    {
+                    Instantiate(goodTextPrefab, transform.position, Quaternion.identity);
+                    }
+                    sfxS.PlayOneShot(hitSounds[1]);
+                    Animation anim = combotext.GetComponent<Animation>();
+
+                    anim.Stop("comboanim");
+                    anim.Play("comboanim");
+                }
+                else if (distance < middle && distance >= 1)
+                {
+                    sfxS.PlayOneShot(hitSounds[1]);
+                    StartCoroutine(ChangeScore(0.30f, new RaycastHit2D()));
+                    if (AudioManager.Instance != null && AudioManager.Instance.hits)
+                    {
+                    Instantiate(normalTextPrefab, transform.position, Quaternion.identity);
+                    }
+                }
+                else if (distance >= middle)
+                {
+                    sfxS.PlayOneShot(hitSounds[1]);
+                    health -= 20;
+                    combo = 0;
+                    StartCoroutine(ChangeScore(0.48f, new RaycastHit2D()));
+                    if (AudioManager.Instance != null && AudioManager.Instance.hits)
+                    {
+                    Instantiate(okTextPrefab, transform.position, Quaternion.identity);
+                    }
+                }
+                activeCubes.Add(collision.gameObject); // Mark the cube as passed
+                }
+}
             if ((Input.GetKeyDown(KeybindingManager.hit1) || Input.GetKeyDown(KeybindingManager.hit2)) && !isDying && !activeCubes.Contains(collision.gameObject))
             {
                 bufferActive = false; // Reset bufferActive flag
@@ -1110,6 +1211,13 @@ private void AnimateKey(int index, ref int counter)
                 }
                 activeCubes.Add(collision.gameObject); // Mark the cube as passed
                 }
+            }
+
+            if (SettingsFileHandler.LoadSettingsFromFile().mouseHits) if(Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1)) {
+                Color col = collision.GetComponent<SpriteRenderer>().color;
+                col = new Color(col.r, col.g, col.b, col.a / 2);
+                collision.GetComponent<SpriteRenderer>().color = col;
+                collision.enabled = false;
             }
             if ((Input.GetKeyUp(KeybindingManager.hit1) || Input.GetKeyUp(KeybindingManager.hit2)) && !isDying && activeCubes.Contains(collision.gameObject)) {
                 Color col = collision.GetComponent<SpriteRenderer>().color;

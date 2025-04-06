@@ -30,7 +30,6 @@ namespace JammerDash.Game
         private void Start()
         {
             song = AudioManager.Instance.source;
-            player.enabled = false;
             Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
             foreach (Canvas canvas in canvases)
             {
@@ -76,14 +75,13 @@ namespace JammerDash.Game
                 player0 = GameObject.FindGameObjectWithTag("Player");
             }
             song.Stop();
-            player.enabled = false;
+            player.enabled = true;
             new WaitForSecondsRealtime(0.5f);
             
-            yield return new WaitForSeconds(4f); // Delay for 4 seconds
+            yield return new WaitForSeconds(3f); // Delay for 4 seconds
 
             started = true;
             player.enabled = true; // Enable the player movement after the delay
-            GetComponent<Animator>().enabled = false;
             
             song.Play(); 
             if (File.Exists(Path.Combine(Main.gamePath, "levels", "extracted", $"{CustomLevelDataManager.Instance.ID} - {CustomLevelDataManager.Instance.levelName}", "backgroundVideo.mp4")))
