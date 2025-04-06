@@ -23,7 +23,7 @@ namespace JammerDash.Tech
         public string levelName;
         public string artist;
         public string creator;
-        public int diff;
+        public float diff;
         public int ID;
         public int playerhp;
         public float cubesize;
@@ -69,7 +69,6 @@ namespace JammerDash.Tech
                 levelName = sceneData.name;
                 creator = sceneData.creator;
                 artist = sceneData.artist;
-                diff = (int)sceneData.calculatedDifficulty;
                 ID = sceneData.ID;
                 playerhp = sceneData.playerHP != 0 ? sceneData.playerHP : 300;
                 cubesize = sceneData.boxSize != 0 ? sceneData.boxSize : 1;
@@ -121,7 +120,6 @@ namespace JammerDash.Tech
                     manager.videoPlayer.url = File.Exists(videoPath) ? videoPath : null;
                     levelName = sceneData.name;
                     creator = sceneData.creator;
-                    diff = (int)sceneData.calculatedDifficulty;
                     this.ID = sceneData.ID;
                     SceneManager.sceneLoaded += OnSceneLoaded;
                     return sceneData;
@@ -384,14 +382,14 @@ namespace JammerDash.Tech
                 if (modStates.ContainsKey(ModType.easy) && modStates[ModType.easy])
                 {
                     longCubeRenderer.size = new Vector2(width / 7 * 5, 1);
-                    collider.size = new Vector2((width / 7 * 5) + 0.25f, 0.75f);
-                    collider.offset = new Vector2(width / 1.965f / 7 * 5, 0f);
+                    collider.size = new Vector2((width / 7 * 5) - 0.25f, 0.75f);
+                    collider.offset = new Vector2(width / 2 / 7 * 5, 0f);
                     Debug.Log("Instantiated long cube");
                 }
                 else {
                 longCubeRenderer.size = new Vector2(width, 1);
-                collider.size = new Vector2(width + 0.5f, 0.75f);
-                collider.offset = new Vector2(width / 1.965f, 0f);
+                collider.size = new Vector2(width - 0.5f, 0.75f);
+                collider.offset = new Vector2(width / 2f, 0f);
                 }
                 
                 Debug.Log("Instantiated long cube");

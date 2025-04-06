@@ -46,6 +46,10 @@ namespace JammerDash.Editor
             {
                 transform.position += new Vector3(0f, jumpHeight * 2f, 0f);
             }
+            else if (Input.GetKeyDown(KeybindingManager.lowboost) && transform.position.y > 0)
+            {
+                transform.position += new Vector3(0f, jumpHeight * -2f, 0f);
+            }
             else if (Input.GetKeyDown(KeybindingManager.down) && transform.position.y > minY)
             {
                 transform.position -= new Vector3(0f, jumpHeight, 0f);
@@ -55,6 +59,10 @@ namespace JammerDash.Editor
             {
                 transform.position = new Vector3(transform.position.x, -1, transform.position.z);
 
+            } if (Input.GetKeyDown(KeybindingManager.top) && transform.position.y < 4)
+            {
+                transform.position = new Vector3(transform.position.x, 4, transform.position.z);
+
             }
 
             if (Input.GetKey(KeyCode.R))
@@ -62,10 +70,7 @@ namespace JammerDash.Editor
                 Time.timeScale = 2f;
                 AudioSource[] sources = FindObjectsByType<AudioSource>(FindObjectsSortMode.None);
 
-                foreach (AudioSource source in sources)
-                {
-                    source.pitch = 2f;
-                }
+               
             }
         }
 

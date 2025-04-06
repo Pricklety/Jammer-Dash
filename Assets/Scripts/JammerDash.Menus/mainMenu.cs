@@ -345,6 +345,7 @@ namespace JammerDash.Menus
         lookupUUID.text = $"UUID: {user.uuid}";
     }
 
+string buttonurl;
    IEnumerator LoadPfp(string uri)
 {
     using (UnityWebRequest request = UnityWebRequest.Get(uri))
@@ -362,6 +363,7 @@ namespace JammerDash.Menus
         {
             Debug.LogError($"Error downloading profile picture: {request.error} (HTTP {request.responseCode})");
             lookupPfp.texture = Resources.Load<UnityEngine.Texture>("defaultPFP");
+                    buttonurl = "";
         }
         else
         {
@@ -374,6 +376,7 @@ namespace JammerDash.Menus
             {
                 Debug.LogError("Received an HTML page instead of an image!");
                 lookupPfp.texture = Resources.Load<UnityEngine.Texture>("defaultPFP");
+                    buttonurl = "";
                 yield break;
             }
 
@@ -388,22 +391,28 @@ namespace JammerDash.Menus
                 {
                     Debug.Log("Texture downloaded and loaded successfully.");
                     lookupPfp.texture = downloadedTexture;
+                    buttonurl = uri;
                 }
                 else
                 {
                     Debug.LogError("Failed to load image into Texture2D.");
                     lookupPfp.texture = Resources.Load<UnityEngine.Texture>("defaultPFP");
+                    buttonurl = "";
                 }
             }
             else
             {
                 Debug.LogError("No data received for the texture!");
                 lookupPfp.texture = Resources.Load<UnityEngine.Texture>("defaultPFP");
+                buttonurl = "";
             }
         }
     }
 }
 
+public void OpenPFP() {
+    Application.OpenURL(buttonurl);
+}
             
     public void SetAdmin()
     {
@@ -1798,15 +1807,20 @@ public void FixedUpdate()
         }
 
         // Select a random level
-        int randomIndex = Random.Range(0, levels.Length);
-        levelRow = randomIndex;
+       int randomIndex;
+do {
+    randomIndex = Random.Range(0, levels.Length);
+} while (randomIndex == levelRow);
+
+levelRow = randomIndex;
+
 
         Debug.Log($"Random level selected: {levels[randomIndex].name}");
 
         // Change the level and play audio
         if (levels[randomIndex].GetComponent<leaderboard>().panelContainer != null)
         {
-            StartCoroutine(levels[randomIndex].PlayAudioOnlyMode());
+            StartCoroutine(levels[randomIndex].HandleButtonClick());
         }
         levels[randomIndex].Change();
     }
@@ -1849,7 +1863,7 @@ public void FixedUpdate()
                     StartCoroutine(levels[levelRow].Move(1));
                     if (AudioManager.Instance.source.clip.name != $"{levels[levelRow].GetComponent<CustomLevelScript>().sceneData.artist} - {levels[levelRow].GetComponent<CustomLevelScript>().sceneData.songName}")
                     {
-                        StartCoroutine(levels[levelRow].PlayAudioOnlyMode());
+                        StartCoroutine(levels[levelRow].HandleButtonClick());
                     }
                 }
             }
@@ -1879,10 +1893,7 @@ public void FixedUpdate()
                 afkTime += Time.unscaledDeltaTime;
                 HandleIdleAnimations();
             }
-            else
-            {
-                ResetIdleState();
-            }
+            
         }
 
         private void HandleIdleAnimations()
@@ -1892,25 +1903,23 @@ public void FixedUpdate()
                 if (!hasPlayedIdle)
                 {
                     ToggleMenuPanel(mainPanel);
-                    Cursor.visible = false;
                     idle.PlayInFixedTime("Idle");
                     hasPlayedIdle = true;
                 }
             }
-            else if (afkTime > 10f && IsPanelActive(settingsPanel, accPanel))
+            else if (afkTime > 10f && IsPanelActive(settingsPanel, accPanel, musicPanel))
             {
-                Cursor.visible = true;
                 notIdle.PlayInFixedTime("notIdle");
                 hasPlayedIdle = false;
             }
         }
-
-        private void ResetIdleState()
+        public AudioClip afkclick;
+        public void ResetIdleState()
         {
-            Cursor.visible = true;
             notIdle.PlayInFixedTime("notIdle");
             hasPlayedIdle = false;
             afkTime = 0f;
+            FindFirstObjectByType<AudioSource>().PlayOneShot(afkclick);
         }
 
         private void UpdateTimers()

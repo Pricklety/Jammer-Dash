@@ -43,7 +43,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 3082442338304
-    m_Localized: "Pres\xEB t\xFAr\xEDn d\xF3 mouse an menu\xEB v\xE1len."
+    m_Localized: "Mokto logo an menu\xEB v\xE1len."
     m_Metadata:
       m_Items: []
   - m_Id: 6902991908864
@@ -484,6 +484,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 26178270689603584
     m_Localized: Deskrypca
+    m_Metadata:
+      m_Items: []
+  - m_Id: 47772041705443328
+    m_Localized: online
     m_Metadata:
       m_Items: []
   references:

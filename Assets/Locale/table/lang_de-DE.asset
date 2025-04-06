@@ -35,7 +35,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 3082442338304
-    m_Localized: "Bewege deine Maus um das Men\xFC aufzurufen"
+    m_Localized: "Klicke auf den Logo um das Men\xFC aufzurufen"
     m_Metadata:
       m_Items: []
   - m_Id: 6902991908864
@@ -485,6 +485,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 26178270689603584
     m_Localized: Beschreibung
+    m_Metadata:
+      m_Items: []
+  - m_Id: 47772041705443328
+    m_Localized: online
     m_Metadata:
       m_Items: []
   references:

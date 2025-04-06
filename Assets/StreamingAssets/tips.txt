@@ -1,26 +1,28 @@
 [Tips]
-These notes when you click are annoying? Disable hit notes in Settings!
-Being banned only lets you play the game offline. Your scores won't be uploaded online.
-Click on your profile to enter "Community Tab"! There, you can chat with others, check your basic player stats and see the latest news!
+You find the notes when you click annoying? Disable hit notes in Settings!
+Being banned only lets you play the game offline. Your scores won't be uploaded online. It must be lonely.
+Click on your profile to enter "Community Tab"! There, you can chat with others, check your (or other's) player stats and engage!
 Follow players to be notified of their new top plays, new levels uploaded and new rates!
 Become a supporter and get access to some awesome features!
 Click H to change this text :D
 The editor guide has a lot of useful things. Make sure to check it out!
-Shift + left click changes the long cube width in the editor.
+Click the arrow keys with a selected long cube to snap it's size to the previous/next timing marker.
 To get a perfect score, destroy each box with as little mistakes as possible.
 Switch between fullscreen and windowed with "Alt+Enter"!
 Take occassional breaks. Jammer Dash isn't going to go away.
 Grinding to be the best isn't the goal. The goal is to have fun!
 Are you a fan of snow? Enable the snow option in the options to have snow falling in the menu!!
 Imported new levels? Click F5 to refresh your play screen!
-Playing ranked-only levels will give you a massive disadvantage in total player score. Play Approved, Checked and Reviewed maps as well. They give out score to your level too!
-If there's spam parts in levels you play, switch between keys (by default it's K and L, but you can change it in options).
+Playing ranked-only levels will give you a massive disadvantage in total player score. Play Approved maps as well. They give out score to your level too!
+If there's spam parts in levels you play, switch between keys (by default it's K and L, or just use mouse :D).
 If you don't like the default game keybind layout, feel free to change it in the Options
 If you ever get notified of a new update, download it. Something new just dropped!!
 Play screen is laggy? Delete the levels you don't play, your scores will still be saved online!
 Love custom things? Change your background in settings! (Upload background and toggle "Custom image" in Background Type in Settings)
 Found a bug? Report it in the Discord server!
-Hold Shift in the editor when going back to the menu to leave without saving changes!
+Hold Shift in the editor when going back to the menu to leave without saving/exporting!
+Connect your Steam account to access Multiplayer (and many more other features)!
+
 
 [old humor]
 <FUN>: Made in Austria!
@@ -92,6 +94,15 @@ Hold Shift in the editor when going back to the menu to leave without saving cha
 <FUN>: Sad to inform you that Jammer dash does NOT include a jar of strawberry jam...
 <FUN>: googoo gaagaa
 <FUN>: Jammer Hash
+<FUN>: I can't live without a fumo.
+<FUN>: I can't understand how people can be in love with Japan. OH MY GOD I LOVE JAP-
+
+
+[Brainrot]
+<FUN>: lingan guli guli guli
+<FUN>: Bombardiro Crocodilo.
+<FUN>: o i i a i o i i i a i
+
 
 [Undertale references]
 <REF>: Get dunked on.
@@ -121,13 +132,11 @@ Hold Shift in the editor when going back to the menu to leave without saving cha
 <REF>: ゴゴゴゴゴ 
 
 [Quotes from the Community (I love you guys)]
-<QUOTE>: "PRICKLETY CAN I HAVE A F*****G QUOTE MAN" -konro
-<QUOTE>: "why florida? don't y'all got alligators and shit" -konro
-<QUOTE>: "im gladnkynkom died brook" -konro
-<QUOTE>: "if you hit that subscribe button down below i will PERSONALLY send you 1000 TONS of COCAINE!!" -konro
-<QUOTE>: "call me harry hong the way i use a left well :33" -konro
 <QUOTE>: "山田リョウ大好き" -Pricklety, not noticing he's a f*****g simp. (Wait, that means I noticed now, I wrote this myself...)
 <QUOTE>: "Someone help, how does one become the one of the one" -Pricklety
 <QUOTE>: "hop on jammer dash" -themagicanimals
 <QUOTE>: "prickle works for 2 days, loses 3 days of progress" -dimi and EbenAP
 <QUOTE>: "I have two cats inside of me" -dimi
+<QUOTE>: "hello i am randomdev. ask me about my 06" -Random
+<QUOTE>: "who up jamming they dash" -Random
+<QUOTE>: "Day 102 of saying #nukepeppyshouse" -ema

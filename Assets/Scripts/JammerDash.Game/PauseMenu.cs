@@ -99,14 +99,19 @@ namespace JammerDash.Game
 
         void FixedUpdate()
         {
-            image.color = new(image.color.r, image.color.g, image.color.b, dim.value);
+            
               if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>() != null && music == null)
                 music = AudioManager.Instance.source;
         }
 
+public void UpdateDim(float value) {
+    image.color = new(image.color.r, image.color.g, image.color.b, value / 100);
+    dim.GetComponentInChildren<Text>().text = "Background visibility: " + value + "%";
+}
+
         void OnApplicationFocus(bool focus)
         {
-            if (!focus && canvas.activeSelf && GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().FindNearestCubeDistance() < 21) // Only execute when focus is lost
+            if (!focus && canvas.activeSelf && GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().FindNearestObjectDistance() < 49) // Only execute when focus is lost
             {
                 if (GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovement>().health > 0 && GameObject.FindGameObjectWithTag("Player").transform.position.x < FindFirstObjectByType<FinishLine>().transform.position.x && (GameObject.FindGameObjectWithTag("Player").transform.position != new Vector3(0, -1, 0)))
                 {

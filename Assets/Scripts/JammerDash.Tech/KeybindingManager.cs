@@ -10,7 +10,9 @@ namespace JammerDash
         [Header("Gameplay")]
         public static KeyCode up = KeyCode.W;
         public static KeyCode down = KeyCode.S;
-        public static KeyCode boost = KeyCode.Space;
+        public static KeyCode boost = KeyCode.E;
+        public static KeyCode lowboost = KeyCode.Q;
+        public static KeyCode top = KeyCode.D;
         public static KeyCode ground = KeyCode.A;
         public static KeyCode hit1 = KeyCode.K;
         public static KeyCode hit2 = KeyCode.L;
@@ -68,8 +70,8 @@ namespace JammerDash
 
         private void Awake()
         {
-            LoadKeybindingsFromJson();
             savePath = Main.gamePath + "/keybindings.json";
+            LoadKeybindingsFromJson();
             instance = this;
         }
 
@@ -80,6 +82,8 @@ namespace JammerDash
                 up = up,
                 down = down,
                 boost = boost,
+                lowboost = lowboost,
+                top = top,
                 ground = ground,
                 hit1 = hit1,
                 hit2 = hit2,
@@ -127,7 +131,9 @@ namespace JammerDash
 
                 up = data.up != KeyCode.None ? data.up : KeyCode.W;
                 down = data.down != KeyCode.None ? data.down : KeyCode.S;
-                boost = data.boost != KeyCode.None ? data.boost : KeyCode.Space;
+                boost = data.boost != KeyCode.None ? data.boost : KeyCode.E;
+                lowboost = data.lowboost != KeyCode.None ? data.lowboost : KeyCode.Q;
+                top = data.top != KeyCode.None ? data.top : KeyCode.D;
                 ground = data.ground != KeyCode.None ? data.ground : KeyCode.A;
                 hit1 = data.hit1 != KeyCode.None ? data.hit1 : KeyCode.K;
                 hit2 = data.hit2 != KeyCode.None ? data.hit2 : KeyCode.L;
@@ -158,16 +164,7 @@ namespace JammerDash
                 goToSelectedLevel = data.goToSelectedLevel != KeyCode.None ? data.goToSelectedLevel : KeyCode.F4;
                 reloadData = data.reloadData != KeyCode.None ? data.reloadData : KeyCode.F5;
 
-                Debug.Log("Loaded keybindings: up=" + up + ", down=" + down + ", boost=" + boost +
-                          ", ground=" + ground + ", hit1=" + hit1 + ", hit2=" + hit2 + ", place=" + place +
-                          ", moveCam=" + moveCam + ", moveObjectLeft=" + moveObjectLeft + ", moveObjectRight=" + moveObjectRight +
-                          ", moveObjectUp=" + moveObjectUp + ", moveObjectDown=" + moveObjectDown + ", moveObjectFast=" + moveObjectFast +
-                          ", moveObjectSlow=" + moveObjectSlow + ", selectObject=" + selectObject + ", delete=" + delete +
-                          ", deleteBPM=" + deleteBPM + ", playMode=" + playMode + ", songMode=" + songMode +
-                          ", changeLongCubeSize=" + changeLongCubeSize + ", options=" + options + ", menu=" + menu +
-                          ", nextSong=" + nextSong + ", prevSong=" + prevSong + ", pause=" + pause + ", play=" + play +
-                          ", toggleUI=" + toggleUI + ", screenshot=" + screenshot + ", reloadPlaylist=" + reloadPlaylist +
-                          ", debug=" + debug + ", goToSelectedLevel=" + goToSelectedLevel + ", reloadData=" + reloadData);
+                
             }
             else
             {
@@ -186,6 +183,10 @@ namespace JammerDash
                     return down.ToString();
                 case "boost":
                     return boost.ToString();
+                case "lowboost":
+                    return lowboost.ToString();
+                case "top":
+                    return top.ToString();
                 case "ground":
                     return ground.ToString();
                 case "hit1":
@@ -283,8 +284,14 @@ namespace JammerDash
                 case "boost":
                     boost = newKey;
                     break;
+                case "lowboost":
+                    lowboost = newKey;
+                    break;
                 case "ground":
                     ground = newKey;
+                    break;
+                case "top":
+                    top = newKey;
                     break;
                 case "hit1":
                     hit1 = newKey;
@@ -380,6 +387,8 @@ namespace JammerDash
             usedGameplayKeys.Add(up);
             usedGameplayKeys.Add(down);
             usedGameplayKeys.Add(boost);
+            usedGameplayKeys.Add(lowboost);
+            usedGameplayKeys.Add(top);
             usedGameplayKeys.Add(ground);
             usedGameplayKeys.Add(hit1);
             usedGameplayKeys.Add(hit2);
@@ -391,6 +400,8 @@ namespace JammerDash
                 "up" => up,
                 "down" => down,
                 "boost" => boost,
+                "lowboost" => lowboost,
+                "top" => top,
                 "ground" => ground,
                 "hit1" => hit1,
                 "hit2" => hit2,
@@ -430,6 +441,8 @@ namespace JammerDash
         public KeyCode up;
         public KeyCode down;
         public KeyCode boost;
+        public KeyCode lowboost;
+        public KeyCode top;
         public KeyCode ground;
         public KeyCode hit1;
         public KeyCode hit2;
