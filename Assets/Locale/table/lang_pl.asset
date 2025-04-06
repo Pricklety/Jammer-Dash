@@ -435,7 +435,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2574306774822912
-    m_Localized: "Wr\xF3\u0107 do menu\r"
+    m_Localized: "Wr\xF3\u0107 do menu\r\n"
     m_Metadata:
       m_Items: []
   - m_Id: 2574527961444352
@@ -443,7 +443,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2575739440017408
-    m_Localized: "Zawsze mo\u017Cesz spr\xF3bowa\u0107 ponownie! \nMo\u017Ce uda
+    m_Localized: "Zawsze mo\u017Cesz spr\xF3bowa\u0107 ponownie! \r\nMo\u017Ce uda
       Ci si\u0119 po restarcie?"
     m_Metadata:
       m_Items: []

@@ -175,7 +175,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 41289854840832
-    m_Localized: "Mais graves\r"
+    m_Localized: 'Mais graves
+
+'
     m_Metadata:
       m_Items: []
   - m_Id: 41482788630528
@@ -444,7 +446,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2575739440017408
     m_Localized: "Existe sempre uma pr\xF3xima vez! Talvez voc\xEA consiga se tentar
-      de novo?\r"
+      de novo?\r\n"
     m_Metadata:
       m_Items: []
   - m_Id: 2575789129936896
